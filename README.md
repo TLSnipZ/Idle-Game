@@ -1,8 +1,8 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 0 only: this application is not playable yet.**
-No game systems, persistence, timers, or gameplay data are implemented.
+idle/tycoon browser game. **Phase 1A: core economy and one starter delivery.**
+Cash is session-only and resets on reload. No buildings, persistence or timers exist.
 
 ## Development
 
@@ -12,19 +12,20 @@ Use Node 24 LTS (`.nvmrc`) and npm. Node must be at least 22.12.
 npm ci
 npm run dev
 npm run typecheck
+npm run test
 npm run build
 npm run preview
 ```
 
 `build` runs strict TypeScript checks then emits static files into `dist/`.
 Vite handles TSX directly; no additional React build plugin is needed for this
-shell. There is no router, state library, test runner or UI component library.
+shell. Vitest tests the pure domain. There is no router, state library or UI component library.
 
 ## Project map
 
 - `src/app/`: application composition and shell.
-- `src/features/`: future feature modules; currently documentation only.
-- `src/game/`: future shared domain contracts and integration.
+- `src/features/`: implemented economy and boundaries for future modules.
+- `src/game/`: minimal GameState, starter command and selectors.
 - `src/platform/`: future browser side-effect adapters.
 - `src/shared/`: shared UI/utilities when actual reuse emerges.
 - `src/assets/`: future licensed/original artwork, separate from logic.

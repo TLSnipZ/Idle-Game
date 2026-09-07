@@ -1,6 +1,6 @@
 # Feature modules
 
-Create feature folders only when their implementation is requested. Planned names:
+Economy is implemented in Phase 1A. Create other feature folders only when requested. Planned names:
 `economy`, `buildings`, `upgrades`, `cars`, `garage`, `rebirth`, `skills`,
 `territories`, `heat`, `crew`, `events`, `automation`, `achievements`, `statistics`.
 

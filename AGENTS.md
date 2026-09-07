@@ -51,8 +51,8 @@ migrations, stable content IDs and safe import failure handling. Never silently
 wipe a save or replace it before full validation. Keep run and permanent progress
 separate. Import/export codes and offline catch-up are future work, not Phase 0.
 Test domain invariants and failure boundaries when implementing real systems.
-Do not add tests merely mirroring static shell markup. No test runner is installed
-yet; add one only when behavioral tests have a concrete consumer.
+Do not add tests merely mirroring static shell markup. Vitest is installed for
+pure behavioral tests; run `npm run test` when changing domain code.
 
 ## Finish each task
 

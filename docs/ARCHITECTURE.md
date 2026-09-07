@@ -2,10 +2,9 @@
 
 ## Current implementation
 
-React + TypeScript + Vite, with strict compilation and ordinary CSS. Only
-`main.tsx`, `app/App.tsx` and styles execute. There are no game interfaces, state
-containers, tick loops, save handlers, domain calculations or feature stubs yet.
-README files retain the intended folder boundaries without unused code.
+Phase 1A adds a pure economy feature, a minimal GameState factory, one starter
+job command and selectors to the React/TypeScript/Vite shell. Local React state
+owns the runtime snapshot. No production loop, persistence or other systems exist.
 
 ## Boundaries and dependency direction
 
@@ -78,11 +77,9 @@ Use milliseconds for external timestamps/durations and explicitly named units
 such as elapsedMs and incomePerSecond. Offline catch-up must share simulation
 semantics with online play, with an explicit cap and no double counting.
 
-Choose the money representation and rounding policy before economy implementation.
-JS numbers are not an indefinite idle-game magnitude strategy. Phase 1 must state
-its supported range, overflow policy and whether scaled integers or a dedicated
-large-number type is justified. Keep numeric operations behind domain functions;
-format only at the UI boundary. No numeric library is added in Phase 0.
+Phase 1A uses exact integer cents represented as branded canonical decimal strings.
+Native BigInt is used transiently only inside the money helpers. See the numeric
+contract below. No numerical dependency or custom arbitrary-precision engine exists.
 
 ## Planned persistence contract
 
@@ -132,3 +129,83 @@ failures, storage failure and repeated offline reconciliation.
 | Local Git initialization | Empty workspace, no accessible connected repository; remote integration pending |
 
 Record future significant decisions here with rationale and migration implications.
+
+## Phase 1A decisions and contracts
+
+### Currency policy
+
+`Money` is a branded string of canonical nonnegative integer cents. Valid values
+are `"0"` or up to 100 decimal digits starting with 1–9. Maximum cash is
+(10^100 − 1) cents, or (10^98 − 0.01) dollars. This is a technical resource bound,
+not a gameplay target. Length and syntax checks precede BigInt parsing. Numbers,
+bigints, negatives, signs, leading zeros, whitespace, exponents, fractions and
+nonfinite values are rejected. Money is never converted to Number for calculations
+or display. String comparison/concatenation must never substitute for money APIs.
+
+`moneyFromMinorUnits` validates trusted literals and throws RangeError for invalid
+programmer input. `isMoney` narrows unknown external amounts. `compareMoney` uses
+exact integer comparison; `addMoney` and `subtractMoney` return explicit overflow
+or insufficient-funds results. Valid zero transfers succeed. Addition/subtraction
+are exact; fractional cents are rejected rather than rounded. There is no rounding
+or multiplication API yet. Production/modifier tasks must explicitly introduce
+fractional accrual and rounding semantics before using them.
+
+Money is a string in JSON, with no runtime brand, class, Date or BigInt in state.
+`moneyToDecimal` exposes exact fixed two-decimal text; the presentation formatter
+adds USD-style separators. Branding does not validate imported data. Future save
+loaders must validate unknown input, including every amount and state shape,
+before it reaches these typed domain APIs. A malformed authoritative cash value
+is a programming/integration error and throws; invalid transaction input is an
+expected result failure. Neither path repairs or silently clamps invalid data.
+
+The 100-digit bound already exceeds Number precision and typical early/mid idle
+progression. If more range becomes necessary, raise the bound with compatibility
+fixtures, or replace the private representation with a reviewed large-exponent
+library. Preserve economy commands/selectors as boundaries, version the future
+save schema, and migrate old integer-cent strings explicitly (including an exact
+or documented-loss conversion policy). No migrations or save versions are invented
+before persistence exists.
+
+### Ownership and transitions
+
+GameState is currently `{ economy: { cash: Money } }` only. Cash is the player's
+run balance; no separate empty player/permanent slices or redundant totals exist.
+`createInitialGameState` delegates to `createInitialEconomyState`. No schema metadata
+is needed for this in-memory-only version; schemaVersion belongs to a future save
+envelope. The state is readonly at compile time; transitions create new objects.
+
+Economy public API is exported from `features/economy/index.ts`: `readCash`,
+`earnCash`, `canAfford`, `spendCash`, the factory, config and money helpers/types.
+Amounts enter transitions as unknown to enforce runtime validation. `canAfford`
+returns false for invalid amounts; commands provide a precise error reason.
+Transitions return `{ ok: true, state }` or `{ ok: false, state, error }` with
+`invalid-amount`, `overflow` or `insufficient-funds`. On failure the exact original
+state object is returned. No partial spend, mutation or negative balance is possible
+from valid state through these APIs. Success preserves unrelated fields by spread.
+
+`game/perform-starter-job.ts` composes `earnCash` with the single configured reward.
+It preserves the whole GameState on failure. `selectCash` derives the current cash
+view without copying it into another authoritative field. Future purchases and
+automation must compose these same contracts rather than directly writing cash.
+No command bus, modifier evaluator or scheduling abstraction is introduced.
+
+`app/use-game.ts` uses one functional React state updater, so queued actions always
+consume the latest snapshot. The result/feedback wrapper belongs to the runtime,
+not GameState. There is no context or state dependency. Replacing React state later
+only changes the adapter. UI reads selectors/config and the economy's public `ui`
+entry point for formatting; pure modules never import presentation. Future feature
+UI can expose a separate `ui/index.ts` entry to preserve this separation.
+
+### Tests and scope
+
+Vitest runs pure domain and exact-formatting tests in Node with no DOM emulator,
+React rendering tests, coverage infrastructure or extra test configuration. Tests
+are colocated and included in strict TypeScript checks, but not imported into the
+application bundle. `npm run test` runs once and exits. Tests cover initial state,
+valid/repeated earning, affordability, zero/full/failed spending, malformed input,
+precision beyond 2^53, maximum values, overflow, immutable deterministic command
+results, selectors and JSON representation. Frozen inputs expose accidental mutation.
+
+Phase 1B may introduce the first business purchase once separately requested.
+Production, clocks, modifiers, automation, saves, offline progress and rebirth
+remain unimplemented. No architectural boundary has been replaced.

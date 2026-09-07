@@ -7,7 +7,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | Phase | Scope | Acceptance gate |
 | --- | --- | --- |
 | 0 — Foundation | React/TS/Vite, empty shell, boundaries, development/design docs | Strict build succeeds; no gameplay; local commit and handoff |
-| 1 — Small economic slice | Decide numeric policy; one active earning interaction and business purchase | Pure tested transitions, atomic spending, no negative/invalid funds |
+| 1A — Core economy (complete) | Exact cash, minimal GameState, safe transactions, one earning action and domain tests | Strict checks and behavioral tests pass; immutable deterministic transitions |
+| 1B — First business slice (deferred) | First business definition and purchase using existing spend contracts | Separate request; atomic ownership/cash change and purchase invariants |
 | 2 — Durable progress | Versioned local saves, validated import/export and migrations | Reload/round trip; corruption/newer versions preserve state; storage errors visible |
 | 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
@@ -19,17 +20,19 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 
 ## Current status
 
-Phase 0 implementation is complete. App shell and documentation only. No runtime
-state, income, purchase flow, modifiers, saves, offline rewards, cars or other game
-systems are implemented. No remote or deployment is configured.
+Phase 0 and Phase 1A are complete. Cash and one active delivery action exist.
+No business, production, timers, modifiers, save/load, offline rewards, or other
+future feature has been implemented. No deployment is configured.
 
 ## Next session
 
-1. Read AGENTS.md, inspect Git status and the architecture/design documents.
-2. If restoring the ZIP, clone the included Git bundle as described in README.
-3. Resolve repository URL/access before integrating with existing GitHub history.
-4. Wait for a Phase 1 request; agree on its smallest playable slice and numeric policy.
-5. Add only the domain contracts and tests needed by that slice.
+1. Read AGENTS.md, inspect Git status and the architecture/balance contracts.
+2. Restore/install with `npm ci`; run `npm run typecheck`, `npm run test`, and
+   `npm run build`. Review remote status before integrating commits.
+3. Wait for an explicit Phase 1B task. Its first business may consume `spendCash`;
+   do not mutate cash directly or add systems simply because they appear here.
+4. Decide business data and atomic purchase semantics in that task. Passive income,
+   timers and persistence remain separate future scope unless explicitly authorized.
 
 Before rebirth, explicitly decide the permanence of every owned item and currency.
 Before offline progression, define simulation/clock/cap semantics. Before saves,

@@ -1,10 +1,13 @@
 # Balancing policy
 
-## Phase 0
+## Phase 1A
 
-There are no gameplay balance values, live formulas or economy configuration yet.
-This document defines how future balance work is organized. All formulas below
-are candidate models or contract examples, not approved tuning.
+The only implemented balance values live in
+`src/features/economy/config/economy-config.ts`: initial cash is 0 cents and the
+waterfront delivery reward is 2,500 cents ($25.00). The reward validates the domain
+slice; it is provisional starter tuning, not a progression curve or clicker loop.
+No costs, production rates, cooldowns or other systems exist. Candidate models
+below remain future proposals.
 
 ## Source of truth
 
@@ -55,3 +58,25 @@ Test affordability at boundaries; no NaN/Infinity, negative funds or overflow;
 modifier stacking/expiry/scopes; active vs automated action consistency; online vs
 offline progression; prestige retention; and save migrations. Use deterministic
 fixtures and simulations for actual rules, not duplicated implementation tests.
+
+## Exact cash and limits
+
+Store canonical integer-cent strings, with at most 100 digits: 0 through
+10^100 − 1 cents. Native BigInt performs exact helper arithmetic without floating
+point drift. Equal amounts compare exactly. Add/subtract never round; fractional
+cents, Number inputs, nonfinite values, negative values and noncanonical strings
+are invalid. No implicit dollar-to-cent conversion exists. Enter config amounts
+through `moneyFromMinorUnits`; never calculate or duplicate rewards in React.
+
+Zero earns/spends succeed; insufficient funds and exceeding the maximum fail
+without changing state. Invalid amounts fail explicitly, rather than clamping.
+The numeric limit is a resource bound, not a cap designed to be reached by players.
+Balance tests pin the starter reward through repeated-action outcomes; update those
+expectations deliberately if tuning changes. Arithmetic precision fixtures are
+technical boundary values, not additional balance configuration.
+
+Future rates/modifiers need a documented fractional-cent accumulation and rounding
+policy; neither exists yet. A future representation change must preserve callers'
+economy APIs and explicitly migrate any persisted integer-cent strings. Increasing
+the digit bound also requires revisiting older-client validation. See architecture
+for serialization and error contracts. No actual save system is implemented.

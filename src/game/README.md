@@ -1,6 +1,6 @@
-# Game integration boundary — reserved
+# Game integration boundary
 
-No runtime or game state exists in Phase 0. Future shared domain contracts,
-modifier evaluation, and composition of feature transitions belong here.
-Keep domain code pure and independent of React, timers, storage, and artwork.
-Do not use this directory as a monolithic implementation of all features.
+Phase 1A owns GameState creation, the starter job coordinator and cash selectors.
+Feature rules remain in economy. Domain modules are independent of React, browser
+APIs, clocks and artwork. No other feature or persistence contract is implemented.
+See docs/ARCHITECTURE.md for state and money contracts.
