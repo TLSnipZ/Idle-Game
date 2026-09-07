@@ -6,8 +6,8 @@ The Phase 1A balance values live in
 `src/features/economy/config/economy-config.ts`: initial cash is 0 cents and the
 waterfront delivery reward is 2,500 cents ($25.00). The reward validates the domain
 slice; it is provisional starter tuning, not a progression curve or clicker loop.
-Phase 1B adds the single fixed purchase cost below. No production rates or
-cooldowns exist. Candidate models below remain future proposals.
+Phase 1B adds the single fixed purchase cost below; Phase 1C.1 adds one fixed
+production rate. No cooldowns exist. Candidate models below remain future proposals.
 
 ## Source of truth
 
@@ -75,8 +75,8 @@ Balance tests pin the starter reward through repeated-action outcomes; update th
 expectations deliberately if tuning changes. Arithmetic precision fixtures are
 technical boundary values, not additional balance configuration.
 
-Future rates/modifiers need a documented fractional-cent accumulation and rounding
-policy; neither exists yet. A future representation change must preserve callers'
+Phase 1C.1 defines exact fractional accrual for integer cents/second below. Future
+modifiers still require a separate precision and rounding policy. A future representation change must preserve callers'
 economy APIs and explicitly migrate any persisted integer-cent strings. Increasing
 the digit bound also requires revisiting older-client validation. See architecture
 for serialization and error contracts. No actual save system is implemented.
@@ -96,5 +96,36 @@ for serialization and error contracts. No actual save system is implemented.
 
 Integration tests pin six deliveries, the exact spend and duplicate-purchase
 rejection. Boundary fixtures above Number's safe-integer range verify that buying
-still preserves cents through the existing money/spend API. Phase 1C production
-and clock tuning require a separate task; no rate should be inferred from this cost.
+still preserves cents through the existing money/spend API. The explicitly chosen
+Phase 1C.1 rate follows; runtime clock tuning remains separate.
+
+## Phase 1C.1 — provisional base production
+
+Dockside Detail produces **75 cents per second ($0.75/sec)** in pure simulation.
+The rate lives only in `baseProductionCentsPerSecond` on the existing business
+config, constructed through `moneyFromMinorUnits('75')`. The $150 purchase cost
+is recovered in exactly **200 seconds (3 minutes 20 seconds)**. A $25 delivery
+still equals about 33.33 seconds of base production, so active earning retains
+value. This is one provisional rate, not a scaling or modifier system.
+
+Integer elapsed milliseconds multiply whole cents/second exactly. The intermediate
+unit is thousandths of a cent (1,000 per cent). Retain a pooled integer remainder
+0..999 in `businesses.productionRemainderMilliCents`. At 75 cents/sec, 1 ms earns
+75 remainder units; 13 ms earns 975; 14 ms credits 1 cent and retains 50. A 100 ms
+step credits 7 cents and retains 500, so a second 100 ms step credits 8 cents.
+A full second or any valid partition of it credits exactly 75 cents, without
+per-step rounding loss. Multiple rates are summed before extracting whole cents.
+
+There are no fractional-cent/second config rates, levels, bonuses, growth formulas
+or offline caps. Invalid elapsed is rejected; valid elapsed ranges from zero to
+Number.MAX_SAFE_INTEGER integer ms. Integer quotient/modulo keeps earned fractions,
+never silently clamps income. If the Money limit is exceeded, the whole transition
+fails and both cash and remainder stay unchanged. Partition equivalence assumes
+successful intervals and unchanged rates/ownership; rejected overflow intervals
+cannot be treated as partially applied. Architecture documents validation and the
+future runtime clock boundary.
+
+This rate is not active in the browser yet: no timer calls the simulation. Phase
+1C.2 will supply explicit elapsed intervals to the same domain function, without
+reimplementing the rate math or truncating stored fractions. Offline progression,
+saves and automation are not implemented.

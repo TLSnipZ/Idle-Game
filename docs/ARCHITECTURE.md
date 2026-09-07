@@ -2,10 +2,10 @@
 
 ## Current implementation
 
-Through Phase 1B, the React/TypeScript/Vite shell has pure economy and business
-ownership features, a GameState factory, a starter job and an atomic business
-purchase command. Local React state owns the runtime snapshot. No production
-loop, game clock or persistence exists.
+Through Phase 1C.1, the domain has economy and business ownership, atomic job and
+purchase commands, and pure elapsed-time production simulation. The browser still
+only exposes earning and purchasing; it never calls simulation yet. Local React
+state owns the runtime snapshot. No production loop, game clock or persistence exists.
 
 ## Boundaries and dependency direction
 
@@ -147,9 +147,9 @@ or display. String comparison/concatenation must never substitute for money APIs
 programmer input. `isMoney` narrows unknown external amounts. `compareMoney` uses
 exact integer comparison; `addMoney` and `subtractMoney` return explicit overflow
 or insufficient-funds results. Valid zero transfers succeed. Addition/subtraction
-are exact; fractional cents are rejected rather than rounded. There is no rounding
-or multiplication API yet. Production/modifier tasks must explicitly introduce
-fractional accrual and rounding semantics before using them.
+are exact; fractional cents are rejected rather than rounded. General multiplication and modifiers remain deferred. Phase 1C.1 introduces only
+the exact rate-times-elapsed accrual helper documented below; transfers still accept
+whole cents only.
 
 Money is a string in JSON, with no runtime brand, class, Date or BigInt in state.
 `moneyToDecimal` exposes exact fixed two-decimal text; the presentation formatter
@@ -207,13 +207,13 @@ valid/repeated earning, affordability, zero/full/failed spending, malformed inpu
 precision beyond 2^53, maximum values, overflow, immutable deterministic command
 results, selectors and JSON representation. Frozen inputs expose accidental mutation.
 
-Phase 1B adds the purchase slice below. Production, clocks, modifiers, automation,
-saves, offline progress and rebirth remain unimplemented. No architectural boundary
-has been replaced.
+Phase 1B adds purchases and Phase 1C.1 adds pure production below. Runtime clocks,
+modifiers, automation, saves, offline progress and rebirth remain unimplemented.
+No architectural boundary has been replaced.
 
 ## Phase 1B — first business purchase
 
-GameState now contains `economy` and `businesses: { ownedIds: BusinessId[] }`.
+Phase 1B introduced `economy` and `businesses: { ownedIds: BusinessId[] }`.
 The array is readonly in TypeScript and contains unique stable namespaced IDs,
 not duplicated prices, labels, levels or future production fields. A fresh game
 creates its own empty ownership array and keeps initial cash at zero. No Set,
@@ -269,5 +269,104 @@ exact/full/large-balance purchases, deep-frozen inputs, unchanged object identit
 on failure, duplicate requests with and without funds, deterministic results,
 selectors, JSON compatibility, and six-delivery purchase integration. Existing
 starter-job tests are adapted to the added required slice without changing reward
-rules. Phase 1C must separately define production and clock semantics; owning this
-business currently generates no income and schedules no work.
+rules. Phase 1C.1 now defines pure production below; owning this business still
+schedules no work and generates no live income in the browser.
+
+## Phase 1C.1 — deterministic elapsed production
+
+### Rate and authoritative remainder
+
+Dockside Detail adds `baseProductionCentsPerSecond: Money` to its definition,
+configured as `"75"` (75 whole cents/second, $0.75/sec). Money supplies canonical
+nonnegative integer validation and the existing 100-digit bound; the field name
+supplies the rate unit. Fractional cents per second are not supported as config
+inputs in this phase. No rate or total is copied into ownership state.
+
+BusinessState now contains `{ ownedIds, productionRemainderMilliCents }`. The
+remainder starts at 0 and is a JSON number restricted to integer 0..999, measured
+in thousandths of a cent. This tiny integer is exactly representable, never a
+floating-point fraction. It is authoritative earned cash below the whole-cent
+threshold, pooled across all producing businesses. Per-business remainders are
+unnecessary because all sources credit the same currency and no source-specific
+claim/reset mechanic exists. Purchases and starter jobs preserve this field.
+A future ownership removal or rate change must retain already-earned fractions;
+future source-specific mechanics would require an explicit state migration policy.
+
+### Shared simulation API and math
+
+`simulateElapsed(state, elapsedMs)` in `src/game/simulate-elapsed.ts` is the sole
+elapsed-time coordinator. It is independent of React, browser APIs, clocks, random
+sources and storage. `getOwnedProductionRates` in businesses is a derived selector
+with a real simulation consumer: it resolves each unique owned ID to config.
+There are no extra business definitions or unused UI selectors.
+
+`accrueProduction` in economy owns the exact financial calculation:
+
+- `R = sum(owned base rates in cents/second)`.
+- `A = R * elapsedMs + previousRemainder`, in thousandths of a cent.
+- Whole-cent income = integer quotient `A / 1000`.
+- New remainder = `A % 1000`.
+
+All sum/product/quotient/modulo arithmetic uses transient native BigInt. The
+resulting income is validated canonical Money; only the bounded 0..999 modulo
+is converted to Number. No BigInt enters state. Division truncates only the
+credited whole cents; the entire fraction remains authoritative, so nothing is
+rounded away. The helper also accepts several rate inputs for future owned
+businesses without per-source rounding. Work is O(owned business count) plus
+bounded-size integer math, never O(elapsed milliseconds) or O(tick count).
+
+For unchanged rates/ownership and accepted non-overflowing transitions, splitting
+an interval preserves both final cash and remainder. Integer quotient/remainder
+retains the exact numerator across calls, including 100+900, 500+500, 100×10, and
+1×1000 ms. The split total must itself fit the accepted elapsed range for comparison
+to a single call. If ownership/rates change between intervals, callers must split
+at that boundary; a new business cannot earn for time before it was bought.
+
+### Elapsed input and failure contract
+
+Accept only Number safe integers in [0, Number.MAX_SAFE_INTEGER] milliseconds.
+Zero (including JavaScript -0) is an identity no-op for valid state. Negative,
+fractional, nonfinite, unsafe integers, strings and BigInts return
+`{ ok: false, state: originalState, error: 'invalid-elapsed' }`. No coercion,
+rounding, cap or clock reading occurs. This is a numeric input bound, not an
+offline-reward cap. Real runtime/offline policies belong to future callers.
+
+Valid elapsed input triggers authoritative-state validation even at zero elapsed:
+existing `readCash` validates cash, owned IDs must be an array of unique known IDs,
+and the remainder must be an integer 0..999. Unknown/duplicate IDs, invalid cash,
+missing/corrupt remainder and invalid configured rates throw RangeError under the
+existing fail-loudly policy for programming/integration corruption. Invalid elapsed
+is reported first if both input and state are invalid. This is not a save importer
+or a general schema validator; externally loaded GameState must eventually be
+validated before entering domain code. Throwing never mutates the original state.
+
+Derived production beyond Money's 100 digits returns `overflow`. Otherwise the
+coordinator credits the entire whole-cent income once via `earnCash`. Any failed
+credit, including maximum-balance overflow, returns the original GameState with
+its original remainder and ownership; no partial payment or fractional advancement
+is published. Successful calls return both credited economy and new remainder
+atomically. Calls with no cash or remainder change return the original object.
+Existing EconomyError values propagate without changing the economy contract.
+
+Split-size equivalence concerns successful transitions, not sequences which cross
+the maximum balance: a failed call rejects its entire interval; earlier successful
+calls remain committed. Future callers must handle failures explicitly, never retry
+an already-applied interval, silently cap income, or discard the remainder.
+
+### Tests and Phase 1C.2 handoff
+
+Pure tests cover config, owned-rate selection, no owners, zero/invalid elapsed,
+full seconds, sub-cent carry, arbitrary partitions, sequential calls, deep-frozen
+inputs, JSON compatibility, exact large balances, maximum elapsed, income and
+cash overflow, corrupt state, invalid rates, pooled synthetic rate inputs (not
+additional businesses), and ownership/earning integration. No new dependencies.
+
+Phase 1C.2 may add the runtime adapter only when requested. It must provide explicit
+integer elapsed intervals to `simulateElapsed`, apply successful state atomically,
+and preserve fractional elapsed milliseconds at its clock boundary rather than
+rounding every callback. It must reconcile time before commands which change the
+production set. Scheduling, hidden-tab policy, clock origins and failures remain
+Phase 1C.2 decisions. No timer, timestamp, offline catch-up, save/load, modifier,
+automation or UI ticking exists in Phase 1C.1. Reload still resets the session.
+Future saves must persist the remainder with a versioned schema; no migration is
+implemented before persistence exists.

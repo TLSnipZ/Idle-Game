@@ -3,3 +3,5 @@ export { createInitialEconomyState, readCash, earnCash, canAfford, spendCash } f
 export type { EconomyState, EconomyError, EconomyTransition } from './model/economy';
 export { moneyFromMinorUnits, isMoney, compareMoney, addMoney, subtractMoney, moneyToDecimal, MAX_MONEY_DIGITS } from './model/money';
 export type { Money, MoneyResult } from './model/money';
+export { accrueProduction, isElapsedMs, MILLICENTS_PER_CENT } from './model/production';
+export type { ProductionAccrualResult } from './model/production';
