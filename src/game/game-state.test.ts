@@ -5,9 +5,9 @@ import { selectCash } from './selectors';
 import { STARTER_JOB, MAX_MONEY_DIGITS, moneyFromMinorUnits } from '../features/economy';
 
 describe('game state and starter delivery', () => {
-  it('creates only the implemented economy slice', () => {
+  it('creates only the implemented economy and businesses slices', () => {
     const state = createInitialGameState();
-    expect(state).toEqual({ economy: { cash: '0' } });
+    expect(state).toEqual({ economy: { cash: '0' }, businesses: { ownedIds: [] } });
     expect(selectCash(state)).toBe('0');
     expect(createInitialGameState().economy).not.toBe(state.economy);
   });
@@ -29,14 +29,14 @@ describe('game state and starter delivery', () => {
   });
 
   it('preserves the entire game state when the reward would overflow', () => {
-    const state = Object.freeze({ economy: Object.freeze({ cash: moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS)) }) });
+    const state = Object.freeze({ ...createInitialGameState(), economy: Object.freeze({ cash: moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS)) }) });
     const result = performStarterJob(state);
     expect(result).toEqual({ ok: false, state, error: 'overflow' });
     expect(result.state).toBe(state);
   });
 
   it('serializes losslessly as plain JSON even for huge balances', () => {
-    const state = { economy: { cash: moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS)) } };
+    const state = { ...createInitialGameState(), economy: { cash: moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS)) } };
     const parsed: unknown = JSON.parse(JSON.stringify(state));
     expect(parsed).toEqual(state);
     // This proves representability, not a save/load or validation implementation.

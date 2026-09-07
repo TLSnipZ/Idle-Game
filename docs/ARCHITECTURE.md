@@ -2,9 +2,10 @@
 
 ## Current implementation
 
-Phase 1A adds a pure economy feature, a minimal GameState factory, one starter
-job command and selectors to the React/TypeScript/Vite shell. Local React state
-owns the runtime snapshot. No production loop, persistence or other systems exist.
+Through Phase 1B, the React/TypeScript/Vite shell has pure economy and business
+ownership features, a GameState factory, a starter job and an atomic business
+purchase command. Local React state owns the runtime snapshot. No production
+loop, game clock or persistence exists.
 
 ## Boundaries and dependency direction
 
@@ -168,7 +169,7 @@ before persistence exists.
 
 ### Ownership and transitions
 
-GameState is currently `{ economy: { cash: Money } }` only. Cash is the player's
+Phase 1A introduced `{ economy: { cash: Money } }`; Phase 1B extends it below. Cash is the player's
 run balance; no separate empty player/permanent slices or redundant totals exist.
 `createInitialGameState` delegates to `createInitialEconomyState`. No schema metadata
 is needed for this in-memory-only version; schemaVersion belongs to a future save
@@ -206,6 +207,67 @@ valid/repeated earning, affordability, zero/full/failed spending, malformed inpu
 precision beyond 2^53, maximum values, overflow, immutable deterministic command
 results, selectors and JSON representation. Frozen inputs expose accidental mutation.
 
-Phase 1B may introduce the first business purchase once separately requested.
-Production, clocks, modifiers, automation, saves, offline progress and rebirth
-remain unimplemented. No architectural boundary has been replaced.
+Phase 1B adds the purchase slice below. Production, clocks, modifiers, automation,
+saves, offline progress and rebirth remain unimplemented. No architectural boundary
+has been replaced.
+
+## Phase 1B — first business purchase
+
+GameState now contains `economy` and `businesses: { ownedIds: BusinessId[] }`.
+The array is readonly in TypeScript and contains unique stable namespaced IDs,
+not duplicated prices, labels, levels or future production fields. A fresh game
+creates its own empty ownership array and keeps initial cash at zero. No Set,
+BigInt or class instance is stored; the entire state remains JSON-compatible.
+
+The `businesses` feature implements the previously planned buildings/businesses
+boundary (do not create a second parallel `buildings` module for the same ownership).
+Its config has exactly one frozen definition: `business:dockside-detail`,
+**Dockside Detail**, costing 15,000 cents ($150.00). This original waterfront
+detailing garage fits the early automotive setting; six existing deliveries fund
+it. Definition fields are only ID, name, description and canonical Money cost.
+No category is added because there is no category consumer. `findBusiness` performs
+an exact lookup and returns undefined for unknown or non-string input; no registry
+framework or prototype-sensitive object indexing is needed for one definition.
+
+Public feature contracts expose definition lookup, the starter definition, types,
+`createInitialBusinessState`, `ownsBusiness`, and `prepareBusinessOwnership`.
+The latter validates existence and duplicate ownership, returning a proposed
+immutable slice only. It is not a paid purchase API; runtime callers must use the
+game coordinator. Business config/types depend only on the public economy Money
+contract. Neither feature imports the other feature's internal files, and economy
+continues to own affordability and all cash arithmetic.
+
+`game/purchase-business.ts` exposes `purchaseBusiness(state, businessId)`:
+
+1. Prepare ownership through the business public API. Unknown ID takes precedence,
+   then already-owned, before checking payment.
+2. Call existing `spendCash` with the resolved config cost. Do not subtract or
+   duplicate the economy's payment validation.
+3. Return a new GameState containing BOTH candidate slices only after success.
+   Every expected failure returns the exact original GameState and both unchanged
+   slices. No intermediate candidate is ever published to the runtime.
+
+Results follow the existing `{ ok, state, error? }` discriminated-union convention.
+Expected failures are `unknown-business`, `already-owned`, and
+`insufficient-funds`; the type also propagates existing EconomyError values
+(`invalid-amount`, `overflow`) without recreating or changing economy rules.
+Valid frozen config cannot produce those latter errors in this slice. Malformed
+authoritative state remains a programming/integration error under Phase 1A policy;
+this phase does not add an import validator or a save schema migration.
+
+`selectOwnsBusiness` and `selectCanPurchaseBusiness` derive UI state from lookup,
+ownership and `canAfford`; unknown IDs return false. UI eligibility is advisory:
+the command always rechecks the latest state, including repeated queued requests.
+`useGame` uses the same functional state updater for earning and purchasing. Its
+result union is runtime-only; no global bus or new state library is introduced.
+`BusinessCard` renders the single definition with price, affordability and owned
+status. There are no placeholder cards or production rates. Ownership visibly
+persists for the current session only, and the UI continues to disclose reload reset.
+
+Tests cover config and lookup, fresh ownership, invalid IDs, insufficient funds,
+exact/full/large-balance purchases, deep-frozen inputs, unchanged object identity
+on failure, duplicate requests with and without funds, deterministic results,
+selectors, JSON compatibility, and six-delivery purchase integration. Existing
+starter-job tests are adapted to the added required slice without changing reward
+rules. Phase 1C must separately define production and clock semantics; owning this
+business currently generates no income and schedules no work.

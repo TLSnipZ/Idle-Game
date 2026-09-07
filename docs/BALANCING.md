@@ -2,12 +2,12 @@
 
 ## Phase 1A
 
-The only implemented balance values live in
+The Phase 1A balance values live in
 `src/features/economy/config/economy-config.ts`: initial cash is 0 cents and the
 waterfront delivery reward is 2,500 cents ($25.00). The reward validates the domain
 slice; it is provisional starter tuning, not a progression curve or clicker loop.
-No costs, production rates, cooldowns or other systems exist. Candidate models
-below remain future proposals.
+Phase 1B adds the single fixed purchase cost below. No production rates or
+cooldowns exist. Candidate models below remain future proposals.
 
 ## Source of truth
 
@@ -80,3 +80,21 @@ policy; neither exists yet. A future representation change must preserve callers
 economy APIs and explicitly migrate any persisted integer-cent strings. Increasing
 the digit bound also requires revisiting older-client validation. See architecture
 for serialization and error contracts. No actual save system is implemented.
+
+## Phase 1B — provisional first acquisition
+
+- Business: **Dockside Detail** (`business:dockside-detail`), an original small
+  waterfront detailing garage chosen for the automotive/Florida setting.
+- Definition and price source: `src/features/businesses/config/business-config.ts`.
+- Purchase cost: **15,000 cents ($150.00)**, validated through `moneyFromMinorUnits`.
+- Initial cash remains **$0.00**. Each existing delivery still earns **$25.00**.
+  Exactly **six deliveries** fund the purchase; spending the exact cost leaves zero.
+- One-time ownership only: no repeat purchases, levels, scaling, refunds or pricing
+  curve. The cost is deliberately provisional and is not a realistic property valuation.
+- There is no production rate, passive income, clock, manager or offline behavior.
+  Ownership has no economic effect beyond its one-time purchase cost in this phase.
+
+Integration tests pin six deliveries, the exact spend and duplicate-purchase
+rejection. Boundary fixtures above Number's safe-integer range verify that buying
+still preserves cents through the existing money/spend API. Phase 1C production
+and clock tuning require a separate task; no rate should be inferred from this cost.
