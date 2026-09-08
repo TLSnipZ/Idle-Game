@@ -129,3 +129,9 @@ Passed: `npm ci --no-audit --no-fund`, `npm run build` (including
 checked for existing files and relative resolution beneath a repository path.
 Browser visual/interaction testing was not run; no behavioral test suite exists
 yet because Phase 0 has no gameplay behavior.
+
+
+Rebirth becomes available at Player Level 20 and Dockside Level 25. Review the
+explicit keep/lose summary before confirming: temporary progress resets, while
+vehicles, Empire Points and Rebirth count remain permanent. The reset takes effect
+only after local saving succeeds. Empire Points have no bonuses or spending yet.

@@ -364,3 +364,30 @@ simulation retains every fraction with no per-second rounding.
 The same vehicle effect applies online and during the unchanged eight-hour offline
 window. Requirements never revoke owned bonuses. No collection/set reward, equip
 restriction, vehicle progression or additional vehicle is included.
+
+
+## Phase 6A — provisional Rebirth balance
+
+Eligibility requires Player Level 20 AND Dockside Detail Level 25, centrally
+configured. No cash, vehicle, equipment or Dispatcher requirement exists.
+
+`EP gained = floor(playerLevel / 10) + floor(DocksideLevel / 10)`.
+
+| Player / Dockside level | Empire Points gained |
+| --- | --- |
+| 20 / 25 | 4 EP |
+| 37 / 48 | 7 EP |
+| 100 / 100 | 20 EP |
+
+EP and Rebirth count are exact non-negative safe integers; overflow fails without
+resetting anything. Each successful Rebirth adds its reward and one count. Thus
+4 EP then 7 EP produces 11 EP and two Rebirths. Neither currency nor count provides
+bonuses, and EP cannot be spent in Phase 6A. No XP or cash is awarded for Rebirth.
+
+Cash, business ownership/levels, all normal upgrades, Dispatcher ownership/progress,
+XP and both fractional production remainders reset. Garage ownership and permanent
+EP/count survive. A retained Vortex S9 still applies +15% when Dockside is repurchased:
+$0.75/s × 1.15 = $0.8625/s. Acquisition gates apply again to reset temporary content.
+Existing business prices, XP sources, modifier rules and eight-hour offline cap are
+unchanged. The reward formula and eligibility are provisional; skills and spending
+belong to the separately deferred Phase 6B.

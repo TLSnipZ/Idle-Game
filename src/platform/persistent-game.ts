@@ -1,3 +1,5 @@
+import { performRebirth } from '../game/rebirth';
+import type { RebirthResult } from '../game/rebirth';
 import type { OfflineProgress } from '../game/offline-progress';
 import { validateSaveCode } from '../game/save-code';
 import type { ExportResult, SaveCodeError } from '../game/save-code';
@@ -9,6 +11,10 @@ import type { BootstrapResult, LoadResult, WriteResult } from './local-save';
 
 export type ImportResult = { readonly ok: true }
   | { readonly ok: false; readonly error: SaveCodeError | 'runtime-unavailable' | 'persistence-failure'; readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
+
+export type RebirthTransactionResult = { readonly ok: true; readonly reward: number }
+  | Extract<RebirthResult, { ok: false }>
+  | { readonly ok: false; readonly error: 'runtime-unavailable' | 'persistence-failure'; readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
 
 export const AUTOSAVE_CADENCE_MS = 5_000;
 export type PersistenceStatus = Omit<Extract<BootstrapResult, { kind: 'offline-error' }>, 'state'>
@@ -110,6 +116,26 @@ export function createPersistentGame(
     startAutosave();
     return { ok: true };
   }
+  /** Called only after explicit in-app confirmation; never use execute's publish-before-save path. */
+  function rebirth(): RebirthTransactionResult {
+    if (!active || !runtime || !runtime.reconcile()) return { ok: false, error: 'runtime-unavailable' };
+    if (view.persistence.kind === 'blocked') return { ok: false, error: 'persistence-failure', detail: 'storage-conflict' };
+    const candidate = performRebirth(runtime.getSnapshot().result.state);
+    if (!candidate.ok) return candidate;
+    const commit = runtime.prepareReplacement(candidate.state);
+    if (!commit) return { ok: false, error: 'runtime-unavailable' };
+    // Normal guarded save protects corrupt/changed storage; Rebirth is not an import override.
+    const written = saves.save(candidate.state);
+    if (!written.ok) {
+      view = { ...view, persistence: written.error === 'storage-conflict'
+        ? { kind: 'blocked', error: written.error } : { kind: 'error', error: written.error } };
+      publish(view);
+      return { ok: false, error: 'persistence-failure', detail: written.error };
+    }
+    view = { ...view, persistence: { kind: 'saved' }, offline: null };
+    commit(); // Clears run events and fractional runtime time, after the durable write.
+    return { ok: true, reward: candidate.reward };
+  }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

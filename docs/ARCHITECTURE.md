@@ -1214,4 +1214,77 @@ Later artwork is intended to be detailed, real-car-inspired, lightly toon/comic
 styled, with fictional names and no unmodified manufacturer logos. No final images,
 logos or final Solara City art direction are implemented in Phase 5C.
 
-Phase 5C is complete; more vehicles, collection set bonuses and Phase 6 are deferred.
+Phase 5C is complete; more vehicles and collection set bonuses remain deferred. Phase 6A follows below.
+
+
+## Phase 6A — Rebirth and permanent progression
+
+`permanentProgression` stores only `empirePoints` and `rebirthCount`, each a
+non-negative safe integer up to Number.MAX_SAFE_INTEGER. EP is neither Money nor
+XP and has no gameplay effect or spending path yet. Player level remains derived.
+`game/rebirth.ts` owns the acquisition requirements, reward preview and pure
+`performRebirth` transition. Eligibility uses the central AND evaluator: Player
+Level 20 and Dockside Detail Level 25. Reward is integer division of player level
+by 10 plus integer division of Dockside level by 10, each floored independently.
+Cash, vehicles, upgrades and automation do not enter this formula.
+
+The exhaustive `REBIRTH_POLICY` describes every GameState slice. The transition
+constructs a fresh state and explicitly retains only garage and updated permanent
+progression. Adding a future slice requires an explicit policy decision.
+
+| Reset to fresh run | Retain permanently |
+| --- | --- |
+| Cash: zero | Exact owned vehicle IDs |
+| Businesses and their levels: absent | Previous EP plus current reward |
+| Normal upgrades: none | Previous Rebirth count plus one |
+| Dispatcher ownership: locked; progress: zero | |
+| XP: zero; derived player level: one | |
+| Both production remainder fields: zero | |
+
+Incomplete delivery progress and remaining fractional production are sacrificed.
+Vehicles remain active collection modifier sources despite now-unmet acquisition
+requirements. Rebuying level-1 Dockside with Vortex S9 yields exactly $0.8625/s
+through the existing evaluator. Temporary purchases must satisfy their gates again.
+Repeated Rebirths use the same reset, accumulating EP/count without special cases.
+Overflow fails with the original state; malformed authoritative input follows the
+existing loud validation convention without mutation.
+
+### Destructive transaction and confirmation
+
+`persistent-game.rebirth()` is separate from ordinary publish-then-autosave
+commands. It reconciles current elapsed business production and Dispatcher cash/XP,
+then re-evaluates eligibility and reward, builds the whole reset candidate, and
+uses the normal guarded save adapter. Only a successful durable write permits
+runtime replacement. The existing replacement boundary rebases monotonic timing,
+drops fractional runtime milliseconds and clears prior runtime event metadata.
+No pre-Rebirth elapsed interval enters the new run. No additional timer exists.
+
+A failed write preserves the reconciled pre-Rebirth live state and previous durable
+save, awards no EP and resets nothing. No destructive candidate is queued for retry.
+Blocked/corrupt-save sessions cannot overwrite that save through Rebirth. Normal
+runtime failure suspension still applies when pre-command reconciliation fails.
+Successful persistence records current injected wall-clock time; offline timing
+starts at that new anchor. Immediate reload cannot award pre-Rebirth progress.
+
+The compact Empire panel consumes the shared preview and policy. Review opens an
+inline accessible confirmation with the exact current reward and explicit keep/lose
+summary. Cancel affects only UI state, not clocks or saves. Confirmation reads the
+latest authoritative state again, including XP earned while it was open. Success
+reports the actual awarded reward; failures clearly report that nothing reset.
+Focus moves to Cancel on opening and returns to the heading on completion/cancel.
+Confirmation and feedback are never persisted.
+
+### Save v7 and existing simulation
+
+The same validated envelope and CE1- transport now carry schema v7. Sequential
+v1→v2→v3→v4→v5→v6→v7 migration adds zero EP/count to valid v6 saves while preserving
+all temporary state, garage, both fractions and savedAt exactly. Migration never
+performs Rebirth. Current v7 validates both permanent fields strictly; missing,
+negative, fractional, unsafe or non-number values are rejected, not repaired.
+
+Export/import preserves permanent and temporary state through the shared schema.
+Import never triggers Rebirth and historical imported timestamps award no cash,
+jobs, XP or EP; local timing starts at import time. The existing eight-hour offline
+cap, write-before-publication, one-time consumption, future-clock policy, Dispatcher
+XP and vehicle modifiers are unchanged. Offline simulation cannot increase EP/count.
+Phase 6B remains deferred: no skills, EP spending or permanent stat bonuses exist.

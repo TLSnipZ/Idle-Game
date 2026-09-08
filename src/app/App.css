@@ -153,3 +153,11 @@ h1 em { color: var(--color-cool); font-style: normal; }
   letter-spacing: .12em;
 }
 .vehicle-placeholder small { letter-spacing: normal; color: #b2b9cd; }
+
+.rebirth-panel { min-width: 0; overflow-wrap: anywhere; }
+.permanent-totals { display: flex; flex-wrap: wrap; gap: 1.5rem; font-variant-numeric: tabular-nums; }
+.permanent-totals dd { margin: .4rem 0 0; font-size: 1.4rem; color: var(--color-cool); }
+.rebirth-policy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.rebirth-policy ul { padding-left: 1.2rem; }
+.rebirth-button { border-color: #eea3c4; }
+@media (max-width: 740px) { .rebirth-policy { grid-template-columns: minmax(0, 1fr); } }
