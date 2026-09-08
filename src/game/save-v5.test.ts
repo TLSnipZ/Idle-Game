@@ -16,8 +16,8 @@ const legacy = () => ({ format: 'crime-empire-save', version: 4, savedAt: 123456
 describe('v5 progression saves', () => {
   it('migrates realistic v4 without altering any prior state or its timestamp', () => {
     const old = legacy(); const text = JSON.stringify(old);
-    const expected = { ok: true, envelope: { ...old, version: 5, state: { ...old.state, progression: { xp: 0 } } } };
-    expect(CURRENT_SAVE_VERSION).toBe(5);
+    const expected = { ok: true, envelope: { ...old, version: 6, state: { ...old.state, garage: { ownedVehicleIds: [] }, progression: { xp: 0 } } } };
+    expect(CURRENT_SAVE_VERSION).toBe(6);
     expect(parseSave(text)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(expected);
     expect(JSON.stringify(old)).toBe(text);
@@ -29,7 +29,7 @@ describe('v5 progression saves', () => {
     const code = exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 5, savedAt: 42, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 6, savedAt: 42, state } });
     expect(serialized.serialized).not.toMatch(/levelEvent|xpIntoLevel|currentLevel|progressRatio/);
   });
   it.each([-1,.5,NaN,Infinity,MAX_XP+1,'10',null,undefined])('rejects malformed XP %#', xp => {
@@ -48,6 +48,6 @@ describe('v5 progression saves', () => {
     const old = legacy();
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, automation: { ...old.state.automation, starterJobElapsedMs: -1 } } })).ok).toBe(false);
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, progression: { xp: 123 } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, version: 6 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(JSON.stringify({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

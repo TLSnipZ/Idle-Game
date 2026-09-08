@@ -1,3 +1,4 @@
+import type { GarageState } from '../features/vehicles';
 import type { ProgressionState } from '../features/progression';
 import { createInitialAutomationState } from '../features/automation';
 import type { AutomationState } from '../features/automation';
@@ -8,6 +9,7 @@ import { createInitialEconomyState } from '../features/economy';
 import type { EconomyState } from '../features/economy';
 
 export interface GameState {
+  readonly garage: GarageState;
   readonly progression: ProgressionState;
   readonly automation: AutomationState;
   readonly upgrades: UpgradeState;
@@ -16,5 +18,5 @@ export interface GameState {
 }
 
 export function createInitialGameState(): GameState {
-  return { progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
+  return { garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
 }

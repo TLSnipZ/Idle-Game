@@ -22,7 +22,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 4C — Starter-job delegation (complete) | One Delivery Dispatcher, 10-second cycle, v4 migration | Exact shared online/offline elapsed transaction, atomic failures and persistence |
 | 5A — Player XP and levels (complete) | Exact XP, three reward sources, derived levels 1–100, v5 migration | Atomic cash/XP, shared offline dispatcher XP, threshold and persistence tests |
 | 5B — Central unlock requirements (complete) | Typed AND lists, selected acquisition gates and shared presentation | Exact boundaries, atomic failures, grandfathered saves and deadlock protection |
-| Future — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
+| 5C — Vehicle collection foundation (complete) | One collectible, Garage, central requirements/modifier source, v6 migration | Atomic acquisition, exact stacking, save/runtime/offline and presentation tests |
+| Future — Collection expansion | Additional cars, final art, collections and set bonuses | Separately scoped; stable IDs and replaceable assets |
 | 6 — Permanent progression | Rebirth, reset policy, multiple skill trees, unlocks | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
 | 7 — City systems | Territories, heat, crew, random events, one at a time | Each uses public contracts, deterministic inputs and compatible saves |
 | 8 — Long-term progression | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
@@ -82,4 +83,12 @@ consideration. These are phase-specific decisions, not requests to implement now
 The user manually verified the live Phase 3A offline income and welcome-back UI
 after a hard refresh. The user also manually verified Phase 3B save migration,
 levels/costs/scaled production, reload, offline income and export/import with levels.
-The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. The user manually verified Phase 4B’s five upgrades, scoped/global production, stacked and displayed job rewards, reload, offline production and export/import in the working live build. The user manually verified Phase 4C dispatcher purchase, 10-second execution, $25/$30/$36 rewards, saved progress, offline automation, welcome-back breakdown and export/import. The user manually verified Phase 5A manual/dispatcher/business-level XP, reload, offline dispatcher XP, export/import and the player progress UI. Phase 5B has local deterministic verification; live verification is pending.
+The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. The user manually verified Phase 4B’s five upgrades, scoped/global production, stacked and displayed job rewards, reload, offline production and export/import in the working live build. The user manually verified Phase 4C dispatcher purchase, 10-second execution, $25/$30/$36 rewards, saved progress, offline automation, welcome-back breakdown and export/import. The user manually verified Phase 5A manual/dispatcher/business-level XP, reload, offline dispatcher XP, export/import and the player progress UI. The user manually verified Phase 5B player/business-level gates, requirement UI, grandfathered ownership and fresh-save progression in the working live build. Phase 5C has local deterministic verification; live verification remains pending.
+
+
+Phase 5C is complete: one provisional Vortex S9, $50,000 acquisition at Player
+Level 7 / Dockside Level 10, +15% global production through the central evaluator,
+Garage presentation and sequential v5→v6 migration. No final art, second vehicle,
+set bonuses or equipped system is included. Preserve acquisition-only gates,
+CE1-, exact fractions, command reconciliation and durable offline/import publication.
+Collection expansion and Phase 6 remain deferred pending a separate task.

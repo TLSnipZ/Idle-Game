@@ -1,3 +1,4 @@
+import type { PurchaseVehicleResult } from '../game/purchase-vehicle';
 import { newlyEligibleContent } from '../game/requirements';
 import { getLevelIncrease } from '../features/progression';
 import type { LevelIncrease } from '../features/progression';
@@ -13,7 +14,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
@@ -112,9 +113,10 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // Ownership/level/equipment/delegation changes start a new rate boundary. Runtime sub-ms
+    // Ownership/level/equipment/delegation/vehicle changes start a new rate boundary. Runtime sub-ms
     // duration is dropped; earned authoritative milli-cents are never reset.
     if (result.ok && (result.state.businesses.owned !== previous.businesses.owned
+        || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds
         || result.state.upgrades !== previous.upgrades
         || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
     snapshot = { ...snapshot, ...(result.ok ? levelEventFor(result.state) : {}), result };

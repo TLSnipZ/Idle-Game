@@ -37,11 +37,11 @@ describe('acquisition-only gates preserve live saves', () => {
     expect(simulated.ok && simulated.automation).toMatchObject({ completedJobs: 3, income: '9000' });
     expect(reconcileOffline(state,0,25000).state).toEqual(simulated.state);
   });
-  it('retains v5/CE1 and exact gated ownership on roundtrip even without any business', () => {
+  it('retains current schema/CE1 and exact gated ownership on roundtrip even without any business', () => {
     const state={ ...grandfathered(), businesses: createInitialGameState().businesses };
-    expect(CURRENT_SAVE_VERSION).toBe(5);
+    expect(CURRENT_SAVE_VERSION).toBe(6);
     const serialized=serializeSave(state,42); if (!serialized.ok) throw Error('fixture');
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 5, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 6, state } });
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));

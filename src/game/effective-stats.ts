@@ -1,3 +1,4 @@
+import { findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
 import { findBusiness, getLevelProduction, getOwnedProductionInputs } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
@@ -9,12 +10,20 @@ import type { GameState } from './game-state';
 export function collectModifiers(state: GameState): readonly Modifier[] {
   if (!Array.isArray(state.upgrades.purchasedIds)) throw new RangeError('Invalid authoritative upgrade ownership');
   const seen = new Set<string>();
-  return state.upgrades.purchasedIds.map(id => {
+  const upgrades = state.upgrades.purchasedIds.map(id => {
     const upgrade = findUpgrade(id);
     if (!upgrade || seen.has(id)) throw new RangeError('Invalid authoritative upgrade ownership');
     seen.add(id);
     return upgrade.modifier;
   });
+  if (!Array.isArray(state.garage.ownedVehicleIds)) throw new RangeError('Invalid authoritative vehicle ownership');
+  const vehicles = state.garage.ownedVehicleIds.map(id => {
+    const vehicle = findVehicle(id);
+    if (!vehicle || seen.has(id)) throw new RangeError('Invalid authoritative vehicle ownership');
+    seen.add(id);
+    return vehicle.modifier;
+  });
+  return [...upgrades, ...vehicles];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
   const business = findBusiness(id);

@@ -1,3 +1,5 @@
+import { findVehicle } from '../features/vehicles';
+import type { VehicleId } from '../features/vehicles';
 import { isXp } from '../features/progression';
 import { createInitialAutomationState, isAutomationState } from '../features/automation';
 import { findUpgrade } from '../features/upgrades';
@@ -9,7 +11,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 5;
+export const CURRENT_SAVE_VERSION = 6;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -42,7 +44,7 @@ export function isSaveTimestamp(value: unknown): value is number {
 function validateState(value: unknown, version: number): GameState | null {
   const legacy = version === 1;
   const hasModifiers = version >= 3;
-  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : [])])) return null;
+  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : []), ...(version >= 6 ? ['garage'] : [])])) return null;
   const { economy, businesses } = value;
   if (!record(economy) || !keys(economy, ['cash']) || !isMoney(economy.cash)
       || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents', ...(hasModifiers ? ['productionRemainderSubMilliCents'] : [])])) return null;
@@ -83,7 +85,16 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isAutomationState(automation)) return null;
   const progression = version >= 5 ? value.progression : { xp: 0 };
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
-  return { progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  const ownedVehicleIds: VehicleId[] = [];
+  if (version >= 6) {
+    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds']) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
+    for (const id of value.garage.ownedVehicleIds) {
+      const vehicle = findVehicle(id);
+      if (!vehicle || ownedVehicleIds.includes(vehicle.id)) return null;
+      ownedVehicleIds.push(vehicle.id);
+    }
+  }
+  return { garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -103,7 +114,13 @@ function migrateV3ToV4(value: unknown): unknown {
   if (!valid) return null;
   return { economy: valid.economy, businesses: valid.businesses, upgrades: valid.upgrades, automation: valid.automation };
 }
-function migrateV4ToV5(value: unknown): GameState | null { return validateState(value, 4); }
+function migrateV4ToV5(value: unknown): unknown {
+  const valid = validateState(value, 4);
+  if (!valid) return null;
+  return { economy: valid.economy, businesses: valid.businesses, upgrades: valid.upgrades,
+    automation: valid.automation, progression: valid.progression };
+}
+function migrateV5ToV6(value: unknown): GameState | null { return validateState(value, 5); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -120,6 +137,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 2) migrated = migrateV2ToV3(migrated);
   if (value.version <= 3) migrated = migrateV3ToV4(migrated);
   if (value.version <= 4) migrated = migrateV4ToV5(migrated);
+  if (value.version <= 5) migrated = migrateV5ToV6(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

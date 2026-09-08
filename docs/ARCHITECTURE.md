@@ -50,7 +50,7 @@ strings, functions, assets or React elements in save data.
 
 Phase 4A implements the shared stat contract in `game/modifiers.ts`, with source
 collection in `game/effective-stats.ts`. Only `business-production` and `job-reward`
-exist. Purchased equipment is the only source; future implemented sources join the
+exist. Purchased equipment and owned vehicles are sources; future implemented sources join the
 same collector, never mutate cash/rates directly. Full precision, stacking and
 migration decisions are documented in the Phase 4A section below. This supersedes
 the Phase 0 proposal of separate flat/additive-percent/factor operations: flat additions and
@@ -1149,3 +1149,69 @@ remains ungated and awards cash/XP, ensuring a fresh player can buy Dockside and
 reach Level 2 without gated content. Future businesses and separately implemented
 cars/skills/districts can declare these same typed AND lists; none are added here.
 Phase 5B is complete. The next phase requires a new task.
+
+
+## Phase 5C — vehicle collection and Garage
+
+GameState adds only `garage: { ownedVehicleIds: VehicleId[] }`. Ownership IDs are
+unique, stable and namespaced; prices, requirements, effects, labels and artwork
+are never duplicated in state. The vehicles feature exposes its typed definition,
+explicitly ordered catalog and lookup through its public API. There is exactly one
+provisional collectible: Vortex S9 (`vehicle:starter-sport-sedan`). No equipped slot,
+capacity, vehicle levels, selling or set bonuses exist; all owned bonuses are passive.
+
+`purchaseVehicle(state, id)` validates identity/duplicate ownership, calls the same
+`evaluateRequirements` used by other purchases, then spends through `spendCash`.
+Cash and ownership publish together. Expected failures are `unknown-vehicle`,
+`already-owned`, `prerequisite-not-met` (structured RequirementResult) and existing
+economy errors including `insufficient-funds`. The original state is retained on
+failure; acquisition awards no XP and never resets earned fractions or delegation.
+Requirements apply only to purchase. Known owned vehicles remain valid and active
+when imported below the acquisition gates, just like grandfathered upgrades.
+
+The sole modifier collector now combines purchased upgrades and owned vehicles,
+resolving definitions and rejecting unknown/duplicate authoritative IDs. Both sources
+enter the unchanged `evaluateStat`: flats first, then exact multiplicative basis-point
+factors, stable modifier-ID order within each group, no intermediate rounding.
+The sedan supplies one +15% global business-production modifier (1,500 basis points).
+There is no car-specific production path or stored multiplier. Job Money/XP is
+unaffected. Business production still goes through `simulateElapsed`, retaining
+both the integer milli-cent carry and reduced rational sub-milli-cent carry.
+
+Vehicle commands use the existing runtime execute boundary: reconcile with old
+ownership first, acquire, then produce with the new modifier. As with other rate
+changes, only the runtime's unapplied sub-millisecond duration is dropped at the
+boundary; authoritative earned fractions survive. No scheduler is added.
+The shared eight-hour offline window, Dispatcher jobs/XP, future-clock handling,
+one-time timestamp consumption and durable write-before-publication remain intact.
+
+### Save v6 and presentation identity
+
+The shape change requires **v6**. The sequential v1→v2→v3→v4→v5→v6 pipeline validates
+each historical shape; v5 gains an empty garage, preserving cash, XP, business
+levels, upgrades, automation progress, both production fractions and savedAt exactly.
+The v4→v5 step still emits the historical v5 shape before the new step. No offline
+time is lost through migration. Current validation requires the garage's sole
+ownership field and rejects unknown/duplicate IDs and malformed structures. It does
+not evaluate acquisition requirements. Retiring/changing a persistent vehicle ID
+requires an explicit migration; changing its name or art does not.
+
+Local saves, autosave and CE1- export/import all use this one schema. Export
+reconciles current state first. Import preserves vehicle ownership, writes before
+replacement and rebases active/local timing; historical imported timestamps award
+no Money, jobs or XP. The vehicle effect is active immediately after replacement.
+
+The Garage section uses pure `selectGarage` counts and `selectVehicle` purchase
+presentation, the shared RequirementList, explicit owned/locked/insufficient-cash
+text, semantic buttons and the existing mobile/focus styles. Owned cards omit buy
+controls. Modifier breakdown names resolve both upgrade and vehicle source IDs.
+Level-up eligibility feedback includes the vehicle in explicit catalog order.
+
+`app/vehicle-artwork.ts` is a presentation-only registry keyed by stable VehicleId.
+Its neutral CSS placeholder can later resolve imported images without changing any
+save or formula. The temporary display name and final catalog/art are replaceable.
+Later artwork is intended to be detailed, real-car-inspired, lightly toon/comic
+styled, with fictional names and no unmodified manufacturer logos. No final images,
+logos or final Solara City art direction are implemented in Phase 5C.
+
+Phase 5C is complete; more vehicles, collection set bonuses and Phase 6 are deferred.

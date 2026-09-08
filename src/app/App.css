@@ -140,3 +140,16 @@ h1 em { color: var(--color-cool); font-style: normal; }
 
 .requirements ul { padding-left: 1.2rem; overflow-wrap: anywhere; }
 .unlock-feedback { display: block; margin-top: .35rem; }
+
+/* Deliberately neutral collection treatment; final artwork is replaceable. */
+.garage { min-width: 0; }
+.garage > .panel-heading { flex-wrap: wrap; gap: .75rem; }
+.vehicle-card { min-width: 0; overflow-wrap: anywhere; }
+.vehicle-card.is-owned { border-color: var(--color-cool); }
+.vehicle-placeholder {
+  min-height: 8rem; display: flex; flex-direction: column; justify-content: flex-end;
+  gap: .5rem; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: .75rem;
+  background: linear-gradient(125deg, #163237, #171627 70%); color: #c0d9db;
+  letter-spacing: .12em;
+}
+.vehicle-placeholder small { letter-spacing: normal; color: #b2b9cd; }

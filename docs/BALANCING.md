@@ -341,3 +341,26 @@ is a separate check. Fresh players can earn manually, acquire Dockside after six
 base deliveries while still Level 1, and reach Level 2 after ten total deliveries.
 No XP reward or income bonus is granted merely for becoming eligible.
 These gates are provisional content balancing. No new content is introduced.
+
+
+## Phase 5C — provisional first collectible vehicle
+
+Exactly one vehicle, **Vortex S9** (`vehicle:starter-sport-sedan`), is a temporary
+fictional performance-sedan identity. Price: **5,000,000 cents ($50,000)**, purchased
+once. Acquisition requires **Player Level 7 (3,600 XP)**, **Dockside ownership** and
+**Dockside Level 10**. This is a milestone after early equipment and delegation;
+all price, label and art choices are provisional. Existing content costs, gates,
+XP rewards, business levels and Dispatcher timing remain unchanged.
+
+Ownership provides **+15% global business production**, exactly the factor
+`11500/10000 = 23/20`, through the central modifier evaluator. It awards no XP and
+does not affect delivery rewards. At Dockside Level 4 with washer, detailing line,
+logistics and vehicle, effective production is exactly
+`$3 × 1.25 × 1.50 × 1.10 × 1.15 = $7.115625/sec`.
+This is a mathematical/grandfathered-ownership example; acquiring the vehicle
+normally requires Dockside Level 10. UI may show `≈$7.1156/sec`; authoritative
+simulation retains every fraction with no per-second rounding.
+
+The same vehicle effect applies online and during the unchanged eight-hour offline
+window. Requirements never revoke owned bonuses. No collection/set reward, equip
+restriction, vehicle progression or additional vehicle is included.

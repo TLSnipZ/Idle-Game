@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 5B: level-gated unlock requirements.**
+idle/tycoon browser game. **Phase 5C: vehicle collection and Garage foundation.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -18,6 +18,11 @@ Dockside Level 5; Fleet Logistics requires an owned business, Commercial Pressur
 Washer and Player Level 5. Cards show each requirement separately from affordability.
 Dockside and Express Tips remain ungated. These are purchase requirements only:
 already-owned upgrades and automation stay active, including in older saves.
+The Garage introduces one provisional collectible, **Vortex S9**, for **$50,000**.
+It requires Player Level 7 and Dockside Level 10, and adds **+15% global business
+production** while owned, including offline. Vehicles persist through reload and
+save codes; older saves gain an empty garage. Its display name/art are temporary;
+there are no equip slots or set bonuses.
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, businesses and the dispatcher receive the same maximum **eight hours**
 of offline progress from the last successful local save. A welcome card shows
@@ -73,7 +78,9 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 10-second jobs, $25/$30/$36 evaluated rewards, saved cycle progress, offline
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
-and the player progress UI. Phase 5B live verification remains pending.
+and the player progress UI. The user verified Phase 5B level gates, requirement UI,
+grandfathered ownership and fresh-save progression live. Phase 5C live verification
+remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**

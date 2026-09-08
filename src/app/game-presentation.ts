@@ -1,3 +1,4 @@
+import { findVehicle } from '../features/vehicles';
 import { XP_REWARDS } from '../features/progression';
 import { DELIVERY_DISPATCHER } from '../features/automation';
 import { formatProduction } from './stat-format';
@@ -9,11 +10,12 @@ import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
-export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation', result: RuntimeSnapshot['result'], upgradeId?: unknown): string {
+export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown): string {
   if (result.ok) {
+    if (action === 'vehicle') return `${findVehicle(contentId)?.name ?? 'Vehicle'} added to your garage. Production bonus is active.`;
     if (action === 'automation') return `${DELIVERY_DISPATCHER.name} hired. Automated deliveries are active.`;
     if (action === 'equipment') {
-      const upgrade = findUpgrade(upgradeId);
+      const upgrade = findUpgrade(contentId);
       return `${upgrade?.name ?? 'Upgrade'} purchased. ${upgrade?.modifier.target.stat === 'job-reward' ? 'Delivery' : 'Production'} bonus is active.`;
     }
     if (action === 'upgrade') {
@@ -26,7 +28,8 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
   }
   switch (result.error) {
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
-    case 'already-owned': return 'This business is already yours.';
+    case 'already-owned': return action === 'vehicle' ? 'This vehicle is already yours.' : 'This business is already yours.';
+    case 'unknown-vehicle': return 'This vehicle is unavailable. No purchase was made.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
     case 'unknown-automation': return 'This delegation is unavailable.';
     case 'already-unlocked': return 'This dispatcher is already hired.';

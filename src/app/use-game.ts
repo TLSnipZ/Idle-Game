@@ -1,3 +1,4 @@
+import { purchaseVehicle } from '../game/purchase-vehicle';
 import { purchaseAutomation } from '../game/purchase-automation';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
 import { upgradeBusiness } from '../game/upgrade-business';
@@ -65,5 +66,13 @@ export function useGame() {
     });
   }
 
-  return { levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  function buyVehicle(id: unknown) {
+    runtime.execute(state => {
+      const result = purchaseVehicle(state, id);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeAction('vehicle', result, id) }));
+      return result;
+    });
+  }
+
+  return { buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }
