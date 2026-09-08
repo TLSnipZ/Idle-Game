@@ -125,7 +125,20 @@ successful intervals and unchanged rates/ownership; rejected overflow intervals
 cannot be treated as partially applied. Architecture documents validation and the
 future runtime clock boundary.
 
-This rate is not active in the browser yet: no timer calls the simulation. Phase
-1C.2 will supply explicit elapsed intervals to the same domain function, without
-reimplementing the rate math or truncating stored fractions. Offline progression,
-saves and automation are not implemented.
+## Phase 1C.2 — runtime cadence (no balance changes)
+
+The browser now supplies measured `performance.now()` intervals to the same
+`simulateElapsed` function every 250 ms. Four updates per second balance visible
+cash changes with mobile CPU/battery cost; cadence never defines an earning reward.
+Delayed callbacks in the same open session catch up by elapsed duration. Purchase
+and starter-job boundaries reconcile first, preventing retroactive purchase income
+and preserving accrued earnings.
+
+Fractional runtime milliseconds are retained separately from authoritative
+milli-cent production. The first purchase starts its producing interval at the
+purchase timestamp, without transferring fractional unowned time. The 75-cent/sec
+rate and 200-second payback remain unchanged. Overflow suspends the runtime with
+its last valid cash/remainder; no partial or capped credit is applied. See
+ARCHITECTURE.md for lifecycle, fractional precision and terminal failure policy.
+Reload resets the game. Offline progression, saves and automation are absent;
+Phase 1C.3 visual production feedback/polish remains deferred.

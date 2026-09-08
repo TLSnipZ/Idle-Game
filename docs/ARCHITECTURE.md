@@ -2,10 +2,10 @@
 
 ## Current implementation
 
-Through Phase 1C.1, the domain has economy and business ownership, atomic job and
-purchase commands, and pure elapsed-time production simulation. The browser still
-only exposes earning and purchasing; it never calls simulation yet. Local React
-state owns the runtime snapshot. No production loop, game clock or persistence exists.
+Through Phase 1C.2, the domain has economy and business ownership, atomic job and
+purchase commands, and pure elapsed-time production simulation. A per-mount browser
+adapter drives live production and reconciles before player commands. React state
+renders published snapshots. No persistence or offline progression exists.
 
 ## Boundaries and dependency direction
 
@@ -190,10 +190,12 @@ view without copying it into another authoritative field. Future purchases and
 automation must compose these same contracts rather than directly writing cash.
 No command bus, modifier evaluator or scheduling abstraction is introduced.
 
-`app/use-game.ts` uses one functional React state updater, so queued actions always
-consume the latest snapshot. The result/feedback wrapper belongs to the runtime,
-not GameState. There is no context or state dependency. Replacing React state later
-only changes the adapter. UI reads selectors/config and the economy's public `ui`
+Phase 1A used a functional React updater for latest-state command ordering.
+Phase 1C.2 preserves that guarantee with a synchronous per-hook runtime adapter
+(see below), keeping timing side effects out of React updater replay. The
+result/feedback wrapper belongs to the runtime, not GameState. There is no context
+or state library dependency. Replacing React state later only changes the adapter.
+UI reads selectors/config and the economy's public `ui`
 entry point for formatting; pure modules never import presentation. Future feature
 UI can expose a separate `ui/index.ts` entry to preserve this separation.
 
@@ -207,8 +209,9 @@ valid/repeated earning, affordability, zero/full/failed spending, malformed inpu
 precision beyond 2^53, maximum values, overflow, immutable deterministic command
 results, selectors and JSON representation. Frozen inputs expose accidental mutation.
 
-Phase 1B adds purchases and Phase 1C.1 adds pure production below. Runtime clocks,
-modifiers, automation, saves, offline progress and rebirth remain unimplemented.
+Phase 1B adds purchases, Phase 1C.1 adds pure production, and Phase 1C.2 adds the
+browser runtime below. Modifiers, automation, saves, offline progress and rebirth
+remain unimplemented.
 No architectural boundary has been replaced.
 
 ## Phase 1B — first business purchase
@@ -258,8 +261,8 @@ this phase does not add an import validator or a save schema migration.
 `selectOwnsBusiness` and `selectCanPurchaseBusiness` derive UI state from lookup,
 ownership and `canAfford`; unknown IDs return false. UI eligibility is advisory:
 the command always rechecks the latest state, including repeated queued requests.
-`useGame` uses the same functional state updater for earning and purchasing. Its
-result union is runtime-only; no global bus or new state library is introduced.
+`useGame` routes earning and purchasing through the same runtime command boundary.
+Its result union is runtime-only; no global bus or new state library is introduced.
 `BusinessCard` renders the single definition with price, affordability and owned
 status. There are no placeholder cards or production rates. Ownership visibly
 persists for the current session only, and the UI continues to disclose reload reset.
@@ -269,8 +272,8 @@ exact/full/large-balance purchases, deep-frozen inputs, unchanged object identit
 on failure, duplicate requests with and without funds, deterministic results,
 selectors, JSON compatibility, and six-delivery purchase integration. Existing
 starter-job tests are adapted to the added required slice without changing reward
-rules. Phase 1C.1 now defines pure production below; owning this business still
-schedules no work and generates no live income in the browser.
+rules. Phase 1C.1 defines pure production below; Phase 1C.2 connects it to live
+browser income.
 
 ## Phase 1C.1 — deterministic elapsed production
 
@@ -361,12 +364,93 @@ inputs, JSON compatibility, exact large balances, maximum elapsed, income and
 cash overflow, corrupt state, invalid rates, pooled synthetic rate inputs (not
 additional businesses), and ownership/earning integration. No new dependencies.
 
-Phase 1C.2 may add the runtime adapter only when requested. It must provide explicit
-integer elapsed intervals to `simulateElapsed`, apply successful state atomically,
-and preserve fractional elapsed milliseconds at its clock boundary rather than
-rounding every callback. It must reconcile time before commands which change the
-production set. Scheduling, hidden-tab policy, clock origins and failures remain
-Phase 1C.2 decisions. No timer, timestamp, offline catch-up, save/load, modifier,
-automation or UI ticking exists in Phase 1C.1. Reload still resets the session.
-Future saves must persist the remainder with a versioned schema; no migration is
+Phase 1C.2 consumes this unchanged domain API as documented below. Future saves
+must persist the production remainder with a versioned schema; no migration is
 implemented before persistence exists.
+
+## Phase 1C.2 — browser runtime game clock
+
+### Clock, scheduler and reconciliation
+
+`src/platform/game-runtime.ts` exposes `createGameRuntime(initialState, publish,
+timing)`. The small injected `RuntimeTiming` contract supplies `now()` and
+`schedule(callback)` returning a cancellation function. The default clock is
+`performance.now()`, never `Date.now()`. `setInterval` requests a reconciliation
+every **250 ms** (four per second): adequate visible cash updates for $0.75/sec,
+with low CPU/mobile battery overhead and no 60 FPS economy. Changing scheduling
+does not change domain formulas or production amounts.
+
+Construction is side-effect free. `start()` establishes the baseline at mount,
+without startup income. Each `reconcile()` reads the clock once, adds the measured
+delta to the retained fractional runtime milliseconds, floors the total to whole
+milliseconds, and calls `simulateElapsed(latestState, wholeMs)` exactly once.
+On success it advances the baseline, retains the fraction in [0, 1), and publishes
+the complete returned state if changed. No millisecond loops or money calculations
+live here. Fractional browser timestamps retain their native Number precision;
+they are not independently rounded at every callback. For example, 0.4 + 0.4 +
+0.4 ms provides 1 ms of simulation with approximately 0.2 ms retained.
+
+Two distinct remainders must never be confused:
+
+- `remainderMs`: runtime-only fractional duration, absent from GameState/JSON.
+- `businesses.productionRemainderMilliCents`: authoritative integer 0..999
+  thousandths of a cent, preserved by the unchanged pure simulation domain.
+
+### Player command boundary
+
+`execute(command)` reconciles first, then runs the pure command against the latest
+successful snapshot. Both starter deliveries and business purchases use this path.
+A purchase cannot receive the full pre-purchase timer interval. A failed command
+still retains the production successfully reconciled before it. Timer updates
+preserve the last command's feedback rather than clearing it on each callback.
+
+When the first business is successfully purchased, the runtime clears only the
+sub-millisecond *unowned* duration: that time earned nothing and must not transfer
+to the new producer. Its production baseline is the actual purchase timestamp.
+Starter jobs and failed purchases retain fractional producing time. This handles
+the only production-set change supported now. Future rate/ownership changes must
+use this same boundary and explicitly define sub-millisecond rate-transition
+semantics before implementation; do not blindly carry old-rate time into a new
+rate. No earned milli-cent remainder is reset.
+
+### Lifecycle and state ordering
+
+`useGame` holds one stable runtime instance through a lazy state initializer;
+React state remains the render source. The instance's private synchronous snapshot
+is the latest transition source, so batched commands/timers cannot consume stale
+render snapshots. JavaScript callbacks run serially; publication updates the
+adapter before requesting a React render. The former functional-updater mechanism
+is replaced only to keep clock reads and bookkeeping out of replayable React
+updaters. Domain functions and state shape are unchanged. There is no singleton,
+external store dependency, or generic command bus.
+
+The effect starts the scheduler and returns `stop` for cleanup. Start is idempotent;
+stop cancels the interval and invalidates its callback generation. Late callbacks
+from an old generation cannot affect a restarted runtime. React development
+setup/cleanup/setup establishes a new baseline with one loop and the same valid
+snapshot; stopped time is not credited. Commands while stopped do nothing. A real
+remount/reload creates fresh state; no timestamps cross sessions. Runtime lifecycle
+and scheduler tests use deterministic clocks/fake timers; no DOM renderer or real
+sleeping is needed for these adapter contracts.
+
+### Throttling and failure policy
+
+A hidden tab remains an open session. Delayed callbacks reconcile the actual
+monotonic elapsed duration on the next callback or command; no visibility listener
+or assumed callback count is necessary. Time measurement follows the browser's
+monotonic clock (including its platform-specific sleep behavior). There is no
+wall-clock fallback, persisted timestamp, reload catch-up or offline reward.
+
+A simulation failure preserves the last valid GameState and its production
+remainder, cancels scheduling, publishes a separate `runtimeError`, and blocks
+further commands/reconciliation/restart on that instance. The failed interval is
+never marked successfully applied or replayed. This terminal session suspension
+has no recovery/retry mechanism: the UI reports it and reload starts a fresh game.
+Unapplied time is not converted to a partial credit or silently skipped to resume
+production. Nonfinite/backward/unsafe clock intervals also suspend. Authoritative
+state exceptions suspend first and are rethrown to preserve the domain's fail-loudly
+policy. Expected overflow does not throw or create a rapid retry loop.
+
+Phase 1C.2 changes only the existing session note and adds a concise runtime error
+message. Phase 1C.3 owns visual production feedback/polish; it is deferred. No
+save/load, offline progression, modifiers or automation have been introduced.

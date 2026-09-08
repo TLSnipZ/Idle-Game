@@ -7,7 +7,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { snapshot, runStarterJob, buyBusiness } = useGame();
+  const { snapshot, runtimeError, runStarterJob, buyBusiness } = useGame();
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">Skip to content</a>
@@ -28,7 +28,9 @@ export function App() {
           </button>
           <p className="session-note">Session only · Progress resets on reload.</p>
           <p role="status" className="action-status">
-            {!snapshot.ok ? 'Action could not be completed. Your cash and ownership are unchanged.' : ''}
+            {runtimeError
+              ? 'Game paused after a runtime error. Reload to start a new session.'
+              : !snapshot.ok ? 'Action could not be completed.' : ''}
           </p>
         </div>
         <BusinessCard

@@ -1,24 +1,31 @@
-import { purchaseBusiness } from '../game/purchase-business';
-import type { PurchaseBusinessResult } from '../game/purchase-business';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createInitialGameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
-import type { StarterJobResult } from '../game/perform-starter-job';
+import { purchaseBusiness } from '../game/purchase-business';
+import { createGameRuntime } from '../platform/game-runtime';
+import type { RuntimeSnapshot } from '../platform/game-runtime';
 
-// Feedback is runtime-only; it is not part of authoritative GameState.
 export function useGame() {
-  const [snapshot, setSnapshot] = useState<StarterJobResult | PurchaseBusinessResult>(() => ({
-    ok: true,
-    state: createInitialGameState(),
+  const [view, setView] = useState<RuntimeSnapshot>(() => ({
+    result: { ok: true, state: createInitialGameState() },
+    runtimeError: null,
   }));
+  // This stable, per-hook adapter serializes transitions synchronously before
+  // React batches rendering. Never perform clock side effects in a state updater.
+  const [runtime] = useState(() => createGameRuntime(view.result.state, setView));
+
+  useEffect(() => {
+    runtime.start();
+    return runtime.stop;
+  }, [runtime]);
 
   function runStarterJob() {
-    setSnapshot(previous => performStarterJob(previous.state));
+    runtime.execute(performStarterJob);
   }
 
   function buyBusiness(businessId: unknown) {
-    setSnapshot(previous => purchaseBusiness(previous.state, businessId));
+    runtime.execute(state => purchaseBusiness(state, businessId));
   }
 
-  return { snapshot, runStarterJob, buyBusiness };
+  return { snapshot: view.result, runtimeError: view.runtimeError, runStarterJob, buyBusiness };
 }

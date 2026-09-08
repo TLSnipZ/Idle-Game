@@ -18,7 +18,7 @@ export function BusinessCard({ owned, canPurchase, onPurchase }: BusinessCardPro
         {owned ? 'Acquired' : 'Buy business'}
       </button>
       <p className="session-note">
-        {owned ? 'The keys are yours. Production is not available yet.'
+        {owned ? 'Live production · Earning while this session is open.'
           : canPurchase ? 'Ready to make it yours.' : 'Complete deliveries to afford this business.'}
       </p>
     </section>
