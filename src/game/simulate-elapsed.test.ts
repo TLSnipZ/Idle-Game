@@ -24,7 +24,7 @@ function simulate(state: GameState, ms: number): GameState {
 
 function freeze(state: GameState): GameState {
   Object.freeze(state.economy);
-  Object.freeze(state.businesses.ownedIds);
+  Object.freeze(state.businesses.owned);
   Object.freeze(state.businesses);
   return Object.freeze(state);
 }
@@ -108,7 +108,7 @@ describe('elapsed production simulation', () => {
     expect(simulateElapsed(state, 123)).toEqual(simulateElapsed(state, 123));
     const result = simulate(state, 123);
     expect(result).not.toBe(state);
-    expect(result.businesses.ownedIds).toBe(state.businesses.ownedIds);
+    expect(result.businesses.owned).toBe(state.businesses.owned);
     expect(JSON.stringify(state)).toBe(before);
     const decoded: unknown = JSON.parse(JSON.stringify(result));
     expect(decoded).toEqual(result);
@@ -162,11 +162,11 @@ describe('elapsed production simulation', () => {
     expect(state.businesses.productionRemainderMilliCents).toBe(value);
   });
 
-  it('rejects unknown and duplicate owned IDs before applying any income', () => {
-    for (const ids of [[STARTER_BUSINESS.id, 'business:missing'], [STARTER_BUSINESS.id, STARTER_BUSINESS.id]]) {
+  it('rejects unknown IDs and invalid levels before applying any income', () => {
+    for (const entries of [{ 'business:missing': { level: 1 } }, { [STARTER_BUSINESS.id]: { level: 0 } }]) {
       const state = owned();
       // Simulate corrupted external data without lying to TypeScript about its validity.
-      Object.defineProperty(state.businesses, 'ownedIds', { value: ids });
+      Object.defineProperty(state.businesses, 'owned', { value: entries });
       freeze(state);
       const before = JSON.stringify(state);
       expect(() => simulateElapsed(state, 1000)).toThrow(RangeError);
@@ -174,8 +174,8 @@ describe('elapsed production simulation', () => {
     }
   });
 
-  it('rejects malformed cash, ownership arrays and missing remainder even at zero elapsed', () => {
-    for (const field of ['cash', 'ownedIds', 'productionRemainderMilliCents']) {
+  it('rejects malformed cash, ownership records and missing remainder even at zero elapsed', () => {
+    for (const field of ['cash', 'owned', 'productionRemainderMilliCents']) {
       const state = owned();
       Object.defineProperty(field === 'cash' ? state.economy : state.businesses, field, { value: undefined });
       freeze(state);

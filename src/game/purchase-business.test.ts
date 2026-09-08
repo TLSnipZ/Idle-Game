@@ -18,7 +18,7 @@ function funded(cents: string): GameState {
 
 function freezeState(state: GameState): GameState {
   Object.freeze(state.economy);
-  Object.freeze(state.businesses.ownedIds);
+  Object.freeze(state.businesses.owned);
   Object.freeze(state.businesses);
   return Object.freeze(state);
 }
@@ -60,7 +60,7 @@ describe('atomic business purchase', () => {
       const result = purchaseBusiness(state, id);
       expect(result.ok).toBe(true);
       expect(selectCash(result.state)).toBe(remaining);
-      expect(result.state.businesses.ownedIds).toEqual([id]);
+      expect(result.state.businesses.owned).toEqual({ [id]: { level: 1 } });
       expect(ownsBusiness(result.state.businesses, id)).toBe(true);
       expect(selectOwnsBusiness(result.state, id)).toBe(true);
       expect(selectCanPurchaseBusiness(result.state, id)).toBe(false);
@@ -87,7 +87,7 @@ describe('atomic business purchase', () => {
     const result = purchaseBusiness(state, id);
     expect(result).toEqual({ ok: false, state, error: 'already-owned' });
     expect(result.state).toBe(state);
-    expect(result.state.businesses.ownedIds).toEqual([id]);
+    expect(result.state.businesses.owned).toEqual({ [id]: { level: 1 } });
   });
 
   it('reaches the first purchase after six unchanged starter deliveries', () => {

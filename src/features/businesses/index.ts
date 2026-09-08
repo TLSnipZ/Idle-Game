@@ -4,3 +4,5 @@ export type { BusinessId, BusinessDefinition, BusinessState } from './model/busi
 export { prepareBusinessOwnership } from './model/prepare-business-ownership';
 export type { BusinessOwnershipError } from './model/prepare-business-ownership';
 export { getOwnedProductionRates } from './model/production';
+
+export { MAX_BUSINESS_LEVEL, isBusinessLevel, getBusinessLevel, getLevelProduction, getUpgradeCost } from './model/levels';

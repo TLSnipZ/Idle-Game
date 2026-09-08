@@ -1,11 +1,16 @@
+import { selectBusinessProgress } from '../game/selectors';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
-export function describeAction(action: 'delivery' | 'purchase', result: RuntimeSnapshot['result']): string {
+export function describeAction(action: 'delivery' | 'purchase' | 'upgrade', result: RuntimeSnapshot['result']): string {
   if (result.ok) {
+    if (action === 'upgrade') {
+      const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
+      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatCash(progress.production)}/sec.` : 'Business upgraded.';
+    }
     return action === 'delivery'
       ? `Delivery completed. +${formatCash(STARTER_JOB.reward)} earned.`
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
@@ -14,6 +19,9 @@ export function describeAction(action: 'delivery' | 'purchase', result: RuntimeS
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
     case 'already-owned': return 'This business is already yours.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
+    case 'not-owned': return 'Acquire this business before upgrading.';
+    case 'max-level-reached': return 'This business is at max level.';
+    case 'invalid-level': return 'Business level is invalid. No transaction was made.';
     case 'overflow': return 'Cash limit reached. This action could not be completed.';
     case 'invalid-amount': return 'This action could not be completed. No transaction was made.';
   }

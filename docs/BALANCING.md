@@ -157,3 +157,29 @@ the cap is consumed when the new current timestamp is durably saved. No extra
 rounding is introduced; saved fractions combine exactly with offline production.
 The welcome card's positive-whole-cent threshold affects presentation only.
 No business levels, modifiers, managers or other balance changes are included.
+
+## Phase 3B — provisional business levels
+
+The named maximum is **100** in the public business level module. Newly purchased
+Dockside Detail starts at level 1 for the unchanged **$150.00**, earning **$0.75/sec**.
+Each definition now supplies its own `baseUpgradeCost`; Dockside uses **15,000 cents**.
+For current level L below the cap, the upgrade price is exactly
+`baseUpgradeCost × L²` whole cents. There is no price at level 100. The quadratic
+curve makes the first upgrade comparable to purchase, with increasingly long waits
+later, without exponential growth or rounding. All values are provisional.
+
+| Upgrade | Exact price |
+| --- | --- |
+| 1 → 2 | $150.00 |
+| 2 → 3 | $600.00 |
+| 3 → 4 | $1,350.00 |
+| 10 → 11 | $15,000.00 |
+| 99 → 100 | $1,470,150.00 |
+
+Production is exactly `baseProductionCentsPerSecond × level`: $0.75/sec at level 1,
+$1.50/sec at level 2, $5.25/sec at level 7 and $75.00/sec at level 100. Prices and
+rates are derived, never cached in saves. BigInt-backed economy scaling preserves
+integer cents. Fractional earned milli-cents survive all upgrades and saves.
+Future businesses may set independent purchase cost, base rate and base upgrade
+cost under these shared curves. No modifiers or cap upgrades exist. The offline
+cap remains eight hours and uses these same derived production rates.

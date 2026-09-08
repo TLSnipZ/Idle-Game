@@ -1,10 +1,10 @@
-import { findBusiness } from '../features/businesses';
+import { findBusiness, isBusinessLevel } from '../features/businesses';
 import type { BusinessId } from '../features/businesses';
 import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 1;
+export const CURRENT_SAVE_VERSION = 2;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -33,23 +33,38 @@ export function isSaveTimestamp(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
-/** Validate and reconstruct only authoritative fields; never cast decoded JSON. */
-export function validateSaveState(value: unknown): GameState | null {
+/** Shared state validation; legacy ownership is accepted only by the v1 migration. */
+function validateState(value: unknown, legacy: boolean): GameState | null {
   if (!record(value) || !keys(value, ['economy', 'businesses'])) return null;
   const { economy, businesses } = value;
   if (!record(economy) || !keys(economy, ['cash']) || !isMoney(economy.cash)
-      || !record(businesses) || !keys(businesses, ['ownedIds', 'productionRemainderMilliCents'])) return null;
-  const { ownedIds, productionRemainderMilliCents: remainder } = businesses;
-  if (!Array.isArray(ownedIds) || typeof remainder !== 'number'
-      || !Number.isInteger(remainder) || remainder < 0 || remainder > 999) return null;
-  const ids: BusinessId[] = [];
-  for (const candidate of ownedIds) {
-    const business = findBusiness(candidate);
-    if (!business || ids.includes(business.id)) return null;
-    ids.push(business.id);
+      || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents'])) return null;
+  const remainder = businesses.productionRemainderMilliCents;
+  if (typeof remainder !== 'number' || !Number.isInteger(remainder) || remainder < 0 || remainder > 999) return null;
+  const owned: Partial<Record<BusinessId, { readonly level: number }>> = {};
+  if (legacy) {
+    if (!Array.isArray(businesses.ownedIds)) return null;
+    for (const id of businesses.ownedIds) {
+      const business = findBusiness(id);
+      if (!business || Object.hasOwn(owned, business.id)) return null;
+      owned[business.id] = { level: 1 };
+    }
+  } else {
+    if (!record(businesses.owned)) return null;
+    for (const id of Reflect.ownKeys(businesses.owned)) {
+      const business = findBusiness(id);
+      if (!business || typeof id !== 'string') return null;
+      const descriptor = Object.getOwnPropertyDescriptor(businesses.owned, id);
+      if (!descriptor || !Object.hasOwn(descriptor, 'value')) return null;
+      const entry: unknown = descriptor.value;
+      if (!record(entry) || !keys(entry, ['level']) || !isBusinessLevel(entry.level)) return null;
+      owned[business.id] = { level: entry.level };
+    }
   }
-  return { economy: { cash: economy.cash }, businesses: { ownedIds: ids, productionRemainderMilliCents: remainder } };
+  return { economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder } };
 }
+export function validateSaveState(value: unknown): GameState | null { return validateState(value, false); }
+function migrateV1State(value: unknown): GameState | null { return validateState(value, true); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -58,10 +73,11 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   }
   if (value.format !== SAVE_FORMAT) return { ok: false, error: 'wrong-format' };
   if (!isSaveTimestamp(value.version) || value.version < 1) return { ok: false, error: 'invalid-envelope' };
-  // v1 is the first format: there are no historical migrations to invent.
-  if (value.version !== CURRENT_SAVE_VERSION) return { ok: false, error: 'unsupported-version' };
+  // Sequential migration: validated v1 ownership becomes v2 level-1 records.
+  if (value.version > CURRENT_SAVE_VERSION) return { ok: false, error: 'unsupported-version' };
   if (!isSaveTimestamp(value.savedAt)) return { ok: false, error: 'invalid-timestamp' };
-  const state = validateSaveState(value.state);
+  const migrated = value.version === 1 ? migrateV1State(value.state) : value.state;
+  const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };
 }

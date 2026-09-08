@@ -10,7 +10,7 @@ import { createLocalSave } from './local-save';
 import { createPersistentGame, AUTOSAVE_CADENCE_MS } from './persistent-game';
 import { performStarterJob } from '../game/perform-starter-job';
 
-const owned = { ...createInitialGameState(), businesses: { ownedIds: [STARTER_BUSINESS.id], productionRemainderMilliCents: 975 } };
+const owned = { ...createInitialGameState(), businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
 function fixture(state: GameState = owned, savedAt = 1000, current = 2000) {
   const encoded = serializeSave(state, savedAt); if (!encoded.ok) throw Error('fixture');
   let raw = encoded.serialized;
@@ -129,4 +129,13 @@ it('a conflicting stored value is preserved instead of publishing the offline ca
   expect(game.getSnapshot().persistence).toEqual({ kind: 'offline-error', error: 'storage-conflict' });
   expect(game.getSnapshot().result.state).toEqual(owned);
   expect(f.storage.setItem).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+});
+
+it('offline catch-up uses saved higher levels and unchanged eight-hour cap', () => {
+  const higher = { ...owned, businesses: { ...owned.businesses, owned: { [STARTER_BUSINESS.id]: { level: 7 } } } };
+  const f = fixture(higher, 0, Number.MAX_SAFE_INTEGER); const game = f.make(); game.start();
+  expect(game.getSnapshot().result.state).toEqual(simulateElapsed(higher, 8 * 60 * 60 * 1000).state);
+  expect(game.getSnapshot().offline?.capped).toBe(true);
+  game.stop(); const again = f.make(); again.start();
+  expect(again.getSnapshot().offline?.incomeEarned).toBe('0');
 });

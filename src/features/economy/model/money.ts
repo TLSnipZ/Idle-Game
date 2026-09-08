@@ -48,3 +48,11 @@ export function moneyToDecimal(value: Money): string {
   const digits = moneyFromMinorUnits(value).padStart(3, '0');
   return `${digits.slice(0, -2)}.${digits.slice(-2)}`;
 }
+
+/** Exact nonnegative integer scaling for bounded, configured progression. */
+export function multiplyMoney(amount: Money, factor: number): MoneyResult {
+  if (!Number.isSafeInteger(factor) || factor < 0) throw new RangeError('Invalid integer money factor');
+  const value = (integer(amount) * BigInt(factor)).toString();
+  return value.length > MAX_MONEY_DIGITS ? { ok: false, error: 'overflow' }
+    : { ok: true, value: moneyFromMinorUnits(value) };
+}

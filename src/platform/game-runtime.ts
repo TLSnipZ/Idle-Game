@@ -1,3 +1,4 @@
+import type { UpgradeBusinessResult } from '../game/upgrade-business';
 import type { GameState } from '../game/game-state';
 import type { StarterJobResult } from '../game/perform-starter-job';
 import type { PurchaseBusinessResult } from '../game/purchase-business';
@@ -6,7 +7,7 @@ import type { SimulationResult } from '../game/simulate-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = StarterJobResult | PurchaseBusinessResult;
+type CommandResult = StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult;
 type RuntimeError = Extract<SimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
@@ -91,11 +92,9 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // The first producer starts at this command's actual clock boundary. A
-    // sub-ms interval with no owners has no earned value and must not become
-    // retroactive time for the new owner. Producing-session fractions persist.
-    if (result.ok && previous.businesses.ownedIds.length === 0
-        && result.state.businesses.ownedIds.length > 0) remainderMs = 0;
+    // Any ownership/level change starts a new rate boundary. Only runtime sub-ms
+    // duration is dropped; earned authoritative milli-cents are never reset.
+    if (result.ok && result.state.businesses.owned !== previous.businesses.owned) remainderMs = 0;
     snapshot = { ...snapshot, result };
     publish(snapshot);
   }

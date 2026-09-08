@@ -1,7 +1,7 @@
 export { INITIAL_CASH, STARTER_JOB } from './config/economy-config';
 export { createInitialEconomyState, readCash, earnCash, canAfford, spendCash } from './model/economy';
 export type { EconomyState, EconomyError, EconomyTransition } from './model/economy';
-export { moneyFromMinorUnits, isMoney, compareMoney, addMoney, subtractMoney, moneyToDecimal, MAX_MONEY_DIGITS } from './model/money';
+export { multiplyMoney, moneyFromMinorUnits, isMoney, compareMoney, addMoney, subtractMoney, moneyToDecimal, MAX_MONEY_DIGITS } from './model/money';
 export type { Money, MoneyResult } from './model/money';
 export { accrueProduction, isElapsedMs, MILLICENTS_PER_CENT } from './model/production';
 export type { ProductionAccrualResult } from './model/production';

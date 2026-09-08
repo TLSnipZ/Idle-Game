@@ -16,7 +16,7 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 2A — Versioned local saves (complete) | Validated v1 localStorage envelope, safe bootstrap and autosave | Exact reload without offline credit; corrupt/newer saves protected; storage/lifecycle tests |
 | 2B — Save export/import codes (complete) | Portable codes through shared validation and migration boundary | Confirmed atomic replacement, bounded UTF-8 Base64URL and deterministic failure tests |
 | 3A — Offline progression (complete) | Eight-hour bounded bootstrap through shared simulation | Exact remainder, atomic persistence and one-time consumption tests |
-| 3B — Further business progression (deferred) | Separate requested scope; no levels or modifiers implemented | Define balance and migrations before implementation |
+| 3B — Business levels (complete) | Normalized levels, exact quadratic costs and linear production | v1→v2 migration, atomic upgrades, runtime boundaries and offline/save regression tests |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
 | 5 — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
 | 6 — Permanent progression | Rebirth, reset policy, multiple skill trees, unlocks | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
@@ -53,7 +53,9 @@ write before live replacement. Clipboard failure leaves a manually copyable code
 Phase 3A is complete: valid local saves earn bounded offline production, durably
 recorded before live startup. Failed offline transactions preserve the old save
 and pause the session. Imported historical timestamps still award no income.
-Phase 3B and business levels remain deferred.
+Phase 3B is complete: purchases start at level 1, with paid upgrades through level
+100. Existing v1 saves migrate without changing cash, savedAt or earned remainder.
+No additional businesses or modifiers are implemented. Later phases remain deferred.
 
 ## Next session
 
@@ -72,3 +74,6 @@ Before rebirth, explicitly decide the permanence of every owned item and currenc
 Before offline progression, define simulation/clock/cap semantics. Before saves,
 define v1 schema and validation; every later save-shape change needs migration
 consideration. These are phase-specific decisions, not requests to implement now.
+
+The user manually verified the live Phase 3A offline income and welcome-back UI
+after a hard refresh. Phase 3B still requires live deployment verification.

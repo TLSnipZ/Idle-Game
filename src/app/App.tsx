@@ -6,13 +6,13 @@ import { STARTER_BUSINESS } from '../features/businesses';
 import { BusinessCard } from './BusinessCard';
 import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
-import { selectCash, selectOwnsBusiness, selectCanPurchaseBusiness } from '../game/selectors';
+import { selectBusinessProgress, selectCash, selectOwnsBusiness, selectCanPurchaseBusiness } from '../game/selectors';
 import { describePersistence } from './game-presentation';
 import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const paused = runtimeError !== null;
   return (
@@ -58,6 +58,8 @@ export function App() {
             </div>
           </section>
           <BusinessCard
+            progress={selectBusinessProgress(snapshot.state, STARTER_BUSINESS.id)}
+            onUpgrade={() => upgradeOwnedBusiness(STARTER_BUSINESS.id)}
             owned={owned}
             canPurchase={selectCanPurchaseBusiness(snapshot.state, STARTER_BUSINESS.id)}
             paused={paused}

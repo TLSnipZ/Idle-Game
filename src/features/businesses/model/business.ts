@@ -8,18 +8,19 @@ export interface BusinessDefinition {
   readonly description: string;
   readonly purchaseCost: Money;
   readonly baseProductionCentsPerSecond: Money;
+  readonly baseUpgradeCost: Money;
 }
 
 export interface BusinessState {
-  readonly ownedIds: readonly BusinessId[];
+  readonly owned: Readonly<Partial<Record<BusinessId, { readonly level: number }>>>;
   /** Earned fractional cash pooled across businesses, in 1/1000-cent units. */
   readonly productionRemainderMilliCents: number;
 }
 
 export function createInitialBusinessState(): BusinessState {
-  return { ownedIds: [], productionRemainderMilliCents: 0 };
+  return { owned: {}, productionRemainderMilliCents: 0 };
 }
 
 export function ownsBusiness(state: BusinessState, id: BusinessId): boolean {
-  return state.ownedIds.includes(id);
+  return Object.hasOwn(state.owned, id);
 }

@@ -3,10 +3,10 @@ import { createInitialBusinessState, findBusiness, ownsBusiness, prepareBusiness
 import { isMoney } from '../../economy';
 
 describe('business content and ownership', () => {
-  it('starts with fresh empty ownership arrays', () => {
+  it('starts with fresh empty ownership records', () => {
     const first = createInitialBusinessState();
-    expect(first).toEqual({ ownedIds: [], productionRemainderMilliCents: 0 });
-    expect(createInitialBusinessState().ownedIds).not.toBe(first.ownedIds);
+    expect(first).toEqual({ owned: {}, productionRemainderMilliCents: 0 });
+    expect(createInitialBusinessState().owned).not.toBe(first.owned);
     expect(ownsBusiness(first, STARTER_BUSINESS.id)).toBe(false);
   });
 
@@ -28,14 +28,14 @@ describe('business content and ownership', () => {
     },
   );
 
-  it('prepares only IDs without mutating or duplicating config in state', () => {
+  it('prepares level-1 records without mutating or duplicating config in state', () => {
     const state = createInitialBusinessState();
-    Object.freeze(state.ownedIds);
+    Object.freeze(state.owned);
     Object.freeze(state);
     const result = prepareBusinessOwnership(state, STARTER_BUSINESS.id);
     expect(result.ok).toBe(true);
-    expect(result.state).toEqual({ ownedIds: [STARTER_BUSINESS.id], productionRemainderMilliCents: 0 });
-    expect(state.ownedIds).toEqual([]);
+    expect(result.state).toEqual({ owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 });
+    expect(state.owned).toEqual({});
     expect(ownsBusiness(result.state, STARTER_BUSINESS.id)).toBe(true);
     const duplicate = prepareBusinessOwnership(result.state, STARTER_BUSINESS.id);
     expect(duplicate).toEqual({ ok: false, state: result.state, error: 'already-owned' });

@@ -15,6 +15,6 @@ export function prepareBusinessOwnership(state: BusinessState, id: unknown): Bus
   return {
     ok: true,
     business,
-    state: { ...state, ownedIds: [...state.ownedIds, business.id] },
+    state: { ...state, owned: { ...state.owned, [business.id]: { level: 1 } } },
   };
 }

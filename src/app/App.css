@@ -118,3 +118,6 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .offline-return p { line-height: 1.5; }
 .offline-income { color: var(--color-cool); font-size: clamp(1.5rem, 4vw, 2.5rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .offline-return button { max-width: 16rem; }
+
+.business-terms > div { min-width: 0; }
+.business-terms strong { display: block; overflow-wrap: anywhere; }

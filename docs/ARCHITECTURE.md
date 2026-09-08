@@ -6,7 +6,7 @@ Through Phase 1C.2, the domain has economy and business ownership, atomic job an
 purchase commands, and pure elapsed-time production simulation. A per-mount browser
 adapter drives live production and reconciles before player commands. React state
 renders published snapshots. Phase 2A adds validated versioned local persistence
-as documented below. Phase 3A adds bounded offline bootstrap below.
+as documented below. Phase 3A adds bounded offline bootstrap; Phase 3B adds levels and v2 migration below.
 
 ## Boundaries and dependency direction
 
@@ -713,3 +713,74 @@ Tests use fake clocks/storage/schedulers to check cap/clock boundaries, exact
 simulation equivalence, write-before-publication, rollback, one-time consumption,
 Strict Mode restart, autosave, import/reload timestamps, remainder partitioning,
 and presentation. Phase 3A is complete; Phase 3B, levels and modifiers are deferred.
+
+## Phase 3B — business level progression
+
+Current GameState replaces `businesses.ownedIds` with a single normalized
+`businesses.owned` map: `{ [businessId]: { level } }`. An absent record means unowned;
+purchase creates level 1. Levels are safe positive integers bounded by
+`MAX_BUSINESS_LEVEL = 100`. Only level and the existing pooled
+`productionRemainderMilliCents` are authoritative. No price, rate, duplicated
+ownership list or config is stored in state. Ownership transitions replace nested
+records immutably; the current stable business ID and purchase cost are unchanged.
+
+`features/businesses/model/levels.ts` derives upgrade cost and production from a
+business definition and level. Each definition supplies independent purchaseCost,
+baseProductionCentsPerSecond and baseUpgradeCost. The shared Phase 3B curve is
+quadratic: upgrading current level L costs `baseUpgradeCost * L²` cents. Production
+is `baseProductionCentsPerSecond * L` cents/second. L is checked before bounded
+integer-factor arithmetic (maximum square 9,801 for purchasable upgrades). Economic
+multiplication runs through the economy's `multiplyMoney`, using transient BigInt
+and the existing Money range/overflow policy. Invalid future configuration that
+cannot scale within Money bounds fails loudly; shipped config remains safe through
+level 100. There are no floating-point currency multipliers, unbounded powers,
+levels beyond the cap, special bonuses or modifier infrastructure.
+
+`upgradeBusiness(state, id)` validates business, ownership, level and cap, derives
+the cost, spends via `spendCash`, then returns the complete cash/level transition.
+Expected failures are unknown-business, not-owned, invalid-level,
+max-level-reached and existing economy errors (including insufficient-funds).
+Failures retain the exact original state. Simulation continues to fail loudly on
+corrupt authoritative levels, while loaded external data is strictly validated.
+`selectBusinessProgress` returns current level/rate, next rate/cost and affordability
+for real UI use. Other business helpers remain feature-public and React-independent.
+
+### Save schema v2 and compatibility
+
+`CURRENT_SAVE_VERSION` is now **2** because the authoritative ownership shape changed.
+`migrateToCurrentSave` explicitly validates the old v1 envelope and old ownedIds
+array (known, unique IDs only), converts owners to level-1 records, and validates
+the resulting v2 state. Cash, production remainder and savedAt are unchanged by
+migration. Missing/extra fields, invalid money, unknown IDs and bad levels remain
+rejected. v2 payloads cannot use v1 ownership, and unsupported future versions fail.
+No fake migrations or alternate schema path exist. Further versions must add real
+sequential validated steps after v1→v2. Local bootstrap still uses the original
+savedAt for offline catch-up, then durably writes current v2 state/current time.
+Thus migration itself neither loses absence nor silently consumes it.
+
+The **CE1-** encoding and storage key remain unchanged: transport version is
+independent of save schema version. Old save codes migrate through the same loader.
+Import still validates historical savedAt without crediting it, writes a new local
+timestamp before replacement, and resets live timing. v2 levels survive command
+saves, five-second autosave, reload, export, import and offline bootstrap.
+
+### Time and fraction boundaries
+
+Upgrade runs through the existing `execute`: reconcile whole elapsed milliseconds
+at the OLD level, then upgrade, then future time uses the NEW level. Purchase and
+upgrade never reset authoritative production milli-cents. On a successful ownership
+map change the runtime discards only the remaining **sub-millisecond runtime time**
+at that rate boundary, extending the existing first-purchase policy. This is a
+conservative loss of less than 1 ms per successful rate change, not per callback;
+it prevents old-rate fractional time from receiving the higher rate. Failed commands
+retain that runtime fraction. No new scheduling loop or production formula exists.
+With integer elapsed boundaries, online/offline partition equivalence stays exact,
+including saved fractions before an upgrade followed by scaled production after it.
+
+Offline remains `simulateElapsed` with the saved levels, the unchanged eight-hour
+cap, safe future-clock rebasing, atomic write-before-publication and one-time
+consumption. The offline algorithm and save-code transport are unchanged.
+The card shows Level, current and next production, upgrade cost, affordability and
+MAX LEVEL. Announcements reuse existing action feedback; no upgrade modal is needed.
+Phase 3B is complete. No additional business, managers, special upgrades or modifiers
+are implemented; future phases must preserve migration and rate-boundary semantics.

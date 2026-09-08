@@ -6,6 +6,7 @@ export const STARTER_BUSINESS: BusinessDefinition = Object.freeze({
   name: 'Dockside Detail',
   description: 'A compact waterfront garage with room for a wash bay and a fresh start.',
   purchaseCost: moneyFromMinorUnits('15000'),
+  baseUpgradeCost: moneyFromMinorUnits('15000'),
   baseProductionCentsPerSecond: moneyFromMinorUnits('75'),
 });
 

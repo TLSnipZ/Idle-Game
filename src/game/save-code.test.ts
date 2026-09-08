@@ -7,7 +7,7 @@ const state = createInitialGameState();
 const envelope = () => ({ format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: 42, state });
 const code = () => encodeSaveText(JSON.stringify(envelope()));
 describe('portable save transport', () => {
-  it('deterministically round trips the existing v1 envelope with the stable prefix', () => {
+  it('deterministically round trips the current envelope with the stable prefix', () => {
     const result = exportSaveCode(state, 42);
     expect(result).toEqual({ ok: true, code: code() });
     expect(exportSaveCode(state, 42)).toEqual(result);
@@ -44,9 +44,9 @@ describe('portable save transport', () => {
   it.each([
     { ...envelope(), version: CURRENT_SAVE_VERSION + 1 },
     { ...envelope(), state: { ...state, economy: { cash: '01' } } },
-    { ...envelope(), state: { ...state, businesses: { ownedIds: ['business:no'], productionRemainderMilliCents: 0 } } },
-    { ...envelope(), state: { ...state, businesses: { ownedIds: ['business:dockside-detail', 'business:dockside-detail'], productionRemainderMilliCents: 0 } } },
-    { ...envelope(), state: { ...state, businesses: { ownedIds: [], productionRemainderMilliCents: 1000 } } },
+    { ...envelope(), state: { ...state, businesses: { owned: { ['business:no']: { level: 1 } }, productionRemainderMilliCents: 0 } } },
+    { ...envelope(), state: { ...state, businesses: { owned: { ['business:dockside-detail']: { level: 0 } }, productionRemainderMilliCents: 0 } } },
+    { ...envelope(), state: { ...state, businesses: { owned: {}, productionRemainderMilliCents: 1000 } } },
     { ...envelope(), savedAt: -1 }, {}, null,
   ])('reuses the shared schema to reject invalid payload %#', value => {
     expect(validateSaveCode(encodeSaveText(JSON.stringify(value))).ok).toBe(false);
