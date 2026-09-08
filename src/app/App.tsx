@@ -3,11 +3,12 @@ import { BusinessCard } from './BusinessCard';
 import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
 import { selectCash, selectOwnsBusiness, selectCanPurchaseBusiness } from '../game/selectors';
+import { describePersistence } from './game-presentation';
 import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const paused = runtimeError !== null;
   return (
@@ -59,9 +60,10 @@ export function App() {
           />
         </div>
         <div role="alert" className={paused ? 'runtime-error' : undefined}>
-          {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload the page to start a new session. Your current progress will reset.</p></>}
+          {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload to restore the last available local save. Unsaved progress may be lost.</p></>}
         </div>
-        <p className="session-note">Session only <span aria-hidden="true">/</span> Progress resets on reload. Keep this page open to keep earning.</p>
+        <p role="status" className={persistence.kind === 'blocked' || persistence.kind === 'error' ? 'runtime-error' : 'session-note'}>{describePersistence(persistence)}</p>
+        <p className="session-note">Local progress <span aria-hidden="true">/</span> No offline earnings. Keep this page open to keep earning.</p>
       </main>
       <footer className="app-footer"><span>Crime Empire <span aria-hidden="true">/</span> Working title</span><span>Start small. Own the night.</span></footer>
     </div>

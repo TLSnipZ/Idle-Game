@@ -5,7 +5,8 @@
 Through Phase 1C.2, the domain has economy and business ownership, atomic job and
 purchase commands, and pure elapsed-time production simulation. A per-mount browser
 adapter drives live production and reconciles before player commands. React state
-renders published snapshots. No persistence or offline progression exists.
+renders published snapshots. Phase 2A adds validated versioned local persistence
+as documented below. No offline progression exists.
 
 ## Boundaries and dependency direction
 
@@ -482,3 +483,87 @@ affordability, paused status, configured values and action failure messages.
 Browser visual QA remains pending because the available browser blocked the local
 preview address. Phase 1C.4 GitHub Pages deployment is deferred; no hosting, saves
 or offline progression is introduced.
+
+## Phase 2A — versioned local save core
+
+### Schema and validation
+
+`game/save-schema.ts` owns `SAVE_FORMAT = "crime-empire-save"`,
+`CURRENT_SAVE_VERSION = 1` and the envelope `{ format, version, savedAt, state }`.
+The concrete field `version` implements the schema-version concept in the earlier
+planned contract; it is independent of package/game releases. `savedAt` is a
+nonnegative safe-integer Unix timestamp in milliseconds, supplied explicitly.
+Future timestamps are valid metadata and cause no simulated income.
+
+`MAX_SAVE_LENGTH = 65,536` bounds UTF-16 code units before JSON parsing (at most
+128 KiB for string contents). This deliberately generous bound accommodates future
+small saves while limiting corrupt input. It is not an offline cap. Parse into
+unknown, check a plain object and exact own data keys, verify format/version and
+timestamp, enter `migrateToCurrentSave`, then validate/reconstruct the entire current
+GameState. Missing and extra fields, custom prototypes/accessors, invalid money,
+unknown/duplicate IDs and noninteger/out-of-range remainders are rejected. Cash
+uses public `isMoney`; IDs resolve through public `findBusiness`. No parsed value
+is asserted to be GameState and no input is repaired. Output is a detached plain
+object with only economy.cash and businesses.ownedIds/productionRemainderMilliCents.
+
+`migrateToCurrentSave` is the explicit pure migration boundary. Only v1 exists, so
+it currently validates v1 without a transformation. Unsupported versions fail.
+When a real v2 exists, add validated sequential vN -> vN+1 transitions at this
+boundary and validate the final current shape; do not skip versions or silently
+reinterpret a newer payload. No dummy migrations or save-code format are present.
+Outgoing state and metadata are also validated before serializing.
+
+### Browser storage and failure policy
+
+`platform/local-save.ts` owns one stable key **`crime-empire:save`** in localStorage.
+`createLocalSave` injects storage access and a wall clock, defaulting to guarded
+`window.localStorage` access and `Date.now()`. Neither is read during construction.
+`load()` distinguishes loaded, empty and explicit error outcomes. `save(state)`
+constructs/validates/serializes the full v1 envelope before one atomic `setItem`;
+it never removes the old entry first. Quota, access and write errors leave gameplay
+intact, and failed localStorage writes preserve the previous stored value.
+
+Read-before-write compares the stored string with this adapter's last successfully
+loaded/written string. An observed change suspends writes with a conflict warning
+rather than overwriting another session. This is best-effort conflict detection,
+not a cross-tab transaction/lock: localStorage offers no compare-and-swap, so truly
+simultaneous writers are not fully coordinated in Phase 2A. Use one active tab.
+No backup slots, cloud synchronization or storage-event system is introduced.
+
+### Bootstrap, commands and autosave
+
+`platform/persistent-game.ts` composes the unchanged `createGameRuntime` with the
+save adapter. Its side-effect-free factory can be created by `useGame` during
+render. The mount effect loads once before starting production. A valid save is
+the initial state; empty storage starts fresh. Invalid/corrupt/future-version saves
+or storage-read failure start a safe fresh playable state with a persistent warning
+and **all writes blocked for that instance**, including successful commands.
+Nothing deletes or replaces the problematic entry, and no reset/overwrite control
+is added. Users can retain that entry for later recovery; a subsequent page load
+validates it again. Dismissing a warning is not treated as permission to erase data.
+
+Successful meaningful commands still run through the original runtime's
+reconcile-before-command boundary. The wrapper saves only after execute returns,
+using its latest published post-command state; failed/no-op commands do not save.
+A separate five-second persistence interval calls the existing `reconcile()` once
+and then saves the resulting state. It does not calculate production or replace
+the 250 ms production scheduler. Write errors retry on the next normal command or
+five-second autosave; there is no rapid retry loop. Runtime simulation failure
+prevents further autosaves. Persistence status is runtime-only and never GameState.
+
+Start is idempotent. Stop cancels autosave, invalidates old callback generations,
+and stops the original runtime. Strict Mode setup/cleanup/setup neither reloads
+over newer in-memory state nor duplicates schedulers. There are no cleanup/unload
+writes: unsaved production since the last successful save may be lost on close.
+A fresh reload restores exactly the stored state, starts a new monotonic baseline,
+and resets fractional runtime milliseconds. Timer handles, clock baselines and UI
+feedback are never serialized. `savedAt` is discarded by the load adapter after
+validation: runtime code receives state only and awards **no offline progression**.
+
+The UI reports ready/loaded/saved/error/blocked status. Pause copy now explains
+restoring the last available save and potential loss of unsaved progress. Tests
+use fake storage, injected clocks and fake timers for schema/round trips,
+corruption protection, version rejection, atomic failures, command boundaries,
+reload timing, cadence, and lifecycle cleanup. Phase 2B export/import codes remain
+deferred and must reuse this validation/migration boundary with explicit replacement
+semantics. No compression, Base64, checksum, slots or offline logic is implemented.

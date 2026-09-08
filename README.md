@@ -1,8 +1,12 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 1A: core economy and one starter delivery.**
-Cash is session-only and resets on reload. No buildings, persistence or timers exist.
+idle/tycoon browser game. **Phase 2A: versioned local saves.**
+Cash, business ownership and fractional production survive reloads on this browser.
+Progress saves after successful actions and every five seconds; closing the page
+can lose progress since the last successful save. There is **no offline income**.
+Corrupt/newer saves are preserved with a warning and saving disabled for that
+session. Storage failures are shown in-game. No export/import or cloud saves exist.
 
 ## Development
 
@@ -26,7 +30,7 @@ shell. Vitest tests the pure domain. There is no router, state library or UI com
 - `src/app/`: application composition and shell.
 - `src/features/`: implemented economy and boundaries for future modules.
 - `src/game/`: minimal GameState, starter command and selectors.
-- `src/platform/`: future browser side-effect adapters.
+- `src/platform/`: browser runtime and local persistence adapters.
 - `src/shared/`: shared UI/utilities when actual reuse emerges.
 - `src/assets/`: future licensed/original artwork, separate from logic.
 - `src/styles/`: global styles and presentation tokens.

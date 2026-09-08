@@ -2,6 +2,7 @@ import { STARTER_BUSINESS } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
+import type { PersistenceStatus } from '../platform/persistent-game';
 
 export function describeAction(action: 'delivery' | 'purchase', result: RuntimeSnapshot['result']): string {
   if (result.ok) {
@@ -25,9 +26,23 @@ export function businessPresentation(owned: boolean, canPurchase: boolean, pause
     productionLabel: paused ? 'Production paused' : owned ? 'Live production' : 'Potential production',
     buttonLabel: paused ? 'Session paused' : owned ? 'Acquired' : canPurchase ? 'Acquire business' : 'More cash needed',
     disabled: paused || owned || !canPurchase,
-    note: paused ? 'Reload to start a new session. Current progress will reset.'
+    note: paused ? 'Reload to restore the last available local save. Unsaved progress may be lost.'
       : owned ? 'Your garage is earning automatically. Keep this session open.'
       : canPurchase ? 'Make it yours. Production starts as soon as you acquire it.'
       : 'Complete waterfront deliveries to fund your first business.',
   };
+}
+
+export function describePersistence(status: PersistenceStatus): string {
+  switch (status.kind) {
+    case 'ready': return 'Local autosave ready. Progress saves after actions and every few seconds.';
+    case 'loaded': return 'Local save restored. No offline income was added.';
+    case 'saved': return 'Progress saved on this browser.';
+    case 'error': return 'Saving failed. You can keep playing, but recent progress may be lost on reload. Autosave will try again.';
+    case 'blocked':
+      if (status.error === 'unsupported-version') return 'This save needs a newer game version. It has been preserved. This fresh session will not be saved.';
+      if (status.error === 'storage-read') return 'Local storage could not be read. This session will not be saved; existing data has not been changed.';
+      if (status.error === 'storage-conflict') return 'The local save changed in another session. Saving has stopped to protect it. Reload to load the stored save.';
+      return 'The local save could not be validated and has been preserved. You are playing a fresh session with saving disabled.';
+  }
 }

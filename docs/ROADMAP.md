@@ -13,7 +13,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 1C.2 — Runtime ticking (complete) | Monotonic browser clock, command boundaries and live production | Deterministic timing, fractional carry, cleanup and terminal failure tests |
 | 1C.3 — UI feedback/polish (complete) | Premium cash/delivery/business presentation, live status and accessible feedback | Targeted presentation tests; runtime/domain contracts unchanged |
 | 1C.4 — GitHub Pages configuration (complete; remote verification pending) | Official Actions workflow builds and deploys `dist` from `main` | Local checks and relative asset validation pass; live deployment must be verified remotely |
-| 2 — Durable progress | Versioned local saves, validated import/export and migrations | Reload/round trip; corruption/newer versions preserve state; storage errors visible |
+| 2A — Versioned local saves (complete) | Validated v1 localStorage envelope, safe bootstrap and autosave | Exact reload without offline credit; corrupt/newer saves protected; storage/lifecycle tests |
+| 2B — Save export/import codes (deferred) | Portable codes through shared validation and migration boundary | Explicit replacement, bounded input and safe failure; separate requested phase |
 | 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
 | 5 — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
@@ -28,7 +29,7 @@ Phases 0, 1A, 1B, 1C.1 and 1C.2 are complete. Cash, starter delivery, business
 purchase and deterministic production simulation are connected to a 250 ms browser
 scheduler using monotonic elapsed time. Commands reconcile before acting; fractional
 time, lifecycle cleanup and safe failure suspension are tested. No modifiers,
-saves, offline rewards or automation exist. GitHub Pages deployment configuration is implemented in Phase 1C.4.
+offline rewards or automation exist. Phase 2A local saves are implemented. GitHub Pages deployment configuration is implemented in Phase 1C.4.
 Phase 1C.3 presentation polish is complete: responsive cards, configured production
 rates, acquisition readiness, action announcements and terminal error presentation.
 Browser visual verification was blocked by the available browser rejecting the local
@@ -41,8 +42,13 @@ serializes deployments to the `github-pages` environment. Vite's relative base
 is unchanged. Remote deployment is **not verified**: shell GitHub authentication
 is unavailable, so the local configuration still needs to be pushed. Enable Pages
 with Source **GitHub Actions**, then verify the Actions run and public site using
-README instructions. This is not a claim that the live site works. Phase 2 is not
-started; saves and offline progression remain out of scope.
+README instructions. The user reports the public deployment now works; remote
+verification was not repeated during Phase 2A. Offline progression remains deferred.
+
+Phase 2A is complete: local state is saved after successful meaningful commands and
+every five seconds. Validated reload restores cash, ownership and production
+milli-cent remainder without offline income. Corrupt/newer saves and read failures
+block writes for the fresh session. Phase 2B export/import codes are not started.
 
 ## Next session
 
@@ -53,7 +59,7 @@ started; saves and offline progression remain out of scope.
    keep `simulateElapsed(state, elapsedMs)` as the only production path and route
    commands through runtime reconciliation. Do not add new timers in UI components.
 4. Preserve `purchaseBusiness` as the paid ownership command and the economy's safe
-   cash APIs. Saves, offline progression and automation remain separate scope unless
+   cash APIs. Export/import, offline progression and automation remain separate scope unless
    explicitly authorized. The later production roadmap row is broader follow-on work,
    not permission to include levels or offline rewards in Phase 1C.2.
 

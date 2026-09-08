@@ -38,7 +38,7 @@ describe('business presentation', () => {
     expect(view.disabled).toBe(true);
     expect(view.productionLabel).toBe('Production paused');
     expect(view.note).toContain('Reload');
-    expect(view.note).toContain('reset');
+    expect(view.note).toContain('Unsaved progress');
   });
   it('renders configured prospective price/rate and a described disabled purchase button', () => {
     const html = renderToStaticMarkup(<BusinessCard owned={false} canPurchase={false} paused={false} onPurchase={() => {}} />);
