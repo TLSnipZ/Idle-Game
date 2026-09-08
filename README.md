@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 5C: vehicle collection and Garage foundation.**
+idle/tycoon browser game. **Phase 6B: Empire Foundations permanent skills.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -9,7 +9,7 @@ Hire the **Delivery Dispatcher** for **$7,500** at Player Level 3 after acquirin
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both
 job upgrades). Manual deliveries remain available and do not reset its progress.
 Existing saves/codes migrate automatically. Pre-XP saves start with XP 0 while preserving existing progress.
-Earn 10 XP per manual delivery, 5 per dispatched delivery (including credited offline
+Base rewards are 10 XP per manual delivery, 5 per dispatched delivery (including credited offline
 jobs), and 25 per business level increase. Player level is derived from XP, capped
 at 100, and grants no income bonus. The progress bar shows XP within the current
 level; feedback announces level increases and newly eligible content.
@@ -24,7 +24,7 @@ production** while owned, including offline. Vehicles persist through reload and
 save codes; older saves gain an empty garage. Its display name/art are temporary;
 there are no equip slots or set bonuses.
 Progress saves after successful actions and every five seconds; closing the page
-can lose unsaved actions. On return, businesses and the dispatcher receive the same maximum **eight hours**
+can lose unsaved actions. On return, businesses and the dispatcher receive the same base maximum **eight hours** (up to twelve with Never Sleeps)
 of offline progress from the last successful local save. A welcome card shows
 positive income with the business/dispatcher breakdown when hired. If offline reconciliation cannot be saved, the session pauses
 and preserves your old save; reload to retry.
@@ -79,8 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C live verification
-remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -134,4 +133,7 @@ yet because Phase 0 has no gameplay behavior.
 Rebirth becomes available at Player Level 20 and Dockside Level 25. Review the
 explicit keep/lose summary before confirming: temporary progress resets, while
 vehicles, Empire Points and Rebirth count remain permanent. The reset takes effect
-only after local saving succeeds. Empire Points have no bonuses or spending yet.
+only after local saving succeeds. Spend unspent Empire Points in **Empire Foundations**:
+five permanent ranked skills improve production, delivery pay, XP or the future
+offline cap. Skills survive Rebirth; EP spending is never refunded. There is no respec.
+XP rounds down once per award; Dispatcher XP rounds once per completed-job batch.

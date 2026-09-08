@@ -1287,4 +1287,114 @@ Import never triggers Rebirth and historical imported timestamps award no cash,
 jobs, XP or EP; local timing starts at import time. The existing eight-hour offline
 cap, write-before-publication, one-time consumption, future-clock policy, Dispatcher
 XP and vehicle modifiers are unchanged. Offline simulation cannot increase EP/count.
-Phase 6B remains deferred: no skills, EP spending or permanent stat bonuses exist.
+Phase 6A stopped before skills; Phase 6B extends this permanent contract below.
+
+
+## Phase 6B — Empire Foundations
+
+One permanent tree, `tree:empire-foundations`, contains exactly five skills.
+`features/skills` owns stable SkillIds, immutable definitions, explicit display
+order and strict rank validation. Names can change without changing save identity.
+Retiring or changing a persistent ID/rank meaning requires explicit migration.
+`permanentProgression` now contains `{ empirePoints, rebirthCount, skills }` where
+`skills` is a sparse SkillId→positive integer rank map. Absent means rank zero;
+stored zero, unknown IDs, malformed maps, accessors, non-serializable properties,
+unsafe/fractional ranks and ranks above configured maxima are rejected.
+No effects, costs, cap, prerequisite flags or derived levels are persisted.
+
+Empire Points are the existing **unspent** safe-integer currency. The only skill
+acquisition API is `purchaseSkillRank(state, skillId)`. It validates authoritative
+state, looks up the definition and next rank, evaluates configured AND requirements,
+checks EP and atomically subtracts exact EP while incrementing precisely one rank.
+No Money, XP or Rebirth count changes. Unknown skill, max rank, unmet prerequisite
+and insufficient EP are distinct typed failures preserving the entire original
+state. Malformed authoritative state fails loudly without mutation.
+
+The central requirement union adds `skill-rank` with stable SkillId and minimum
+rank. Definitions use type-only references so configuration does not import the
+runtime evaluator. Prerequisites are acquisition-only: already-owned ranks remain
+valid and active without their current prerequisites, including import and Rebirth.
+See BALANCING.md for all five exact definitions and prerequisite boundaries.
+
+### Shared stats and XP units
+
+`collectModifiers` gathers purchased equipment, vehicles and owned skill ranks.
+`getSkillEffect` computes both preview and applied strength. Stat skills produce
+one modifier per skill with a stable ID derived from SkillId;
+ranks add basis points within that skill (not separate factors per rank). Different
+sources then multiply, after flats, in the existing stable modifier-ID order.
+There is no separate prestige multiplier. Production retains exact rational rates
+and both authoritative production remainders through the sole `simulateElapsed`
+path. The same breakdown identifies equipment, vehicles and skills by source name.
+
+`evaluateStat` additionally supports the typed `xp-reward` target with a transient
+BigInt base, separate from Money. Existing Money callers retain their contract.
+`game/xp-reward.ts` is the single XP reward boundary for manual jobs, business levels
+and dispatcher batches: choose configured base XP, multiply by batch count exactly,
+evaluate all matching modifiers, floor the final rational result once, enforce the
+safe-integer XP bound, and add via the progression API. No fractional XP is saved.
+Money modifiers never affect XP; XP modifiers never affect Money or level thresholds.
+Money/XP/level/progress changes still publish atomically; XP overflow rolls all back.
+
+**Dispatcher XP intentionally depends on batch boundaries.** At +10%, one batch of
+three cycles earns floor(15×1.10)=16 XP. Three separate one-cycle batches earn
+5+5+5=15 XP. This is the specified batch-floor policy, not per-cycle flooring inside
+a batch and not a fractional carry system. Production Money, dispatcher Money and
+cycle progress remain partition-independent; fractional modified XP does not claim
+that property. Online and offline agree for the same state and same credited batch.
+No per-cycle loops or additional clocks are introduced.
+
+### Derived cap and command boundaries
+
+`getOfflineCapMs` derives the shared cap from validated permanent ranks: eight-hour
+base plus Never Sleeps' configured two hours per rank (10h/12h). The offline
+bootstrap validates/migrates first, computes this cap, bounds actual wall-clock
+elapsed, then supplies one credited duration to business production, dispatcher
+Money and dispatcher XP. `OfflineProgress.capMs` records the cap actually used for
+that runtime-only welcome-back result. UI reads it instead of the base constant;
+the current session note reads the same cap selector. The cap is never saved.
+Discarded time does not enter automation progress or future catch-up. Purchasing
+Never Sleeps online changes future absence credit only; bootstrap is not rerun.
+Future-clock rebasing, one-time consumption and durable offline publication remain.
+
+Every skill purchase uses existing `runtime.execute`: reconcile old ranks first,
+apply the atomic command, then the normal successful-command save. No pre-purchase
+business income, completed delivery Money or completed delivery XP receives a new
+bonus. Unfinished delivery progress survives and a later completed cycle uses the
+then-current ranks. The established runtime sub-ms rate boundary also applies to
+skill changes; earned authoritative production fractions remain intact.
+Autosave remains five seconds and production scheduling remains 250 ms.
+
+Skills use the existing ordinary-command persistence policy: save errors leave the
+new valid rank/EP state live, expose the normal persistence warning and allow later
+autosave, while the old durable save remains intact. Unsaved progress can be lost
+on reload; it is never reported as durably saved on failure. Rebirth/import/offline
+retain their stronger write-before-replacement transaction, unchanged.
+
+### Rebirth, saves and presentation
+
+The explicit Rebirth constructor now retains skill ranks along with garage, unspent
+EP plus the new reward, and Rebirth count plus one. Every temporary field from the
+Phase 6A matrix still resets. Spent EP is never refunded. The reward formula remains
+unchanged. For example 3 unspent EP plus a 4 EP Rebirth leaves 7 EP with identical
+ranks. Permanent effects resume automatically: Fast Talker/XP act on the next job;
+production bonuses act when a business is repurchased; Never Sleeps retains its cap.
+
+Save **v8** extends the single envelope through sequential v1→…→v7→v8 migration.
+v7 gains only empty `skills`; every prior value including EP/count, garage,
+automation progress, both production fractions and savedAt survives exactly.
+Migration never buys ranks, spends EP or triggers Rebirth. Historical v6→v7 emits
+the actual v7 shape before the new step. CE1- transport is unchanged; export/import
+preserves all skills and unspent EP and activates owned effects immediately. Import
+still awards no historical Money/jobs/XP/EP/ranks and rebases to current local time.
+
+The single responsive Empire Foundations section consumes pure skill selectors for
+ranks, prices, effects, requirements and availability. Text prerequisites carry the
+branch relationships without reliance on connector lines. Current owned effects
+stay labelled active even if another rank is locked. Maxed nodes omit purchasing;
+EP shortage is distinct from a prerequisite lock. Existing polite action feedback
+shows exact rank/EP changes and evaluated integer XP; Rebirth confirmation lists
+Permanent skills under You keep. No new notification history, scheduler or UI library.
+
+Phase 6B implementation is complete; live verification is pending. No second tree,
+sixth skill, respec, refunds, passive EP, extra currency or follow-on content exists.

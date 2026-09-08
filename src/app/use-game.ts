@@ -1,3 +1,5 @@
+import { purchaseSkillRank } from '../game/purchase-skill-rank';
+import { describeSkillPurchase } from './skill-presentation';
 import { purchaseVehicle } from '../game/purchase-vehicle';
 import { purchaseAutomation } from '../game/purchase-automation';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
@@ -74,11 +76,19 @@ export function useGame() {
     });
   }
 
+  function buySkill(id: unknown) {
+    runtime.execute(state => {
+      const result = purchaseSkillRank(state, id);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeSkillPurchase(result, id) }));
+      return result;
+    });
+  }
+
   function rebirth() {
     const result = runtime.rebirth();
     if (result.ok) setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
     return result;
   }
 
-  return { rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

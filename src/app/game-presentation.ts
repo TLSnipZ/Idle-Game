@@ -1,5 +1,5 @@
 import { findVehicle } from '../features/vehicles';
-import { XP_REWARDS } from '../features/progression';
+import { evaluateXpReward } from '../game/xp-reward';
 import { DELIVERY_DISPATCHER } from '../features/automation';
 import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
@@ -20,13 +20,16 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     }
     if (action === 'upgrade') {
       const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
-      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec · +${XP_REWARDS.businessLevel} XP.` : 'Business upgraded.';
+      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec · +${xpReward(result.state, 'businessLevel')} XP.` : 'Business upgraded.';
     }
     return action === 'delivery'
-      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} · +${XP_REWARDS.manualJob} XP.`
+      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} · +${xpReward(result.state, 'manualJob')} XP.`
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'unknown-skill': return 'This permanent skill is unavailable.';
+    case 'insufficient-empire-points': return 'Not enough Empire Points.';
+    case 'max-rank-reached': return 'This skill is already at max rank.';
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
     case 'already-owned': return action === 'vehicle' ? 'This vehicle is already yours.' : 'This business is already yours.';
     case 'unknown-vehicle': return 'This vehicle is unavailable. No purchase was made.';
@@ -78,4 +81,10 @@ function deliveryReward(state: RuntimeSnapshot['result']['state']) {
   const reward = evaluateJobReward(state);
   if (!reward.ok) throw new RangeError('Configured job reward exceeds range');
   return reward.reward;
+}
+
+function xpReward(state: RuntimeSnapshot['result']['state'], source: 'manualJob' | 'businessLevel') {
+  const result = evaluateXpReward(state, source);
+  if (!result.ok) throw new RangeError('Configured XP reward exceeds range');
+  return result.reward;
 }

@@ -1,3 +1,4 @@
+import { findSkill, getSkillRank } from '../features/skills';
 import { VEHICLE_CATALOG } from '../features/vehicles';
 import { findBusiness, getBusinessLevel, MAX_BUSINESS_LEVEL, STARTER_BUSINESS } from '../features/businesses';
 import { findUpgrade, UPGRADE_CATALOG } from '../features/upgrades';
@@ -18,6 +19,13 @@ function businessDefinition(id: unknown) {
 export function evaluateRequirements(state: GameState, requirements: readonly Requirement[]): RequirementResult {
   const details = requirements.map((requirement): RequirementDetail => {
     switch (requirement.type) {
+      case 'skill-rank': {
+        const skill = findSkill(requirement.skillId);
+        if (!skill) throw new RangeError('Unknown skill requirement');
+        minimum(requirement.minimumRank, skill.maxRank);
+        return { requirement, met: getSkillRank(state.permanentProgression.skills, skill.id) >= requirement.minimumRank,
+          description: `${skill.name} Rank ${requirement.minimumRank}` };
+      }
       case 'player-level':
         minimum(requirement.minimumLevel, MAX_PLAYER_LEVEL);
         return { requirement, met: getPlayerLevel(state.progression.xp) >= requirement.minimumLevel,

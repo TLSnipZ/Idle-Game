@@ -10,7 +10,7 @@ export function UpgradeCard({ view, paused, onPurchase }: {
   const headingId = `${view.definition.id}-heading`;
   const requirementId = `${view.definition.id}-requirement`;
   const target = view.definition.modifier.target;
-  const scope = target.stat === 'job-reward' ? 'Starter-job reward'
+  const scope = target.stat !== 'business-production' ? (target.stat === 'xp-reward' ? 'XP reward' : 'Starter-job reward')
     : target.businessId === null ? 'All businesses production' : `${findBusiness(target.businessId)?.name} production`;
   return <section className="panel upgrade-panel" aria-labelledby={headingId}>
     <div className="panel-heading"><h3 id={headingId}>{view.definition.name}</h3>{view.purchased && <span className="ownership-badge is-owned">PURCHASED</span>}</div>

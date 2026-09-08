@@ -1,3 +1,5 @@
+import { getOfflineCapMs } from './offline-cap';
+export { OFFLINE_CAP_MS } from './offline-cap';
 import { getLevelIncrease } from '../features/progression';
 import type { LevelIncrease } from '../features/progression';
 import { subtractMoney } from '../features/economy';
@@ -8,9 +10,10 @@ import { simulateGameElapsed } from './simulate-game-elapsed';
 import type { AutomationSummary } from './simulate-automation';
 import type { GameSimulationResult } from './simulate-game-elapsed';
 
-export const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;
+
 export interface OfflineProgress {
   readonly actualElapsedMs: number;
+  readonly capMs: number;
   readonly rewardedElapsedMs: number;
   readonly capped: boolean;
   readonly incomeEarned: Money;
@@ -30,13 +33,14 @@ export function reconcileOffline(state: GameState, savedAt: unknown, now: unknow
   const clockAnomaly = now < savedAt;
   // Both endpoints are nonnegative safe integers: the ordered difference is safe.
   const actualElapsedMs = clockAnomaly ? 0 : now - savedAt;
-  const rewardedElapsedMs = Math.min(actualElapsedMs, OFFLINE_CAP_MS);
+  const capMs = getOfflineCapMs(state);
+  const rewardedElapsedMs = Math.min(actualElapsedMs, capMs);
   const result = simulateGameElapsed(state, rewardedElapsedMs);
   if (!result.ok) return result;
   const income = subtractMoney(result.state.economy.cash, state.economy.cash);
   if (!income.ok) throw new Error('Production must not reduce cash');
   return { ok: true, state: result.state, progress: {
-    actualElapsedMs, rewardedElapsedMs, capped: actualElapsedMs >= OFFLINE_CAP_MS,
+    actualElapsedMs, rewardedElapsedMs, capMs, capped: actualElapsedMs >= capMs,
     incomeEarned: income.value, clockAnomaly,
     xpEarned: result.state.progression.xp - state.progression.xp,
     levelIncrease: getLevelIncrease(state.progression.xp, result.state.progression.xp),

@@ -20,7 +20,7 @@ export const REBIRTH_POLICY = {
   automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress'] },
   progression: { action: 'reset', labels: ['Player XP / Level (returns to Level 1)'] },
   garage: { action: 'retain', labels: ['Vehicles'] },
-  permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count'] },
+  permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills'] },
 } as const satisfies Record<keyof GameState, { readonly action: 'reset' | 'retain' | 'accumulate'; readonly labels: readonly string[] }>;
 
 /** One reward path for preview and command. Ineligible states have no payable reward. */

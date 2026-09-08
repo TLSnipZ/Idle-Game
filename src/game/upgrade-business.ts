@@ -1,4 +1,4 @@
-import { addXp, XP_REWARDS } from '../features/progression';
+import { awardXp } from './xp-reward';
 import type { XpError } from '../features/progression';
 import { findBusiness, isBusinessLevel, MAX_BUSINESS_LEVEL, getUpgradeCost } from '../features/businesses';
 import { spendCash } from '../features/economy';
@@ -18,7 +18,7 @@ export function upgradeBusiness(state: GameState, id: unknown): UpgradeBusinessR
   if (cost === null) return { ok: false, state, error: 'max-level-reached' };
   const payment = spendCash(state.economy, cost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
-  const xp = addXp(state.progression, XP_REWARDS.businessLevel);
+  const xp = awardXp(state, 'businessLevel');
   if (!xp.ok) return { ok: false, state, error: xp.error };
   return { ok: true, state: { ...state, progression: xp.state, economy: payment.state, businesses: {
     ...state.businesses, owned: { ...state.businesses.owned, [business.id]: { level: level + 1 } },

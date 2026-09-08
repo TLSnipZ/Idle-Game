@@ -1,4 +1,4 @@
-import { addXp, XP_REWARDS } from '../features/progression';
+import { awardXp } from './xp-reward';
 import type { XpError } from '../features/progression';
 import { DELIVERY_DISPATCHER, isAutomationState } from '../features/automation';
 import { earnCash, isElapsedMs, moneyFromMinorUnits, multiplyMoney } from '../features/economy';
@@ -34,7 +34,7 @@ export function simulateAutomation(state: GameState, elapsedMs: unknown): Automa
     if (!batch.ok) return { ok: false, state, error: batch.error };
     income = batch.value;
   }
-  const xp = addXp(state.progression, XP_REWARDS.dispatcherJob, completedJobs);
+  const xp = awardXp(state, 'dispatcherJob', completedJobs);
   if (!xp.ok) return { ok: false, state, error: xp.error };
   const credit = earnCash(state.economy, income);
   if (!credit.ok) return { ok: false, state, error: credit.error };

@@ -4,7 +4,7 @@ import { addRational, multiplyRational, rational, requireRational, RationalOverf
 import type { Rational } from '../shared/rational';
 
 export type StatTarget = { readonly stat: 'business-production'; readonly businessId: string | null }
-  | { readonly stat: 'job-reward' };
+  | { readonly stat: 'job-reward' } | { readonly stat: 'xp-reward' };
 interface ModifierIdentity {
   readonly id: string;
   readonly sourceId: string;
@@ -15,15 +15,20 @@ export type Modifier = ModifierIdentity & ({ readonly operation: 'add-flat'; rea
   /** Positive percentage delta: 2500 means +25%, 10000 means +100%. */
   readonly bonusBasisPoints: number;
 });
-export type StatEvaluation = { readonly ok: true; readonly base: Money; readonly effective: Rational; readonly applied: readonly Modifier[] }
+export type StatEvaluation<T extends Money | bigint = Money> = { readonly ok: true; readonly base: T; readonly effective: Rational; readonly applied: readonly Modifier[] }
   | { readonly ok: false; readonly error: 'overflow' };
 export const MAX_MODIFIERS = 64;
 const BASIS_POINTS_PER_UNIT = 10_000n;
 const MAX_BONUS_BASIS_POINTS = 1_000_000;
 
 /** Flat additions before percentage factors; stable IDs within each group, no rounding. */
-export function evaluateStat(base: Money, target: StatTarget, modifiers: readonly Modifier[]): StatEvaluation {
-  moneyFromMinorUnits(base);
+export function evaluateStat<T extends Money | bigint>(base: T, target: StatTarget, modifiers: readonly Modifier[]): StatEvaluation<T> {
+  if (typeof base === 'bigint') {
+    if (target.stat !== 'xp-reward' || base < 0n) throw new RangeError('Invalid integer stat base');
+  } else {
+    if (target.stat === 'xp-reward') throw new RangeError('XP must not use Money');
+    moneyFromMinorUnits(base);
+  }
   if (modifiers.length > MAX_MODIFIERS) throw new RangeError('Too many modifiers');
   const ids = new Set<string>();
   for (const m of modifiers) {
@@ -43,7 +48,8 @@ export function evaluateStat(base: Money, target: StatTarget, modifiers: readonl
         ? addRational(effective, rational(BigInt(modifier.amount)))
         : multiplyRational(effective, rational(BASIS_POINTS_PER_UNIT + BigInt(modifier.bonusBasisPoints), BASIS_POINTS_PER_UNIT));
     }
-    // Rates may contain fractions, but their magnitude has the same bound as Money.
+    // Economic rates use the Money magnitude bound. XP adds its safe-integer
+    // bound after final flooring in xp-reward; both share this exact rational path.
     const maximum = BigInt('9'.repeat(MAX_MONEY_DIGITS));
     if (BigInt(effective.numerator) > maximum * BigInt(effective.denominator)) return { ok: false, error: 'overflow' };
     return { ok: true, base, effective, applied };

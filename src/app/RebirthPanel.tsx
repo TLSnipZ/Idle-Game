@@ -27,7 +27,7 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
     <p>Restart your temporary operation in exchange for permanent Empire Points.</p>
     <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{preview.empirePoints} EP</dd></div>
       <div><dt>Rebirths</dt><dd>{preview.rebirthCount}</dd></div></dl>
-    <p>Empire Points are banked for a future phase. They provide no bonuses yet.</p>
+    <p>Invest unspent Empire Points in permanent skills that survive Rebirth.</p>
     <RequirementList result={preview.requirements} id="rebirth-requirements" />
     <p className="production">Reward: {preview.reward === null ? 'Not eligible' : `+${preview.reward} Empire Points`}</p>
     <div id="rebirth-policy" className="rebirth-policy">

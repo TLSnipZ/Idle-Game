@@ -391,3 +391,51 @@ $0.75/s × 1.15 = $0.8625/s. Acquisition gates apply again to reset temporary co
 Existing business prices, XP sources, modifier rules and eight-hour offline cap are
 unchanged. The reward formula and eligibility are provisional; skills and spending
 belong to the separately deferred Phase 6B.
+
+
+## Phase 6B — provisional permanent skill balance
+
+Exactly one tree: **Empire Foundations** (`tree:empire-foundations`). All values
+below are provisional. Empire Points are unspent currency, not lifetime earnings.
+
+| Stable SkillId / Name | Max rank | EP per rank | Prerequisite | Effect per rank |
+| --- | --- | --- | --- | --- |
+| `skill:streetwise-investment` / Streetwise Investment | 3 | 1 | None | +5% global business production |
+| `skill:fast-talker` / Fast Talker | 2 | 1 | Streetwise Rank 1 | +10% starter-job Money reward |
+| `skill:learn-the-streets` / Learn the Streets | 2 | 2 | Streetwise Rank 1 | +10% XP gain |
+| `skill:silent-partner` / Silent Partner | 2 | 3 | Streetwise Rank 3 | +10% global business production |
+| `skill:never-sleeps` / Never Sleeps | 2 | 2 | Streetwise Rank 2 | +2 hours offline cap |
+
+Ranks sum their bonus within a skill: Streetwise ranks 1/2/3 give +5/+10/+15%;
+other percentage skills give +10/+20%. Distinct sources multiply exactly after
+flat additions. Maxing the entire tree costs 19 EP. No respec or refunds exist.
+Rebirth adds its unchanged reward to remaining EP and retains every purchased rank.
+For example 4 EP minus a 2 EP purchase plus a later 7 EP Rebirth leaves 9 EP.
+
+Canonical production: `$0.75 × 1.15 × 1.10 × 1.10 = $1.043625/s` with Vortex,
+Streetwise rank 2 and Silent Partner rank 1. The latter is valid retained/imported
+ownership even though acquiring it currently requires Streetwise rank 3.
+Production keeps exact rational fractions without intermediate rounding.
+
+Canonical job: `($25 + $5) × 1.20 × 1.10 = $39.60` with Express Tips, Street
+Connections and Fast Talker rank 1. After Rebirth removes normal upgrades, Fast
+Talker rank 1 still makes the base job $27.50. Dispatcher uses the same Money reward.
+
+| XP source | Base | Learn rank 1 (+10%) | Learn rank 2 (+20%) |
+| --- | --- | --- | --- |
+| Manual job | 10 | 11 | 12 |
+| Business level increase | 25 | 27 | 30 |
+| One dispatcher batch of 3 jobs | 15 | 16 | 18 |
+
+XP floors once after exact modified evaluation at each award boundary. Dispatcher
+first combines N×5 base XP and floors the modified batch once. Consequently three
+separate single-cycle batches at rank 1 yield 15 XP, while a single three-cycle batch
+yields 16 XP. There is deliberately no saved fractional XP remainder; this policy
+makes fractional XP depend on batching. Money/cycle/remainder partition guarantees
+are unchanged. Level thresholds, base XP values and all old Money costs stay intact.
+
+Never Sleeps derives one shared cap: 8h at rank 0, 10h at rank 1, 12h at rank 2.
+Businesses, Dispatcher Money and Dispatcher XP use that same credited duration.
+No discarded time survives in progress. Buying the skill after an 8h-capped return
+does not recover previously discarded time. The cap and all ranks survive Rebirth;
+the derived cap is not persisted. Further trees/content and final balance are deferred.

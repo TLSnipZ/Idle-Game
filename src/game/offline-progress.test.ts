@@ -31,7 +31,7 @@ describe('offline policy uses deterministic simulation', () => {
   it('future timestamps yield zero with an anomaly flag', () => {
     const result = reconcileOffline(state, Number.MAX_SAFE_INTEGER, 0);
     expect(result.ok && result.state).toBe(state);
-    expect(result.ok && result.progress).toEqual({ actualElapsedMs: 0, rewardedElapsedMs: 0, capped: false, clockAnomaly: true, incomeEarned: '0', xpEarned: 0, levelIncrease: null });
+    expect(result.ok && result.progress).toEqual({ capMs: OFFLINE_CAP_MS, actualElapsedMs: 0, rewardedElapsedMs: 0, capped: false, clockAnomaly: true, incomeEarned: '0', xpEarned: 0, levelIncrease: null });
   });
   it.each([-1, .5, Infinity, NaN, Number.MAX_SAFE_INTEGER + 1, '1', null])('rejects invalid clock endpoint %#', invalid => {
     expect(reconcileOffline(state, 0, invalid)).toEqual({ ok: false, state, error: 'invalid-timestamp' });

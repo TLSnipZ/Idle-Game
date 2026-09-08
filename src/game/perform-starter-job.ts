@@ -1,4 +1,4 @@
-import { addXp, XP_REWARDS } from '../features/progression';
+import { awardXp } from './xp-reward';
 import type { XpError } from '../features/progression';
 import { evaluateJobReward } from './effective-stats';
 import { earnCash } from '../features/economy';
@@ -14,7 +14,7 @@ export function performStarterJob(state: GameState): StarterJobResult {
   if (!reward.ok) return { ok: false, state, error: reward.error };
   const result = earnCash(state.economy, reward.reward);
   if (!result.ok) return { ok: false, state, error: result.error };
-  const xp = addXp(state.progression, XP_REWARDS.manualJob);
+  const xp = awardXp(state, 'manualJob');
   if (!xp.ok) return { ok: false, state, error: xp.error };
   return { ok: true, state: { ...state, progression: xp.state, economy: result.state } };
 }

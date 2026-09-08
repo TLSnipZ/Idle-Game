@@ -1,6 +1,5 @@
 import { describeLevelIncrease, formatXp } from './progression-presentation';
 import type { OfflineProgress } from '../game/offline-progress';
-import { OFFLINE_CAP_MS } from '../game/offline-progress';
 import { formatCash } from '../features/economy/ui';
 import { formatOfflineDuration, showOfflineReward } from './offline-presentation';
 
@@ -22,7 +21,7 @@ export function OfflineReturn({ progress, onDismiss }: {
       {progress.levelIncrease && <p>{describeLevelIncrease(progress.levelIncrease)}</p>}
       <p>Away: {formatOfflineDuration(progress.actualElapsedMs)}</p>
       <p>Time credited: {formatOfflineDuration(progress.rewardedElapsedMs)}</p>
-      {progress.capped && <p>Offline earnings capped at {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>}
+      {progress.capped && <p>Offline earnings capped at {formatOfflineDuration(progress.capMs)}.</p>}
     </div>
     <button className="action-button delivery-button" onClick={onDismiss}>Continue</button>
   </section>;

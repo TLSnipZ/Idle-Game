@@ -24,8 +24,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 5B — Central unlock requirements (complete) | Typed AND lists, selected acquisition gates and shared presentation | Exact boundaries, atomic failures, grandfathered saves and deadlock protection |
 | 5C — Vehicle collection foundation (complete) | One collectible, Garage, central requirements/modifier source, v6 migration | Atomic acquisition, exact stacking, save/runtime/offline and presentation tests |
 | Future — Collection expansion | Additional cars, final art, collections and set bonuses | Separately scoped; stable IDs and replaceable assets |
-| 6A — Rebirth foundation (implementation complete; live pending) | Rebirth, EP/count, permanent garage, v7 migration | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
-| 6B — Permanent progression expansion (deferred) | Future permanent upgrades / skills, separately scoped | Preserve Rebirth retention, exact EP and durable transactions |
+| 6A — Rebirth foundation (complete; user verified live) | Rebirth, EP/count, permanent garage, v7 migration | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
+| 6B — Permanent skill foundation (implementation complete; live pending) | One Empire Foundations tree, five skills, EP spending, v8 migration | Exact effects/XP flooring, permanent retention, shared derived cap |
 | 7 — City systems | Territories, heat, crew, random events, one at a time | Each uses public contracts, deterministic inputs and compatible saves |
 | 8 — Long-term progression | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
@@ -92,4 +92,13 @@ Level 7 / Dockside Level 10, +15% global production through the central evaluato
 Garage presentation and sequential v5→v6 migration. No final art, second vehicle,
 set bonuses or equipped system is included. Preserve acquisition-only gates,
 CE1-, exact fractions, command reconciliation and durable offline/import publication.
-Collection expansion remains deferred. Phase 6A implementation is complete: central reset/retention policy, banked Empire Points and Rebirth count, exact reward preview, explicit confirmation, durable write-before-publication, and sequential v6→v7 migration. Phase 6A live verification remains pending. Phase 6B is the next permanent-progression subphase and remains deferred; skills, EP spending and permanent bonuses are not implemented.
+Collection expansion remains deferred. Phase 6A implementation is complete: central reset/retention policy, banked Empire Points and Rebirth count, exact reward preview, explicit confirmation, durable write-before-publication, and sequential v6→v7 migration. The user manually verified Phase 6A eligibility, reward preview, confirmation/reset, EP/count persistence, permanent garage/modifier behavior and reload/export/import in the functioning live build. Phase 6B implementation is complete; live verification remains pending.
+
+
+Phase 6B adds precisely five ranked skills in Empire Foundations, atomic unspent-EP
+purchases, central permanent production/job/XP modifiers, final XP award flooring,
+Dispatcher batch-floor semantics, derived 8h/10h/12h offline caps and v7→v8 migration.
+Skills survive Rebirth without refund. CE1-, savedAt, one-time catch-up and the
+strong Rebirth/import/offline persistence transactions remain intact. Additional
+permanent skill trees, collection expansion and the next content phase are deferred.
+Final permanent-progression balance is not complete; no respec or passive EP exists.

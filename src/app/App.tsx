@@ -1,3 +1,4 @@
+import { SkillTree } from './SkillTree';
 import { RebirthPanel } from './RebirthPanel';
 import { Garage } from './Garage';
 import { PlayerProgress } from './PlayerProgress';
@@ -10,7 +11,7 @@ import { UPGRADE_CATALOG } from '../features/upgrades';
 import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { OfflineReturn } from './OfflineReturn';
-import { OFFLINE_CAP_MS } from '../game/offline-progress';
+import { getOfflineCapMs } from '../game/offline-cap';
 import { formatOfflineDuration } from './offline-presentation';
 import { SaveManagement } from './SaveManagement';
 import { STARTER_BUSINESS } from '../features/businesses';
@@ -23,7 +24,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { buySkill, rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const reward = evaluateJobReward(snapshot.state);
   const paused = runtimeError !== null;
@@ -88,8 +89,9 @@ export function App() {
         <AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} />
         <Garage state={snapshot.state} paused={paused} onPurchase={buyVehicle} />
         <RebirthPanel state={snapshot.state} unavailable={paused || persistence.kind === 'blocked'} onRebirth={rebirth} />
+        <SkillTree state={snapshot.state} paused={paused} onPurchase={buySkill} />
         <SaveManagement actions={saveActions} />
-        <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>
+        <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(getOfflineCapMs(snapshot.state))}.</p>
       </main>
       <footer className="app-footer"><span>Crime Empire <span aria-hidden="true">/</span> Working title</span><span>Start small. Own the night.</span></footer>
     </div>
