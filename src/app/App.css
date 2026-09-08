@@ -121,3 +121,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 
 .business-terms > div { min-width: 0; }
 .business-terms strong { display: block; overflow-wrap: anywhere; }
+
+.upgrade-panel { padding: clamp(1.25rem, 4vw, 2rem); margin-block: 1.5rem; overflow-wrap: anywhere; }
+.upgrade-panel h3 { margin-block: 1rem .5rem; }
+.upgrade-panel .action-button { min-height: 48px; width: 100%; }

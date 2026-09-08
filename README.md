@@ -1,10 +1,12 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 3B: business levels and deterministic scaling.**
-Cash, business levels and fractional production survive reloads on this browser.
+idle/tycoon browser game. **Phase 4A: central modifiers and first equipment upgrade.**
+Cash, business levels, purchased equipment and fractional production survive reloads on this browser.
 Buy Dockside Detail at level 1, then use its Upgrade button to increase production
-up to level 100. Existing saves and codes migrate automatically to level-1 ownership.
+up to level 100. Commercial Pressure Washer equipment costs $2,500 and boosts
+Dockside production by 25%. Existing saves/codes migrate automatically, preserving
+levels and earned fractions; old saves begin with no purchased equipment.
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, owned businesses earn up to **eight hours**
 of offline production from the last successful local save. A welcome card shows

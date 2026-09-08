@@ -1,3 +1,4 @@
+import { formatProduction } from './stat-format';
 import { selectBusinessProgress } from '../game/selectors';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -9,7 +10,7 @@ import type { RuntimeSnapshot } from '../platform/game-runtime';
 import { businessPresentation, describeAction } from './game-presentation';
 import { BusinessCard } from './BusinessCard';
 
-const progress = selectBusinessProgress({ ...createInitialGameState(), businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 } }, STARTER_BUSINESS.id);
+const progress = selectBusinessProgress({ ...createInitialGameState(), businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 } }, STARTER_BUSINESS.id);
 const state = createInitialGameState();
 
 describe('business presentation', () => {
@@ -93,22 +94,22 @@ describe('action feedback', () => {
 });
 
 it.each([2, 4, 100])('renders owned level %s with derived rates, costs and max state', level => {
-  const game = { ...state, businesses: { owned: { [STARTER_BUSINESS.id]: { level } }, productionRemainderMilliCents: 975 } };
+  const game = { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level } }, productionRemainderMilliCents: 975 } };
   const progress = selectBusinessProgress(game, STARTER_BUSINESS.id);
   if (!progress) throw Error('fixture');
   const html = renderToStaticMarkup(<BusinessCard owned progress={progress} onUpgrade={() => {}} canPurchase={false} paused={false} onPurchase={() => {}} />);
   expect(html).toContain(`Level ${level}`);
-  expect(html).toContain(formatCash(progress.production));
+  expect(html).toContain(formatProduction(progress.production));
   expect(html).toContain('disabled=""');
   if (progress.upgradeCost && progress.nextProduction) {
     expect(html).toContain(formatCash(progress.upgradeCost));
-    expect(html).toContain(formatCash(progress.nextProduction));
+    expect(html).toContain(formatProduction(progress.nextProduction));
     expect(html).toContain('More cash needed');
   } else {
     expect(html).toContain('MAX LEVEL'); expect(html).not.toContain('Upgrade to Level 101');
   }
 });
 it('announces successful upgrades and the configured new rate', () => {
-  const game = { ...state, businesses: { owned: { [STARTER_BUSINESS.id]: { level: 5 } }, productionRemainderMilliCents: 0 } };
+  const game = { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 5 } }, productionRemainderMilliCents: 0 } };
   expect(describeAction('upgrade', { ok: true, state: game })).toContain('Level 5. Production increased to $3.75/sec');
 });

@@ -10,7 +10,7 @@ import { createLocalSave } from './local-save';
 import { createPersistentGame, AUTOSAVE_CADENCE_MS } from './persistent-game';
 import { performStarterJob } from '../game/perform-starter-job';
 
-const owned = { ...createInitialGameState(), businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
+const owned = { ...createInitialGameState(), businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
 function fixture(state: GameState = owned, savedAt = 1000, current = 2000) {
   const encoded = serializeSave(state, savedAt); if (!encoded.ok) throw Error('fixture');
   let raw = encoded.serialized;

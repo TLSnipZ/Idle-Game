@@ -1,3 +1,4 @@
+import type { PurchaseUpgradeResult } from '../game/purchase-upgrade';
 import type { UpgradeBusinessResult } from '../game/upgrade-business';
 import type { GameState } from '../game/game-state';
 import type { StarterJobResult } from '../game/perform-starter-job';
@@ -7,7 +8,7 @@ import type { SimulationResult } from '../game/simulate-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult;
+type CommandResult = StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<SimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
@@ -92,9 +93,10 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // Any ownership/level change starts a new rate boundary. Only runtime sub-ms
+    // Any ownership/level/equipment change starts a new rate boundary. Only runtime sub-ms
     // duration is dropped; earned authoritative milli-cents are never reset.
-    if (result.ok && result.state.businesses.owned !== previous.businesses.owned) remainderMs = 0;
+    if (result.ok && (result.state.businesses.owned !== previous.businesses.owned
+        || result.state.upgrades !== previous.upgrades)) remainderMs = 0;
     snapshot = { ...snapshot, result };
     publish(snapshot);
   }

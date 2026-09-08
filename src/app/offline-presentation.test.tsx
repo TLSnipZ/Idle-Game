@@ -11,7 +11,7 @@ describe('offline return presentation', () => {
     expect(formatOfflineDuration(Number(ms))).toBe(expected);
   });
   it('only shows positive income with accessible dismissible capped feedback', () => {
-    const state = { ...createInitialGameState(), businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 } };
+    const state = { ...createInitialGameState(), businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 } };
     const result = reconcileOffline(state, 0, OFFLINE_CAP_MS + 1); if (!result.ok) throw Error('fixture');
     expect(showOfflineReward(result.progress)).toBe(true);
     const html = renderToStaticMarkup(<OfflineReturn progress={result.progress} onDismiss={() => {}} />);

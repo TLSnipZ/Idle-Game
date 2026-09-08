@@ -5,7 +5,7 @@ import { isMoney } from '../../economy';
 describe('business content and ownership', () => {
   it('starts with fresh empty ownership records', () => {
     const first = createInitialBusinessState();
-    expect(first).toEqual({ owned: {}, productionRemainderMilliCents: 0 });
+    expect(first).toEqual({ productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {}, productionRemainderMilliCents: 0 });
     expect(createInitialBusinessState().owned).not.toBe(first.owned);
     expect(ownsBusiness(first, STARTER_BUSINESS.id)).toBe(false);
   });
@@ -34,7 +34,7 @@ describe('business content and ownership', () => {
     Object.freeze(state);
     const result = prepareBusinessOwnership(state, STARTER_BUSINESS.id);
     expect(result.ok).toBe(true);
-    expect(result.state).toEqual({ owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 });
+    expect(result.state).toEqual({ productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 0 });
     expect(state.owned).toEqual({});
     expect(ownsBusiness(result.state, STARTER_BUSINESS.id)).toBe(true);
     const duplicate = prepareBusinessOwnership(result.state, STARTER_BUSINESS.id);

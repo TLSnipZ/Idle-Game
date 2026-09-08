@@ -9,7 +9,7 @@ import { simulateElapsed } from './simulate-elapsed';
 import { selectBusinessProgress } from './selectors';
 
 function owned(level = 1, cash = '999999999999999999999', remainder = 975): GameState {
-  return { economy: { cash: moneyFromMinorUnits(cash) }, businesses: { owned: { [business.id]: { level } }, productionRemainderMilliCents: remainder } };
+  return { ...createInitialGameState(), economy: { cash: moneyFromMinorUnits(cash) }, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [business.id]: { level } }, productionRemainderMilliCents: remainder } };
 }
 describe('exact business progression', () => {
   it('purchases level 1 for unchanged cost', () => {
@@ -57,7 +57,7 @@ describe('exact business progression', () => {
   it('spends exactly above Number precision and exposes derived selectors', () => {
     const result = upgradeBusiness(owned(1, '9007199254740993'), business.id);
     expect(result.state.economy.cash).toBe('9007199254725993');
-    expect(selectBusinessProgress(result.state, business.id)).toMatchObject({ level: 2, production: '150', nextProduction: '225', upgradeCost: '60000', canUpgrade: true });
+    expect(selectBusinessProgress(result.state, business.id)).toMatchObject({ level: 2, production: { numerator: '150', denominator: '1' }, nextProduction: { numerator: '225', denominator: '1' }, upgradeCost: '60000', canUpgrade: true });
   });
   it.each([[1, '75'], [2, '150'], [7, '525'], [100, '7500']])('production is linear at level %s', (level, rate) => {
     expect(getLevelProduction(business, Number(level))).toBe(rate);

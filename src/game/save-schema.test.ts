@@ -3,10 +3,10 @@ import { STARTER_BUSINESS } from '../features/businesses';
 import { createInitialGameState } from './game-state';
 import { CURRENT_SAVE_VERSION, MAX_SAVE_LENGTH, SAVE_FORMAT, migrateToCurrentSave, parseSave, serializeSave, validateSaveState } from './save-schema';
 
-const state = { ...createInitialGameState(), economy: { cash: createInitialGameState().economy.cash }, businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
+const state = { ...createInitialGameState(), economy: { cash: createInitialGameState().economy.cash }, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
 const envelope = () => ({ format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: 123456, state });
 
-describe('v2 save schema', () => {
+describe('current save schema', () => {
   it('round trips all authoritative fields with deterministic metadata', () => {
     const encoded = serializeSave(state, 123456);
     expect(encoded.ok).toBe(true);
@@ -60,7 +60,7 @@ describe('v2 save schema', () => {
   it.each([-1, 1000, .5, NaN, Infinity, '0', null])('rejects invalid production remainder %s', productionRemainderMilliCents => {
     expect(validateSaveState({ ...state, businesses: { ...state.businesses, productionRemainderMilliCents } })).toBeNull();
   });
-  it.each([{}, { economy: state.economy }, { ...state, economy: {} }, { ...state, businesses: { owned: {} } }])('rejects missing state fields %#', value => {
+  it.each([{}, { economy: state.economy }, { ...state, economy: {} }, { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {} } }])('rejects missing state fields %#', value => {
     expect(validateSaveState(value)).toBeNull();
   });
   it('rejects inherited fields, custom prototypes, and prototype keys', () => {

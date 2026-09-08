@@ -183,3 +183,35 @@ integer cents. Fractional earned milli-cents survive all upgrades and saves.
 Future businesses may set independent purchase cost, base rate and base upgrade
 cost under these shared curves. No modifiers or cap upgrades exist. The offline
 cap remains eight hours and uses these same derived production rates.
+
+
+## Phase 4A — provisional first equipment and modifier policy
+
+Exactly one upgrade is configured in `src/features/upgrades/config/upgrade-config.ts`:
+**Commercial Pressure Washer** (`upgrade:commercial-pressure-washer`), priced at
+**250,000 cents ($2,500)**. It requires owning Dockside Detail, has no level
+prerequisite, can be purchased once, and adds **+25% Dockside production** through
+2,500 integer basis points. It never affects other businesses or delivery rewards.
+
+The price places it after early acquisitions/levels rather than alongside the first
+$150 purchase. Its value grows with the business level: at level 5 its extra
+$0.9375/sec repays $2,500 in about 44 minutes 27 seconds; at level 10, about
+22 minutes 13 seconds. This creates a choice against increasingly costly levels.
+The price/effect are provisional, not a full upgrade economy. Purchase price,
+quadratic level costs, level cap 100 and base production remain unchanged.
+
+| Level | Base production/sec | With equipment/sec |
+| --- | --- | --- |
+| 1 | $0.75 | $0.9375 |
+| 4 | $3.00 | $3.75 |
+| 5 | $3.75 | $4.6875 |
+| 100 | $75.00 | $93.75 |
+
+Effective production is `(75 cents × level) × 12500/10000`. All current/future
+eligible percentage factors compound exactly in stable modifier-ID order. There
+is no per-tick or per-second rounding. The integer milli-cent remainder plus its
+new reduced sub-milli-cent fraction preserves all earned value (see architecture).
+UI precision is independent from simulation. Starter delivery still pays $25.00
+through the central evaluator; future fractional job rewards floor once at payout.
+The eight-hour offline cap is unchanged, using the identical effective rate.
+No other equipment, modifiers as content, new businesses or automation are added.

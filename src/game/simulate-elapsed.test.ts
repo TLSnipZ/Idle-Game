@@ -4,7 +4,7 @@ import type { GameState } from './game-state';
 import { simulateElapsed } from './simulate-elapsed';
 import { purchaseBusiness } from './purchase-business';
 import { performStarterJob } from './perform-starter-job';
-import { STARTER_BUSINESS, getOwnedProductionRates } from '../features/businesses';
+import { STARTER_BUSINESS, getOwnedProductionInputs } from '../features/businesses';
 import { earnCash, isMoney, MAX_MONEY_DIGITS } from '../features/economy';
 
 function owned(): GameState {
@@ -33,8 +33,8 @@ describe('elapsed production simulation', () => {
   it('starts without fractional accrual and derives only owned rates', () => {
     const state = createInitialGameState();
     expect(state.businesses.productionRemainderMilliCents).toBe(0);
-    expect(getOwnedProductionRates(state.businesses)).toEqual([]);
-    expect(getOwnedProductionRates(owned().businesses)).toEqual([STARTER_BUSINESS.baseProductionCentsPerSecond]);
+    expect(getOwnedProductionInputs(state.businesses)).toEqual([]);
+    expect(getOwnedProductionInputs(owned().businesses)).toEqual([{ businessId: STARTER_BUSINESS.id, base: STARTER_BUSINESS.baseProductionCentsPerSecond }]);
     expect(isMoney(STARTER_BUSINESS.baseProductionCentsPerSecond)).toBe(true);
     expect(STARTER_BUSINESS.baseProductionCentsPerSecond).toBe('75');
   });

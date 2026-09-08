@@ -6,7 +6,8 @@ Through Phase 1C.2, the domain has economy and business ownership, atomic job an
 purchase commands, and pure elapsed-time production simulation. A per-mount browser
 adapter drives live production and reconciles before player commands. React state
 renders published snapshots. Phase 2A adds validated versioned local persistence
-as documented below. Phase 3A adds bounded offline bootstrap; Phase 3B adds levels and v2 migration below.
+as documented below. Phase 3A adds bounded offline bootstrap; Phase 3B adds levels and v2 migration.
+Phase 4A adds central exact modifiers, one equipment upgrade and v3 migration below.
 
 ## Boundaries and dependency direction
 
@@ -44,31 +45,15 @@ panels, selection) remains separate. Choose a state container only when the firs
 real interactions demonstrate a need. Do not store computed income, formatted
 strings, functions, assets or React elements in save data.
 
-## Planned modifier contract
+## Central modifier contract
 
-These are design constraints, not TypeScript implementations in Phase 0:
-
-- Stable modifier ID and source ID identify provenance and prevent accidental
-  duplicate application. One modifier per distinct effect; enforce unique IDs.
-- A typed target stat identifies income, purchase cost, production speed or a
-  future supported stat. Avoid unrestricted magic string lookups.
-- Scope is explicit: global, business ID, district ID, vehicle category, etc.
-  Only implement scope variants with real consumers.
-- Operations start with flat addition, additive percentage and multiplicative
-  factor. Define the evaluation order centrally as
-  `(base + sum(flat)) * (1 + sum(percent)) * product(factor)`.
-- Percent values are fractional deltas (0.10 means +10%); factor 1.10 means ×1.10.
-  Sorting by stable ID makes evaluation repeatable. Stacking policy is documented
-  by source; additive bonuses sum and factor bonuses compound in the given order.
-- Validate finite values, eligible scope and explicit expiry before evaluation.
-  Apply target-specific floors/caps/rounding once at the documented boundary;
-  do not scatter clamps throughout feature code.
-- Producers expose eligible modifiers from source state; they never directly
-  change another system's income or price. Recompute derived modifiers after load.
-
-Example only: base income 100, flat +20, percent +0.10, factor 1.5 yields 198.
-This is a contract illustration, not a game balance value. UI should eventually
-explain effective stats using modifier provenance.
+Phase 4A implements the shared stat contract in `game/modifiers.ts`, with source
+collection in `game/effective-stats.ts`. Only `business-production` and `job-reward`
+exist. Purchased equipment is the only source; future implemented sources join the
+same collector, never mutate cash/rates directly. Full precision, stacking and
+migration decisions are documented in the Phase 4A section below. This supersedes
+the Phase 0 proposal of separate flat/additive-percent/factor operations: only
+multiplicative percentage bonuses have a real current consumer.
 
 ## Time, randomness and numbers
 
@@ -784,3 +769,119 @@ The card shows Level, current and next production, upgrade cost, affordability a
 MAX LEVEL. Announcements reuse existing action feedback; no upgrade modal is needed.
 Phase 3B is complete. No additional business, managers, special upgrades or modifiers
 are implemented; future phases must preserve migration and rate-boundary semantics.
+
+
+## Phase 4A — central stats and one equipment upgrade
+
+### Evaluation and sources
+
+`game/modifiers.ts` owns the pure `evaluateStat(base, target, modifiers)` path.
+`game/effective-stats.ts` collects effects from validated purchased upgrade IDs and
+uses that evaluator for business production and starter-job reward. Business code
+still owns `baseProductionCentsPerSecond × level`; its public
+`getOwnedProductionInputs` returns business IDs with their level-scaled base inputs.
+The former rates-only API changed deliberately so composition can apply scope
+without matching rates to IDs by positional assumptions. Simulation and UI both
+use the same effective-stat composition. No config or derived bonus enters saves.
+
+The two typed stats are `business-production` and `job-reward`. Business scope is
+an explicit business ID, or null for all businesses; global business effects never
+apply to jobs. The shipped effect is business-specific. Each modifier has stable
+`id`, `sourceId`, target and `multiply-basis-points` operation. A bonus of 2,500
+basis points is +25%; its exact factor is 12,500/10,000. Filter by stat/scope,
+sort eligible effects by stable ID using lexical comparison (not locale), and
+multiply their factors. Two +25% bonuses would compound to ×1.5625, not ×1.5.
+Duplicate modifier IDs fail loudly to prevent double application. No flat/additive
+percentage operation is implemented without a content consumer. This is intentionally
+smaller than the early proposed generic contract.
+
+All arithmetic uses transient BigInt and reduced rational values; no authoritative
+floating-point amount or percentage exists. Evaluation exposes base, ordered applied
+modifiers (including source IDs), and effective value for explanation. Magnitudes
+above Money's existing maximum return `overflow`. Invalid config is a programming
+error, not a silently skipped bonus. Technical work bounds are 64 modifiers and
+nonnegative safe-integer bonus deltas up to 1,000,000 basis points per modifier.
+These are resource/config limits, not new purchasable progression caps.
+
+Discrete job rewards floor once to whole cents **after** the entire evaluation;
+there is no job-fraction state. With no job-targeted content the reward remains
+exactly 2,500 cents. The command, button and feedback obtain that effective reward.
+Continuous business rates are never floored before elapsed simulation.
+
+### Exact fractional production
+
+`shared/rational.ts` provides only the consumed nonnegative fraction operations:
+reduction, addition, multiplication and validation. Rational data is
+`{ numerator: string, denominator: string }`, canonical decimal integers, positive
+denominator, reduced by gcd; zero must be `0/1`. Each component is bounded to 256
+digits before parsing. Arithmetic exceeding that precision bound returns an
+explicit overflow through evaluation/accrual rather than rounding. It is a
+technical resource boundary; future content must remain within it or deliberately
+migrate/change the contract. Money itself retains its separate 100-digit bound.
+
+The existing integer `businesses.productionRemainderMilliCents` (0..999) remains
+unchanged in meaning. v3 adds `productionRemainderSubMilliCents`, a reduced fraction
+in [0,1) of **one milli-cent**. Together they represent exactly
+`(milliCents + subMilliCents) / 1000` cents. This mixed representation retains old
+milli-cent values verbatim while supplying the precision percent factors require;
+neither field duplicates the other. This is earned authoritative production, not
+fractional runtime milliseconds.
+
+`accrueProduction` sums exact rational cents/second, multiplies once by integer
+elapsed milliseconds, adds both old remainder parts in milli-cent units, extracts
+whole cents, then normalizes the two remaining parts. It also accepts unchanged
+whole-cent rate inputs. `simulateElapsed` remains the only economic production
+coordinator: effective rates → one accrual → `earnCash` → atomic state publication.
+Cash and both fractions stay unchanged on overflow. Runtime/valid-save corruption
+policies are preserved. No loop scales with elapsed time.
+
+At level 1 with equipment, the rate is 375/4 cents/sec. One millisecond earns
+93 + 3/4 milli-cents; four milliseconds earn 375 milli-cents. These fractions
+survive callbacks, saves, purchases, levels and offline catch-up. Accepted split
+intervals equal one combined interval exactly. Precision overflow, like cash
+overflow, rejects the whole interval; rejected intervals are never partial credit.
+
+### Equipment, transactions and v3 migration
+
+`features/upgrades` contains exactly **Commercial Pressure Washer**,
+`upgrade:commercial-pressure-washer`: $2,500, requires Dockside Detail ownership,
++25% Dockside production at every level. `upgrades.purchasedIds` is the only added
+ownership slice; it stores unique known IDs. Config owns cost/requirement/effect.
+`purchaseUpgrade(state, id)` validates lookup, duplicate and prerequisite, calls
+`spendCash`, and publishes cash plus ownership together. Failures return the original
+state with `unknown-upgrade`, `already-purchased`, `prerequisite-not-met`, or the
+existing economy error. No repeat tier, other upgrade or automation is present.
+
+Runtime `execute` reconciles the old modifier set before the equipment purchase.
+Future elapsed time uses the new set. Successful equipment changes extend the
+Phase 3B rate-boundary policy: discard only the remaining sub-ms runtime duration
+(less than 1 ms), never either earned production remainder. Failed commands retain
+that duration and all successfully reconciled income. No second production timer.
+
+The single envelope is now **v3**, CE1- transport and storage key unchanged.
+Sequential v1→v2 converts IDs to level-1 records; v2→v3 adds empty purchased IDs and
+`0/1` sub-milli-cent remainder. Each input shape is validated, then the final v3
+state is validated and reconstructed. Levels, cash, old milli-cents and savedAt
+are preserved exactly. Current validation rejects unknown/duplicate upgrade IDs,
+upgrades without required ownership, malformed levels, noncanonical fractions,
+custom prototypes/accessors, missing/extra fields and newer unsupported versions.
+There is still one schema path for local saves and portable codes.
+
+Local migration preserves savedAt so offline bootstrap consumes the full eligible
+absence through modified `simulateElapsed`, capped at the unchanged eight hours.
+Durable write still precedes offline/import publication. Failed writes preserve
+old storage; failed offline catch-up pauses without autosave. Successful bootstrap
+rebases once. Imported historical timestamps still award nothing; import writes
+current local time and offline timing begins there. Five-second autosave and the
+250 ms live scheduler are unchanged.
+
+### Presentation and completion
+
+The single compact equipment panel displays config cost, requirement, effect,
+affordability and PURCHASED/active status; buying controls disappear after purchase.
+The business card shows effective current/next production and base/bonus breakdown.
+Rates display up to four dollar decimals (e.g. $4.6875/sec), with at least two;
+nonterminating/higher-precision future values are truncated only for display and
+labelled ≈. Formatting never feeds simulation. Existing focus, mobile layout,
+polite feedback and reduced-motion rules are retained; no UI timer is added.
+Phase 4A is complete; Phase 4B and automation remain deferred.

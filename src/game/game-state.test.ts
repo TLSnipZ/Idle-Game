@@ -7,7 +7,7 @@ import { STARTER_JOB, MAX_MONEY_DIGITS, moneyFromMinorUnits } from '../features/
 describe('game state and starter delivery', () => {
   it('creates only the implemented economy and businesses slices', () => {
     const state = createInitialGameState();
-    expect(state).toEqual({ economy: { cash: '0' }, businesses: { owned: {}, productionRemainderMilliCents: 0 } });
+    expect(state).toEqual({ upgrades: { purchasedIds: [] }, economy: { cash: '0' }, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {}, productionRemainderMilliCents: 0 } });
     expect(selectCash(state)).toBe('0');
     expect(createInitialGameState().economy).not.toBe(state.economy);
   });

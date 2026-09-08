@@ -5,7 +5,7 @@ import { createInitialGameState } from './game-state';
 import { OFFLINE_CAP_MS, reconcileOffline } from './offline-progress';
 import { simulateElapsed } from './simulate-elapsed';
 
-const state = { ...createInitialGameState(), businesses: { owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
+const state = { ...createInitialGameState(), businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [STARTER_BUSINESS.id]: { level: 1 } }, productionRemainderMilliCents: 975 } };
 describe('offline policy uses deterministic simulation', () => {
   it.each([0, 1, 13, 1000, OFFLINE_CAP_MS - 1, OFFLINE_CAP_MS, OFFLINE_CAP_MS + 1, Number.MAX_SAFE_INTEGER])('matches shared simulation with capped duration %s', elapsed => {
     const result = reconcileOffline(state, 0, elapsed);

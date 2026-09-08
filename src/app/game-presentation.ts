@@ -1,24 +1,30 @@
+import { formatProduction } from './stat-format';
+import { evaluateJobReward } from '../game/effective-stats';
+import { PRESSURE_WASHER } from '../features/upgrades';
 import { selectBusinessProgress } from '../game/selectors';
 import { STARTER_BUSINESS } from '../features/businesses';
-import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
-export function describeAction(action: 'delivery' | 'purchase' | 'upgrade', result: RuntimeSnapshot['result']): string {
+export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment', result: RuntimeSnapshot['result']): string {
   if (result.ok) {
+    if (action === 'equipment') return `${PRESSURE_WASHER.name} purchased. Production bonus is active.`;
     if (action === 'upgrade') {
       const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
-      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatCash(progress.production)}/sec.` : 'Business upgraded.';
+      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec.` : 'Business upgraded.';
     }
     return action === 'delivery'
-      ? `Delivery completed. +${formatCash(STARTER_JOB.reward)} earned.`
+      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} earned.`
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
     case 'already-owned': return 'This business is already yours.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
+    case 'unknown-upgrade': return 'This equipment is unavailable.';
+    case 'already-purchased': return 'This equipment is already purchased.';
+    case 'prerequisite-not-met': return 'Acquire Dockside Detail before buying this equipment.';
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';
     case 'invalid-level': return 'Business level is invalid. No transaction was made.';
@@ -54,4 +60,10 @@ export function describePersistence(status: PersistenceStatus): string {
       if (status.error === 'storage-conflict') return 'The local save changed in another session. Saving has stopped to protect it. Reload to load the stored save.';
       return 'The local save could not be validated and has been preserved. You are playing a fresh session with saving disabled.';
   }
+}
+
+function deliveryReward(state: RuntimeSnapshot['result']['state']) {
+  const reward = evaluateJobReward(state);
+  if (!reward.ok) throw new RangeError('Configured job reward exceeds range');
+  return reward.reward;
 }

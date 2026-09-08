@@ -1,4 +1,4 @@
-import { getOwnedProductionRates } from '../features/businesses';
+import { effectiveProductionRates } from './effective-stats';
 import { accrueProduction, earnCash, isElapsedMs, readCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
 import type { GameState } from './game-state';
@@ -12,11 +12,14 @@ export function simulateElapsed(state: GameState, elapsedMs: unknown): Simulatio
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
   // Keep the existing policy: corrupt authoritative data is a programming error.
   readCash(state.economy);
-  const rates = getOwnedProductionRates(state.businesses);
-  const accrual = accrueProduction(rates, elapsedMs, state.businesses.productionRemainderMilliCents);
+  const rates = effectiveProductionRates(state);
+  if (!rates.ok) return { ok: false, state, error: rates.error };
+  const accrual = accrueProduction(rates.rates, elapsedMs, state.businesses.productionRemainderMilliCents, state.businesses.productionRemainderSubMilliCents);
   if (!accrual.ok) return { ok: false, state, error: accrual.error };
   if (accrual.income === '0'
-      && accrual.remainderMilliCents === state.businesses.productionRemainderMilliCents) {
+      && accrual.remainderMilliCents === state.businesses.productionRemainderMilliCents
+      && accrual.remainderSubMilliCents.numerator === state.businesses.productionRemainderSubMilliCents.numerator
+      && accrual.remainderSubMilliCents.denominator === state.businesses.productionRemainderSubMilliCents.denominator) {
     return { ok: true, state };
   }
   const credit = earnCash(state.economy, accrual.income);
@@ -29,6 +32,7 @@ export function simulateElapsed(state: GameState, elapsedMs: unknown): Simulatio
       businesses: {
         ...state.businesses,
         productionRemainderMilliCents: accrual.remainderMilliCents,
+        productionRemainderSubMilliCents: accrual.remainderSubMilliCents,
       },
     },
   };

@@ -44,9 +44,9 @@ describe('portable save transport', () => {
   it.each([
     { ...envelope(), version: CURRENT_SAVE_VERSION + 1 },
     { ...envelope(), state: { ...state, economy: { cash: '01' } } },
-    { ...envelope(), state: { ...state, businesses: { owned: { ['business:no']: { level: 1 } }, productionRemainderMilliCents: 0 } } },
-    { ...envelope(), state: { ...state, businesses: { owned: { ['business:dockside-detail']: { level: 0 } }, productionRemainderMilliCents: 0 } } },
-    { ...envelope(), state: { ...state, businesses: { owned: {}, productionRemainderMilliCents: 1000 } } },
+    { ...envelope(), state: { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { ['business:no']: { level: 1 } }, productionRemainderMilliCents: 0 } } },
+    { ...envelope(), state: { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { ['business:dockside-detail']: { level: 0 } }, productionRemainderMilliCents: 0 } } },
+    { ...envelope(), state: { ...state, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {}, productionRemainderMilliCents: 1000 } } },
     { ...envelope(), savedAt: -1 }, {}, null,
   ])('reuses the shared schema to reject invalid payload %#', value => {
     expect(validateSaveCode(encodeSaveText(JSON.stringify(value))).ok).toBe(false);

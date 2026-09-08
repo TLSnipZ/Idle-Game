@@ -1,3 +1,7 @@
+import { UpgradeCard } from './UpgradeCard';
+import { PRESSURE_WASHER } from '../features/upgrades';
+import { selectUpgrade } from '../game/selectors';
+import { evaluateJobReward } from '../game/effective-stats';
 import { OfflineReturn } from './OfflineReturn';
 import { OFFLINE_CAP_MS } from '../game/offline-progress';
 import { formatOfflineDuration } from './offline-presentation';
@@ -12,8 +16,9 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
+  const reward = evaluateJobReward(snapshot.state);
   const paused = runtimeError !== null;
   return (
     <div className="app-shell">
@@ -50,7 +55,7 @@ export function App() {
               <p>Take a waterfront delivery and put cash toward your first set of keys.</p>
               <button className="action-button delivery-button" onClick={runStarterJob} disabled={paused}>
                 <span>{STARTER_JOB.label}</span>
-                <span className="reward">+{formatCash(STARTER_JOB.reward)} <span aria-hidden="true">↗</span></span>
+                <span className="reward">+{reward.ok ? formatCash(reward.reward) : 'Unavailable'} <span aria-hidden="true">↗</span></span>
               </button>
             </div>
             <div className="action-status" role="status" aria-live="polite" aria-atomic="true">
@@ -70,6 +75,7 @@ export function App() {
           {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload to restore the last available local save. Unsaved progress may be lost.</p></>}
         </div>
         <p role="status" className={persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error' ? 'runtime-error' : 'session-note'}>{describePersistence(persistence)}</p>
+        <UpgradeCard view={selectUpgrade(snapshot.state, PRESSURE_WASHER.id)} paused={paused} onPurchase={() => buyUpgrade(PRESSURE_WASHER.id)} />
         <SaveManagement actions={saveActions} />
         <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>
       </main>
