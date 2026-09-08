@@ -1,4 +1,4 @@
-import { findUpgrade } from '../features/upgrades';
+import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
 import type { UpgradeId } from '../features/upgrades';
 import { isRational, ZERO_RATIONAL } from '../shared/rational';
 import { findBusiness, isBusinessLevel } from '../features/businesses';
@@ -73,7 +73,7 @@ function validateState(value: unknown, version: number): GameState | null {
     if (!record(value.upgrades) || !keys(value.upgrades, ['purchasedIds']) || !Array.isArray(value.upgrades.purchasedIds)) return null;
     for (const id of value.upgrades.purchasedIds) {
       const upgrade = findUpgrade(id);
-      if (!upgrade || purchasedIds.includes(upgrade.id) || !Object.hasOwn(owned, upgrade.requiredBusiness)) return null;
+      if (!upgrade || purchasedIds.includes(upgrade.id) || !meetsUpgradeRequirement(upgrade, owned)) return null;
       purchasedIds.push(upgrade.id);
     }
   }

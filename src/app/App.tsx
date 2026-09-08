@@ -1,5 +1,6 @@
+import { ModifierBreakdown } from './ModifierBreakdown';
 import { UpgradeCard } from './UpgradeCard';
-import { PRESSURE_WASHER } from '../features/upgrades';
+import { UPGRADE_CATALOG } from '../features/upgrades';
 import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { OfflineReturn } from './OfflineReturn';
@@ -57,6 +58,7 @@ export function App() {
                 <span>{STARTER_JOB.label}</span>
                 <span className="reward">+{reward.ok ? formatCash(reward.reward) : 'Unavailable'} <span aria-hidden="true">↗</span></span>
               </button>
+              {reward.ok && reward.applied.length > 0 && <><p>Base reward: {formatCash(reward.base)}</p><ModifierBreakdown modifiers={reward.applied} /><p>Effective reward: {formatCash(reward.reward)}</p></>}
             </div>
             <div className="action-status" role="status" aria-live="polite" aria-atomic="true">
               <span key={feedback.sequence}>{paused ? '' : feedback.message}</span>
@@ -75,7 +77,7 @@ export function App() {
           {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload to restore the last available local save. Unsaved progress may be lost.</p></>}
         </div>
         <p role="status" className={persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error' ? 'runtime-error' : 'session-note'}>{describePersistence(persistence)}</p>
-        <UpgradeCard view={selectUpgrade(snapshot.state, PRESSURE_WASHER.id)} paused={paused} onPurchase={() => buyUpgrade(PRESSURE_WASHER.id)} />
+        <section aria-labelledby="upgrades-heading"><h2 id="upgrades-heading">Upgrades</h2><div className="upgrade-catalog">{UPGRADE_CATALOG.map(upgrade => <UpgradeCard key={upgrade.id} view={selectUpgrade(snapshot.state, upgrade.id)} paused={paused} onPurchase={() => buyUpgrade(upgrade.id)} />)}</div></section>
         <SaveManagement actions={saveActions} />
         <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>
       </main>

@@ -70,7 +70,7 @@ describe('pressure washer purchase and shared production', () => {
   });
   it('routes the unchanged $25 job through the central evaluator with scoped equipment', () => {
     const state = purchaseUpgrade(owned(), PRESSURE_WASHER.id).state;
-    expect(evaluateJobReward(state)).toEqual({ ok: true, reward: '2500' });
+    expect(evaluateJobReward(state)).toEqual({ ok: true, reward: '2500', base: '2500', applied: [] });
     expect(performStarterJob(state).state.economy.cash).toBe('2500');
     expect(performStarterJob(createInitialGameState()).state.economy.cash).toBe('2500');
   });

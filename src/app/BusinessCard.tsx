@@ -1,4 +1,5 @@
-import { formatProduction, formatBonus } from './stat-format';
+import { ModifierBreakdown } from './ModifierBreakdown';
+import { formatProduction } from './stat-format';
 import type { selectBusinessProgress } from '../game/selectors';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { formatCash } from '../features/economy/ui';
@@ -39,7 +40,7 @@ export function BusinessCard({ progress, onUpgrade, owned, canPurchase, paused, 
           <div><span className="metric-label">Next level</span><strong>{progress.nextProduction ? `${formatProduction(progress.nextProduction)} / sec` : 'MAX LEVEL'}</strong></div>
           {progress.upgradeCost && <div><span className="metric-label">Upgrade price</span><strong>{formatCash(progress.upgradeCost)}</strong></div>}
         </div>}
-        {progress && progress.modifiers.length > 0 && <p className="purchase-note">Base at Level {progress.level}: {formatCash(progress.baseProduction)}/sec · {progress.modifiers.map(m => formatBonus(m.bonusBasisPoints)).join(' × ')} equipment bonus</p>}
+        {progress && progress.modifiers.length > 0 && <div className="purchase-note"><p>Base at Level {progress.level}: {formatCash(progress.baseProduction)}/sec</p><ModifierBreakdown modifiers={progress.modifiers} /><p>Effective: {formatProduction(progress.production)}/sec</p></div>}
         <button className="action-button purchase-button" disabled={progress ? paused || !progress.canUpgrade : view.disabled} onClick={progress ? onUpgrade : onPurchase} aria-describedby="purchase-note">
           <span>{progress ? paused ? 'Session paused' : progress.upgradeCost === null ? 'MAX LEVEL' : `Upgrade to Level ${progress.level + 1}` : view.buttonLabel}</span><span aria-hidden="true">{owned ? '✓' : '↗'}</span>
         </button>

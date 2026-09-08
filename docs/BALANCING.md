@@ -215,3 +215,31 @@ UI precision is independent from simulation. Starter delivery still pays $25.00
 through the central evaluator; future fractional job rewards floor once at payout.
 The eight-hour offline cap is unchanged, using the identical effective rate.
 No other equipment, modifiers as content, new businesses or automation are added.
+
+## Phase 4B — five-upgrade catalog (provisional)
+
+The Phase 4A washer remains unchanged. Four additions provide choices between
+active delivery income, stronger Dockside output and a global milestone. Delivery
+upgrades are cheaper so they can matter before later business levels; production
+upgrades require a substantially larger investment. No level prerequisites apply.
+
+| ID | Name | Cost | Effect | Requirement |
+| --- | --- | --- | --- | --- |
+| `upgrade:commercial-pressure-washer` | Commercial Pressure Washer | $2,500 | +25% Dockside production | Own Dockside |
+| `upgrade:industrial-detailing-line` | Industrial Detailing Line | $10,000 | +50% Dockside production | Own Dockside |
+| `upgrade:fleet-logistics` | Fleet Logistics | $15,000 | +10% all business production | Own any business |
+| `upgrade:street-connections` | Street Connections | $750 | +20% starter-job reward | None |
+| `upgrade:express-tips` | Express Tips | $400 | +$5 starter-job reward | None |
+
+Each is purchased once. This table also defines explicit catalog display order.
+Evaluation applies flats first, then compounds percentages, with stable IDs within
+each operation group. Base delivery remains $25: either job upgrade alone yields
+$30; both yield `($25 + $5) × 1.20 = $36`, irrespective of purchase order.
+
+Base production stays `$0.75/sec × level`. At level 4: $3 base, $3.75 with washer
+alone, $4.50 with detailing line alone, $3.30 with logistics alone. All three yield
+`$3 × 1.25 × 1.50 × 1.10 = $6.1875/sec` exactly. Factors are rational, never added
+together or rounded between operations. Both production remainders retain all
+fractions across callbacks, saves and offline catch-up. UI precision is display
+only. Business purchase/level costs, level cap and eight-hour offline cap are
+unchanged. Phase 4C automation and additional content are deferred.

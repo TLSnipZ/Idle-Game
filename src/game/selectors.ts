@@ -1,5 +1,5 @@
 import { evaluateBusinessProduction } from './effective-stats';
-import { findUpgrade } from '../features/upgrades';
+import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
 import { findBusiness, ownsBusiness, getBusinessLevel, getUpgradeCost, MAX_BUSINESS_LEVEL } from '../features/businesses';
 import { readCash, canAfford } from '../features/economy';
 import type { Money } from '../features/economy';
@@ -39,8 +39,9 @@ export function selectUpgrade(state: GameState, id: unknown) {
   const definition = findUpgrade(id);
   if (!definition) return null;
   const purchased = state.upgrades.purchasedIds.includes(definition.id);
-  const eligible = selectOwnsBusiness(state, definition.requiredBusiness);
+  const eligible = meetsUpgradeRequirement(definition, state.businesses.owned);
   return { definition, purchased, eligible,
-    requirement: findBusiness(definition.requiredBusiness)?.name,
+    requirement: definition.requirement.kind === 'business' ? `Requires ownership of ${findBusiness(definition.requirement.businessId)?.name}.`
+      : definition.requirement.kind === 'any-business' ? 'Requires at least one owned business.' : 'No business required.',
     canPurchase: !purchased && eligible && canAfford(state.economy, definition.purchaseCost) };
 }

@@ -51,7 +51,7 @@ export function useGame() {
   function buyUpgrade(id: unknown) {
     runtime.execute(state => {
       const result = purchaseUpgrade(state, id);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeAction('equipment', result) }));
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeAction('equipment', result, id) }));
       return result;
     });
   }

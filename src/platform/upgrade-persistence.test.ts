@@ -5,7 +5,7 @@ import { createInitialGameState } from '../game/game-state';
 import { serializeSave, parseSave } from '../game/save-schema';
 import { validateSaveCode, encodeSaveText } from '../game/save-code';
 import { moneyFromMinorUnits } from '../features/economy';
-import { PRESSURE_WASHER } from '../features/upgrades';
+import { UPGRADE_CATALOG, PRESSURE_WASHER } from '../features/upgrades';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
 import { simulateElapsed } from '../game/simulate-elapsed';
@@ -130,4 +130,40 @@ it('local v2 bootstrap preserves the old timestamp for catch-up before durably w
   expect(result).toMatchObject({ kind: 'loaded', state: { economy: { cash: '525' }, upgrades: { purchasedIds: [] }, businesses: { productionRemainderMilliCents: 975 } } });
   expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 3, savedAt: 2000 } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { incomeEarned: '0' } });
+});
+
+function fullyEquipped(): GameState {
+  return { ...owned(4), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
+}
+it('reconciles before every catalog purchase using the previous modifier set', () => {
+  const initial = { ...owned(4), economy: { cash: moneyFromMinorUnits('100000000') } };
+  const f = fixture(initial); const game = f.make(); game.start();
+  let expected: GameState = initial;
+  UPGRADE_CATALOG.forEach((upgrade, index) => {
+    f.at(1000 + (index + 1) * 1001); f.wall(1000 + (index + 1) * 1001);
+    expected = purchaseUpgrade(simulateElapsed(expected, 1001).state, upgrade.id).state;
+    game.execute(state => purchaseUpgrade(state, upgrade.id));
+    expect(game.getSnapshot().result.state).toEqual(expected);
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state: expected } });
+  });
+  game.stop();
+});
+it('all modifiers survive autosave, export/import and offline cap with one-time consumption', () => {
+  const initial = fullyEquipped(); const f = fixture(initial); f.wall(1000 + OFFLINE_CAP_MS + 1);
+  const game = f.make(); game.start();
+  expect(game.getSnapshot().result.state).toEqual(simulateElapsed(initial, OFFLINE_CAP_MS).state);
+  expect(game.getSnapshot().offline).toMatchObject({ capped: true, incomeEarned: '17820000' });
+  f.at(1001); f.tick(); f.autosave(); const current = game.getSnapshot().result.state;
+  const code = game.exportCode(); if (!code.ok) throw Error('fixture');
+  expect(game.importCode(code.code)).toEqual({ ok: true });
+  expect(game.getSnapshot().result.state).toEqual(current);
+  game.stop(); const reload = f.make(); reload.start();
+  expect(reload.getSnapshot().result.state).toEqual(current);
+  expect(reload.getSnapshot().offline?.incomeEarned).toBe('0'); reload.stop();
+});
+it('all-modifier future timestamp rebases without income and failed write never publishes', () => {
+  const state = fullyEquipped(); const future = fixture(state, 2000); const game = future.make(); game.start();
+  expect(game.getSnapshot().offline).toMatchObject({ clockAnomaly: true, incomeEarned: '0' }); game.stop();
+  const f = fixture(state); const raw = f.raw(); f.wall(2000); f.fail(); const failed = f.make(); failed.start();
+  expect(failed.getSnapshot().result.state).toEqual(state); expect(f.raw()).toBe(raw); expect(f.timers()).toBe(0);
 });

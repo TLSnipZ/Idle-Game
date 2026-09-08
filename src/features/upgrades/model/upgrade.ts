@@ -8,6 +8,7 @@ export interface UpgradeDefinition {
   readonly name: string;
   readonly description: string;
   readonly purchaseCost: Money;
-  readonly requiredBusiness: BusinessId;
+  readonly requirement: { readonly kind: 'business'; readonly businessId: BusinessId }
+    | { readonly kind: 'any-business' } | { readonly kind: 'none' };
   readonly modifier: Modifier;
 }

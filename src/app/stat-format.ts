@@ -1,3 +1,4 @@
+import type { Modifier } from '../game/modifiers';
 import { formatCash } from '../features/economy/ui';
 import { moneyFromMinorUnits } from '../features/economy';
 import type { Money } from '../features/economy';
@@ -16,4 +17,8 @@ export function formatBonus(basisPoints: number): string {
   const units = BigInt(basisPoints);
   const decimals = (units % 100n).toString().padStart(2, '0').replace(/0+$/, '');
   return `+${units / 100n}${decimals ? `.${decimals}` : ''}%`;
+}
+
+export function formatModifier(modifier: Modifier): string {
+  return modifier.operation === 'add-flat' ? `+${formatCash(modifier.amount)}` : formatBonus(modifier.bonusBasisPoints);
 }

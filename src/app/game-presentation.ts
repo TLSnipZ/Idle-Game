@@ -1,15 +1,18 @@
 import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
-import { PRESSURE_WASHER } from '../features/upgrades';
+import { findUpgrade } from '../features/upgrades';
 import { selectBusinessProgress } from '../game/selectors';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
-export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment', result: RuntimeSnapshot['result']): string {
+export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment', result: RuntimeSnapshot['result'], upgradeId?: unknown): string {
   if (result.ok) {
-    if (action === 'equipment') return `${PRESSURE_WASHER.name} purchased. Production bonus is active.`;
+    if (action === 'equipment') {
+      const upgrade = findUpgrade(upgradeId);
+      return `${upgrade?.name ?? 'Upgrade'} purchased. ${upgrade?.modifier.target.stat === 'job-reward' ? 'Delivery' : 'Production'} bonus is active.`;
+    }
     if (action === 'upgrade') {
       const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
       return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec.` : 'Business upgraded.';
@@ -22,9 +25,9 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
     case 'already-owned': return 'This business is already yours.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
-    case 'unknown-upgrade': return 'This equipment is unavailable.';
-    case 'already-purchased': return 'This equipment is already purchased.';
-    case 'prerequisite-not-met': return 'Acquire Dockside Detail before buying this equipment.';
+    case 'unknown-upgrade': return 'This upgrade is unavailable.';
+    case 'already-purchased': return 'This upgrade is already purchased.';
+    case 'prerequisite-not-met': return 'This upgrade’s requirement is not met yet.';
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';
     case 'invalid-level': return 'Business level is invalid. No transaction was made.';

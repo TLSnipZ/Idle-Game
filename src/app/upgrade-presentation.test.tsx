@@ -1,3 +1,6 @@
+import { ModifierBreakdown } from './ModifierBreakdown';
+import { evaluateJobReward } from '../game/effective-stats';
+import { formatCash } from '../features/economy/ui';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { UpgradeCard } from './UpgradeCard';
@@ -6,7 +9,7 @@ import { formatProduction, formatBonus } from './stat-format';
 import { selectUpgrade, selectBusinessProgress } from '../game/selectors';
 import { createInitialGameState } from '../game/game-state';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
-import { PRESSURE_WASHER } from '../features/upgrades';
+import { UPGRADE_CATALOG, PRESSURE_WASHER } from '../features/upgrades';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { moneyFromMinorUnits } from '../features/economy';
 import { describeAction } from './game-presentation';
@@ -21,8 +24,8 @@ describe('equipment presentation', () => {
     const html = renderToStaticMarkup(<UpgradeCard view={view} paused={false} onPurchase={() => {}} />);
     expect(html).toContain('Commercial Pressure Washer'); expect(html).toContain('$2,500.00');
     expect(html).toContain('+25% Dockside Detail production'); expect(html).toContain('Requires ownership of Dockside Detail');
-    expect(html).toContain('disabled=""'); expect(html).toContain('aria-labelledby="upgrades-heading"');
-    expect(html).toContain('aria-describedby="equipment-requirement"');
+    expect(html).toContain('disabled=""'); expect(html).toContain('aria-labelledby="upgrade:commercial-pressure-washer-heading"');
+    expect(html).toContain('aria-describedby="upgrade:commercial-pressure-washer-requirement"');
   });
   it('shows affordability and enables exactly at the purchase price', () => {
     const poor = selectUpgrade(owned('249999'), PRESSURE_WASHER.id);
@@ -56,4 +59,34 @@ describe('equipment presentation', () => {
     expect(formatBonus(2500)).toBe('+25%'); expect(formatBonus(1)).toBe('+0.01%');
     expect(formatBonus(3333)).toBe('+33.33%');
   });
+});
+
+it.each(UPGRADE_CATALOG)('catalog card $name exposes readiness, requirement and purchased state', upgrade => {
+  const poor = selectUpgrade(owned('0'), upgrade.id);
+  const render = (state: ReturnType<typeof selectUpgrade>) => renderToStaticMarkup(<UpgradeCard view={state} paused={false} onPurchase={() => {}} />);
+  expect(render(poor)).toContain('More cash needed'); expect(render(poor)).toContain('disabled=""');
+  const ready = selectUpgrade(owned(upgrade.purchaseCost), upgrade.id);
+  expect(render(ready)).toContain(`Buy ${upgrade.name}`); expect(render(ready)).not.toContain('disabled');
+  const purchased = purchaseUpgrade(owned(upgrade.purchaseCost), upgrade.id).state;
+  expect(render(selectUpgrade(purchased, upgrade.id))).toContain('PURCHASED');
+  expect(render(selectUpgrade(purchased, upgrade.id))).not.toContain('<button');
+  const fresh = render(selectUpgrade(createInitialGameState(), upgrade.id));
+  expect(fresh).toContain(upgrade.requirement.kind === 'none' ? 'No business required' : 'Requirement not met');
+});
+
+it('explains named production bonuses and the exact combined effective value', () => {
+  const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
+  const html = renderToStaticMarkup(<BusinessCard progress={selectBusinessProgress(state, STARTER_BUSINESS.id)} onUpgrade={() => {}} owned canPurchase={false} paused={false} onPurchase={() => {}} />);
+  expect(html).toContain('Commercial Pressure Washer: +25%');
+  expect(html).toContain('Industrial Detailing Line: +50%'); expect(html).toContain('Fleet Logistics: +10%');
+  expect(html).toContain('$7.7343'); // level 5 display truncation is explicitly approximate
+});
+
+it('explains effective $36 delivery reward with flat-before-percent named sources', () => {
+  const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
+  const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
+  expect(formatCash(reward.reward)).toBe('$36.00');
+  const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
+  expect(html).toContain('Express Tips: +$5.00'); expect(html).toContain('Street Connections: +20%');
+  expect(html.indexOf('Express Tips')).toBeLessThan(html.indexOf('Street Connections'));
 });

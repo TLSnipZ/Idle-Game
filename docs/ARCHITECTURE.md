@@ -885,3 +885,40 @@ nonterminating/higher-precision future values are truncated only for display and
 labelled ≈. Formatting never feeds simulation. Existing focus, mobile layout,
 polite feedback and reduced-motion rules are retained; no UI timer is added.
 Phase 4A is complete; Phase 4B and automation remain deferred.
+
+## Phase 4B — catalog and stacking contract
+
+Five upgrades now use the same `purchaseUpgrade` command and `evaluateStat` path.
+The explicit `UPGRADE_CATALOG` array defines presentation order; evaluation order
+is independent: filter stat/business scope, apply all `add-flat` adjustments in
+stable modifier-ID order, then all `multiply-basis-points` factors in stable ID
+order. Flat amounts are canonical whole cents (cents/sec for production); factors
+are `(10000 + bonusBasisPoints) / 10000`. No intermediate rounding occurs. All
+rational bounds/overflow rules remain unchanged. Discrete jobs floor only once at
+payout; continuous production retains both authoritative remainder fields.
+
+Business-specific targets match exactly; a null business ID applies to every
+business for the business-production stat only. Job targets are stat-only. The
+evaluator contains no Dockside special case. Config requirements are `business`,
+`any-business` or `none`; purchase, selectors and authoritative save/source
+validation share `meetsUpgradeRequirement`. Job upgrades require no business.
+
+Evaluation metadata supplies ordered named bonus explanations to both the business
+card and delivery area. UI formatting never feeds economic calculations. All five
+cards show scope, cost, prerequisite and purchase availability; purchased cards
+remove buying controls. The catalog uses two columns, one below 740px, retaining
+existing keyboard focus, touch targets and reduced-motion rules.
+
+Save schema remains **v3**: only catalog/config and derived metadata changed, not
+GameState or envelope shape. Existing v3 washer saves remain valid; v1/v2 migrate
+sequentially as before, and CE1- transport is unchanged. Unknown/duplicate purchased
+IDs are rejected. Persistent upgrade IDs must never be renamed/retired without
+explicit migration handling; do not silently ignore retired content. No new keys
+or cached effective stats exist.
+
+Every upgrade purchase reconciles old modifiers before atomic spending/acquisition;
+only later elapsed time uses the new set. Earned milli-cent and sub-milli-cent
+remainders survive. Autosave, export/import and offline bootstrap keep their normal
+paths: durable write before replacement, imported historical timestamps ignored,
+eight-hour offline cap and one-time consumption. Online/offline production both use
+`simulateElapsed`, with no additional timers or modifier-specific formula.
