@@ -1,3 +1,6 @@
+import { OfflineReturn } from './OfflineReturn';
+import { OFFLINE_CAP_MS } from '../game/offline-progress';
+import { formatOfflineDuration } from './offline-presentation';
 import { SaveManagement } from './SaveManagement';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { BusinessCard } from './BusinessCard';
@@ -9,7 +12,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const paused = runtimeError !== null;
   return (
@@ -30,6 +33,7 @@ export function App() {
             <span className="status-dot" aria-hidden="true" />{paused ? 'Session paused' : 'Session open'}
           </span>
         </div>
+        <OfflineReturn progress={offline} onDismiss={dismissOffline} />
         <div className="play-grid">
           <section className="cash-panel panel" aria-labelledby="cash-heading">
             <div className="panel-heading"><h2 id="cash-heading">Available cash</h2><span className="unit-label">USD</span></div>
@@ -63,9 +67,9 @@ export function App() {
         <div role="alert" className={paused ? 'runtime-error' : undefined}>
           {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload to restore the last available local save. Unsaved progress may be lost.</p></>}
         </div>
-        <p role="status" className={persistence.kind === 'blocked' || persistence.kind === 'error' ? 'runtime-error' : 'session-note'}>{describePersistence(persistence)}</p>
+        <p role="status" className={persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error' ? 'runtime-error' : 'session-note'}>{describePersistence(persistence)}</p>
         <SaveManagement actions={saveActions} />
-        <p className="session-note">Local progress <span aria-hidden="true">/</span> No offline earnings. Keep this page open to keep earning.</p>
+        <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>
       </main>
       <footer className="app-footer"><span>Crime Empire <span aria-hidden="true">/</span> Working title</span><span>Start small. Own the night.</span></footer>
     </div>

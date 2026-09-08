@@ -16,7 +16,7 @@ export function SaveManagementView({ state, controls }: {
   const validateButton = useRef<HTMLButtonElement>(null);
   return <section className="save-panel panel" aria-labelledby="save-heading">
     <h2 id="save-heading">Save management</h2>
-    <p>Keep a portable backup or move to another browser. Codes are not encrypted. No offline earnings.</p>
+    <p>Keep a portable backup or move to another browser. Codes are not encrypted. Importing never credits time from the code.</p>
     <div className="save-grid">
       <div>
         <button className="action-button" onClick={controls.exportCode}>Export save</button>

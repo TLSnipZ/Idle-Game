@@ -21,10 +21,12 @@ function encoded(state = owned()) {
   const result = serializeSave(state, 1); if (!result.ok) throw Error('fixture');
   return result.serialized;
 }
+// Active-runtime tests clear the one bootstrap write; offline-bootstrap.test.ts
+// verifies that transaction independently. Equal wall timestamps mean no catch-up here.
 function fixture(initial: string | null = null) {
   let raw = initial;
   let now = 100;
-  let wall = 100_000;
+  let wall = 1;
   const storage = {
     getItem: vi.fn(() => raw),
     setItem: vi.fn((_key: string, value: string) => { raw = value; }),
@@ -50,21 +52,21 @@ describe('persistent runtime lifecycle', () => {
     const f = fixture(); const game = f.make();
     expect(f.storage.getItem).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
-    game.start();
+    game.start(); f.storage.setItem.mockClear();
     expect(game.getSnapshot().result.state).toEqual(createInitialGameState());
     expect(game.getSnapshot().persistence.kind).toBe('ready');
     expect(f.storage.setItem).not.toHaveBeenCalled();
   });
-  it('restores valid cash, ownership and remainder exactly without offline credit', () => {
+  it('restores exactly when no wall-clock interval elapsed', () => {
     const f = fixture(encoded()); const game = f.make();
-    f.at(1_000_000); f.wall(9_000_000); game.start();
+    f.at(1_000_000); f.wall(1); game.start(); f.storage.setItem.mockClear();
     expect(game.getSnapshot().result.state).toEqual(owned());
     expect(game.getSnapshot().persistence.kind).toBe('loaded');
     f.advance(1000);
     expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned(), 1000).state);
   });
   it('autosaves at five seconds, not on each production callback', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.advance(AUTOSAVE_CADENCE_MS - 1);
     expect(f.storage.setItem).not.toHaveBeenCalled();
     f.advance(1);
@@ -72,14 +74,14 @@ describe('persistent runtime lifecycle', () => {
     expect(JSON.parse(f.raw() ?? '').state).toEqual(simulateElapsed(owned(), AUTOSAVE_CADENCE_MS).state);
   });
   it('saves only the fully applied command after pre-command production', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(1100.4); game.execute(performStarterJob);
     expect(f.storage.setItem).toHaveBeenCalledTimes(1);
     expect(JSON.parse(f.raw() ?? '').state).toEqual(performStarterJob(simulateElapsed(owned(), 1000).state).state);
     expect(game.getSnapshot().persistence.kind).toBe('saved');
   });
   it('purchase saves both cash and ownership atomically; failure does not save', () => {
-    const f = fixture(); const game = f.make(); game.start();
+    const f = fixture(); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     for (let i = 0; i < 6; i++) game.execute(performStarterJob);
     f.at(5100.75); game.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     const persisted = JSON.parse(f.raw() ?? '').state;
@@ -94,7 +96,7 @@ describe('persistent runtime lifecycle', () => {
     const f = fixture(encoded()); const first = f.make(); first.start();
     f.at(100.75); first.execute(performStarterJob);
     const saved = first.getSnapshot().result.state;
-    first.stop(); f.at(50_000); f.wall(1_000_000);
+    first.stop(); f.at(50_000); f.wall(1);
     const second = f.make(); second.start();
     expect(second.getSnapshot().result.state).toEqual(saved);
     f.at(50_000.5); second.execute(state => ({ ok: true, state }));
@@ -102,7 +104,7 @@ describe('persistent runtime lifecycle', () => {
     expect(Object.keys(JSON.parse(f.raw() ?? ''))).toEqual(['format', 'version', 'savedAt', 'state']);
   });
   it.each(['{', JSON.stringify({ format: 'crime-empire-save', version: 2, savedAt: 1, state: owned() })])('protects corrupt/newer saves throughout a fresh playable session %#', raw => {
-    const f = fixture(raw); const game = f.make(); game.start();
+    const f = fixture(raw); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     expect(game.getSnapshot().result.state).toEqual(createInitialGameState());
     expect(game.getSnapshot().persistence.kind).toBe('blocked');
     game.execute(performStarterJob); f.advance(30_000);
@@ -112,13 +114,13 @@ describe('persistent runtime lifecycle', () => {
   });
   it('storage read failure blocks saving without blocking play', () => {
     const f = fixture(); f.storage.getItem.mockImplementation(() => { throw Error('denied'); });
-    const game = f.make(); game.start(); game.execute(performStarterJob);
+    const game = f.make(); game.start(); f.storage.setItem.mockClear(); game.execute(performStarterJob);
     expect(game.getSnapshot().persistence).toEqual({ kind: 'blocked', error: 'storage-read' });
     expect(game.getSnapshot().result.state.economy.cash).toBe('2500');
     expect(f.storage.setItem).not.toHaveBeenCalled();
   });
   it('failed writes preserve gameplay and retry on the next normal autosave', () => {
-    const f = fixture(); const game = f.make(); game.start();
+    const f = fixture(); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.storage.setItem.mockImplementationOnce(() => { throw Error('quota'); });
     game.execute(performStarterJob);
     expect(game.getSnapshot().result.state.economy.cash).toBe('2500');
@@ -128,25 +130,25 @@ describe('persistent runtime lifecycle', () => {
     expect(game.getSnapshot().persistence.kind).toBe('saved');
   });
   it('start/cleanup/start does not duplicate loops, reload state or perform teardown writes', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear(); game.start(); f.storage.setItem.mockClear();
     expect(vi.getTimerCount()).toBe(2);
     game.stop(); expect(vi.getTimerCount()).toBe(0);
-    f.advance(10_000); game.start();
+    f.advance(10_000); game.start(); f.storage.setItem.mockClear();
     expect(vi.getTimerCount()).toBe(2);
-    expect(f.storage.getItem).toHaveBeenCalledTimes(1);
+    expect(f.storage.getItem).toHaveBeenCalledTimes(2);
     expect(f.storage.setItem).not.toHaveBeenCalled();
     f.advance(AUTOSAVE_CADENCE_MS);
     expect(f.storage.setItem).toHaveBeenCalledTimes(1);
     game.stop(); expect(vi.getTimerCount()).toBe(0);
   });
   it('inactive commands cannot mutate or save', () => {
-    const f = fixture(); const game = f.make(); game.start(); game.stop();
+    const f = fixture(); const game = f.make(); game.start(); f.storage.setItem.mockClear(); game.stop();
     game.execute(performStarterJob);
     expect(game.getSnapshot().result.state).toEqual(createInitialGameState());
     expect(f.storage.setItem).not.toHaveBeenCalled();
   });
   it('runtime failure does not overwrite the last save', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(NaN); vi.advanceTimersByTime(AUTOSAVE_CADENCE_MS);
     expect(game.getSnapshot().runtimeError).toBe('invalid-clock');
     expect(f.storage.setItem).not.toHaveBeenCalled();
@@ -156,7 +158,7 @@ describe('persistent runtime lifecycle', () => {
 
 describe('portable runtime transactions', () => {
   it('exports current reconciled state, not stale storage, with the injected export timestamp', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(1100.5); f.wall(777);
     const result = game.exportCode();
     if (!result.ok) throw Error('export');
@@ -169,7 +171,7 @@ describe('portable runtime transactions', () => {
     expect(game.getSnapshot().result.state).toBe(snapshot);
   });
   it('imports exact state, replaces savedAt with current time and discards old runtime fraction', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(100.9); game.exportCode();
     f.at(10_000); f.wall(999);
     const candidate = performStarterJob(owned()).state;
@@ -185,7 +187,7 @@ describe('portable runtime transactions', () => {
     expect(f.storage.setItem).toHaveBeenCalledTimes(2);
   });
   it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 2, savedAt: 0, state: owned() }))])('failed validation preserves both state and save %#', code => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     const original = game.getSnapshot().result.state;
     f.at(1100);
     expect(game.importCode(code).ok).toBe(false);
@@ -197,7 +199,7 @@ describe('portable runtime transactions', () => {
     expect(game.getSnapshot().result.state).toEqual(simulateElapsed(original, 1000).state);
   });
   it('write failure leaves live state, prior valid save and clock bookkeeping intact', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start();
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.storage.setItem.mockImplementationOnce(() => { throw Error('quota'); });
     const original = game.getSnapshot().result.state;
     f.at(1100);
@@ -208,7 +210,7 @@ describe('portable runtime transactions', () => {
     expect(game.getSnapshot().result.state).toEqual(simulateElapsed(original, 1000).state);
   });
   it('rejects invalid timing before writing and keeps runtime usable', () => {
-    const f = fixture(encoded()); const game = f.make(); game.start(); f.at(NaN);
+    const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear(); f.at(NaN);
     expect(game.importCode(portable())).toEqual({ ok: false, error: 'runtime-unavailable' });
     expect(f.storage.setItem).not.toHaveBeenCalled();
     expect(game.getSnapshot().runtimeError).toBeNull();
@@ -216,7 +218,7 @@ describe('portable runtime transactions', () => {
     expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned(), 1000).state);
   });
   it('confirmed replacement can recover a corrupt stored save and starts one autosave loop', () => {
-    const f = fixture('{'); const game = f.make(); game.start();
+    const f = fixture('{'); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     expect(vi.getTimerCount()).toBe(1);
     expect(game.importCode(portable()).ok).toBe(true);
     expect(game.getSnapshot().persistence.kind).toBe('saved');
@@ -224,11 +226,11 @@ describe('portable runtime transactions', () => {
     game.importCode(portable());
     expect(vi.getTimerCount()).toBe(2);
     game.stop(); expect(vi.getTimerCount()).toBe(0);
-    game.start(); expect(vi.getTimerCount()).toBe(2);
+    game.start(); f.storage.setItem.mockClear(); expect(vi.getTimerCount()).toBe(2);
   });
   it('import cannot bypass unreadable storage or stopped runtime', () => {
     const f = fixture(); f.storage.getItem.mockImplementation(() => { throw Error('read'); });
-    const game = f.make(); game.start();
+    const game = f.make(); game.start(); f.storage.setItem.mockClear();
     expect(game.importCode(portable()).ok).toBe(false);
     expect(f.storage.setItem).not.toHaveBeenCalled();
     game.stop();
@@ -238,7 +240,7 @@ describe('portable runtime transactions', () => {
 });
 
 it('confirmed UI import publishes replacement cash immediately; cancel never reaches runtime', () => {
-  const f = fixture(); const game = f.make(); game.start();
+  const f = fixture(); const game = f.make(); game.start(); f.storage.setItem.mockClear();
   const controls = createSaveManagement(game, vi.fn());
   controls.edit(portable(performStarterJob(owned()).state)); controls.validate();
   expect(game.getSnapshot().result.state).toEqual(createInitialGameState());

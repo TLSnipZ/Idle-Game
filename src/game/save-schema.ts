@@ -29,7 +29,7 @@ function keys(value: Record<string, unknown>, expected: readonly string[]): bool
     && expected.every(key => Object.getOwnPropertyDescriptor(value, key)?.get === undefined
       && Object.hasOwn(value, key));
 }
-function timestamp(value: unknown): value is number {
+export function isSaveTimestamp(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
@@ -57,10 +57,10 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
     return { ok: false, error: 'invalid-envelope' };
   }
   if (value.format !== SAVE_FORMAT) return { ok: false, error: 'wrong-format' };
-  if (!timestamp(value.version) || value.version < 1) return { ok: false, error: 'invalid-envelope' };
+  if (!isSaveTimestamp(value.version) || value.version < 1) return { ok: false, error: 'invalid-envelope' };
   // v1 is the first format: there are no historical migrations to invent.
   if (value.version !== CURRENT_SAVE_VERSION) return { ok: false, error: 'unsupported-version' };
-  if (!timestamp(value.savedAt)) return { ok: false, error: 'invalid-timestamp' };
+  if (!isSaveTimestamp(value.savedAt)) return { ok: false, error: 'invalid-timestamp' };
   const state = validateSaveState(value.state);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

@@ -16,7 +16,7 @@ describe('local save adapter', () => {
     expect(f.adapter.save(state)).toEqual({ ok: true });
     expect(f.storage.setItem).toHaveBeenCalledTimes(1);
     expect(f.storage.setItem).toHaveBeenCalledWith(SAVE_STORAGE_KEY, expect.any(String));
-    expect(f.adapter.load()).toEqual({ kind: 'loaded', state });
+    expect(f.adapter.load()).toEqual({ kind: 'loaded', state, savedAt: 42 });
     expect(JSON.parse(f.raw() ?? '').savedAt).toBe(42);
   });
   it('reports read and localStorage getter failures without throwing', () => {

@@ -15,7 +15,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 1C.4 — GitHub Pages configuration (complete; user verified) | Official Actions workflow builds and deploys `dist` from `main` | Live Phase 2A persistence, reload and autosave manually verified by the user |
 | 2A — Versioned local saves (complete) | Validated v1 localStorage envelope, safe bootstrap and autosave | Exact reload without offline credit; corrupt/newer saves protected; storage/lifecycle tests |
 | 2B — Save export/import codes (complete) | Portable codes through shared validation and migration boundary | Confirmed atomic replacement, bounded UTF-8 Base64URL and deterministic failure tests |
-| 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
+| 3A — Offline progression (complete) | Eight-hour bounded bootstrap through shared simulation | Exact remainder, atomic persistence and one-time consumption tests |
+| 3B — Further business progression (deferred) | Separate requested scope; no levels or modifiers implemented | Define balance and migrations before implementation |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
 | 5 — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
 | 6 — Permanent progression | Rebirth, reset policy, multiple skill trees, unlocks | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
@@ -28,8 +29,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 Phases 0, 1A, 1B, 1C.1 and 1C.2 are complete. Cash, starter delivery, business
 purchase and deterministic production simulation are connected to a 250 ms browser
 scheduler using monotonic elapsed time. Commands reconcile before acting; fractional
-time, lifecycle cleanup and safe failure suspension are tested. No modifiers,
-offline rewards or automation exist. Phase 2A local saves are implemented. GitHub Pages deployment configuration is implemented in Phase 1C.4.
+time, lifecycle cleanup and safe failure suspension are tested. No modifiers or
+automation exist. Phase 3A offline rewards are implemented. Phase 2A local saves are implemented. GitHub Pages deployment configuration is implemented in Phase 1C.4.
 Phase 1C.3 presentation polish is complete: responsive cards, configured production
 rates, acquisition readiness, action announcements and terminal error presentation.
 Browser visual verification was blocked by the available browser rejecting the local
@@ -49,7 +50,10 @@ milli-cent remainder without offline income. Corrupt/newer saves and read failur
 block automatic writes for the fresh session. Phase 2B is complete: CE1- codes reuse
 the v1 envelope; validated imports require confirmation and a successful durable
 write before live replacement. Clipboard failure leaves a manually copyable code.
-No offline income is awarded. Phase 2C and Phase 3 remain unstarted.
+Phase 3A is complete: valid local saves earn bounded offline production, durably
+recorded before live startup. Failed offline transactions preserve the old save
+and pause the session. Imported historical timestamps still award no income.
+Phase 3B and business levels remain deferred.
 
 ## Next session
 
@@ -59,8 +63,8 @@ No offline income is awarded. Phase 2C and Phase 3 remain unstarted.
 3. Preserve the verified Pages configuration; keep `simulateElapsed(state, elapsedMs)` as the only production path and route
    commands through runtime reconciliation. Do not add new timers in UI components.
 4. Preserve `purchaseBusiness` as the paid ownership command and the economy's safe
-   cash APIs and the shared save-schema/import transaction boundaries. Offline
-   progression and automation remain separate scope unless
+   cash APIs, shared save-schema/import transaction boundaries, and offline
+   write-before-publication semantics. Further progression and automation remain separate scope unless
    explicitly authorized. The later production roadmap row is broader follow-on work,
    not permission to include levels or offline rewards in Phase 1C.2.
 

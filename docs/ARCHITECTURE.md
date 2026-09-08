@@ -6,7 +6,7 @@ Through Phase 1C.2, the domain has economy and business ownership, atomic job an
 purchase commands, and pure elapsed-time production simulation. A per-mount browser
 adapter drives live production and reconciles before player commands. React state
 renders published snapshots. Phase 2A adds validated versioned local persistence
-as documented below. No offline progression exists.
+as documented below. Phase 3A adds bounded offline bootstrap below.
 
 ## Boundaries and dependency direction
 
@@ -645,3 +645,71 @@ state from becoming authoritative; it does not prevent intentional valid edits.
 No signatures or static-client secret keys exist. Future phases must preserve the
 single schema/migration boundary and durable-write-before-publication ordering.
 Phase 2B is complete; Phase 2C and Phase 3 are not started.
+
+## Phase 3A — deterministic offline progression
+
+The v1 envelope and CE1- transport are unchanged. For **local persisted saves**,
+`savedAt` now identifies the fully reconciled state at the synchronous persistence
+boundary. The adapter captures an integer Unix wall timestamp; bootstrap uses this
+same captured value for calculation and durable write, never reading a later time
+for the candidate's metadata. Active commands/autosaves still reconcile immediately
+before saving. The synchronous serialization/storage operation has no interleaved
+game callbacks; browser I/O duration is not an additional offline simulation step.
+The old Phase 2 “metadata only” behavior above is superseded for local bootstrap.
+
+`game/offline-progress.ts` receives explicit timestamps and validated GameState.
+It reuses the save timestamp validator (nonnegative safe integers), orders the
+endpoints before subtraction, and caps the difference at `OFFLINE_CAP_MS` =
+28,800,000 ms (eight hours). The difference between ordered nonnegative safe
+integers is itself safe. No unsafe elapsed input reaches simulation, even at
+Number.MAX_SAFE_INTEGER. Negative differences become zero with `clockAnomaly` true;
+valid state is retained and the timestamp rebased to current time. No punishment or
+positive credit is attached to a future timestamp. `capped` is true at or above
+the cap; `actualElapsedMs` is zero for a backwards clock and otherwise full absence.
+
+Every candidate comes from exactly one `simulateElapsed(state, rewardedElapsedMs)`
+call, including zero time/no businesses. The same rates, exact Money helpers and
+production milli-cent remainder apply online and offline, with no per-second loops
+or alternate income formula. Metadata contains actual/rewarded elapsed, capped,
+clockAnomaly and exact `incomeEarned` derived by the existing Money subtraction
+helper from the before/after balances. It contains no duplicate resulting balance.
+Metadata lives only in the persistent runtime snapshot, never GameState or saves.
+
+`local-save.bootstrap()` reads and fully validates/migrates the envelope, reads the
+injected wall clock, computes the candidate, and uses the existing guarded atomic
+write path with that timestamp. The coordinator publishes the candidate and starts
+its fresh performance.now baseline **only after the write succeeds**. The timestamp
+is consumed even for zero income, a capped absence or a future timestamp. The
+coordinator bootstraps once per instance; Strict Mode restart reuses that result.
+A new instance reads the rebased envelope, so immediate reload awards zero additional
+elapsed time. Autosave remains every five seconds and never invokes offline logic.
+There is no repeating offline timer or change to the 250 ms active scheduler.
+
+If offline simulation overflows, the wall clock is invalid/unavailable, or the
+write fails/conflicts, bootstrap returns the original validated saved state and a
+typed `offline-error`. No candidate or reward metadata is published. The session
+shows that original state but remains paused, with no production/autosave timers or
+commands; reload is required to retry. This intentionally prevents subsequent
+saving from silently erasing the unconsumed interval. The previous valid stored
+string remains intact on write failure. Malformed save bootstrap retains Phase 2's
+fresh-state warning/blocked-write policy. Cross-tab comparison remains best effort;
+localStorage is not a cross-tab compare-and-swap transaction. Use one active tab.
+
+Import preserves Phase 2B's exception: historical code timestamps are validated but
+never simulated. Confirmed import writes the candidate with the **current import
+time**, then replaces live state and clears any prior welcome metadata. A later
+reload may earn only since that new local timestamp. Export only reconciles active
+time and records current export time; it never performs offline catch-up. Schema
+version stays v1 because no envelope or GameState field changed.
+
+The inline, nonblocking Welcome back card appears only for positive whole-cent
+income, shows exact cash and credited duration, indicates the cap when reached,
+and offers Continue to dismiss runtime-only metadata. Zero-income/fraction-only
+returns do not show a fake reward. A pure duration formatter uses seconds/minutes/
+hours without a date library. The card uses existing responsive surfaces, focus
+styles and a polite live region; no UI timer or animation was added.
+
+Tests use fake clocks/storage/schedulers to check cap/clock boundaries, exact
+simulation equivalence, write-before-publication, rollback, one-time consumption,
+Strict Mode restart, autosave, import/reload timestamps, remainder partitioning,
+and presentation. Phase 3A is complete; Phase 3B, levels and modifiers are deferred.

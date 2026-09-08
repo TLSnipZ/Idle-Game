@@ -142,3 +142,18 @@ its last valid cash/remainder; no partial or capped credit is applied. See
 ARCHITECTURE.md for lifecycle, fractional precision and terminal failure policy.
 Reload resets the game. Offline progression, saves and automation are absent;
 Phase 1C.3 visual production feedback/polish remains deferred.
+
+## Phase 3A — provisional offline cap
+
+`OFFLINE_CAP_MS` in `src/game/offline-progress.ts` is **28,800,000 ms (eight hours)**.
+This allows a normal sleep/work absence to earn at the unchanged full production
+rate while bounding long absences. No efficiency multiplier or cap upgrade exists.
+Only elapsed time is capped; the sole production path remains `simulateElapsed`.
+Dockside Detail still earns 75 cents/second, with exact authoritative milli-cent
+carry. Eight credited hours at that rate earn $21,600.00. This is provisional
+single-business tuning, not a progression curve or promise for later levels.
+Negative wall-clock differences receive zero time and rebase safely. Absence beyond
+the cap is consumed when the new current timestamp is durably saved. No extra
+rounding is introduced; saved fractions combine exactly with offline production.
+The welcome card's positive-whole-cent threshold affects presentation only.
+No business levels, modifiers, managers or other balance changes are included.

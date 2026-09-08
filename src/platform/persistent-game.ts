@@ -1,20 +1,23 @@
+import type { OfflineProgress } from '../game/offline-progress';
 import { validateSaveCode } from '../game/save-code';
 import type { ExportResult, SaveCodeError } from '../game/save-code';
 import { createInitialGameState } from '../game/game-state';
 import { createGameRuntime } from './game-runtime';
 import type { RuntimeSnapshot, RuntimeTiming } from './game-runtime';
 import { createLocalSave } from './local-save';
-import type { LoadResult, WriteResult } from './local-save';
+import type { BootstrapResult, LoadResult, WriteResult } from './local-save';
 
 export type ImportResult = { readonly ok: true }
   | { readonly ok: false; readonly error: SaveCodeError | 'runtime-unavailable' | 'persistence-failure'; readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
 
 export const AUTOSAVE_CADENCE_MS = 5_000;
-export type PersistenceStatus = { readonly kind: 'ready' | 'loaded' | 'saved' }
+export type PersistenceStatus = Omit<Extract<BootstrapResult, { kind: 'offline-error' }>, 'state'>
+  | { readonly kind: 'ready' | 'loaded' | 'saved' }
   | { readonly kind: 'blocked'; readonly error: Extract<LoadResult, { kind: 'error' }>['error'] | 'storage-conflict' }
   | { readonly kind: 'error'; readonly error: Extract<WriteResult, { ok: false }>['error'] };
 export interface PersistentSnapshot extends RuntimeSnapshot {
   readonly persistence: PersistenceStatus;
+  readonly offline: OfflineProgress | null;
 }
 const browserAutosave = (callback: () => void) => {
   const id = window.setInterval(callback, AUTOSAVE_CADENCE_MS);
@@ -30,7 +33,7 @@ export function createPersistentGame(
 ) {
   let view: PersistentSnapshot = {
     result: { ok: true, state: createInitialGameState() }, runtimeError: null,
-    persistence: { kind: 'ready' },
+    persistence: { kind: 'ready' }, offline: null,
   };
   let runtime: ReturnType<typeof createGameRuntime> | null = null;
   let cancel: (() => void) | null = null;
@@ -47,18 +50,20 @@ export function createPersistentGame(
   function start() {
     if (active) return;
     if (!runtime) {
-      const loaded = saves.load();
+      const loaded = saves.bootstrap();
       view = { ...view,
-        result: { ok: true, state: loaded.kind === 'loaded' ? loaded.state : view.result.state },
-        persistence: loaded.kind === 'error' ? { kind: 'blocked', error: loaded.error }
+        result: { ok: true, state: loaded.kind === 'loaded' || loaded.kind === 'offline-error' ? loaded.state : view.result.state },
+        offline: loaded.kind === 'loaded' ? loaded.offline : null,
+        persistence: loaded.kind === 'offline-error' ? { kind: 'offline-error', error: loaded.error } : loaded.kind === 'error' ? { kind: 'blocked', error: loaded.error }
           : { kind: loaded.kind === 'loaded' ? 'loaded' : 'ready' },
       };
       runtime = createGameRuntime(view.result.state, snapshot => {
-        view = { ...snapshot, persistence: view.persistence };
+        view = { ...snapshot, persistence: view.persistence, offline: view.offline };
         publish(view);
       }, timing);
       publish(view);
     }
+    if (view.persistence.kind === 'offline-error') return;
     active = true;
     runtime.start();
     startAutosave();
@@ -100,10 +105,11 @@ export function createPersistentGame(
     if (!commit) return { ok: false, error: 'runtime-unavailable' };
     const written = saves.replace(candidate.envelope.state);
     if (!written.ok) return { ok: false, error: 'persistence-failure', detail: written.error };
-    view = { ...view, persistence: { kind: 'saved' } };
+    view = { ...view, persistence: { kind: 'saved' }, offline: null };
     commit();
     startAutosave();
     return { ok: true };
   }
-  return { start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  function dismissOffline() { view = { ...view, offline: null }; publish(view); }
+  return { dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

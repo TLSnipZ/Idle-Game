@@ -36,7 +36,8 @@ export function businessPresentation(owned: boolean, canPurchase: boolean, pause
 export function describePersistence(status: PersistenceStatus): string {
   switch (status.kind) {
     case 'ready': return 'Local autosave ready. Progress saves after actions and every few seconds.';
-    case 'loaded': return 'Local save restored. No offline income was added.';
+    case 'loaded': return 'Local save restored and offline interval recorded.';
+    case 'offline-error': return 'Offline progress could not be recorded. Session paused; your previous save is preserved. Reload to try again.';
     case 'saved': return 'Progress saved on this browser.';
     case 'error': return 'Saving failed. You can keep playing, but recent progress may be lost on reload. Autosave will try again.';
     case 'blocked':

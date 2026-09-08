@@ -113,3 +113,8 @@ h1 em { color: var(--color-cool); font-style: normal; }
 @media (max-width: 740px) {
   .save-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+.offline-return { padding: clamp(1rem, 3vw, 2rem); margin-bottom: 1.5rem; border-color: var(--color-cool); }
+.offline-return p { line-height: 1.5; }
+.offline-income { color: var(--color-cool); font-size: clamp(1.5rem, 4vw, 2.5rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.offline-return button { max-width: 16rem; }

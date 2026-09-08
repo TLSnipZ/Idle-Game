@@ -1,10 +1,13 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 2B: local saves and portable save codes.**
+idle/tycoon browser game. **Phase 3A: deterministic offline progression.**
 Cash, business ownership and fractional production survive reloads on this browser.
 Progress saves after successful actions and every five seconds; closing the page
-can lose progress since the last successful save. There is **no offline income**.
+can lose unsaved actions. On return, owned businesses earn up to **eight hours**
+of offline production from the last successful local save. A welcome card shows
+positive income. If offline reconciliation cannot be saved, the session pauses
+and preserves your old save; reload to retry.
 Corrupt/newer saves are preserved with a warning and saving disabled for that
 session unless you explicitly confirm importing a replacement. Storage failures are
 shown in-game. No cloud saves exist.
@@ -13,7 +16,8 @@ Use **Save management → Export save** to generate a `CE1-` backup code. Copy i
 with the button or select the text manually if clipboard access is unavailable.
 To restore, paste a code, validate it, then confirm replacing current progress and
 the local save. Cancel keeps your progress. Codes are not encrypted or secret.
-Imported timestamps award no offline income.
+Importing a code awards no income from its historical timestamp. Offline timing
+begins at the new local import timestamp.
 
 ## Development
 

@@ -11,7 +11,7 @@ export function useGame() {
   const [view, setView] = useState<PersistentSnapshot>(() => ({
     result: { ok: true, state: createInitialGameState() },
     runtimeError: null,
-    persistence: { kind: 'ready' },
+    persistence: { kind: 'ready' }, offline: null,
   }));
   // This stable, per-hook adapter serializes transitions synchronously before
   // React batches rendering. Never perform clock side effects in a state updater.
@@ -38,5 +38,5 @@ export function useGame() {
     });
   }
 
-  return { saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.runtimeError, runStarterJob, buyBusiness };
+  return { offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }
