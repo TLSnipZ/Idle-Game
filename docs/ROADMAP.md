@@ -11,7 +11,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 1B — First business slice (complete) | Dockside Detail definition, ownership, atomic purchase and minimal UI | Purchase invariants and exact cross-slice transitions tested |
 | 1C.1 — Production math (complete) | Exact elapsed production, pooled fractional accrual and pure simulation tests | Step-size independence, atomic overflow and corruption handling |
 | 1C.2 — Runtime ticking (complete) | Monotonic browser clock, command boundaries and live production | Deterministic timing, fractional carry, cleanup and terminal failure tests |
-| 1C.3 — UI feedback/polish (deferred) | Refine live production presentation when requested | Separate scope; preserve the runtime/domain contracts |
+| 1C.3 — UI feedback/polish (complete) | Premium cash/delivery/business presentation, live status and accessible feedback | Targeted presentation tests; runtime/domain contracts unchanged |
+| 1C.4 — GitHub Pages deployment (deferred) | Configure and verify static hosting when explicitly requested | Separate task; no deployment or workflow added in 1C.3 |
 | 2 — Durable progress | Versioned local saves, validated import/export and migrations | Reload/round trip; corruption/newer versions preserve state; storage errors visible |
 | 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
@@ -28,14 +29,18 @@ purchase and deterministic production simulation are connected to a 250 ms brows
 scheduler using monotonic elapsed time. Commands reconcile before acting; fractional
 time, lifecycle cleanup and safe failure suspension are tested. No modifiers,
 saves, offline rewards or automation exist. No deployment is configured.
-Phase 1C.3 presentation polish has not started.
+Phase 1C.3 presentation polish is complete: responsive cards, configured production
+rates, acquisition readiness, action announcements and terminal error presentation.
+Browser visual verification was blocked by the available browser rejecting the local
+preview address; narrow-width CSS constraints and server-rendered state presentation
+were checked. Phase 1C.4 GitHub Pages deployment remains explicitly deferred.
 
 ## Next session
 
 1. Read AGENTS.md, inspect Git status and the architecture/balance contracts.
 2. Restore/install with `npm ci`; run `npm run typecheck`, `npm run test`, and
    `npm run build`. Review remote status before integrating commits.
-3. Wait for an explicit next-phase task. Phase 1C.3 may refine visual feedback;
+3. Wait for an explicit Phase 1C.4 deployment task. Hosting remains unimplemented;
    keep `simulateElapsed(state, elapsedMs)` as the only production path and route
    commands through runtime reconciliation. Do not add new timers in UI components.
 4. Preserve `purchaseBusiness` as the paid ownership command and the economy's safe

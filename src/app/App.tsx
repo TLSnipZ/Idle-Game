@@ -7,39 +7,63 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { snapshot, runtimeError, runStarterJob, buyBusiness } = useGame();
+  const { snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
+  const paused = runtimeError !== null;
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="app-header">
-        <span className="wordmark">Crime Empire</span>
-        <span className="edition">Early access</span>
+        <span className="wordmark"><span className="brand-mark" aria-hidden="true">CE</span> Crime Empire</span>
+        <span className="edition">The waterfront chapter</span>
       </header>
       <main id="main" className="foundation" tabIndex={-1}>
-        <p className="eyebrow">First connections</p>
-        <h1>The city is waiting.</h1>
-        <p className="intro">Your empire starts here.</p>
-        <div className="empty-state">
-          <span className="empty-state-label">Cash on hand</span>
-          <p className="cash-balance">{formatCash(selectCash(snapshot.state))}</p>
-          <button className="starter-job" onClick={runStarterJob}>
-            <span>{STARTER_JOB.label}</span>
-            <span>+{formatCash(STARTER_JOB.reward)}</span>
-          </button>
-          <p className="session-note">Session only · Progress resets on reload.</p>
-          <p role="status" className="action-status">
-            {runtimeError
-              ? 'Game paused after a runtime error. Reload to start a new session.'
-              : !snapshot.ok ? 'Action could not be completed.' : ''}
-          </p>
+        <div className="chapter-heading">
+          <div>
+            <p className="eyebrow">Small beginnings. Bigger ambitions.</p>
+            <h1>Build your <em>first empire.</em></h1>
+            <p className="intro">Run a delivery. Get the keys. Make the waterfront work for you.</p>
+          </div>
+          <span className={`session-badge ${paused ? 'is-paused' : ''}`}>
+            <span className="status-dot" aria-hidden="true" />{paused ? 'Session paused' : 'Session open'}
+          </span>
         </div>
-        <BusinessCard
-          owned={selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id)}
-          canPurchase={selectCanPurchaseBusiness(snapshot.state, STARTER_BUSINESS.id)}
-          onPurchase={() => buyBusiness(STARTER_BUSINESS.id)}
-        />
+        <div className="play-grid">
+          <section className="cash-panel panel" aria-labelledby="cash-heading">
+            <div className="panel-heading"><h2 id="cash-heading">Available cash</h2><span className="unit-label">USD</span></div>
+            <div className="cash-window" tabIndex={0} role="region" aria-label="Current cash balance, scroll horizontally for very large balances">
+              <p className="cash-balance">{formatCash(selectCash(snapshot.state))}</p>
+            </div>
+            <p className={`cash-context ${owned && !paused ? 'is-live' : ''}`}>
+              <span className="status-dot" aria-hidden="true" />
+              {paused ? 'Earnings paused' : owned ? 'Your business is working for you' : 'Your next move starts here'}
+            </p>
+            <div className="delivery-block">
+              <p className="eyebrow">Make a connection</p>
+              <h3>A quick run. A fresh start.</h3>
+              <p>Take a waterfront delivery and put cash toward your first set of keys.</p>
+              <button className="action-button delivery-button" onClick={runStarterJob} disabled={paused}>
+                <span>{STARTER_JOB.label}</span>
+                <span className="reward">+{formatCash(STARTER_JOB.reward)} <span aria-hidden="true">↗</span></span>
+              </button>
+            </div>
+            <div className="action-status" role="status" aria-live="polite" aria-atomic="true">
+              <span key={feedback.sequence}>{paused ? '' : feedback.message}</span>
+            </div>
+          </section>
+          <BusinessCard
+            owned={owned}
+            canPurchase={selectCanPurchaseBusiness(snapshot.state, STARTER_BUSINESS.id)}
+            paused={paused}
+            onPurchase={() => buyBusiness(STARTER_BUSINESS.id)}
+          />
+        </div>
+        <div role="alert" className={paused ? 'runtime-error' : undefined}>
+          {paused && <><strong>Session paused. Production has stopped.</strong><p>Reload the page to start a new session. Your current progress will reset.</p></>}
+        </div>
+        <p className="session-note">Session only <span aria-hidden="true">/</span> Progress resets on reload. Keep this page open to keep earning.</p>
       </main>
-      <footer className="app-footer">Crime Empire · Working title</footer>
+      <footer className="app-footer"><span>Crime Empire <span aria-hidden="true">/</span> Working title</span><span>Start small. Own the night.</span></footer>
     </div>
   );
 }

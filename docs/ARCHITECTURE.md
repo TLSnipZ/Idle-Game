@@ -454,3 +454,31 @@ policy. Expected overflow does not throw or create a rapid retry loop.
 Phase 1C.2 changes only the existing session note and adds a concise runtime error
 message. Phase 1C.3 owns visual production feedback/polish; it is deferred. No
 save/load, offline progression, modifiers or automation have been introduced.
+
+## Phase 1C.3 — presentation boundary
+
+The first playable slice uses responsive cash and business cards with original
+CSS garage artwork, configured rewards/rates, explicit purchase readiness and
+owned/live/paused states. `app/game-presentation.ts` maps existing command results
+and ownership/affordability/runtime-error flags to display text and button states.
+It owns no economic arithmetic. `BusinessCard` consumes the existing business
+config and exact public cash formatter; no balance values are copied into JSX.
+
+`useGame` records action feedback only inside the command callback actually
+executed by the existing runtime boundary. A runtime-only sequence distinguishes
+repeated identical messages for the polite, atomic status region. Timer updates
+do not create announcements or clear the last action message. GameState, the
+clock adapter, scheduler, simulation and command results remain unchanged.
+Terminal runtime errors take precedence, disable actions, remove live status,
+and appear in an alert explaining reload and reset; no recovery is offered.
+
+Cash uses tabular digits on one stable line inside a keyboard-scrollable region
+for extreme balances. The two-column layout stacks below 740 px, with min-width
+zero tracks and full-width buttons. Only short hover/press and border transitions
+are used; reduced-motion disables those transitions and transforms. There are no
+continuous animations, new timers, fonts, assets or dependencies to download.
+Targeted pure presentation and server-rendered card tests cover ownership,
+affordability, paused status, configured values and action failure messages.
+Browser visual QA remains pending because the available browser blocked the local
+preview address. Phase 1C.4 GitHub Pages deployment is deferred; no hosting, saves
+or offline progression is introduced.
