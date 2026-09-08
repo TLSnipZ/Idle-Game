@@ -17,8 +17,8 @@ describe('v3 upgrade and precision schema', () => {
   it('migrates realistic v2 saves preserving level, cash, milli-cents and savedAt', () => {
     const old = legacy(); const before = JSON.stringify(old);
     const result = parseSave(before);
-    expect(result).toEqual({ ok: true, envelope: { ...old, version: 3, state: {
-      ...old.state, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
+    expect(result).toEqual({ ok: true, envelope: { ...old, version: CURRENT_SAVE_VERSION, state: {
+      ...old.state, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
     } } });
     expect(JSON.stringify(old)).toBe(before);
     expect(validateSaveCode(encodeSaveText(before))).toEqual(result);
@@ -64,7 +64,7 @@ describe('v3 upgrade and precision schema', () => {
     const old = legacy();
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, economy: { cash: '01' } } })).ok).toBe(false);
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, businesses: { ...old.state.businesses, productionRemainderMilliCents: 1000 } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, upgrades: { purchasedIds: [] } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, version: 4 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] } } })).ok).toBe(false);
+    expect(parseSave(JSON.stringify({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

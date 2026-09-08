@@ -243,3 +243,31 @@ together or rounded between operations. Both production remainders retain all
 fractions across callbacks, saves and offline catch-up. UI precision is display
 only. Business purchase/level costs, level cap and eight-hour offline cap are
 unchanged. Phase 4C automation and additional content are deferred.
+
+## Phase 4C — provisional delivery delegation
+
+**Delivery Dispatcher** (`automation:delivery-dispatcher`) costs **750,000 cents
+($7,500)** and requires ownership of Dockside Detail. One permanent unlock performs
+one centrally evaluated starter job per **10,000 ms (10 seconds)**; manual jobs
+remain available. No level requirement, worker scaling or second automation exists.
+The price sits between the washer and stronger production upgrades as a choice
+between active-delivery support and business investment.
+
+| Job modifiers | Exact reward every 10 seconds |
+| --- | --- |
+| None | $25.00 |
+| Street Connections | $30.00 |
+| Express Tips | $30.00 |
+| Both | $36.00 |
+
+Base reward, the five upgrades, business rates/level costs and the offline cap are
+unchanged. Both systems share the same eight-hour offline credit window. From zero
+progress, eight hours completes 2,880 deliveries ($72,000 without job upgrades or
+$103,680 with both). Five seconds of saved progress plus 25 seconds credited offline
+completes three deliveries: **$108 with both job upgrades**, progress zero. Extra
+absence beyond the cap does not advance the cycle. Values are provisional.
+
+Cycle payouts use the modifier set when the cycle completes; upgrades reconcile
+already-completed jobs first and retain unfinished progress. Completed cycles are
+batched mathematically, with no per-cycle loop and no fractional money rounding
+between modifiers. Future automation/content remains a separately authorized phase.

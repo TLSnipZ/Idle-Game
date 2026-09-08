@@ -1,3 +1,4 @@
+import { createInitialAutomationState, isAutomationState, DELIVERY_DISPATCHER } from '../features/automation';
 import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
 import type { UpgradeId } from '../features/upgrades';
 import { isRational, ZERO_RATIONAL } from '../shared/rational';
@@ -7,7 +8,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 3;
+export const CURRENT_SAVE_VERSION = 4;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -39,11 +40,11 @@ export function isSaveTimestamp(value: unknown): value is number {
 /** Shared state validation; legacy ownership is accepted only by the v1 migration. */
 function validateState(value: unknown, version: number): GameState | null {
   const legacy = version === 1;
-  const current = version === CURRENT_SAVE_VERSION;
-  if (!record(value) || !keys(value, current ? ['economy', 'businesses', 'upgrades'] : ['economy', 'businesses'])) return null;
+  const hasModifiers = version >= 3;
+  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : [])])) return null;
   const { economy, businesses } = value;
   if (!record(economy) || !keys(economy, ['cash']) || !isMoney(economy.cash)
-      || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents', ...(current ? ['productionRemainderSubMilliCents'] : [])])) return null;
+      || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents', ...(hasModifiers ? ['productionRemainderSubMilliCents'] : [])])) return null;
   const remainder = businesses.productionRemainderMilliCents;
   if (typeof remainder !== 'number' || !Number.isInteger(remainder) || remainder < 0 || remainder > 999) return null;
   const owned: Partial<Record<BusinessId, { readonly level: number }>> = {};
@@ -66,10 +67,10 @@ function validateState(value: unknown, version: number): GameState | null {
       owned[business.id] = { level: entry.level };
     }
   }
-  const sub = current ? businesses.productionRemainderSubMilliCents : ZERO_RATIONAL;
+  const sub = hasModifiers ? businesses.productionRemainderSubMilliCents : ZERO_RATIONAL;
   if (!isRational(sub) || BigInt(sub.numerator) >= BigInt(sub.denominator)) return null;
   const purchasedIds: UpgradeId[] = [];
-  if (current) {
+  if (hasModifiers) {
     if (!record(value.upgrades) || !keys(value.upgrades, ['purchasedIds']) || !Array.isArray(value.upgrades.purchasedIds)) return null;
     for (const id of value.upgrades.purchasedIds) {
       const upgrade = findUpgrade(id);
@@ -77,7 +78,10 @@ function validateState(value: unknown, version: number): GameState | null {
       purchasedIds.push(upgrade.id);
     }
   }
-  return { economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  const automation = version >= 4 ? value.automation : createInitialAutomationState();
+  if (!isAutomationState(automation) || (automation.unlockedIds.length > 0
+      && !Object.hasOwn(owned, DELIVERY_DISPATCHER.requiredBusiness))) return null;
+  return { automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -87,7 +91,12 @@ function migrateV1ToV2(value: unknown): unknown {
   return { economy: valid.economy, businesses: { owned: valid.businesses.owned,
     productionRemainderMilliCents: valid.businesses.productionRemainderMilliCents } };
 }
-function migrateV2ToV3(value: unknown): GameState | null { return validateState(value, 2); }
+function migrateV2ToV3(value: unknown): unknown {
+  const valid = validateState(value, 2);
+  if (!valid) return null;
+  return { economy: valid.economy, businesses: valid.businesses, upgrades: valid.upgrades };
+}
+function migrateV3ToV4(value: unknown): GameState | null { return validateState(value, 3); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -102,6 +111,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   let migrated: unknown = value.state;
   if (value.version === 1) migrated = migrateV1ToV2(migrated);
   if (value.version <= 2) migrated = migrateV2ToV3(migrated);
+  if (value.version <= 3) migrated = migrateV3ToV4(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

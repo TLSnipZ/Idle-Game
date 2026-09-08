@@ -1,3 +1,4 @@
+import { DELIVERY_DISPATCHER } from '../features/automation';
 import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
 import { findUpgrade } from '../features/upgrades';
@@ -7,8 +8,9 @@ import { formatCash } from '../features/economy/ui';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
-export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment', result: RuntimeSnapshot['result'], upgradeId?: unknown): string {
+export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation', result: RuntimeSnapshot['result'], upgradeId?: unknown): string {
   if (result.ok) {
+    if (action === 'automation') return `${DELIVERY_DISPATCHER.name} hired. Automated deliveries are active.`;
     if (action === 'equipment') {
       const upgrade = findUpgrade(upgradeId);
       return `${upgrade?.name ?? 'Upgrade'} purchased. ${upgrade?.modifier.target.stat === 'job-reward' ? 'Delivery' : 'Production'} bonus is active.`;
@@ -25,9 +27,11 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'insufficient-funds': return 'Not enough cash yet. Complete a delivery to keep building your balance.';
     case 'already-owned': return 'This business is already yours.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
+    case 'unknown-automation': return 'This delegation is unavailable.';
+    case 'already-unlocked': return 'This dispatcher is already hired.';
     case 'unknown-upgrade': return 'This upgrade is unavailable.';
     case 'already-purchased': return 'This upgrade is already purchased.';
-    case 'prerequisite-not-met': return 'This upgrade’s requirement is not met yet.';
+    case 'prerequisite-not-met': return 'This purchase’s requirement is not met yet.';
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';
     case 'invalid-level': return 'Business level is invalid. No transaction was made.';

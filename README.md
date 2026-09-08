@@ -1,16 +1,18 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 4A: central modifiers and first equipment upgrade.**
-Cash, business levels, purchased equipment and fractional production survive reloads on this browser.
-Buy Dockside Detail at level 1, then use its Upgrade button to increase production
-up to level 100. Commercial Pressure Washer equipment costs $2,500 and boosts
-Dockside production by 25%. Existing saves/codes migrate automatically, preserving
-levels and earned fractions; old saves begin with no purchased equipment.
+idle/tycoon browser game. **Phase 4C: starter-job delegation.**
+Cash, business levels, five purchased upgrades, automation and exact progress survive
+reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
+to business production and delivery rewards through the shared modifier system.
+Hire the **Delivery Dispatcher** for **$7,500** after acquiring Dockside: it performs
+one delivery every **10 seconds** at your current reward ($25 base, $36 with both
+job upgrades). Manual deliveries remain available and do not reset its progress.
+Existing saves/codes migrate automatically with the dispatcher initially locked.
 Progress saves after successful actions and every five seconds; closing the page
-can lose unsaved actions. On return, owned businesses earn up to **eight hours**
-of offline production from the last successful local save. A welcome card shows
-positive income. If offline reconciliation cannot be saved, the session pauses
+can lose unsaved actions. On return, businesses and the dispatcher receive the same maximum **eight hours**
+of offline progress from the last successful local save. A welcome card shows
+positive income with the business/dispatcher breakdown when hired. If offline reconciliation cannot be saved, the session pauses
 and preserves your old save; reload to retry.
 Corrupt/newer saves are preserved with a warning and saving disabled for that
 session unless you explicitly confirm importing a replacement. Storage failures are
@@ -58,8 +60,9 @@ Start with [AGENTS.md](AGENTS.md). Read [architecture](docs/ARCHITECTURE.md),
 ## GitHub Pages
 
 Expected public URL: [Crime Empire](https://tlsnipz.github.io/Idle-Game/).
-The user manually verified the live Phase 2A deployment: cash and ownership survive
-reload, autosave works, and no offline income is awarded.
+The user manually verified the live Phase 4B deployment: all five upgrades, reward
+stacking, reload, offline income and export/import work. Phase 4C live verification
+is still pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**

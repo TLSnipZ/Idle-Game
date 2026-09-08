@@ -1,3 +1,4 @@
+import { CURRENT_SAVE_VERSION } from './save-schema';
 import { describe, expect, it } from 'vitest';
 import { UPGRADE_CATALOG, PRESSURE_WASHER, DETAILING_LINE, FLEET_LOGISTICS, STREET_CONNECTIONS, EXPRESS_TIPS } from '../features/upgrades';
 import { STARTER_BUSINESS } from '../features/businesses';
@@ -80,10 +81,10 @@ describe('five-upgrade catalog', () => {
     const result = evaluateStat(moneyFromMinorUnits('100'), { stat: 'business-production', businessId: 'business:future-test' }, UPGRADE_CATALOG.map(u => u.modifier));
     expect(result).toMatchObject({ ok: true, effective: rational(110n), applied: [FLEET_LOGISTICS.modifier] });
   });
-  it('roundtrips all five through unchanged v3 and CE1 validation', () => {
+  it('roundtrips all five through the current schema and CE1 validation', () => {
     const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
     const encoded = serializeSave(state, 1234); if (!encoded.ok) throw Error('fixture');
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 3, savedAt: 1234, state } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: CURRENT_SAVE_VERSION, savedAt: 1234, state } });
     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toMatchObject({ ok: true, envelope: { state } });
     for (const ids of [[...state.upgrades.purchasedIds, PRESSURE_WASHER.id], ['upgrade:retired']]) {
       expect(parseSave(JSON.stringify({ ...JSON.parse(encoded.serialized), state: { ...state, upgrades: { purchasedIds: ids } } })).ok).toBe(false);

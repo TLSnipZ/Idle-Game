@@ -7,7 +7,8 @@ purchase commands, and pure elapsed-time production simulation. A per-mount brow
 adapter drives live production and reconciles before player commands. React state
 renders published snapshots. Phase 2A adds validated versioned local persistence
 as documented below. Phase 3A adds bounded offline bootstrap; Phase 3B adds levels and v2 migration.
-Phase 4A adds central exact modifiers, one equipment upgrade and v3 migration below.
+Phase 4A adds central exact modifiers and v3 migration; Phase 4B expands the catalog.
+Phase 4C adds starter-job delegation, shared elapsed reconciliation and v4 migration below.
 
 ## Boundaries and dependency direction
 
@@ -52,8 +53,8 @@ collection in `game/effective-stats.ts`. Only `business-production` and `job-rew
 exist. Purchased equipment is the only source; future implemented sources join the
 same collector, never mutate cash/rates directly. Full precision, stacking and
 migration decisions are documented in the Phase 4A section below. This supersedes
-the Phase 0 proposal of separate flat/additive-percent/factor operations: only
-multiplicative percentage bonuses have a real current consumer.
+the Phase 0 proposal of separate flat/additive-percent/factor operations: flat additions and
+multiplicative percentage bonuses have current consumers (Phase 4B below).
 
 ## Time, randomness and numbers
 
@@ -922,3 +923,93 @@ remainders survive. Autosave, export/import and offline bootstrap keep their nor
 paths: durable write before replacement, imported historical timestamps ignored,
 eight-hour offline cap and one-time consumption. Online/offline production both use
 `simulateElapsed`, with no additional timers or modifier-specific formula.
+
+## Phase 4C — starter-job delegation
+
+`features/automation` owns exactly one config, **Delivery Dispatcher**
+(`automation:delivery-dispatcher`): $7,500, requires Dockside ownership, one-time
+unlock, fixed 10,000 ms interval. It is distinct from upgrade ownership and adds
+no modifiers, workers, levels or additional businesses. GameState adds only:
+
+```ts
+automation: {
+  unlockedIds: AutomationId[];
+  starterJobElapsedMs: number;
+}
+```
+
+Progress is a safe integer in `[0, 10000)`; locked state requires zero progress.
+There are no timestamps, cached rewards, lifetime counts or UI history in this
+slice. `purchaseAutomation` validates identity/prerequisite/ownership, spends via
+`spendCash`, and returns cash plus unlock together with initial progress zero.
+Failures retain the original object. Manual deliveries remain available, reuse
+`evaluateJobReward`, and never change automation progress.
+
+### Shared elapsed transaction
+
+`simulateGameElapsed` is the small composition boundary used by live runtime and
+offline bootstrap. It calls **`simulateElapsed` once for business production**,
+then `simulateAutomation` for the **same integer elapsed duration**, returning one
+candidate. The existing business formula and both production remainder fields
+are unchanged. If either transition fails, the composition returns the original
+state; no successful intermediate business credit/progress is published.
+
+Automation uses transient BigInt for `total = previousProgress + elapsedMs`,
+`jobs = total / interval`, `progress = total % interval`. It does not loop per job.
+Even maximum safe elapsed plus prior progress is exact; the quotient at the fixed
+interval and remainder fit safe integers. Completed jobs use the same
+`evaluateJobReward` as manual jobs, including flat-before-percent stacking and
+one floor at discrete payout. `multiplyMoney(reward, jobs)` and `earnCash` apply the
+batch with existing overflow checks. No reward constant or modifier formula is
+copied. Invalid elapsed returns an explicit failure; corrupt authoritative progress
+throws under the existing fail-loudly policy. Runtime suspends on failure and
+prevents later autosaves from publishing an intermediate candidate.
+
+For unchanged modifiers, partitioning successful elapsed intervals yields identical
+cash and progress. The runtime uses its existing 250 ms monotonic scheduler and
+fractional runtime-ms accumulator; no extra production timer exists. Before **any**
+player command it reconciles both systems with old ownership/modifiers. Unlocking
+starts progress at zero at that boundary, so prior time never counts. Successful
+unlock changes extend the existing conservative discard of less than one runtime
+millisecond at rate boundaries; earned business fractions and whole-ms automation
+progress are never discarded. Failed commands retain timing as before.
+
+Job-modifier purchases first pay all jobs completed up to the boundary at the old
+reward. An unfinished cycle retains its progress and pays the new reward when it
+later completes. There is no prorated per-ms job income. Manual jobs do not reset
+or advance that cycle. After successful reconciliation, optional runtime-only
+`automationEvent` holds just the latest completed batch, its exact income and an
+announcement sequence. Ordinary ticks preserve it as a labelled “Last dispatch”;
+imports clear it. No notification history or lifetime job statistics are saved.
+
+### Save v4, offline and import semantics
+
+Schema **v4** adds automation; sequential v1→v2→v3→v4 migrations validate each old
+shape. Valid v3 saves gain locked automation with zero progress, preserving cash,
+levels, all purchased upgrades, both production fractions and savedAt exactly.
+The shared slice validator rejects missing/extra fields, unknown/duplicate IDs,
+invalid progress, locked nonzero progress and unmet ownership prerequisites.
+CE1- remains the transport; local storage key and bounds are unchanged. Stable
+automation IDs require explicit migration if retired or renamed.
+
+Offline bootstrap calls the shared elapsed coordinator with the existing capped
+window: **both businesses and delegation receive at most eight hours**. Saved cycle
+progress contributes to those jobs; discarded absence contributes to neither jobs
+nor remainder. Future timestamps award zero and safely rebase. The resulting
+candidate is durably written with current time **before** live publication/startup.
+Failure preserves the old save and pauses startup. Repeated bootstrap/reload and
+Strict Mode retain the existing once-only interval consumption behavior.
+
+Export reconciles both systems and serializes v4 with fresh injected savedAt.
+Confirmed import validates/migrates, preserves imported progress, writes before
+replacement, resets active timing and uses import time for future local offline
+accrual. Historical imported timestamps award **no business or automated income**.
+Five-second autosave continues through ordinary reconciliation, not every tick.
+
+The compact Delegation card shows prerequisite, cost, current effective reward,
+interval, ownership and a labelled native progress element with time remaining.
+After hiring, buying controls disappear. Polite feedback aggregates each completed
+batch. The welcome card optionally separates business and dispatcher income/jobs
+while retaining total, credited time, cap notice and dismiss control. Presentation
+uses selectors/formatters and the existing responsive/focus/reduced-motion styles;
+there is no UI timer. Phase 4C is complete; further delegation systems are deferred.

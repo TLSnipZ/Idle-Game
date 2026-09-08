@@ -19,7 +19,7 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 3B — Business levels (complete) | Normalized levels, exact quadratic costs and linear production | v1→v2 migration, atomic upgrades, runtime boundaries and offline/save regression tests |
 | 4A — Central modifiers and first upgrade (complete) | Exact scoped stat evaluation, one purchased equipment bonus, v3 saves | Stacking/precision, atomic purchases, migration, runtime and offline regressions |
 | 4B — Multi-upgrade catalog (complete) | Five scoped/global production and job upgrades | Exact flat-before-percent stacking, v3 compatibility |
-| 4C — Automation (deferred) | Separate requested scope | Preserve central evaluation and command/persistence boundaries |
+| 4C — Starter-job delegation (complete) | One Delivery Dispatcher, 10-second cycle, v4 migration | Exact shared online/offline elapsed transaction, atomic failures and persistence |
 | 5 — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
 | 6 — Permanent progression | Rebirth, reset policy, multiple skill trees, unlocks | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
 | 7 — City systems | Territories, heat, crew, random events, one at a time | Each uses public contracts, deterministic inputs and compatible saves |
@@ -31,7 +31,7 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 Phases 0, 1A, 1B, 1C.1 and 1C.2 are complete. Cash, starter delivery, business
 purchase and deterministic production simulation are connected to a 250 ms browser
 scheduler using monotonic elapsed time. Commands reconcile before acting; fractional
-time, lifecycle cleanup and safe failure suspension are tested. Phase 4A adds one scoped equipment modifier; automation remains deferred. Phase 3A offline rewards are implemented. Phase 2A local saves are implemented. GitHub Pages deployment configuration is implemented in Phase 1C.4.
+time, lifecycle cleanup and safe failure suspension are tested. Phase 4A adds one scoped equipment modifier; Phase 4C adds one starter-job dispatcher. Phase 3A offline rewards are implemented. Phase 2A local saves are implemented. GitHub Pages deployment configuration is implemented in Phase 1C.4.
 Phase 1C.3 presentation polish is complete: responsive cards, configured production
 rates, acquisition readiness, action announcements and terminal error presentation.
 Browser visual verification was blocked by the available browser rejecting the local
@@ -57,7 +57,7 @@ and pause the session. Imported historical timestamps still award no income.
 Phase 3B is complete: purchases start at level 1, with paid upgrades through level
 100. Existing v1 saves migrate without changing cash, savedAt or earned remainder.
 No additional businesses are implemented. Phase 4A adds exactly one equipment upgrade,
-central exact production/job evaluation and v2→v3 migration. Phase 4B is complete: five upgrades exercise scoped/global production and flat/percentage job rewards. Phase 4C automation remains deferred.
+central exact production/job evaluation and v2→v3 migration. Phase 4B is complete: five upgrades exercise scoped/global production and flat/percentage job rewards. Phase 4C is complete: one dispatcher, exact cycle progress and v4 migration. The next phase remains deferred.
 
 ## Next session
 
@@ -80,4 +80,4 @@ consideration. These are phase-specific decisions, not requests to implement now
 The user manually verified the live Phase 3A offline income and welcome-back UI
 after a hard refresh. The user also manually verified Phase 3B save migration,
 levels/costs/scaled production, reload, offline income and export/import with levels.
-The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. Phase 4B is locally verified; its live deployment is not verified in this task.
+The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. The user manually verified Phase 4B’s five upgrades, scoped/global production, stacked and displayed job rewards, reload, offline production and export/import in the working live build. Phase 4C has local deterministic verification; its live build has not been verified in this task.

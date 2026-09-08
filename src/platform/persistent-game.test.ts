@@ -1,3 +1,4 @@
+import { CURRENT_SAVE_VERSION } from '../game/save-schema';
 import { upgradeBusiness } from '../game/upgrade-business';
 import { moneyFromMinorUnits } from '../features/economy';
 import { createSaveManagement } from '../app/save-management';
@@ -105,7 +106,7 @@ describe('persistent runtime lifecycle', () => {
     expect(second.getSnapshot().result.state).toEqual(saved);
     expect(Object.keys(JSON.parse(f.raw() ?? ''))).toEqual(['format', 'version', 'savedAt', 'state']);
   });
-  it.each(['{', JSON.stringify({ format: 'crime-empire-save', version: 4, savedAt: 1, state: owned() })])('protects corrupt/newer saves throughout a fresh playable session %#', raw => {
+  it.each(['{', JSON.stringify({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION + 1, savedAt: 1, state: owned() })])('protects corrupt/newer saves throughout a fresh playable session %#', raw => {
     const f = fixture(raw); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     expect(game.getSnapshot().result.state).toEqual(createInitialGameState());
     expect(game.getSnapshot().persistence.kind).toBe('blocked');
@@ -165,7 +166,7 @@ describe('portable runtime transactions', () => {
     const result = game.exportCode();
     if (!result.ok) throw Error('export');
     const decoded = validateSaveCode(result.code);
-    expect(decoded.ok && decoded.envelope).toEqual({ format: 'crime-empire-save', version: 3, savedAt: 777, state: simulateElapsed(owned(), 1000).state });
+    expect(decoded.ok && decoded.envelope).toEqual({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION, savedAt: 777, state: simulateElapsed(owned(), 1000).state });
     expect(f.raw()).toBe(encoded());
     expect(f.storage.setItem).not.toHaveBeenCalled();
     const snapshot = game.getSnapshot().result.state;
@@ -188,7 +189,7 @@ describe('portable runtime transactions', () => {
     f.advance(AUTOSAVE_CADENCE_MS);
     expect(f.storage.setItem).toHaveBeenCalledTimes(2);
   });
-  it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 4, savedAt: 0, state: owned() }))])('failed validation preserves both state and save %#', code => {
+  it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION + 1, savedAt: 0, state: owned() }))])('failed validation preserves both state and save %#', code => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     const original = game.getSnapshot().result.state;
     f.at(1100);
@@ -301,7 +302,7 @@ describe('level command persistence and time boundaries', () => {
     const f = fixture(JSON.stringify(legacy)); f.wall(1001);
     const game = f.make(); game.start();
     expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned(), 1000).state);
-    expect(JSON.parse(f.raw() ?? '')).toMatchObject({ version: 3, savedAt: 1001 });
+    expect(JSON.parse(f.raw() ?? '')).toMatchObject({ version: CURRENT_SAVE_VERSION, savedAt: 1001 });
     game.stop(); const second = f.make(); second.start();
     expect(second.getSnapshot().offline?.incomeEarned).toBe('0');
     const historical = encodeSaveText(JSON.stringify(legacy));

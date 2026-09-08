@@ -1,20 +1,23 @@
+import type { PurchaseAutomationResult } from '../game/purchase-automation';
+import type { AutomationSummary } from '../game/simulate-automation';
 import type { PurchaseUpgradeResult } from '../game/purchase-upgrade';
 import type { UpgradeBusinessResult } from '../game/upgrade-business';
 import type { GameState } from '../game/game-state';
 import type { StarterJobResult } from '../game/perform-starter-job';
 import type { PurchaseBusinessResult } from '../game/purchase-business';
-import { simulateElapsed } from '../game/simulate-elapsed';
-import type { SimulationResult } from '../game/simulate-elapsed';
+import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
-type RuntimeError = Extract<SimulationResult, { ok: false }>['error']
+type CommandResult = PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
 export interface RuntimeSnapshot {
   readonly result: CommandResult;
   readonly runtimeError: RuntimeError | null;
+  readonly automationEvent?: AutomationSummary & { readonly sequence: number };
 }
 
 export interface RuntimeTiming {
@@ -68,9 +71,9 @@ export function createGameRuntime(
       return false;
     }
     const wholeMs = Math.floor(elapsed);
-    let result: SimulationResult;
+    let result: GameSimulationResult;
     try {
-      result = simulateElapsed(snapshot.result.state, wholeMs);
+      result = simulateGameElapsed(snapshot.result.state, wholeMs);
     } catch (error) {
       suspend('invalid-state');
       throw error; // Preserve the domain's fail-loudly corruption policy.
@@ -83,7 +86,11 @@ export function createGameRuntime(
     remainderMs = elapsed - wholeMs;
     if (result.state !== snapshot.result.state) {
       // Automatic income must not erase feedback from the last player command.
-      snapshot = { ...snapshot, result: { ...snapshot.result, state: result.state } };
+      snapshot = { ...snapshot, result: { ...snapshot.result, state: result.state },
+        ...(result.automation.completedJobs > 0 ? { automationEvent: {
+          ...result.automation, sequence: (snapshot.automationEvent?.sequence ?? 0) + 1,
+        } } : {}),
+      };
       publish(snapshot);
     }
     return true;
@@ -93,10 +100,11 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // Any ownership/level/equipment change starts a new rate boundary. Only runtime sub-ms
+    // Ownership/level/equipment/delegation changes start a new rate boundary. Runtime sub-ms
     // duration is dropped; earned authoritative milli-cents are never reset.
     if (result.ok && (result.state.businesses.owned !== previous.businesses.owned
-        || result.state.upgrades !== previous.upgrades)) remainderMs = 0;
+        || result.state.upgrades !== previous.upgrades
+        || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
     snapshot = { ...snapshot, result };
     publish(snapshot);
   }

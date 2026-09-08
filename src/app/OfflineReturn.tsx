@@ -13,6 +13,11 @@ export function OfflineReturn({ progress, onDismiss }: {
       <h2 id="offline-heading">Welcome back</h2>
       <p>While you were away</p>
       <p className="offline-income">+{formatCash(progress.incomeEarned)}</p>
+      {progress.automation && progress.businessIncome !== undefined && <>
+        <p>Business income: {formatCash(progress.businessIncome)}</p>
+        <p>Dispatcher: {progress.automation.completedJobs} deliveries · {formatCash(progress.automation.income)}</p>
+      </>}
+      <p>Away: {formatOfflineDuration(progress.actualElapsedMs)}</p>
       <p>Time credited: {formatOfflineDuration(progress.rewardedElapsedMs)}</p>
       {progress.capped && <p>Offline earnings capped at {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>}
     </div>

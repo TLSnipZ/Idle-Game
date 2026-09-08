@@ -1,3 +1,4 @@
+import { CURRENT_SAVE_VERSION } from '../game/save-schema';
 import { describe, expect, it } from 'vitest';
 import { createPersistentGame } from './persistent-game';
 import { createLocalSave } from './local-save';
@@ -122,13 +123,13 @@ describe('equipment runtime, persistence and offline contracts', () => {
   });
 });
 
-it('local v2 bootstrap preserves the old timestamp for catch-up before durably writing v3', () => {
+it('local v2 bootstrap preserves the old timestamp for catch-up before durably writing the current schema', () => {
   let raw = JSON.stringify({ format: 'crime-empire-save', version: 2, savedAt: 1000,
     state: { economy: { cash: '0' }, businesses: { owned: { [STARTER_BUSINESS.id]: { level: 7 } }, productionRemainderMilliCents: 975 } } });
   const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 2000);
   const result = save.bootstrap();
   expect(result).toMatchObject({ kind: 'loaded', state: { economy: { cash: '525' }, upgrades: { purchasedIds: [] }, businesses: { productionRemainderMilliCents: 975 } } });
-  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 3, savedAt: 2000 } });
+  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: CURRENT_SAVE_VERSION, savedAt: 2000 } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { incomeEarned: '0' } });
 });
 
