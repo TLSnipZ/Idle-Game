@@ -114,5 +114,18 @@ export function createGameRuntime(
     });
   }
 
-  return { start, stop, reconcile, execute, getSnapshot: () => snapshot };
+  // Prepare without mutation. Caller must durably write before invoking commit,
+  // synchronously in this same task (no await between preparation and commit).
+  function prepareReplacement(state: GameState): (() => void) | null {
+    if (baseline === null || snapshot.runtimeError !== null) return null;
+    const now = timing.now();
+    if (!Number.isFinite(now) || now < baseline) return null;
+    return () => {
+      baseline = now;
+      remainderMs = 0;
+      snapshot = { result: { ok: true, state }, runtimeError: null };
+      publish(snapshot);
+    };
+  }
+  return { start, stop, reconcile, execute, prepareReplacement, getSnapshot: () => snapshot };
 }

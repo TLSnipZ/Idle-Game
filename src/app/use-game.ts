@@ -38,5 +38,5 @@ export function useGame() {
     });
   }
 
-  return { persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.runtimeError, runStarterJob, buyBusiness };
+  return { saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.runtimeError, runStarterJob, buyBusiness };
 }

@@ -567,3 +567,81 @@ corruption protection, version rejection, atomic failures, command boundaries,
 reload timing, cadence, and lifecycle cleanup. Phase 2B export/import codes remain
 deferred and must reuse this validation/migration boundary with explicit replacement
 semantics. No compression, Base64, checksum, slots or offline logic is implemented.
+
+## Phase 2B — portable save codes
+
+`game/save-code.ts` is a transport around the single Phase 2A schema. The stable
+**CE1-** prefix identifies transport version 1 independently of envelope schema
+version. UTF-8 JSON is encoded as canonical unpadded Base64URL; no compression or
+Node-only runtime dependency is used. Serialization still comes from
+`serializeSave`; decoding still ends in `parseSave` / `migrateToCurrentSave`.
+There is no second envelope, Money validator or business validation path.
+
+Raw code input, including surrounding whitespace, is bounded to **262,148 UTF-16
+code units** before trimming or decoding. This includes the four-character prefix
+and room for Base64URL of three UTF-8 bytes per allowed serialized UTF-16 unit.
+Decoded text retains Phase 2A's **65,536 UTF-16 code-unit** limit (at most 128 KiB
+of string contents). Strict alphabet, length, UTF-8 and canonical trailing-bit
+checks reject malformed encoding. Leading/trailing whitespace is otherwise allowed;
+internal whitespace and padding are rejected. JSON is parsed as unknown and the
+existing complete schema/migration validation must succeed. Typed results distinguish
+empty/oversized input, prefix, encoding, JSON, envelope/state/version errors,
+runtime unavailability and persistence failure (with the storage error retained).
+
+### Transaction and timing
+
+The persistent runtime exposes `exportCode()` and `importCode(code)`. Export first
+uses the existing runtime `reconcile()`, then serializes the latest authoritative
+state with the adapter's injected wall clock. It never reads a stale local save as
+its source, writes storage, or mutates gameplay beyond normal reconciliation.
+`savedAt` represents export time, not last autosave time.
+
+Import validates again after UI confirmation. Without reconciling/mutating the old
+state, `prepareReplacement` validates and captures a new monotonic baseline and
+returns a synchronous commit closure. The coordinator then writes the entire
+candidate using the same normal v1 serialization and atomic localStorage `setItem`
+path. Only after a successful write does it call that closure to replace the live
+snapshot and clear fractional runtime milliseconds. Preparation, write and commit
+run in one synchronous task with no await; the boundary timestamp is taken just
+before the durable write. Normal runtime time after that boundary, including the
+synchronous write duration, accrues on later callbacks. No prior session duration
+or imported timestamp is credited. The original production scheduler remains in
+place, and the existing five-second autosave continues without duplicate loops.
+If bootstrap had blocked autosave, a successful explicit import starts that loop.
+
+Validation, unavailable timing or failed storage writes leave the previous state,
+local save and timing bookkeeping untouched. Read-before-write conflict detection
+remains best effort as in Phase 2A: a changed external save is not overwritten;
+reload before trying again. A **confirmed import** may replace an unchanged corrupt
+or newer stored save read at bootstrap, and enables normal saving after success.
+This is the only exception to Phase 2A's automatic-write block. If storage could
+not be read, import remains blocked. Runtime terminal failure still requires reload;
+import does not introduce recovery from simulation failures.
+
+The imported `savedAt` is validated but discarded. Local persistence records the
+current injected wall-clock time when committing the replacement. Cash, ownership
+and authoritative production milli-cent remainder come exactly from the candidate.
+There is **no offline progression**, elapsed-since-save calculation or offline cap.
+
+### Interaction and trust
+
+The compact Save Management panel uses runtime-only interaction state in
+`app/save-management.ts`: paste → validate → explicit Confirm import / Cancel.
+Editing invalidates the pending candidate; validation alone never replaces state.
+Confirmation states that both current progress and the stored local save will be
+replaced. The code is revalidated at commit, and a confirmation applies only once.
+Export output stays selectable in a labelled read-only textarea. The platform
+clipboard wrapper attempts `navigator.clipboard.writeText` without a permission
+request. On failure the code remains visible for manual copying; late clipboard
+results cannot replace newer action feedback. Labels, a polite status region,
+large buttons and stacked narrow-screen controls retain the existing UI baseline.
+No UI timers, browser testing framework or new dependencies were added. Fake storage,
+clocks and clipboard tests cover transport, transactions, confirmation/cancellation,
+publication and autosave; server-rendered checks cover the accessible controls.
+
+Codes are user-controlled, untrusted text: **not encrypted, secret, authentication
+or anti-cheat**. Players may edit their own codes. Validation prevents malformed
+state from becoming authoritative; it does not prevent intentional valid edits.
+No signatures or static-client secret keys exist. Future phases must preserve the
+single schema/migration boundary and durable-write-before-publication ordering.
+Phase 2B is complete; Phase 2C and Phase 3 are not started.

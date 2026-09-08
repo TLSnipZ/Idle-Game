@@ -1,8 +1,13 @@
+import { validateSaveCode } from '../game/save-code';
+import type { ExportResult, SaveCodeError } from '../game/save-code';
 import { createInitialGameState } from '../game/game-state';
 import { createGameRuntime } from './game-runtime';
 import type { RuntimeSnapshot, RuntimeTiming } from './game-runtime';
 import { createLocalSave } from './local-save';
 import type { LoadResult, WriteResult } from './local-save';
+
+export type ImportResult = { readonly ok: true }
+  | { readonly ok: false; readonly error: SaveCodeError | 'runtime-unavailable' | 'persistence-failure'; readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
 
 export const AUTOSAVE_CADENCE_MS = 5_000;
 export type PersistenceStatus = { readonly kind: 'ready' | 'loaded' | 'saved' }
@@ -56,6 +61,10 @@ export function createPersistentGame(
     }
     active = true;
     runtime.start();
+    startAutosave();
+  }
+  function startAutosave() {
+    if (cancel) return;
     const currentGeneration = ++generation;
     if (view.persistence.kind !== 'blocked') cancel = scheduleSave(() => {
       if (active && generation === currentGeneration && runtime?.reconcile()) saveCurrent();
@@ -78,5 +87,23 @@ export function createPersistentGame(
     // intermediate snapshot or read a possibly stale React render here.
     if (changed) saveCurrent();
   }
-  return { start, stop, execute, getSnapshot: () => view };
+  function exportCode(): ExportResult {
+    if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
+    return saves.exportCode(runtime.getSnapshot().result.state);
+  }
+  // Called only after explicit UI confirmation; validate again at the transaction boundary.
+  function importCode(code: string): ImportResult {
+    const candidate = validateSaveCode(code);
+    if (!candidate.ok) return candidate;
+    if (!active || !runtime) return { ok: false, error: 'runtime-unavailable' };
+    const commit = runtime.prepareReplacement(candidate.envelope.state);
+    if (!commit) return { ok: false, error: 'runtime-unavailable' };
+    const written = saves.replace(candidate.envelope.state);
+    if (!written.ok) return { ok: false, error: 'persistence-failure', detail: written.error };
+    view = { ...view, persistence: { kind: 'saved' } };
+    commit();
+    startAutosave();
+    return { ok: true };
+  }
+  return { start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

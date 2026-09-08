@@ -1,12 +1,19 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 2A: versioned local saves.**
+idle/tycoon browser game. **Phase 2B: local saves and portable save codes.**
 Cash, business ownership and fractional production survive reloads on this browser.
 Progress saves after successful actions and every five seconds; closing the page
 can lose progress since the last successful save. There is **no offline income**.
 Corrupt/newer saves are preserved with a warning and saving disabled for that
-session. Storage failures are shown in-game. No export/import or cloud saves exist.
+session unless you explicitly confirm importing a replacement. Storage failures are
+shown in-game. No cloud saves exist.
+
+Use **Save management → Export save** to generate a `CE1-` backup code. Copy it
+with the button or select the text manually if clipboard access is unavailable.
+To restore, paste a code, validate it, then confirm replacing current progress and
+the local save. Cancel keeps your progress. Codes are not encrypted or secret.
+Imported timestamps award no offline income.
 
 ## Development
 
@@ -43,7 +50,8 @@ Start with [AGENTS.md](AGENTS.md). Read [architecture](docs/ARCHITECTURE.md),
 ## GitHub Pages
 
 Expected public URL: [Crime Empire](https://tlsnipz.github.io/Idle-Game/).
-Deployment configuration is implemented; the live deployment is not yet verified.
+The user manually verified the live Phase 2A deployment: cash and ownership survive
+reload, autosave works, and no offline income is awarded.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**

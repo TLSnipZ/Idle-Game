@@ -97,3 +97,19 @@ h1 em { color: var(--color-cool); font-style: normal; }
   .action-button, .business-card { transition: none; }
   .action-button:enabled:hover, .action-button:enabled:active { transform: none; }
 }
+
+.save-panel { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 2rem); }
+.save-panel > p { color: var(--text-muted, #bdc4d5); line-height: 1.6; }
+.save-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.save-grid > div { min-width: 0; }
+.save-panel label { display: block; margin: 1rem 0 .5rem; }
+.save-panel textarea { box-sizing: border-box; width: 100%; resize: vertical; min-height: 7rem; border: 1px solid #627087; border-radius: .6rem; padding: .75rem; background: #101722; color: #eef3ff; font: inherit; font-size: 1rem; overflow-wrap: anywhere; }
+.save-panel textarea:focus-visible { outline: 2px solid #70f3dd; outline-offset: 3px; }
+.save-panel button { min-height: 48px; margin-top: .6rem; }
+.save-confirm { margin-top: 1rem; padding: 1rem; border: 1px solid #e1b676; border-radius: .6rem; }
+.save-confirm p { line-height: 1.5; }
+.save-panel .action-button { background: #172b31; border-color: #527d7d; color: #d6fff5; }
+.save-panel .action-button:hover { background: #214047; }
+@media (max-width: 740px) {
+  .save-grid { grid-template-columns: minmax(0, 1fr); }
+}

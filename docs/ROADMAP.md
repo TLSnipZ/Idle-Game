@@ -12,9 +12,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 1C.1 — Production math (complete) | Exact elapsed production, pooled fractional accrual and pure simulation tests | Step-size independence, atomic overflow and corruption handling |
 | 1C.2 — Runtime ticking (complete) | Monotonic browser clock, command boundaries and live production | Deterministic timing, fractional carry, cleanup and terminal failure tests |
 | 1C.3 — UI feedback/polish (complete) | Premium cash/delivery/business presentation, live status and accessible feedback | Targeted presentation tests; runtime/domain contracts unchanged |
-| 1C.4 — GitHub Pages configuration (complete; remote verification pending) | Official Actions workflow builds and deploys `dist` from `main` | Local checks and relative asset validation pass; live deployment must be verified remotely |
+| 1C.4 — GitHub Pages configuration (complete; user verified) | Official Actions workflow builds and deploys `dist` from `main` | Live Phase 2A persistence, reload and autosave manually verified by the user |
 | 2A — Versioned local saves (complete) | Validated v1 localStorage envelope, safe bootstrap and autosave | Exact reload without offline credit; corrupt/newer saves protected; storage/lifecycle tests |
-| 2B — Save export/import codes (deferred) | Portable codes through shared validation and migration boundary | Explicit replacement, bounded input and safe failure; separate requested phase |
+| 2B — Save export/import codes (complete) | Portable codes through shared validation and migration boundary | Confirmed atomic replacement, bounded UTF-8 Base64URL and deterministic failure tests |
 | 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
 | 5 — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
@@ -39,27 +39,28 @@ were checked.
 Phase 1C.4 repository-side implementation is complete: the Pages workflow reads
 Node 24 from `.nvmrc`, runs the normal checked build, uploads only `dist`, and
 serializes deployments to the `github-pages` environment. Vite's relative base
-is unchanged. Remote deployment is **not verified**: shell GitHub authentication
-is unavailable, so the local configuration still needs to be pushed. Enable Pages
-with Source **GitHub Actions**, then verify the Actions run and public site using
-README instructions. The user reports the public deployment now works; remote
-verification was not repeated during Phase 2A. Offline progression remains deferred.
+is unchanged. The user manually verified the live Phase 2A build: cash, ownership
+and autosave survive reload, with no offline income. This is user-reported live
+verification, not a new browser deployment check performed during Phase 2B.
 
 Phase 2A is complete: local state is saved after successful meaningful commands and
 every five seconds. Validated reload restores cash, ownership and production
 milli-cent remainder without offline income. Corrupt/newer saves and read failures
-block writes for the fresh session. Phase 2B export/import codes are not started.
+block automatic writes for the fresh session. Phase 2B is complete: CE1- codes reuse
+the v1 envelope; validated imports require confirmation and a successful durable
+write before live replacement. Clipboard failure leaves a manually copyable code.
+No offline income is awarded. Phase 2C and Phase 3 remain unstarted.
 
 ## Next session
 
 1. Read AGENTS.md, inspect Git status and the architecture/balance contracts.
 2. Restore/install with `npm ci`; run `npm run typecheck`, `npm run test`, and
    `npm run build`. Review remote status before integrating commits.
-3. Complete remote Pages verification after pushing the workflow and enabling Pages;
-   keep `simulateElapsed(state, elapsedMs)` as the only production path and route
+3. Preserve the verified Pages configuration; keep `simulateElapsed(state, elapsedMs)` as the only production path and route
    commands through runtime reconciliation. Do not add new timers in UI components.
 4. Preserve `purchaseBusiness` as the paid ownership command and the economy's safe
-   cash APIs. Export/import, offline progression and automation remain separate scope unless
+   cash APIs and the shared save-schema/import transaction boundaries. Offline
+   progression and automation remain separate scope unless
    explicitly authorized. The later production roadmap row is broader follow-on work,
    not permission to include levels or offline rewards in Phase 1C.2.
 

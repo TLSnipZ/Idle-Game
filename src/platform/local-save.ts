@@ -1,3 +1,5 @@
+import { exportSaveCode } from '../game/save-code';
+import type { ExportResult } from '../game/save-code';
 import type { GameState } from '../game/game-state';
 import { parseSave, serializeSave } from '../game/save-schema';
 import type { SaveDataError } from '../game/save-schema';
@@ -18,24 +20,26 @@ export function createLocalSave(
   now: () => number = () => Date.now(),
 ) {
   let loaded = false;
+  let readable = false;
   let previousRaw: string | null = null;
   function load(): LoadResult {
-    loaded = false;
+    loaded = false; readable = false;
     let raw: string | null;
     try { raw = storage().getItem(SAVE_STORAGE_KEY); }
     catch { return { kind: 'error', error: 'storage-read' }; }
+    previousRaw = raw; readable = true;
     if (raw === null) {
-      previousRaw = raw; loaded = true;
+      loaded = true;
       return { kind: 'empty' };
     }
     const result = parseSave(raw);
     if (!result.ok) return { kind: 'error', error: result.error };
-    previousRaw = raw; loaded = true;
+    loaded = true;
     // savedAt is deliberately not exposed to the runtime: no offline calculation.
     return { kind: 'loaded', state: result.envelope.state };
   }
-  function save(state: GameState): WriteResult {
-    if (!loaded) return { ok: false, error: 'storage-conflict' };
+  function write(state: GameState, confirmedReplacement: boolean): WriteResult {
+    if (!(confirmedReplacement ? readable : loaded)) return { ok: false, error: 'storage-conflict' };
     try {
       const result = serializeSave(state, now());
       if (!result.ok) return result;
@@ -46,9 +50,14 @@ export function createLocalSave(
         return { ok: false, error: 'storage-conflict' };
       }
       target.setItem(SAVE_STORAGE_KEY, result.serialized);
-      previousRaw = result.serialized;
+      previousRaw = result.serialized; loaded = true;
       return { ok: true };
     } catch { return { ok: false, error: 'storage-write' }; }
   }
-  return { load, save };
+  function exportCode(state: GameState): ExportResult {
+    try { return exportSaveCode(state, now()); }
+    catch { return { ok: false, error: 'clock-unavailable' }; }
+  }
+  return { load, save: (state: GameState) => write(state, false),
+    replace: (state: GameState) => write(state, true), exportCode };
 }
