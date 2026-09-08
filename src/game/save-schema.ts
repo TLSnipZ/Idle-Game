@@ -1,6 +1,6 @@
 import { isXp } from '../features/progression';
-import { createInitialAutomationState, isAutomationState, DELIVERY_DISPATCHER } from '../features/automation';
-import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
+import { createInitialAutomationState, isAutomationState } from '../features/automation';
+import { findUpgrade } from '../features/upgrades';
 import type { UpgradeId } from '../features/upgrades';
 import { isRational, ZERO_RATIONAL } from '../shared/rational';
 import { findBusiness, isBusinessLevel } from '../features/businesses';
@@ -75,13 +75,12 @@ function validateState(value: unknown, version: number): GameState | null {
     if (!record(value.upgrades) || !keys(value.upgrades, ['purchasedIds']) || !Array.isArray(value.upgrades.purchasedIds)) return null;
     for (const id of value.upgrades.purchasedIds) {
       const upgrade = findUpgrade(id);
-      if (!upgrade || purchasedIds.includes(upgrade.id) || !meetsUpgradeRequirement(upgrade, owned)) return null;
+      if (!upgrade || purchasedIds.includes(upgrade.id)) return null;
       purchasedIds.push(upgrade.id);
     }
   }
   const automation = version >= 4 ? value.automation : createInitialAutomationState();
-  if (!isAutomationState(automation) || (automation.unlockedIds.length > 0
-      && !Object.hasOwn(owned, DELIVERY_DISPATCHER.requiredBusiness))) return null;
+  if (!isAutomationState(automation)) return null;
   const progression = version >= 5 ? value.progression : { xp: 0 };
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
   return { progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,

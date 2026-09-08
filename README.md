@@ -1,18 +1,23 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 5A: player XP and levels.**
+idle/tycoon browser game. **Phase 5B: level-gated unlock requirements.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
-Hire the **Delivery Dispatcher** for **$7,500** after acquiring Dockside: it performs
+Hire the **Delivery Dispatcher** for **$7,500** at Player Level 3 after acquiring Dockside: it performs
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both
 job upgrades). Manual deliveries remain available and do not reset its progress.
 Existing saves/codes migrate automatically. Pre-XP saves start with XP 0 while preserving existing progress.
 Earn 10 XP per manual delivery, 5 per dispatched delivery (including credited offline
 jobs), and 25 per business level increase. Player level is derived from XP, capped
 at 100, and grants no income bonus. The progress bar shows XP within the current
-level; feedback announces level increases.
+level; feedback announces level increases and newly eligible content.
+Street Connections requires Player Level 2; Industrial Detailing Line requires
+Dockside Level 5; Fleet Logistics requires an owned business, Commercial Pressure
+Washer and Player Level 5. Cards show each requirement separately from affordability.
+Dockside and Express Tips remain ungated. These are purchase requirements only:
+already-owned upgrades and automation stay active, including in older saves.
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, businesses and the dispatcher receive the same maximum **eight hours**
 of offline progress from the last successful local save. A welcome card shows
@@ -66,8 +71,9 @@ Start with [AGENTS.md](AGENTS.md). Read [architecture](docs/ARCHITECTURE.md),
 Expected public URL: [Crime Empire](https://tlsnipz.github.io/Idle-Game/).
 The user manually verified the live Phase 4C deployment: dispatcher purchase,
 10-second jobs, $25/$30/$36 evaluated rewards, saved cycle progress, offline
-automation, welcome-back breakdown and export/import work. Phase 5A live
-verification remains pending.
+automation, welcome-back breakdown and export/import work. The user also verified
+Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
+and the player progress UI. Phase 5B live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**

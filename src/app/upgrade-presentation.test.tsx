@@ -23,7 +23,7 @@ describe('equipment presentation', () => {
     const view = selectUpgrade(createInitialGameState(), PRESSURE_WASHER.id);
     const html = renderToStaticMarkup(<UpgradeCard view={view} paused={false} onPurchase={() => {}} />);
     expect(html).toContain('Commercial Pressure Washer'); expect(html).toContain('$2,500.00');
-    expect(html).toContain('+25% Dockside Detail production'); expect(html).toContain('Requires ownership of Dockside Detail');
+    expect(html).toContain('+25% Dockside Detail production'); expect(html).toContain('Own Dockside Detail');
     expect(html).toContain('disabled=""'); expect(html).toContain('aria-labelledby="upgrade:commercial-pressure-washer-heading"');
     expect(html).toContain('aria-describedby="upgrade:commercial-pressure-washer-requirement"');
   });
@@ -62,16 +62,18 @@ describe('equipment presentation', () => {
 });
 
 it.each(UPGRADE_CATALOG)('catalog card $name exposes readiness, requirement and purchased state', upgrade => {
-  const poor = selectUpgrade(owned('0'), upgrade.id);
+  const eligible = (cash: string) => ({ ...owned(cash), progression: { xp: 1600 },
+    upgrades: { purchasedIds: upgrade.id === 'upgrade:fleet-logistics' ? [PRESSURE_WASHER.id] : [] } });
+  const poor = selectUpgrade(eligible('0'), upgrade.id);
   const render = (state: ReturnType<typeof selectUpgrade>) => renderToStaticMarkup(<UpgradeCard view={state} paused={false} onPurchase={() => {}} />);
   expect(render(poor)).toContain('More cash needed'); expect(render(poor)).toContain('disabled=""');
-  const ready = selectUpgrade(owned(upgrade.purchaseCost), upgrade.id);
+  const ready = selectUpgrade(eligible(upgrade.purchaseCost), upgrade.id);
   expect(render(ready)).toContain(`Buy ${upgrade.name}`); expect(render(ready)).not.toContain('disabled');
-  const purchased = purchaseUpgrade(owned(upgrade.purchaseCost), upgrade.id).state;
+  const purchased = purchaseUpgrade(eligible(upgrade.purchaseCost), upgrade.id).state;
   expect(render(selectUpgrade(purchased, upgrade.id))).toContain('PURCHASED');
   expect(render(selectUpgrade(purchased, upgrade.id))).not.toContain('<button');
   const fresh = render(selectUpgrade(createInitialGameState(), upgrade.id));
-  expect(fresh).toContain(upgrade.requirement.kind === 'none' ? 'No business required' : 'Requirement not met');
+  expect(fresh).toContain(upgrade.requirements.length === 0 ? 'No requirements' : 'Requirement not met');
 });
 
 it('explains named production bonuses and the exact combined effective value', () => {

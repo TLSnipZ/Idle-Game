@@ -21,7 +21,6 @@ export function simulateAutomation(state: GameState, elapsedMs: unknown): Automa
   if (!isAutomationState(state.automation)) throw new RangeError('Invalid authoritative automation');
   const empty = { completedJobs: 0, income: moneyFromMinorUnits('0'), xpEarned: 0 };
   if (state.automation.unlockedIds.length === 0) return { ok: true, state, automation: empty };
-  if (!Object.hasOwn(state.businesses.owned, DELIVERY_DISPATCHER.requiredBusiness)) throw new RangeError('Missing automation prerequisite');
   // The sum may exceed Number precision; only bounded quotient/remainder become Numbers.
   const total = BigInt(state.automation.starterJobElapsedMs) + BigInt(elapsedMs);
   const interval = BigInt(DELIVERY_DISPATCHER.intervalMs);

@@ -15,7 +15,7 @@ import { purchaseAutomation } from '../game/purchase-automation';
 import { reconcileOffline } from '../game/offline-progress';
 function eligible(cash = D.purchaseCost): GameState {
   const state = createInitialGameState();
-  return { ...state, economy: { cash }, businesses: { ...state.businesses, owned: { [STARTER_BUSINESS.id]: { level: 4 } } } };
+  return { ...state, progression: { xp: 400 }, economy: { cash }, businesses: { ...state.businesses, owned: { [STARTER_BUSINESS.id]: { level: 4 } } } };
 }
 function render(state: GameState, paused = false) {
   return renderToStaticMarkup(<AutomationCard view={selectDispatcher(state)} paused={paused} onPurchase={() => {}} event={undefined} />);
@@ -27,7 +27,7 @@ describe('delegation presentation', () => {
     const html = render(state);
     expect(html).toContain('Delivery Dispatcher'); expect(html).toContain('$7,500.00');
     expect(html).toContain('Runs every 10s'); expect(html).toContain('$25.00 per delivery');
-    expect(html).toContain('Requires ownership of Dockside Detail'); expect(html).toContain('Requirement not met');
+    expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Requirement not met');
     expect(html).toContain('disabled'); expect(html).not.toContain('ACTIVE');
     expect(html).toContain('aria-describedby="dispatcher-requirement"');
   });

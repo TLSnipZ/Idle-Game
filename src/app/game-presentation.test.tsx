@@ -87,7 +87,7 @@ describe('action feedback', () => {
     ['invalid-amount', 'No transaction was made'],
   ];
   it.each(failures)('explains %s without false success feedback', (error, text) => {
-    const message = describeAction('purchase', { ok: false, state, error });
+    const message = describeAction('purchase', { ok: false, state, error, requirements: { met: false, requirements: [] } });
     expect(message).toContain(text);
     expect(message).not.toContain('has started');
   });

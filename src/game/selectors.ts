@@ -1,5 +1,6 @@
+import { evaluateRequirements } from './requirements';
 import { evaluateBusinessProduction } from './effective-stats';
-import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
+import { findUpgrade } from '../features/upgrades';
 import { findBusiness, ownsBusiness, getBusinessLevel, getUpgradeCost, MAX_BUSINESS_LEVEL } from '../features/businesses';
 import { readCash, canAfford } from '../features/economy';
 import type { Money } from '../features/economy';
@@ -18,6 +19,7 @@ export function selectCanPurchaseBusiness(state: GameState, businessId: unknown)
   const business = findBusiness(businessId);
   return business !== undefined
     && !ownsBusiness(state.businesses, business.id)
+    && evaluateRequirements(state, business.requirements).met
     && canAfford(state.economy, business.purchaseCost);
 }
 
@@ -39,9 +41,7 @@ export function selectUpgrade(state: GameState, id: unknown) {
   const definition = findUpgrade(id);
   if (!definition) return null;
   const purchased = state.upgrades.purchasedIds.includes(definition.id);
-  const eligible = meetsUpgradeRequirement(definition, state.businesses.owned);
-  return { definition, purchased, eligible,
-    requirement: definition.requirement.kind === 'business' ? `Requires ownership of ${findBusiness(definition.requirement.businessId)?.name}.`
-      : definition.requirement.kind === 'any-business' ? 'Requires at least one owned business.' : 'No business required.',
-    canPurchase: !purchased && eligible && canAfford(state.economy, definition.purchaseCost) };
+  const requirements = evaluateRequirements(state, definition.requirements);
+  return { definition, purchased, eligible: requirements.met, requirements,
+    canPurchase: !purchased && requirements.met && canAfford(state.economy, definition.purchaseCost) };
 }

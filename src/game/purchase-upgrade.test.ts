@@ -27,7 +27,7 @@ describe('pressure washer purchase and shared production', () => {
     const state = error === 'prerequisite-not-met' ? createInitialGameState()
       : error === 'already-purchased' ? purchaseUpgrade(owned(), PRESSURE_WASHER.id).state : owned(1, '249999');
     const result = purchaseUpgrade(state, error === 'unknown-upgrade' ? 'upgrade:missing' : PRESSURE_WASHER.id);
-    expect(result).toEqual({ ok: false, state, error }); expect(result.state).toBe(state);
+    expect(result).toMatchObject({ ok: false, state, error }); expect(result.state).toBe(state);
   });
   it('deducts exact cents above Number precision', () => {
     const result = purchaseUpgrade(owned(1, '9007199254740993'), PRESSURE_WASHER.id);

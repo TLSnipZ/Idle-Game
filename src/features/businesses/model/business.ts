@@ -1,3 +1,4 @@
+import type { Requirement } from '../../../game/requirement';
 import { ZERO_RATIONAL } from '../../../shared/rational';
 import type { Rational } from '../../../shared/rational';
 import type { Money } from '../../economy';
@@ -9,6 +10,7 @@ export interface BusinessDefinition {
   readonly name: string;
   readonly description: string;
   readonly purchaseCost: Money;
+  readonly requirements: readonly Requirement[];
   readonly baseProductionCentsPerSecond: Money;
   readonly baseUpgradeCost: Money;
 }

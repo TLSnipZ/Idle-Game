@@ -42,7 +42,7 @@ function fixture(state = owned(), savedAt = 1000) {
 }
 describe('delegation runtime transactions', () => {
   it('purchase begins at zero after nine seconds; first subsequent second counts only once', () => {
-    const f = fixture(owned(false)); const game = f.make(); game.start(); game.dismissOffline();
+    const f = fixture({ ...owned(false), progression: { xp: 400 } }); const game = f.make(); game.start(); game.dismissOffline();
     f.at(10000); game.execute(state => purchaseAutomation(state, D.id));
     expect(game.getSnapshot().result.state.automation.starterJobElapsedMs).toBe(0);
     const bought = game.getSnapshot().result.state;
@@ -50,13 +50,13 @@ describe('delegation runtime transactions', () => {
     expect(game.getSnapshot().automationEvent).toBeUndefined(); game.stop(); expect(f.timers()).toBe(0);
   });
   it('discards pre-purchase sub-ms time without resetting any earned business remainder', () => {
-    const f = fixture(owned(false)); const game = f.make(); game.start(); game.dismissOffline();
+    const f = fixture({ ...owned(false), progression: { xp: 400 } }); const game = f.make(); game.start(); game.dismissOffline();
     f.at(10000.75); game.execute(state => purchaseAutomation(state, D.id)); const bought = game.getSnapshot().result.state;
     f.at(10001); f.tick(); expect(game.getSnapshot().result.state).toBe(bought);
     f.at(10001.75); f.tick(); expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought, 1).state); game.stop();
   });
   it.each([STREET_CONNECTIONS, EXPRESS_TIPS])('reconciles completed jobs at old reward before $name', upgrade => {
-    const f = fixture(); const game = f.make(); game.start(); game.dismissOffline();
+    const f = fixture({ ...owned(), progression: { xp: 100 } }); const game = f.make(); game.start(); game.dismissOffline();
     f.at(26000); game.execute(state => purchaseUpgrade(state, upgrade.id));
     expect(game.getSnapshot().automationEvent).toMatchObject({ completedJobs: 2, income: '5000' });
     const bought = game.getSnapshot().result.state;
@@ -156,7 +156,7 @@ describe('persistent XP transactions', () => {
     const f = fixture(); const game = f.make(); game.start(); game.dismissOffline(); const writes = f.writes();
     f.at(1801000); f.wall(1801000); f.tick();
     expect(game.getSnapshot().result.state.progression.xp).toBe(900);
-    expect(game.getSnapshot().levelEvent).toEqual({ fromLevel: 1, toLevel: 4, sequence: 1 });
+    expect(game.getSnapshot().levelEvent).toMatchObject({ fromLevel: 1, toLevel: 4, sequence: 1 });
     expect(f.writes()).toBe(writes);
     f.autosave(); f.tick();
     expect(game.getSnapshot().levelEvent?.sequence).toBe(1);
@@ -211,13 +211,13 @@ it('business level boundary reconciles old production/dispatcher XP then adds 25
   expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(expected.state,10000).state); game.stop();
 });
 it('job-modifier purchase changes money only after reconciling the old reward and XP', () => {
-  const f = fixture(); const game = f.make(); game.start(); game.dismissOffline();
+  const f = fixture({ ...owned(), progression: { xp: 100 } }); const game = f.make(); game.start(); game.dismissOffline();
   f.at(11000); game.execute(state => purchaseUpgrade(state, STREET_CONNECTIONS.id));
   expect(game.getSnapshot().automationEvent).toMatchObject({ income: '2500', xpEarned: 5 });
-  expect(game.getSnapshot().result.state.progression.xp).toBe(5);
+  expect(game.getSnapshot().result.state.progression.xp).toBe(105);
   f.at(21000); f.tick();
   expect(game.getSnapshot().automationEvent).toMatchObject({ income: '3000', xpEarned: 5 });
-  expect(game.getSnapshot().result.state.progression.xp).toBe(10); game.stop();
+  expect(game.getSnapshot().result.state.progression.xp).toBe(110); game.stop();
 });
 it('v4 migration preserves its timestamp and awards only credited dispatcher XP before durable publication', () => {
   const { progression: _progression, ...legacy } = owned(true,5000);

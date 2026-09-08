@@ -26,7 +26,8 @@ describe('five-upgrade catalog', () => {
     for (const u of UPGRADE_CATALOG) { expect(isMoney(u.purchaseCost)).toBe(true); expect(u.modifier.sourceId).toBe(u.id); }
   });
   it.each(UPGRADE_CATALOG)('purchases $name exactly, once, immutably', upgrade => {
-    const state = owned(); const before = JSON.stringify(state);
+    const state = { ...owned(), progression: { xp: 1600 }, businesses: { ...owned().businesses, owned: { [id]: { level: 5 } } },
+      upgrades: { purchasedIds: upgrade.id === FLEET_LOGISTICS.id ? [PRESSURE_WASHER.id] : [] } }; const before = JSON.stringify(state);
     const result = purchaseUpgrade(state, upgrade.id);
     expect(result.ok).toBe(true);
     expect(result.state.economy.cash).toBe(String(BigInt(state.economy.cash) - BigInt(upgrade.purchaseCost)));
@@ -38,10 +39,10 @@ describe('five-upgrade catalog', () => {
   });
   it.each([PRESSURE_WASHER, DETAILING_LINE, FLEET_LOGISTICS])('requires a business for $name', upgrade => {
     const state = { ...createInitialGameState(), economy: owned().economy };
-    expect(purchaseUpgrade(state, upgrade.id)).toEqual({ ok: false, state, error: 'prerequisite-not-met' });
+    expect(purchaseUpgrade(state, upgrade.id)).toMatchObject({ ok: false, state, error: 'prerequisite-not-met' });
   });
   it.each([STREET_CONNECTIONS, EXPRESS_TIPS])('allows $name before business ownership', upgrade => {
-    const result = purchaseUpgrade({ ...createInitialGameState(), economy: owned().economy }, upgrade.id);
+    const result = purchaseUpgrade({ ...createInitialGameState(), progression: { xp: 100 }, economy: owned().economy }, upgrade.id);
     expect(result.ok).toBe(true);
     expect(simulateElapsed(result.state, 10000).state).toEqual(result.state);
     const save = serializeSave(result.state, 100); expect(save.ok).toBe(true);
@@ -53,12 +54,11 @@ describe('five-upgrade catalog', () => {
     expect(performStarterJob(state).state.economy.cash).toBe(String(BigInt(state.economy.cash) + BigInt(reward)));
   });
   it.each([[PRESSURE_WASHER, 375n], [DETAILING_LINE, 450n], [FLEET_LOGISTICS, 330n]] as const)('evaluates individual level-4 production %#', (upgrade, rate) => {
-    const state = purchaseUpgrade(owned(), upgrade.id).state;
+    const state = { ...owned(), upgrades: { purchasedIds: [upgrade.id] } };
     expect(evaluateBusinessProduction(state, id, 4)).toMatchObject({ ok: true, effective: rational(rate) });
   });
   it('stacks all production factors exactly and preserves both fractions across split time', () => {
-    let state = owned();
-    for (const u of UPGRADE_CATALOG) state = purchaseUpgrade(state, u.id).state;
+    const state: GameState = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
     expect(state.businesses.productionRemainderMilliCents).toBe(975);
     expect(state.businesses.productionRemainderSubMilliCents).toEqual(rational(1n, 3n));
     const rate = evaluateBusinessProduction(state, id, 4);
@@ -82,7 +82,7 @@ describe('five-upgrade catalog', () => {
     expect(result).toMatchObject({ ok: true, effective: rational(110n), applied: [FLEET_LOGISTICS.modifier] });
   });
   it('roundtrips all five through the current schema and CE1 validation', () => {
-    const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
+    const state: GameState = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
     const encoded = serializeSave(state, 1234); if (!encoded.ok) throw Error('fixture');
     expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: CURRENT_SAVE_VERSION, savedAt: 1234, state } });
     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toMatchObject({ ok: true, envelope: { state } });

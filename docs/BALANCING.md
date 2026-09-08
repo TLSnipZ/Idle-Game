@@ -315,3 +315,29 @@ upgrades. Discarded absence earns no XP and adds no cycle progress. Imported old
 timestamps award no XP. All existing money costs, production formulas, modifiers
 and automation timing remain unchanged. Skills, XP multipliers, level-up rewards,
 level-based income and future unlock requirements are deferred.
+
+## Phase 5B — acquisition gates
+
+Only acquisition requirements change; costs, effects, business level costs,
+XP rewards, production math and dispatcher timing remain unchanged.
+
+| Content | Requirements (all must be met) |
+| --- | --- |
+| Dockside Detail purchase | None |
+| Express Tips ($400, +$5/job) | None |
+| Street Connections ($750, +20%/job) | Player Level 2 (100 XP) |
+| Commercial Pressure Washer ($2,500, +25% Dockside) | Own Dockside Detail |
+| Industrial Detailing Line ($10,000, +50% Dockside) | Dockside Detail Level 5, implying ownership |
+| Fleet Logistics ($15,000, +10% all businesses) | Own any business; own Commercial Pressure Washer; Player Level 5 (1,600 XP) |
+| Delivery Dispatcher ($7,500, every 10s) | Own Dockside Detail; Player Level 3 (400 XP) |
+
+Requirements are checked only on purchase. Existing owned content is grandfathered:
+it remains active even below these levels or without new prerequisites, including
+after reload/import and offline. It does not need to be purchased again.
+
+99/100, 399/400 and 1,599/1,600 XP are the exact locked/eligible level boundaries.
+Dockside Level 4/5 is the Industrial Detailing Line boundary. Cash affordability
+is a separate check. Fresh players can earn manually, acquire Dockside after six
+base deliveries while still Level 1, and reach Level 2 after ten total deliveries.
+No XP reward or income bonus is granted merely for becoming eligible.
+These gates are provisional content balancing. No new content is introduced.

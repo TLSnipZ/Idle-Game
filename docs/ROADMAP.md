@@ -21,7 +21,7 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 4B — Multi-upgrade catalog (complete) | Five scoped/global production and job upgrades | Exact flat-before-percent stacking, v3 compatibility |
 | 4C — Starter-job delegation (complete) | One Delivery Dispatcher, 10-second cycle, v4 migration | Exact shared online/offline elapsed transaction, atomic failures and persistence |
 | 5A — Player XP and levels (complete) | Exact XP, three reward sources, derived levels 1–100, v5 migration | Atomic cash/XP, shared offline dispatcher XP, threshold and persistence tests |
-| 5B — Follow-on progression (deferred) | Requires a separate scoped task; no skills or level bonuses implemented | Preserve XP and existing simulation/save contracts |
+| 5B — Central unlock requirements (complete) | Typed AND lists, selected acquisition gates and shared presentation | Exact boundaries, atomic failures, grandfathered saves and deadlock protection |
 | Future — Collection | Cars, garage, collections and set bonuses | Ownership/collection rules tested; assets remain replaceable |
 | 6 — Permanent progression | Rebirth, reset policy, multiple skill trees, unlocks | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
 | 7 — City systems | Territories, heat, crew, random events, one at a time | Each uses public contracts, deterministic inputs and compatible saves |
@@ -59,7 +59,7 @@ and pause the session. Imported historical timestamps still award no income.
 Phase 3B is complete: purchases start at level 1, with paid upgrades through level
 100. Existing v1 saves migrate without changing cash, savedAt or earned remainder.
 No additional businesses are implemented. Phase 4A adds exactly one equipment upgrade,
-central exact production/job evaluation and v2→v3 migration. Phase 4B is complete: five upgrades exercise scoped/global production and flat/percentage job rewards. Phase 4C is complete: one dispatcher, exact cycle progress and v4 migration. Phase 5A is complete: exact player XP, derived levels, three atomic reward sources and v4→v5 migration. Phase 5B remains deferred.
+central exact production/job evaluation and v2→v3 migration. Phase 4B is complete: five upgrades exercise scoped/global production and flat/percentage job rewards. Phase 4C is complete: one dispatcher, exact cycle progress and v4 migration. Phase 5A is complete: exact player XP, derived levels, three atomic reward sources and v4→v5 migration. Phase 5B is complete: central acquisition-only requirements, current-content gates and grandfathering without a schema bump. The next phase remains deferred.
 
 ## Next session
 
@@ -82,4 +82,4 @@ consideration. These are phase-specific decisions, not requests to implement now
 The user manually verified the live Phase 3A offline income and welcome-back UI
 after a hard refresh. The user also manually verified Phase 3B save migration,
 levels/costs/scaled production, reload, offline income and export/import with levels.
-The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. The user manually verified Phase 4B’s five upgrades, scoped/global production, stacked and displayed job rewards, reload, offline production and export/import in the working live build. The user manually verified Phase 4C dispatcher purchase, 10-second execution, $25/$30/$36 rewards, saved progress, offline automation, welcome-back breakdown and export/import. Phase 5A has local deterministic verification; live verification is pending.
+The user manually verified Phase 4A purchases, +25% production, reload, offline production and export/import in the working live build. The user manually verified Phase 4B’s five upgrades, scoped/global production, stacked and displayed job rewards, reload, offline production and export/import in the working live build. The user manually verified Phase 4C dispatcher purchase, 10-second execution, $25/$30/$36 rewards, saved progress, offline automation, welcome-back breakdown and export/import. The user manually verified Phase 5A manual/dispatcher/business-level XP, reload, offline dispatcher XP, export/import and the player progress UI. Phase 5B has local deterministic verification; live verification is pending.

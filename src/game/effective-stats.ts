@@ -1,4 +1,4 @@
-import { findUpgrade, meetsUpgradeRequirement } from '../features/upgrades';
+import { findUpgrade } from '../features/upgrades';
 import { findBusiness, getLevelProduction, getOwnedProductionInputs } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
 import { evaluateStat, wholeStatValue } from './modifiers';
@@ -11,7 +11,7 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
   const seen = new Set<string>();
   return state.upgrades.purchasedIds.map(id => {
     const upgrade = findUpgrade(id);
-    if (!upgrade || seen.has(id) || !meetsUpgradeRequirement(upgrade, state.businesses.owned)) throw new RangeError('Invalid authoritative upgrade ownership');
+    if (!upgrade || seen.has(id)) throw new RangeError('Invalid authoritative upgrade ownership');
     seen.add(id);
     return upgrade.modifier;
   });

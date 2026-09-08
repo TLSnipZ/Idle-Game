@@ -15,7 +15,10 @@ export function PlayerProgress({ xp, event, paused }: {
       : `${formatXp(progress.xpIntoLevel)} / ${formatXp(progress.xpNeededForLevel)} XP toward Level ${progress.currentLevel + 1}`}</label>
     <progress id="player-xp-progress" value={progress.isMaxLevel ? 1 : progress.xpIntoLevel} max={progress.isMaxLevel ? 1 : progress.xpNeededForLevel} />
     <p className="is-live" role="status" aria-live="polite" aria-atomic="true">
-      <span key={event?.sequence}>{event && !paused ? describeLevelIncrease(event) : ''}</span>
+      <span key={event?.sequence}>{event && !paused ? <>
+        {describeLevelIncrease(event)}
+        {event.unlocks && <span className="unlock-feedback">New unlock available: {event.unlocks.join(', ')}</span>}
+      </> : ''}</span>
     </p>
   </section>;
 }

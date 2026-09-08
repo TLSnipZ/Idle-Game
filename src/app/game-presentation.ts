@@ -32,7 +32,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'already-unlocked': return 'This dispatcher is already hired.';
     case 'unknown-upgrade': return 'This upgrade is unavailable.';
     case 'already-purchased': return 'This upgrade is already purchased.';
-    case 'prerequisite-not-met': return 'This purchase’s requirement is not met yet.';
+    case 'prerequisite-not-met': return 'Requirements not met: ' + result.requirements.requirements.filter(detail => !detail.met).map(detail => detail.description).join('; ') + '.';
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';
     case 'invalid-level': return 'Business level is invalid. No transaction was made.';

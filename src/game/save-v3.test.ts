@@ -34,8 +34,8 @@ describe('v3 upgrade and precision schema', () => {
   it.each([['upgrade:unknown'], [PRESSURE_WASHER.id, PRESSURE_WASHER.id], [null], null, 'ids'])('rejects invalid purchased IDs %#', purchasedIds => {
     expect(validateSaveState({ ...current(), upgrades: { purchasedIds } })).toBeNull();
   });
-  it('rejects equipment without its prerequisite and missing/extra state', () => {
-    expect(validateSaveState({ ...createInitialGameState(), upgrades: { purchasedIds: [PRESSURE_WASHER.id] } })).toBeNull();
+  it('accepts owned equipment without acquisition requirements; rejects missing/extra state', () => {
+    expect(validateSaveState({ ...createInitialGameState(), upgrades: { purchasedIds: [PRESSURE_WASHER.id] } })).not.toBeNull();
     const { upgrades: _upgrades, ...missing } = current();
     expect(validateSaveState(missing)).toBeNull();
     expect(validateSaveState({ ...current(), modifiers: [] })).toBeNull();

@@ -1,3 +1,4 @@
+import { RequirementList } from './RequirementList';
 import type { selectUpgrade } from '../game/selectors';
 import { findBusiness } from '../features/businesses';
 import { formatCash } from '../features/economy/ui';
@@ -16,9 +17,9 @@ export function UpgradeCard({ view, paused, onPurchase }: {
     <p>{view.definition.description}</p>
     <p className="production">{formatModifier(view.definition.modifier)} {scope}{view.purchased ? paused ? ' · Session paused' : ' · Active' : ''}</p>
     <p>Price: <strong>{formatCash(view.definition.purchaseCost)}</strong></p>
-    <p id={requirementId}>{view.requirement}</p>
     {!view.purchased && <>
-      <p>{view.eligible ? view.canPurchase ? 'Ready to purchase.' : 'More cash needed.' : 'Requirement not met.'}</p>
+      <RequirementList result={view.requirements} id={requirementId} />
+      <p>{view.eligible ? view.canPurchase ? 'Ready to purchase.' : 'More cash needed.' : 'LOCKED — Requirement not met.'}</p>
       <button className="action-button purchase-button" disabled={paused || !view.canPurchase} onClick={onPurchase} aria-describedby={requirementId} aria-label={`Buy ${view.definition.name}`}>{paused ? 'Session paused' : 'Buy upgrade'}</button>
     </>}
   </section>;

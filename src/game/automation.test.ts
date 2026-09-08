@@ -14,7 +14,7 @@ import { reconcileOffline, OFFLINE_CAP_MS } from './offline-progress';
 import { rational } from '../shared/rational';
 function owned(): GameState {
   const state = createInitialGameState();
-  return { ...state, economy: { cash: moneyFromMinorUnits('750000') },
+  return { ...state, progression: { xp: 400 }, economy: { cash: moneyFromMinorUnits('750000') },
     businesses: { ...state.businesses, owned: { [STARTER_BUSINESS.id]: { level: 4 } },
       productionRemainderMilliCents: 975, productionRemainderSubMilliCents: rational(1n, 3n) } };
 }
@@ -24,7 +24,7 @@ function unlocked(progress = 0): GameState {
 }
 describe('Delivery Dispatcher purchase', () => {
   it('pins the sole delegation identity, prerequisite, exact cost and interval', () => {
-    expect(D).toMatchObject({ id: 'automation:delivery-dispatcher', name: 'Delivery Dispatcher', purchaseCost: '750000', intervalMs: 10000, requiredBusiness: STARTER_BUSINESS.id });
+    expect(D).toMatchObject({ id: 'automation:delivery-dispatcher', name: 'Delivery Dispatcher', purchaseCost: '750000', intervalMs: 10000, requirements: [{ type: 'business-owned', businessId: STARTER_BUSINESS.id }, { type: 'player-level', minimumLevel: 3 }] });
     expect(isMoney(D.purchaseCost)).toBe(true);
     expect(createInitialAutomationState()).toEqual({ unlockedIds: [], starterJobElapsedMs: 0 });
   });
@@ -39,7 +39,7 @@ describe('Delivery Dispatcher purchase', () => {
     const state = error === 'already-unlocked' ? unlocked(1234) : error === 'prerequisite-not-met' ? createInitialGameState()
       : error === 'insufficient-funds' ? { ...owned(), economy: { cash: moneyFromMinorUnits('749999') } } : owned();
     const result = purchaseAutomation(state, error === 'unknown-automation' ? 'automation:missing' : D.id);
-    expect(result).toEqual({ ok: false, state, error }); expect(result.state).toBe(state);
+    expect(result).toMatchObject({ ok: false, state, error }); expect(result.state).toBe(state);
   });
 });
 describe('deterministic batch automation', () => {

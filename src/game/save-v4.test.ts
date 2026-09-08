@@ -36,11 +36,11 @@ describe('v4 delegation saves', () => {
   it.each([['automation:unknown'], [D.id, D.id], [null], null, 'ids'])('rejects malformed IDs %#', unlockedIds => {
     expect(validateSaveState({ ...current(), automation: { unlockedIds, starterJobElapsedMs: 0 } })).toBeNull();
   });
-  it('rejects locked progress, missing keys, extra data and missing prerequisite', () => {
+  it('rejects locked progress/missing/extra data but allows grandfathered ownership', () => {
     const state = current();
     for (const automation of [{ unlockedIds: [], starterJobElapsedMs: 1 }, {}, { unlockedIds: [] }, { ...state.automation, count: 1 }])
       expect(validateSaveState({ ...state, automation })).toBeNull();
-    expect(validateSaveState({ ...state, upgrades: { purchasedIds: [] }, businesses: { ...state.businesses, owned: {} } })).toBeNull();
+    expect(validateSaveState({ ...state, upgrades: { purchasedIds: [] }, businesses: { ...state.businesses, owned: {} } })).not.toBeNull();
     const { automation: _automation, ...missing } = state; expect(validateSaveState(missing)).toBeNull();
   });
   it('rejects custom prototypes and accessors without invoking them', () => {

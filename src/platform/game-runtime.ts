@@ -1,3 +1,4 @@
+import { newlyEligibleContent } from '../game/requirements';
 import { getLevelIncrease } from '../features/progression';
 import type { LevelIncrease } from '../features/progression';
 import type { PurchaseAutomationResult } from '../game/purchase-automation';
@@ -19,7 +20,7 @@ type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
 export interface RuntimeSnapshot {
   readonly result: CommandResult;
   readonly runtimeError: RuntimeError | null;
-  readonly levelEvent?: LevelIncrease & { readonly sequence: number };
+  readonly levelEvent?: LevelIncrease & { readonly sequence: number; readonly unlocks?: readonly string[] };
   readonly automationEvent?: AutomationSummary & { readonly sequence: number };
 }
 
@@ -66,7 +67,10 @@ export function createGameRuntime(
 
   function levelEventFor(state: GameState) {
     const increase = getLevelIncrease(snapshot.result.state.progression.xp, state.progression.xp);
-    return increase ? { levelEvent: { ...increase, sequence: (snapshot.levelEvent?.sequence ?? 0) + 1 } } : {};
+    if (!increase) return {};
+    const unlocks = newlyEligibleContent(snapshot.result.state, state);
+    return { levelEvent: { ...increase, sequence: (snapshot.levelEvent?.sequence ?? 0) + 1,
+      ...(unlocks.length ? { unlocks } : {}) } };
   }
 
   function reconcile(): boolean {

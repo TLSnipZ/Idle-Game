@@ -137,3 +137,6 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .player-progress h3 { margin-block: .5rem; }
 .player-progress .panel-heading span { color: var(--color-muted); }
 #player-xp-progress { display: block; width: 100%; height: .75rem; margin-top: .6rem; accent-color: var(--color-cool); }
+
+.requirements ul { padding-left: 1.2rem; overflow-wrap: anywhere; }
+.unlock-feedback { display: block; margin-top: .35rem; }

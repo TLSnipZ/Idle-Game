@@ -1,7 +1,7 @@
+import { RequirementList } from './RequirementList';
 import type { selectDispatcher } from '../game/automation-selectors';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import { formatCash } from '../features/economy/ui';
-import { findBusiness } from '../features/businesses';
 import { describeAutomatedJobs, formatRemainingTime } from './automation-presentation';
 
 export function AutomationCard({ view, paused, onPurchase, event }: {
@@ -24,8 +24,8 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
       <p role="status" aria-live="polite" aria-atomic="true"><span key={event?.sequence}>{event ? `Last dispatch: ${describeAutomatedJobs(event)}` : 'Your dispatcher is ready for the next run.'}</span></p>
     </> : <>
       <p>Price: <strong>{formatCash(view.definition.purchaseCost)}</strong></p>
-      <p id="dispatcher-requirement">Requires ownership of {findBusiness(view.definition.requiredBusiness)?.name}.</p>
-      <p>{view.eligible ? view.canPurchase ? 'Ready to hire.' : 'More cash needed.' : 'Requirement not met.'}</p>
+      <RequirementList result={view.requirements} id="dispatcher-requirement" />
+      <p>{view.eligible ? view.canPurchase ? 'Ready to hire.' : 'More cash needed.' : 'LOCKED — Requirement not met.'}</p>
       <button className="action-button purchase-button" disabled={paused || !view.canPurchase}
         aria-describedby="dispatcher-requirement" onClick={onPurchase}>{paused ? 'Session paused' : `Hire ${view.definition.name}`}</button>
     </>}

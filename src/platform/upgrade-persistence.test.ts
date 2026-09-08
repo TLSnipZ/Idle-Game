@@ -137,7 +137,7 @@ function fullyEquipped(): GameState {
   return { ...owned(4), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
 }
 it('reconciles before every catalog purchase using the previous modifier set', () => {
-  const initial = { ...owned(4), economy: { cash: moneyFromMinorUnits('100000000') } };
+  const initial = { ...owned(5), progression: { xp: 1600 }, economy: { cash: moneyFromMinorUnits('100000000') } };
   const f = fixture(initial); const game = f.make(); game.start();
   let expected: GameState = initial;
   UPGRADE_CATALOG.forEach((upgrade, index) => {

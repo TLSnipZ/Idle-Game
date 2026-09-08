@@ -1086,3 +1086,66 @@ overflow, transaction rollback, modifier independence, migration/CE1 round trips
 runtime ordering, capped once-only offline XP, persistence failures and display
 states. Phase 5A is complete; skills, level-gated content, income bonuses and
 Phase 5B remain deferred.
+
+## Phase 5B — central acquisition requirements
+
+Requirement is a small discriminated union in src/game/requirement.ts. Content
+definitions contain readonly requirements lists; they are configuration, never
+GameState. Supported types are player-level, business-owned, business-level,
+any-business-owned, upgrade-purchased and automation-unlocked. References use
+typed stable content IDs. There are no OR/NOT trees or scripting hooks.
+
+evaluateRequirements(state, requirements) is the sole pure acquisition evaluator.
+It checks every entry in explicit config order, ANDs the results, and returns each
+original requirement, its met boolean and a centrally constructed description.
+Player level comes from getPlayerLevel(XP); business levels use the business public
+API. A minimum business level implies ownership. Empty lists succeed. Unknown
+configured IDs and invalid/impossible minimum levels throw as programming errors;
+catalog tests exercise every configured reference. Evaluation has no side effects.
+
+purchaseBusiness, purchaseUpgrade and purchaseAutomation all evaluate requirements
+after identity/duplicate checks and before spending. Failed acquisition returns
+prerequisite-not-met with a structured RequirementResult and the exact original
+GameState; cash, ownership, XP and progress are unchanged. Insufficient funds remains
+a separate failure after eligibility succeeds. Selectors use the same evaluator.
+The old upgrade-specific prerequisite evaluator and hardcoded dispatcher ownership
+check are removed.
+
+### Acquisition-only compatibility
+
+Requirements gate acquisition, not ongoing ownership or effects. Save validation,
+modifier collection and automation simulation no longer re-evaluate acquisition
+conditions. They still reject malformed state, unknown/duplicate ownership IDs,
+invalid levels, XP, cash and progress. Known owned items remain valid and active
+even when new gates (including prerequisites) are unmet. In particular, a low-XP
+save with Street Connections or a dispatcher, and Fleet Logistics without its new
+washer prerequisite, loads/imports and produces normally. Nothing is revoked.
+
+GameState is unchanged, so save schema stays **v5**, sequential migrations remain
+v1→v2→v3→v4→v5 and transport stays **CE1-**. This config change needs no migration.
+Existing persisted IDs are still compatibility contracts. Imported historical
+savedAt awards neither Money nor XP. Shared offline simulation, eight-hour cap,
+write-before-publication, once-only consumption and exact remainders are unchanged.
+Commands still reconcile old production/rewards before checking current eligibility;
+a dispatcher cycle can cross an XP threshold before the following purchase.
+
+### Presentation and progression
+
+Upgrade and delegation cards consume structured requirement details through one
+RequirementList component. Explicit “Met / Not met” text supplements the locked
+state; unmet requirements and lack of cash remain distinct. Already-purchased cards
+show PURCHASED/ACTIVE and omit acquisition locks. Existing responsive layout,
+semantic buttons, focus styles and progress controls are retained.
+
+The latest runtime-only levelEvent can include newly eligible content names,
+computed by comparing complete requirement results before/after XP changes in
+explicit catalog order. It excludes already-owned items and does not imply cash
+affordability. Polite level-up feedback announces these names; no flags/history
+are saved and no extra scheduler is added. Other eligibility changes (such as
+business level 4→5) immediately update the card through selectors.
+
+Dockside purchase and Express Tips have empty requirement lists. Manual work
+remains ungated and awards cash/XP, ensuring a fresh player can buy Dockside and
+reach Level 2 without gated content. Future businesses and separately implemented
+cars/skills/districts can declare these same typed AND lists; none are added here.
+Phase 5B is complete. The next phase requires a new task.
