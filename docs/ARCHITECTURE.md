@@ -1013,3 +1013,76 @@ batch. The welcome card optionally separates business and dispatcher income/jobs
 while retaining total, credited time, cap notice and dismiss control. Presentation
 uses selectors/formatters and the existing responsive/focus/reduced-motion styles;
 there is no UI timer. Phase 4C is complete; further delegation systems are deferred.
+
+## Phase 5A — player XP and derived levels
+
+GameState.progression = { xp: number } is the only new authoritative state.
+XP is separate from Money: a nonnegative safe integer through
+Number.MAX_SAFE_INTEGER (9,007,199,254,740,991). It cannot be spent. The progression
+feature exports validation, immutable addXp(state, amount, count), level thresholds,
+getPlayerLevel, getLevelProgress and getLevelIncrease. Batch addition uses
+transient BigInt to check the exact total before converting back to Number.
+Overflow returns xp-overflow with the original state; invalid authoritative
+inputs throw under the existing programming-error policy. There is no clamping.
+
+Player level is derived, never persisted. An immutable 100-entry threshold table
+uses 100 × (L - 1)²; integer binary search finds the highest reached level.
+Level starts at 1 and caps at 100 while XP can continue increasing. Progress metadata
+provides cumulative XP, current threshold, nullable next threshold, integer
+within-level progress/requirement, max status and a presentation-only ratio.
+React does not calculate thresholds or persist a level/progress percentage.
+
+### Three reward transactions
+
+Central XP_REWARDS defines manual delivery **10**, dispatcher cycle **5** and
+business level increase **25**. Manual delivery composes evaluated Money and XP
+before returning either. A business level upgrade composes spend, level change and
+XP before returning. Any failure preserves the entire original state. Money
+modifiers never affect XP. Business/equipment/delegation purchases, passive
+business production and elapsed time alone award no XP.
+
+Dispatcher simulation batches 5 × completedJobs through addXp; no per-cycle
+loop or second XP scheduler exists. simulateGameElapsed still composes business
+production through the unchanged simulateElapsed, then dispatcher Money/progress
+and XP for the same interval. All publish together or none publish. An XP failure
+rolls back the candidate business cash and both fractions too, then follows the
+existing runtime suspension/blocked-autosave policy. Manual jobs leave cycle
+progress alone. Pre-command reconciliation still pays completed cycles with old
+modifiers and old business levels before applying the command and its XP reward.
+
+### Save v5 and offline XP
+
+Current schema **v5** adds progression. Sequential v1→v2→v3→v4→v5 migrations
+validate each historical shape; v4 gains { xp: 0 }, preserving cash, owned levels,
+purchased upgrades, dispatcher ownership/progress, both production fractions and
+savedAt. No historical clicks/level upgrades are inferred. The retained timestamp
+still permits normal capped offline dispatcher simulation after migration.
+Current validation requires exactly the progression XP field and rejects negative,
+fractional, nonfinite, unsafe or otherwise malformed XP using the progression API.
+CE1- transport, storage key and encoded/decoded bounds are unchanged.
+
+Offline dispatcher cycles award the same 5 XP each in the shared eight-hour window.
+Saved progress contributes; discarded absence and business income award no XP.
+Future timestamps still credit zero and rebase. Money, progress, XP and current
+timestamp are written durably before the candidate is published. Failure preserves
+the prior save and pauses startup; restart/reload/autosave cannot replay the
+consumed interval. Export reconciles live Money and XP before encoding. Confirmed
+import preserves validated XP but awards no historical Money **or XP**, writes
+before replacement, and rebases future offline timing to import time.
+
+### Presentation and verification
+
+The compact labelled native progress bar beside cash shows within-level XP and
+the next level; max level shows MAX LEVEL plus total XP. Runtime-only levelEvent
+stores only the latest derived before/after level increase with an announcement
+sequence, preserved on ordinary ticks and cleared on import. It has no gameplay
+effect and no notification history. Polite inline feedback handles one or multiple
+levels without a modal or extra timer/motion. Source XP is combined with existing
+manual, business-level and dispatcher messages. Offline metadata adds xpEarned
+and an optional derived level increase; its welcome card shows XP only when positive.
+
+Deterministic tests cover all threshold boundaries, integer validation/batch
+overflow, transaction rollback, modifier independence, migration/CE1 round trips,
+runtime ordering, capped once-only offline XP, persistence failures and display
+states. Phase 5A is complete; skills, level-gated content, income bonuses and
+Phase 5B remain deferred.

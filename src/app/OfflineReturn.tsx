@@ -1,3 +1,4 @@
+import { describeLevelIncrease, formatXp } from './progression-presentation';
 import type { OfflineProgress } from '../game/offline-progress';
 import { OFFLINE_CAP_MS } from '../game/offline-progress';
 import { formatCash } from '../features/economy/ui';
@@ -17,6 +18,8 @@ export function OfflineReturn({ progress, onDismiss }: {
         <p>Business income: {formatCash(progress.businessIncome)}</p>
         <p>Dispatcher: {progress.automation.completedJobs} deliveries · {formatCash(progress.automation.income)}</p>
       </>}
+      {progress.xpEarned > 0 && <p>XP earned: +{formatXp(progress.xpEarned)} XP</p>}
+      {progress.levelIncrease && <p>{describeLevelIncrease(progress.levelIncrease)}</p>}
       <p>Away: {formatOfflineDuration(progress.actualElapsedMs)}</p>
       <p>Time credited: {formatOfflineDuration(progress.rewardedElapsedMs)}</p>
       {progress.capped && <p>Offline earnings capped at {formatOfflineDuration(OFFLINE_CAP_MS)}.</p>}

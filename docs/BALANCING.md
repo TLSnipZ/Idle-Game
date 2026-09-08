@@ -271,3 +271,47 @@ Cycle payouts use the modifier set when the cycle completes; upgrades reconcile
 already-completed jobs first and retain unfinished progress. Completed cycles are
 batched mathematically, with no per-cycle loop and no fractional money rounding
 between modifiers. Future automation/content remains a separately authorized phase.
+
+## Phase 5A — provisional player progression
+
+XP is an exact, non-spendable integer independent of cash. Start at **0 XP,
+player Level 1**. Maximum displayed player level is **100**. Cumulative XP needed
+for level L is **100 × (L − 1)²**; thresholds and rewards are centralized in the
+progression feature. No player level affects income or unlocks content yet.
+
+| Player level | Cumulative XP threshold |
+| --- | --- |
+| 1 | 0 |
+| 2 | 100 |
+| 3 | 400 |
+| 4 | 900 |
+| 5 | 1,600 |
+| 10 | 8,100 |
+| 25 | 57,600 |
+| 50 | 240,100 |
+| 100 | 980,100 |
+
+Early manual progression reaches Level 2 after ten deliveries; later intervals
+grow by 200 XP per level. For example, 1,850 total XP is Level 5 with **250 / 900
+XP toward Level 6**, not 1,850 XP within that level. XP may continue beyond the
+Level 100 threshold up to **9,007,199,254,740,991**; overflow fails atomically
+without clamping or partial cash/level changes.
+
+| Successful source | XP |
+| --- | --- |
+| Manual starter delivery | 10 per action |
+| Completed Delivery Dispatcher cycle | 5 per cycle |
+| Business level increase | 25 per level purchased |
+
+These are the only sources. Business acquisition, equipment/delegation purchases,
+passive business cash, time itself and leveling the player award no XP. Money
+modifiers keep their existing $25/$30/$36 behavior and never change XP rewards.
+Manual and automated execution remain independent.
+
+Offline dispatcher jobs also earn 5 XP each within the same **eight-hour** cap:
+2,880 jobs yield **14,400 XP**, regardless of cash modifiers. Five seconds saved
+plus 25 seconds credited yields three jobs, **15 XP** and $108 with both job
+upgrades. Discarded absence earns no XP and adds no cycle progress. Imported old
+timestamps award no XP. All existing money costs, production formulas, modifiers
+and automation timing remain unchanged. Skills, XP multipliers, level-up rewards,
+level-based income and future unlock requirements are deferred.

@@ -1,3 +1,4 @@
+import { requireXp } from '../features/progression';
 import { simulateElapsed } from './simulate-elapsed';
 import { simulateAutomation } from './simulate-automation';
 import { subtractMoney } from '../features/economy';
@@ -11,6 +12,7 @@ export type GameSimulationResult = Extract<AutomationSimulationResult, { ok: fal
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
   const business = simulateElapsed(state, elapsedMs);
   if (!business.ok) return business;
+  requireXp(state.progression.xp);
   const automation = simulateAutomation(business.state, elapsedMs);
   if (!automation.ok) return { ...automation, state };
   const income = subtractMoney(business.state.economy.cash, state.economy.cash);

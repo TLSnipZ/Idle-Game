@@ -1,3 +1,4 @@
+import { PlayerProgress } from './PlayerProgress';
 import { AutomationCard } from './AutomationCard';
 import { selectDispatcher } from '../game/automation-selectors';
 import { DELIVERY_DISPATCHER } from '../features/automation';
@@ -20,7 +21,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const reward = evaluateJobReward(snapshot.state);
   const paused = runtimeError !== null;
@@ -53,6 +54,7 @@ export function App() {
               <span className="status-dot" aria-hidden="true" />
               {paused ? 'Earnings paused' : owned ? 'Your business is working for you' : 'Your next move starts here'}
             </p>
+            <PlayerProgress xp={snapshot.state.progression.xp} event={levelEvent} paused={paused} />
             <div className="delivery-block">
               <p className="eyebrow">Make a connection</p>
               <h3>A quick run. A fresh start.</h3>

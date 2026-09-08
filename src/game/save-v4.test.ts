@@ -17,15 +17,15 @@ function current() {
 describe('v4 delegation saves', () => {
   it('migrates realistic v3 with all upgrades preserving every previous field and timestamp', () => {
     const original = old(); const text = JSON.stringify(original); const result = parseSave(text);
-    expect(CURRENT_SAVE_VERSION).toBe(4);
-    expect(result).toEqual({ ok: true, envelope: { ...original, version: 4,
-      state: { ...original.state, automation: { unlockedIds: [], starterJobElapsedMs: 0 } } } });
+    expect(CURRENT_SAVE_VERSION).toBe(5);
+    expect(result).toEqual({ ok: true, envelope: { ...original, version: CURRENT_SAVE_VERSION,
+      state: { ...original.state, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 } } } });
     expect(JSON.stringify(original)).toBe(text);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(result);
   });
   it('roundtrips v4 progress/ownership with fresh metadata and unchanged CE1 transport', () => {
     const state = current(); const encoded = serializeSave(state, 42); if (!encoded.ok) throw Error('fixture');
-    expect(parseSave(encoded.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 4, savedAt: 42, state } });
+    expect(parseSave(encoded.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: CURRENT_SAVE_VERSION, savedAt: 42, state } });
     const code = exportSaveCode(state, 42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true); expect(validateSaveCode(code.code)).toEqual(parseSave(encoded.serialized));
     expect(encoded.serialized).not.toMatch(/automationEvent|completedJobs|baseline|runtimeError/);
@@ -53,6 +53,6 @@ describe('v4 delegation saves', () => {
     expect(parseSave(JSON.stringify({ ...old(), state: current() }))).toEqual({ ok: false, error: 'invalid-state' });
     const previous = old();
     expect(parseSave(JSON.stringify({ ...previous, state: { ...previous.state, economy: { cash: '01' } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...previous, version: 5 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(JSON.stringify({ ...previous, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

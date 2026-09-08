@@ -72,7 +72,7 @@ describe('business presentation', () => {
 
 describe('action feedback', () => {
   it('describes delivery success using the configured reward', () => {
-    expect(describeAction('delivery', { ok: true, state })).toBe(`Delivery completed. +${formatCash(STARTER_JOB.reward)} earned.`);
+    expect(describeAction('delivery', { ok: true, state })).toBe(`Delivery completed. +${formatCash(STARTER_JOB.reward)} · +10 XP.`);
   });
   it('announces acquisition and the beginning of production', () => {
     const message = describeAction('purchase', { ok: true, state });

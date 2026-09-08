@@ -1,3 +1,4 @@
+import { XP_REWARDS } from '../features/progression';
 import { DELIVERY_DISPATCHER } from '../features/automation';
 import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
@@ -17,10 +18,10 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     }
     if (action === 'upgrade') {
       const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
-      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec.` : 'Business upgraded.';
+      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec · +${XP_REWARDS.businessLevel} XP.` : 'Business upgraded.';
     }
     return action === 'delivery'
-      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} earned.`
+      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} · +${XP_REWARDS.manualJob} XP.`
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
@@ -35,6 +36,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';
     case 'invalid-level': return 'Business level is invalid. No transaction was made.';
+    case 'xp-overflow': return 'XP limit reached. This action could not be completed.';
     case 'overflow': return 'Cash limit reached. This action could not be completed.';
     case 'invalid-amount': return 'This action could not be completed. No transaction was made.';
   }

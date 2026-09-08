@@ -1,3 +1,5 @@
+import { getLevelIncrease } from '../features/progression';
+import type { LevelIncrease } from '../features/progression';
 import { subtractMoney } from '../features/economy';
 import type { Money } from '../features/economy';
 import type { GameState } from './game-state';
@@ -13,6 +15,8 @@ export interface OfflineProgress {
   readonly capped: boolean;
   readonly incomeEarned: Money;
   readonly clockAnomaly: boolean;
+  readonly xpEarned: number;
+  readonly levelIncrease: LevelIncrease | null;
   readonly businessIncome?: Money;
   readonly automation?: AutomationSummary;
 }
@@ -34,6 +38,8 @@ export function reconcileOffline(state: GameState, savedAt: unknown, now: unknow
   return { ok: true, state: result.state, progress: {
     actualElapsedMs, rewardedElapsedMs, capped: actualElapsedMs >= OFFLINE_CAP_MS,
     incomeEarned: income.value, clockAnomaly,
+    xpEarned: result.state.progression.xp - state.progression.xp,
+    levelIncrease: getLevelIncrease(state.progression.xp, result.state.progression.xp),
     ...(state.automation.unlockedIds.length > 0 ? { businessIncome: result.businessIncome, automation: result.automation } : {}),
   } };
 }

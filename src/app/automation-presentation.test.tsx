@@ -46,11 +46,11 @@ describe('delegation presentation', () => {
     expect(html).not.toContain('<button'); expect(render(state, true)).toContain('PAUSED');
   });
   it('aggregates recent dispatch feedback without notification history', () => {
-    const event = { sequence: 1, completedJobs: 3, income: moneyFromMinorUnits('10800') };
+    const event = { sequence: 1, xpEarned: 15, completedJobs: 3, income: moneyFromMinorUnits('10800') };
     const state = purchaseAutomation(eligible(), D.id).state;
     const html = renderToStaticMarkup(<AutomationCard view={selectDispatcher(state)} paused={false} onPurchase={() => {}} event={event} />);
     expect(html).toContain('3 automated deliveries · +$108.00'); expect(html).toContain('role="status"'); expect(html).toContain('aria-live="polite"');
-    expect(describeAutomatedJobs({ completedJobs: 1, income: moneyFromMinorUnits('2500') })).toBe('1 automated delivery · +$25.00');
+    expect(describeAutomatedJobs({ completedJobs: 1, xpEarned: 5, income: moneyFromMinorUnits('2500') })).toBe('1 automated delivery · +$25.00 · +5 XP');
     expect(describeAction('automation', purchaseAutomation(eligible(), D.id))).toContain('hired');
   });
   it.each([[10000, '10s'], [5679, '6s'], [1, '1s']])('formats remaining time %#', (ms, text) => {

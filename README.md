@@ -1,14 +1,18 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 4C: starter-job delegation.**
-Cash, business levels, five purchased upgrades, automation and exact progress survive
+idle/tycoon browser game. **Phase 5A: player XP and levels.**
+Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
 Hire the **Delivery Dispatcher** for **$7,500** after acquiring Dockside: it performs
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both
 job upgrades). Manual deliveries remain available and do not reset its progress.
-Existing saves/codes migrate automatically with the dispatcher initially locked.
+Existing saves/codes migrate automatically. Pre-XP saves start with XP 0 while preserving existing progress.
+Earn 10 XP per manual delivery, 5 per dispatched delivery (including credited offline
+jobs), and 25 per business level increase. Player level is derived from XP, capped
+at 100, and grants no income bonus. The progress bar shows XP within the current
+level; feedback announces level increases.
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, businesses and the dispatcher receive the same maximum **eight hours**
 of offline progress from the last successful local save. A welcome card shows
@@ -22,7 +26,7 @@ Use **Save management → Export save** to generate a `CE1-` backup code. Copy i
 with the button or select the text manually if clipboard access is unavailable.
 To restore, paste a code, validate it, then confirm replacing current progress and
 the local save. Cancel keeps your progress. Codes are not encrypted or secret.
-Importing a code awards no income from its historical timestamp. Offline timing
+Importing a code awards no income or XP from its historical timestamp. Offline timing
 begins at the new local import timestamp.
 
 ## Development
@@ -60,9 +64,10 @@ Start with [AGENTS.md](AGENTS.md). Read [architecture](docs/ARCHITECTURE.md),
 ## GitHub Pages
 
 Expected public URL: [Crime Empire](https://tlsnipz.github.io/Idle-Game/).
-The user manually verified the live Phase 4B deployment: all five upgrades, reward
-stacking, reload, offline income and export/import work. Phase 4C live verification
-is still pending.
+The user manually verified the live Phase 4C deployment: dispatcher purchase,
+10-second jobs, $25/$30/$36 evaluated rewards, saved cycle progress, offline
+automation, welcome-back breakdown and export/import work. Phase 5A live
+verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**

@@ -1,3 +1,5 @@
+import { getLevelIncrease } from '../features/progression';
+import type { LevelIncrease } from '../features/progression';
 import type { PurchaseAutomationResult } from '../game/purchase-automation';
 import type { AutomationSummary } from '../game/simulate-automation';
 import type { PurchaseUpgradeResult } from '../game/purchase-upgrade';
@@ -17,6 +19,7 @@ type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
 export interface RuntimeSnapshot {
   readonly result: CommandResult;
   readonly runtimeError: RuntimeError | null;
+  readonly levelEvent?: LevelIncrease & { readonly sequence: number };
   readonly automationEvent?: AutomationSummary & { readonly sequence: number };
 }
 
@@ -61,6 +64,11 @@ export function createGameRuntime(
     publish(snapshot);
   }
 
+  function levelEventFor(state: GameState) {
+    const increase = getLevelIncrease(snapshot.result.state.progression.xp, state.progression.xp);
+    return increase ? { levelEvent: { ...increase, sequence: (snapshot.levelEvent?.sequence ?? 0) + 1 } } : {};
+  }
+
   function reconcile(): boolean {
     if (baseline === null || snapshot.runtimeError !== null) return false;
     const now = timing.now();
@@ -86,7 +94,7 @@ export function createGameRuntime(
     remainderMs = elapsed - wholeMs;
     if (result.state !== snapshot.result.state) {
       // Automatic income must not erase feedback from the last player command.
-      snapshot = { ...snapshot, result: { ...snapshot.result, state: result.state },
+      snapshot = { ...snapshot, ...levelEventFor(result.state), result: { ...snapshot.result, state: result.state },
         ...(result.automation.completedJobs > 0 ? { automationEvent: {
           ...result.automation, sequence: (snapshot.automationEvent?.sequence ?? 0) + 1,
         } } : {}),
@@ -105,7 +113,7 @@ export function createGameRuntime(
     if (result.ok && (result.state.businesses.owned !== previous.businesses.owned
         || result.state.upgrades !== previous.upgrades
         || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
-    snapshot = { ...snapshot, result };
+    snapshot = { ...snapshot, ...(result.ok ? levelEventFor(result.state) : {}), result };
     publish(snapshot);
   }
 
