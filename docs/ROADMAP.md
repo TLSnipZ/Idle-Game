@@ -12,7 +12,7 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 1C.1 — Production math (complete) | Exact elapsed production, pooled fractional accrual and pure simulation tests | Step-size independence, atomic overflow and corruption handling |
 | 1C.2 — Runtime ticking (complete) | Monotonic browser clock, command boundaries and live production | Deterministic timing, fractional carry, cleanup and terminal failure tests |
 | 1C.3 — UI feedback/polish (complete) | Premium cash/delivery/business presentation, live status and accessible feedback | Targeted presentation tests; runtime/domain contracts unchanged |
-| 1C.4 — GitHub Pages deployment (deferred) | Configure and verify static hosting when explicitly requested | Separate task; no deployment or workflow added in 1C.3 |
+| 1C.4 — GitHub Pages configuration (complete; remote verification pending) | Official Actions workflow builds and deploys `dist` from `main` | Local checks and relative asset validation pass; live deployment must be verified remotely |
 | 2 — Durable progress | Versioned local saves, validated import/export and migrations | Reload/round trip; corruption/newer versions preserve state; storage errors visible |
 | 3 — Production | Passive income, business levels, shared clock, offline catch-up | Deterministic time integration, capped offline rewards applied once |
 | 4 — Upgrades and modifiers | Scoped/global upgrades, central stat evaluation, initial delegation | Stacking/affordability tests; bonuses explained; active/automated actions agree |
@@ -28,19 +28,28 @@ Phases 0, 1A, 1B, 1C.1 and 1C.2 are complete. Cash, starter delivery, business
 purchase and deterministic production simulation are connected to a 250 ms browser
 scheduler using monotonic elapsed time. Commands reconcile before acting; fractional
 time, lifecycle cleanup and safe failure suspension are tested. No modifiers,
-saves, offline rewards or automation exist. No deployment is configured.
+saves, offline rewards or automation exist. GitHub Pages deployment configuration is implemented in Phase 1C.4.
 Phase 1C.3 presentation polish is complete: responsive cards, configured production
 rates, acquisition readiness, action announcements and terminal error presentation.
 Browser visual verification was blocked by the available browser rejecting the local
 preview address; narrow-width CSS constraints and server-rendered state presentation
-were checked. Phase 1C.4 GitHub Pages deployment remains explicitly deferred.
+were checked.
+
+Phase 1C.4 repository-side implementation is complete: the Pages workflow reads
+Node 24 from `.nvmrc`, runs the normal checked build, uploads only `dist`, and
+serializes deployments to the `github-pages` environment. Vite's relative base
+is unchanged. Remote deployment is **not verified**: shell GitHub authentication
+is unavailable, so the local configuration still needs to be pushed. Enable Pages
+with Source **GitHub Actions**, then verify the Actions run and public site using
+README instructions. This is not a claim that the live site works. Phase 2 is not
+started; saves and offline progression remain out of scope.
 
 ## Next session
 
 1. Read AGENTS.md, inspect Git status and the architecture/balance contracts.
 2. Restore/install with `npm ci`; run `npm run typecheck`, `npm run test`, and
    `npm run build`. Review remote status before integrating commits.
-3. Wait for an explicit Phase 1C.4 deployment task. Hosting remains unimplemented;
+3. Complete remote Pages verification after pushing the workflow and enabling Pages;
    keep `simulateElapsed(state, elapsedMs)` as the only production path and route
    commands through runtime reconciliation. Do not add new timers in UI components.
 4. Preserve `purchaseBusiness` as the paid ownership command and the economy's safe

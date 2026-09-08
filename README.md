@@ -38,18 +38,36 @@ Start with [AGENTS.md](AGENTS.md). Read [architecture](docs/ARCHITECTURE.md),
 
 ## GitHub Pages
 
-This is a static client application. Vite uses `base: './'` so generated assets
-resolve beneath both a domain root and `/repository-name/`. Publish the contents
-of `dist/` using a future Pages workflow; do not serve the unbuilt source tree.
-No deployment or CI workflow is configured in Phase 0. No client routing exists;
-if introduced, prefer hash routing unless the hosting fallback is addressed.
-Use imported assets or `import.meta.env.BASE_URL` for future public asset paths.
+Expected public URL: [Crime Empire](https://tlsnipz.github.io/Idle-Game/).
+Deployment configuration is implemented; the live deployment is not yet verified.
+
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
+on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
+(select `main`). It reads Node **24** from `.nvmrc`, installs with `npm ci`, runs
+`npm run build` (including TypeScript checks), and uploads only `dist` through the
+official Pages artifact/deployment actions. A shared concurrency group prevents
+overlapping deployments. Only the deploy job receives Pages write/OIDC permissions;
+no personal access token or custom secret is required.
+
+One-time setup in `TLSnipZ/Idle-Game`: open **Settings → Pages → Build and deployment**
+and set **Source: GitHub Actions**. Ensure Actions are enabled for the repository
+and official `actions/*` actions are permitted. Push the committed workflow to
+`main`, or run it manually after enabling Pages. Check both jobs under **Actions**;
+the deploy job's `github-pages` environment link and **Settings → Pages** show the
+published URL. Confirm the site loads, delivery/purchase works, and owned cash rises.
+If environment approval is configured, approve the pending deployment there.
+
+Vite's existing `base: './'` is retained: generated JS/CSS references resolve under
+`/Idle-Game/` without changing the local build. No router or custom-domain setup is
+needed. This follows [GitHub's custom Pages workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
 
 ## Repository handoff
 
 The initial workspace had no repository and the GitHub connector returned no
-accessible repositories. This foundation has a local Git commit only; no remote
-or deployment is configured. The delivered ZIP includes source, lockfile and a
+accessible repositories. The current repository has local commits and an `origin` remote at
+`https://github.com/TLSnipZ/Idle-Game.git`. Shell push credentials were unavailable
+in the implementation environment; deployment configuration must reach remote
+`main` before GitHub can run it. The delivered ZIP includes source, lockfile and a
 `foundation.bundle` containing Git history. To restore the committed repository,
 extract the ZIP and run from the extracted project directory:
 
