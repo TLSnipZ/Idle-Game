@@ -18,7 +18,7 @@ describe('v3 upgrade and precision schema', () => {
     const old = legacy(); const before = JSON.stringify(old);
     const result = parseSave(before);
     expect(result).toEqual({ ok: true, envelope: { ...old, version: CURRENT_SAVE_VERSION, state: {
-      ...old.state, city: { ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
+      ...old.state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
     } } });
     expect(JSON.stringify(old)).toBe(before);
     expect(validateSaveCode(encodeSaveText(before))).toEqual(result);

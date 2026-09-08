@@ -79,7 +79,7 @@ describe('delegation runtime transactions', () => {
     expect(f.writes()).toBe(writes);
     f.autosave(); expect(f.writes()).toBe(writes + 1);
     const current = game.getSnapshot().result.state; const code = game.exportCode(); if (!code.ok) throw Error('fixture');
-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 9, savedAt: 26001, state: current } });
+    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 10, savedAt: 26001, state: current } });
     game.stop(); const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(current);
     expect(reload.getSnapshot().offline?.automation?.completedJobs).toBe(0); reload.stop();
   });
@@ -134,7 +134,7 @@ it('v3 local bootstrap keeps its original offline timestamp while migrating disp
   expect(result).toMatchObject({ kind: 'loaded', state: { automation: { unlockedIds: [], starterJobElapsedMs: 0 } } });
   if (result.kind !== 'loaded') throw Error('fixture');
   expect(result.state).toEqual(simulateGameElapsed(owned(false), 25000).state);
-  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 9, savedAt: 26000, state: result.state } });
+  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 10, savedAt: 26000, state: result.state } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { incomeEarned: '0' } });
 });
 
@@ -224,6 +224,6 @@ it('v4 migration preserves its timestamp and awards only credited dispatcher XP 
   let raw = JSON.stringify({ format: 'crime-empire-save', version: 4, savedAt: 1000, state: legacy });
   const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 26000);
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: { progression: { xp: 15 } }, offline: { xpEarned: 15 } });
-  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 9, savedAt: 26000, state: { progression: { xp: 15 } } } });
+  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 10, savedAt: 26000, state: { progression: { xp: 15 } } } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { xpEarned: 0 } });
 });

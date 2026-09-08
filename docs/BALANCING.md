@@ -467,3 +467,40 @@ exists. Rebirth removes Neon Mile and temporary upgrades, leaving Fast Talker ra
 (if owned) at `$25 × 1.10 = $27.50`. All acquisition requirements and the $100,000
 price apply again on the next run. Vehicles and permanent skills remain retained.
 Heat, Crew, Random Events, further territories and final city art remain deferred.
+
+## Phase 7B — provisional Heat balance
+
+Heat is integer 0–100; zero Heat has no banked cooling progress.
+
+| Heat | Tier | Job / Dispatcher cash factor |
+| --- | --- | --- |
+| 0–19 | COLD | ×1.00 |
+| 20–39 | NOTICED | ×1.00 |
+| 40–59 | WATCHED | ×1.00 |
+| 60–79 | HOT | ×0.90 (−10%) |
+| 80–100 | MANHUNT | ×0.75 (−25%) |
+
+| Action | Exact provisional effect |
+| --- | --- |
+| Successful manual job | +1 Heat after the old-tier payout |
+| Dispatcher batch | +floor(completed jobs / 5) Heat, then cooling |
+| Successful Neon Mile acquisition | +10 Heat, clamped at 100 |
+| Credited elapsed time | −1 Heat per full 60,000ms, remainder retained while positive |
+| Lay Low | $500; −10 Heat down to zero; no cooldown/reward |
+
+The three gain sources are exhaustive. Dispatcher batches do not share a counter:
+3 then 2 jobs generate zero Heat; one batch of 5 generates one. Batch-start Heat
+sets all its job payouts. Gain/clamp precedes cooling over the entire elapsed batch,
+without chronological interleaving. Thus timing partitions can change Heat and future
+job income intentionally; pure business fractions and XP's existing floor rules remain.
+No XP, production, EP, Rebirth, price or offline-cap penalty exists. Manual jobs and
+Dispatcher remain usable at 100; no territory can be lost.
+
+Canonical full job stack: ($25+$5)×1.20×1.10×1.10 = $43.56;
+HOT gives exact $39.204, MANHUNT exact $32.67. Existing discrete payouts floor
+final per-job cents: $39.20 / $32.67; automated batches multiply the same job payout.
+Cooling never banks at zero. Lay Low preserves partial cooling while still positive,
+and clears it at zero. All offline Heat uses the existing shared 8/10/12h credited
+window; discarded time neither heats nor cools. Rebirth resets Heat/progress and
+Neon Mile; permanent Fast Talker rank 1 then pays $27.50 as before.
+All values are provisional. No police events, RNG or Crew balance is implemented.

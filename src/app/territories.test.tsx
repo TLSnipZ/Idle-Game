@@ -18,14 +18,15 @@ import { performStarterJob } from '../game/perform-starter-job';
 import { selectRebirth } from '../game/rebirth';
 import { rebirthRuntime } from '../platform/test-fixtures/rebirth-runtime';
 
-const render = (state = createInitialGameState(), paused = false) => renderToStaticMarkup(<City state={state} paused={paused} onAcquire={() => {}} />);
+const render = (state = createInitialGameState(), paused = false) => renderToStaticMarkup(<City state={state} paused={paused} onLayLow={() => {}} onAcquire={() => {}} />);
 describe('Solara City presentation and interaction', () => {
   it('shows two labelled cards in explicit order with a free controlled Waterfront foothold', () => {
     const html = render();
     expect(html).toContain('SOLARA CITY'); expect(html).toContain('Territories controlled: 1 / 2');
-    expect(html.match(/<article/g)).toHaveLength(2);
+    expect(html.match(/class="panel territory-card/g)).toHaveLength(2);
     expect(html.indexOf(`${W.id}-heading`)).toBeLessThan(html.indexOf(`${N.id}-heading`));
-    const waterfront = html.slice(html.indexOf('<article'), html.indexOf('</article>'));
+    const waterfrontStart = html.indexOf('class="panel territory-card');
+    const waterfront = html.slice(waterfrontStart, html.indexOf('</article>', waterfrontStart));
     expect(waterfront).toContain('CONTROLLED'); expect(waterfront).toContain('Starting foothold · No gameplay bonus');
     expect(waterfront).not.toContain('<button'); expect(waterfront).not.toContain('Price:');
     expect(html).toContain('territory-catalog'); expect(html).toContain('territory-card');
@@ -46,7 +47,7 @@ describe('Solara City presentation and interaction', () => {
     const html = render(state); expect(html).toContain('Requirements satisfied · Insufficient cash.');
     expect(html).not.toContain('LOCKED'); expect(html).toContain('disabled=""');
     expect(territoryPresentation(territoryState(), N.id)).toMatchObject({ canAcquire: true, status: 'AVAILABLE' });
-    expect(render(territoryState())).not.toContain('disabled=""');
+    expect(render(territoryState()).match(/<button[^>]*aria-label="Take control of Neon Mile"[^>]*>/)?.[0]).not.toContain('disabled');
     expect(render(territoryState(), true)).toContain('disabled=""');
   });
   it('immediately switches to controlled, updates count and removes repurchase action', () => {
@@ -54,12 +55,12 @@ describe('Solara City presentation and interaction', () => {
     f.game.execute(state => { const result = acquireTerritory(state, N.id); feedback = describeTerritoryAcquisition(result, N.id); return result; });
     const html = render(f.game.getSnapshot().result.state);
     expect(html).toContain('Territories controlled: 2 / 2'); expect(html.match(/CONTROLLED/g)).toHaveLength(2);
-    expect(html).not.toContain('<button'); expect(feedback).toContain('Neon Mile controlled');
+    expect(html).not.toContain('aria-label="Take control'); expect(feedback).toContain('Neon Mile controlled');
     expect(feedback).toContain('-$100,000.00'); expect(feedback).toContain('+10%'); f.game.stop();
   });
   it('grandfathered ownership stays controlled below acquisition requirements', () => {
-    const state = { ...createInitialGameState(), city: { ownedTerritoryIds: [W.id, N.id] } };
-    expect(render(state)).not.toContain('LOCKED'); expect(render(state)).not.toContain('Not met'); expect(render(state)).not.toContain('<button');
+    const state = { ...createInitialGameState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } };
+    expect(render(state)).not.toContain('LOCKED'); expect(render(state)).not.toContain('Not met'); expect(render(state)).not.toContain('aria-label="Take control');
   });
   it('uses typed failures for requirement, affordability, ownership and unknown-ID feedback', () => {
     expect(describeTerritoryAcquisition(acquireTerritory(createInitialGameState(), N.id), N.id)).toContain('Player Level 12');
@@ -76,7 +77,7 @@ describe('Solara City presentation and interaction', () => {
     expect(describeAction('delivery', performStarterJob(state))).toContain('+$30.25 · +10 XP');
   });
   it('Rebirth confirmation describes territory loss, cancellation preserves it, success restores only Waterfront', () => {
-    const f = rebirthRuntime({ ...rebirthState(), city: { ownedTerritoryIds: [W.id, N.id] } });
+    const f = rebirthRuntime({ ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });
     const controls = createRebirthControls(() => f.game.rebirth(), () => {});
     const panel = () => renderToStaticMarkup(<RebirthPanelView preview={selectRebirth(f.game.getSnapshot().result.state)}
       unavailable={false} interaction={controls.getSnapshot()} controls={controls} />);

@@ -10,6 +10,13 @@ import { simulateGameElapsed } from './simulate-game-elapsed';
 import { evaluateJobReward } from './effective-stats';
 import { STARTER_BUSINESS as B } from '../features/businesses';
 
+function withValidHeat(city: unknown): unknown {
+  if (typeof city !== 'object' || city === null || Array.isArray(city)) return city;
+  return Object.create(Object.getPrototypeOf(city), {
+    ...Object.getOwnPropertyDescriptors(city),
+    heat: { value: 0, enumerable: true }, heatDecayElapsedMs: { value: 0, enumerable: true },
+  });
+}
 function legacy() {
   const { city: _city, ...state } = rebirthState(37, 48);
   return { format: 'crime-empire-save', version: 8, savedAt: 123456789,
@@ -19,9 +26,9 @@ function legacy() {
 describe('v9 territory schema and sequential migration', () => {
   it('adds only the Waterfront baseline to a rich v8 save, preserving every prior field exactly', () => {
     const old = legacy(), raw = JSON.stringify(old);
-    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(9);
-    expect(result).toEqual({ ok: true, envelope: { ...old, version: 9,
-      state: { ...old.state, city: { ownedTerritoryIds: [W.id] } } } });
+    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(10);
+    expect(result).toEqual({ ok: true, envelope: { ...old, version: 10,
+      state: { ...old.state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] } } } });
     if (!result.ok) throw Error('fixture');
     const { city, ...previous } = result.envelope.state;
     expect(previous).toEqual(old.state); expect(city.ownedTerritoryIds).not.toContain(N.id);
@@ -39,16 +46,16 @@ describe('v9 territory schema and sequential migration', () => {
       ...(version >= 7 ? { permanentProgression: { empirePoints: 17, rebirthCount: 4,
         ...(version >= 8 ? { skills: s.permanentProgression.skills } : {}) } } : {}) };
     const result = validateSaveCode(encodeSaveText(JSON.stringify({ ...old, version, state })));
-    expect(result).toMatchObject({ ok: true, envelope: { version: 9, savedAt: old.savedAt,
-      state: { city: { ownedTerritoryIds: [W.id] }, economy: s.economy,
+    expect(result).toMatchObject({ ok: true, envelope: { version: 10, savedAt: old.savedAt,
+      state: { city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] }, economy: s.economy,
         businesses: { owned: { [B.id]: { level: version === 1 ? 1 : 48 } }, productionRemainderMilliCents: 975 } } } });
   });
   it.each([{ ids: [W.id] }, { ids: [W.id, N.id] }])('roundtrips authoritative city %# and all previous state through CE1', ({ ids }) => {
-    const state = { ...legacy().state, city: { ownedTerritoryIds: ids } };
+    const state = { ...legacy().state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ids } };
     const serialized = serializeSave(state, 42), exported = exportSaveCode(state, 42);
     if (!serialized.ok || !exported.ok) throw Error('fixture');
     expect(exported.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(exported.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 9, savedAt: 42, state } });
+    expect(validateSaveCode(exported.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 10, savedAt: 42, state } });
     expect(parseSave(serialized.serialized)).toEqual(validateSaveCode(exported.code));
     expect(serialized.serialized).not.toMatch(/controlledCount|purchaseCost|SOLARA|requirements|displayName/);
   });
@@ -56,9 +63,9 @@ describe('v9 territory schema and sequential migration', () => {
     { ownedTerritoryIds: [] }, { ownedTerritoryIds: [N.id] }, { ownedTerritoryIds: [W.id, W.id] },
     { ownedTerritoryIds: [W.id, N.id, N.id] }, { ownedTerritoryIds: [W.id, 'territory:missing'] },
     { ownedTerritoryIds: [W.id, null] }, { ownedTerritoryIds: [W.id], extra: true }])('rejects malformed current city %# without repair', city => {
-    const state = { ...createInitialGameState(), city };
+    const state = { ...createInitialGameState(), city: withValidHeat(city) };
     expect(validateSaveState(state)).toBeNull();
-    expect(parseSave(JSON.stringify({ format: 'crime-empire-save', version: 9, savedAt: 1, state }))).toEqual({ ok: false, error: 'invalid-state' });
+    expect(parseSave(JSON.stringify({ format: 'crime-empire-save', version: 10, savedAt: 1, state }))).toEqual({ ok: false, error: 'invalid-state' });
   });
   it('rejects prototypes, getters, holes and non-JSON own properties without executing getters', () => {
     const base = createInitialGameState();
@@ -68,17 +75,17 @@ describe('v9 territory schema and sequential migration', () => {
     for (const city of [getter, Object.create({ ownedTerritoryIds: [W.id] }), { ownedTerritoryIds: ids }, hidden,
       { ownedTerritoryIds: Object.setPrototypeOf([W.id], {}) },
       { ownedTerritoryIds: new Array(1) }, { ownedTerritoryIds: Object.assign([W.id], { bonus: 1 }) }]) {
-      expect(validateSaveState({ ...base, city })).toBeNull();
+      expect(validateSaveState({ ...base, city: withValidHeat(city) })).toBeNull();
     }
   });
   it('retains owned Neon Mile without its acquisition requirements', () => {
-    const state = { ...createInitialGameState(), city: { ownedTerritoryIds: [W.id, N.id] } };
+    const state = { ...createInitialGameState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } };
     expect(validateSaveState(state)).toEqual(state); expect(evaluateJobReward(state)).toMatchObject({ reward: '2750' });
   });
   it('rejects smuggled city in v8 and unsupported future versions', () => {
     const old = legacy();
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, city: createInitialGameState().city } }))).toEqual({ ok: false, error: 'invalid-state' });
-    expect(parseSave(JSON.stringify({ ...old, version: 10 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(JSON.stringify({ ...old, version: 11 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
   it('migration retains savedAt for one normal offline catch-up without granting territory', () => {
     const old = legacy(); let raw = JSON.stringify(old); const now = old.savedAt + 25000;
@@ -86,7 +93,7 @@ describe('v9 territory schema and sequential migration', () => {
     const state = { ...old.state, city: createInitialGameState().city };
     const expected = simulateGameElapsed(state, 25000).state;
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected });
-    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 9, savedAt: now, state: expected } });
+    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 10, savedAt: now, state: expected } });
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { incomeEarned: '0', xpEarned: 0 } });
   });
 });

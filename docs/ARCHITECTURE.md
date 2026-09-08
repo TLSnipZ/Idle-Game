@@ -1491,4 +1491,120 @@ Controlled cards omit acquisition, and Waterfront explicitly states no gameplay
 bonus. Existing action feedback and modifier breakdown identify Neon Mile by name.
 Rebirth confirmation lists loss of territories beyond the starting Waterfront foothold.
 No map, final district art, Heat, Crew or Random Events are implemented.
-Phase 7A implementation is complete; live verification is pending. Phase 7B is deferred.
+Phase 7A is complete and was manually verified live by the user. Phase 7B follows below.
+
+## Phase 7B — deterministic Heat
+
+Phase 7A was manually verified live by the user. Phase 7B implementation adds
+Heat to the temporary city slice; live verification remains pending.
+
+`city = { ownedTerritoryIds, heat, heatDecayElapsedMs }`. Heat is an integer 0–100,
+separate from Money/XP. Cooling progress is an integer 0–59,999 milliseconds. At
+Heat zero progress must be zero. Tiers are derived centrally, never persisted:
+COLD 0–19, NOTICED 20–39, WATCHED 40–59, HOT 60–79, MANHUNT 80–100.
+The feature-public Heat API owns validation, bounded gains/reductions, constant-time
+cooling, tier derivation and dynamic modifier construction. Content/balance constants
+live in its config. Current save validation rejects malformed state rather than
+clamping or repairing it; only gameplay gain/reduction operations clamp legitimately.
+
+### Sources, ordering and batching
+
+Exactly three sources gain Heat: a successful manual delivery adds 1; one Dispatcher
+reconciliation batch adds `floor(completedJobs / 5)`; acquiring Neon Mile adds 10.
+The territory definition declares its acquisition Heat, shared by command and UI.
+Waterfront has zero and remains the unpurchased baseline. Other purchases, business
+levels/production, XP and passage of time do not generate Heat. Manual delivery
+returns Money, XP and Heat in one immutable transition. Its runtime-only result
+also carries the actual awarded Money/XP so feedback never evaluates the next tier
+by mistake. Neon Mile returns payment, ownership and Heat together; failures retain
+all original state. No XP/EP/count is granted by Heat actions or acquisition.
+
+`simulateGameElapsed` remains the single elapsed composition boundary:
+
+1. Business production through the unchanged `simulateElapsed` path.
+2. Dispatcher cycles, Money and XP using interval-start modifiers/Heat.
+3. Dispatcher batch Heat gain, clamped to 100.
+4. Heat decay over the same full integer elapsed duration.
+5. Publish the complete resulting state atomically.
+
+Business production changes no modifiers, so the Dispatcher sees the same applicable
+modifiers as the interval start. Neither gains nor cooling change this batch's payout.
+No cycle/minute interleaving or per-cycle loop exists. A HOT batch that ends COLD
+still pays every completed job at HOT; only later batches use the cooler state.
+
+There is deliberately **no cross-batch Heat counter**: 3 jobs then 2 jobs generate
+zero Heat, whereas one batch of 5 generates 1. Heat and heat-dependent job Money
+therefore do not claim partition independence across arbitrary reconciliation
+boundaries. Online/offline equivalence means the same initial state and the same
+elapsed batch. Business-production fractions remain partition independent, and
+XP retains the separately documented final/batch-floor policy. The 250ms runtime
+and five-second autosave cadence are unchanged. Ordinary short online batches
+usually complete only one delivery and therefore generate no Dispatcher Heat.
+
+For cooling, transient BigInt computes `total = progress + elapsed`,
+`intervals = total / 60000`, and `remainder = total % 60000`. Subtract the smaller
+of Heat and completed intervals. Preserve the remainder only if Heat remains
+positive; reaching zero clears it. Heat zero never banks time. Gains while positive
+preserve cooling progress; gains from zero begin at zero. This is safe even when
+adding progress to maximum safe-integer elapsed would exceed Number precision.
+Synthetic 10 jobs + 5 cooling intervals at Heat 20 gives 17. The real 10-second
+Dispatcher completes 30 jobs in five minutes, giving 20 + 6 − 5 = 21 instead.
+
+### One consequence and one action
+
+The existing central collector includes the dynamic `modifier:heat-job-reward`
+(source `heat:city-pressure`) only at HOT/MANHUNT. It targets `job-reward` exclusively:
+HOT −1,000 basis points (×0.90), MANHUNT −2,500 (×0.75). The evaluator now permits
+signed integer deltas down to −10,000, retaining the previous upper bound, stable
+ID sorting, flats-first order and exact rational multiplication. No separate cash
+subtraction or penalty formula exists. Breakdown metadata resolves to Heat — HOT
+or Heat — MANHUNT. XP, business production, offline cap and Rebirth reward are unchanged.
+
+The full `$43.56` stack becomes exactly `$39.204` at HOT or `$32.67` at MANHUNT in
+the evaluator. The established discrete reward boundary floors the final per-job
+payout to cents ($39.20 / $32.67); Dispatcher multiplies that same payout by its
+completed cycles. No new saved fractional job-cash field or intermediate modifier
+rounding is introduced. A manual job at 79 uses HOT, then gains 1; the next uses
+MANHUNT. At 100 jobs remain available, gains clamp and territory is never revoked.
+
+`layLow(state)` is the sole active Heat-reduction command: require positive Heat,
+spend $500 via `spendCash`, reduce Heat by 10 down to zero, preserve cooling progress
+unless the result reaches zero. Failures distinguish `already-cold` and
+`insufficient-funds` with the original state. No cooldown, XP/EP, progress reset or
+confirmation modal. It and acquisition use ordinary reconcile-before-command,
+then meaningful-command saving; completed jobs always use the old Heat/ownership.
+Manual/Lay Low preserve existing fractional runtime duration and earned production
+remainders; discrete rewards are selected when cycles complete. Existing purchase
+rate-boundary behavior remains unchanged.
+
+### Offline, Rebirth and saves
+
+Offline bootstrap uses the same composition and one Never Sleeps-derived 8/10/12h
+credited duration for all economic simulation, Dispatcher Heat and cooling. Excess
+absence contributes nothing, including no cooling remainder. No second cap or
+clock exists. The candidate is durably written before startup publication; failure
+preserves the old save and pauses startup. One-time consumption and future-clock
+rebasing remain intact. The live Heat panel reflects the caught-up result; no Heat
+history or additional offline notification state is persisted.
+
+The authoritative fresh-run constructor resets Heat/progress to zero alongside
+Waterfront-only ownership. Rebirth reconciles first and writes before replacing
+state as before. Garage, EP/count and permanent skills remain; Neon Mile and Heat
+reset. Fast Talker rank 1 consequently pays $27.50 after Rebirth with no territory
+bonus or Heat penalty. Heat never affects eligibility or EP reward. Confirmation
+explicitly lists loss of current Heat/attention.
+
+Save schema **v10** adds only the two Heat fields through validated v9→v10 migration.
+Every previous field and savedAt survives exactly; old players start at zero Heat
+regardless of ownership/history. The v8→v9 step still emits the actual historical
+ownership-only city shape. v1–v9 CE1 codes migrate sequentially. CE1 transport,
+encoding, bounds, storage key, import and Rebirth transaction semantics are unchanged.
+Import preserves Heat/progress without historical cooling or Dispatcher Heat and
+rebases timing to import time. Export first reconciles current runtime.
+
+The Solara City Heat panel consumes pure selectors for tier, penalty, affordability,
+cooling countdown and Lay Low. Native progress semantics, visible tier text, focus
+styles and restrained colors retain accessibility without flashing or new UI timers.
+Neon Mile discloses +10 acquisition Heat before purchase. No wanted stars, police
+encounters, RNG, loss/confiscation, Crew, random events or new content exists.
+Phase 7C remains deferred.

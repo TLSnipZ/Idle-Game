@@ -51,7 +51,7 @@ describe('central exact stat evaluation', () => {
   it('rejects duplicate IDs to avoid double application', () => {
     expect(() => evaluateStat(moneyFromMinorUnits('75'), target, [modifier('a'), modifier('a')])).toThrow(RangeError);
   });
-  it.each([-1, 0.5, NaN, Infinity, 1_000_001])('rejects invalid basis points %#', value => {
+  it.each([-10001, 0.5, NaN, Infinity, 1_000_001])('rejects invalid basis points %#', value => {
     expect(() => evaluateStat(moneyFromMinorUnits('75'), target, [modifier('a', value)])).toThrow(RangeError);
   });
   it('bounds modifier work and rational representation', () => {

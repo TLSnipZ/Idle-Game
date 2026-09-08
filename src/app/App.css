@@ -173,3 +173,9 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .territory-card { border-top: 2px solid var(--color-cool); padding: 1.5rem; }
 .territory-effect { font-weight: 600; }
 @media (max-width: 740px) { .territory-catalog { grid-template-columns: minmax(0, 1fr); } }
+
+/* Heat uses text and a native bounded progress control, never flashing. */
+.heat-panel { margin-bottom: 1.25rem; padding: clamp(1rem, 3vw, 1.5rem); min-width: 0; overflow-wrap: anywhere; }
+.heat-panel progress { width: 100%; accent-color: var(--color-cool); }
+.heat-hot progress { accent-color: #eab567; }
+.heat-manhunt progress { accent-color: #e98282; }

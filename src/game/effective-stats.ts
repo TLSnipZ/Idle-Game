@@ -1,3 +1,4 @@
+import { collectHeatModifiers } from '../features/heat';
 import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
 import { findVehicle } from '../features/vehicles';
@@ -25,7 +26,7 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
     seen.add(id);
     return vehicle.modifier;
   });
-  return [...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
+  return [...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
   const business = findBusiness(id);
@@ -44,5 +45,5 @@ export function effectiveProductionRates(state: GameState) {
 }
 export function evaluateJobReward(state: GameState) {
   const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward' }, collectModifiers(state));
-  return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), base: evaluated.base, applied: evaluated.applied } : evaluated;
+  return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), effective: evaluated.effective, base: evaluated.base, applied: evaluated.applied } : evaluated;
 }

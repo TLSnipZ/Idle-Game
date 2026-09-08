@@ -1,3 +1,5 @@
+import { layLow } from '../game/lay-low';
+import { describeLayLow } from './heat-presentation';
 import { acquireTerritory } from '../game/acquire-territory';
 import { describeTerritoryAcquisition } from './territory-presentation';
 import { purchaseSkillRank } from '../game/purchase-skill-rank';
@@ -78,6 +80,14 @@ export function useGame() {
     });
   }
 
+  function coolDown() {
+    runtime.execute(state => {
+      const result = layLow(state);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeLayLow(result) }));
+      return result;
+    });
+  }
+
   function takeTerritory(id: unknown) {
     runtime.execute(state => {
       const result = acquireTerritory(state, id);
@@ -100,5 +110,5 @@ export function useGame() {
     return result;
   }
 
-  return { takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

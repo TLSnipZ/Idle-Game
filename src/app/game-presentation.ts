@@ -23,10 +23,11 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)}/sec · +${xpReward(result.state, 'businessLevel')} XP.` : 'Business upgraded.';
     }
     return action === 'delivery'
-      ? `Delivery completed. +${formatCash(deliveryReward(result.state))} · +${xpReward(result.state, 'manualJob')} XP.`
+      ? `Delivery completed. +${formatCash('moneyEarned' in result ? result.moneyEarned : deliveryReward(result.state))} · +${'xpEarned' in result ? result.xpEarned : xpReward(result.state, 'manualJob')} XP.`
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'already-cold': return 'Already cold. Nothing was spent.';
     case 'unknown-territory': return 'This territory is unavailable.';
     case 'unknown-skill': return 'This permanent skill is unavailable.';
     case 'insufficient-empire-points': return 'Not enough Empire Points.';

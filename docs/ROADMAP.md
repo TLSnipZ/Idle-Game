@@ -26,9 +26,10 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | Future — Collection expansion | Additional cars, final art, collections and set bonuses | Separately scoped; stable IDs and replaceable assets |
 | 6A — Rebirth foundation (complete; user verified live) | Rebirth, EP/count, permanent garage, v7 migration | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
 | 6B — Permanent skill foundation (complete; user verified live) | One Empire Foundations tree, five skills, EP spending, v8 migration | Exact effects/XP flooring, permanent retention, shared derived cap |
-| 7A — Territory foundation (implementation complete; live pending) | Solara City, Waterfront/Neon Mile, temporary ownership, v9 migration | Atomic acquisition, central job modifier, Rebirth baseline and save/runtime/offline tests |
-| 7B — Heat (deferred / next) | Separately scoped Heat foundation | Preserve shared requirements, modifiers, save and runtime contracts |
-| Later Phase 7 — Crew and Random Events (deferred) | Separately scoped city systems | No implementation or placeholder state in Phase 7A |
+| 7A — Territory foundation (complete; user verified live) | Solara City, Waterfront/Neon Mile, temporary ownership, v9 migration | Atomic acquisition, central job modifier, Rebirth baseline and save/runtime/offline tests |
+| 7B — Deterministic Heat (implementation complete; live pending) | Integer Heat, exact gain/decay, job cash penalties, Lay Low, v10 migration | Atomic start-tier batching, cooling remainder, shared offline cap and Rebirth reset |
+| 7C — Crew (deferred / next) | Separately scoped Crew foundation | Preserve shared simulation, Heat and permanent/temporary boundaries |
+| Later Phase 7 — Random Events (deferred) | Separately scoped city systems | No implementation or placeholder state in Phase 7B |
 | 8 — Long-term progression | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
@@ -114,7 +115,20 @@ Phase 7A implementation is complete: **Solara City**, exactly two territories,
 Waterfront baseline ownership, paid Neon Mile acquisition at Player Level 12 and
 Dockside Level 15 for $100,000, central +10% job/Dispatcher Money modifier, temporary
 territory reset on Rebirth, shared requirement presentation and v8→v9 migration.
-Phase 7A live verification is pending; no new live verification is claimed.
-Phase 7B Heat is the next separately authorized scope and remains deferred. Crew,
+The user manually verified Phase 7A territory UI, requirements/acquisition, job cash
+modifier isolation, persistence/export/import, Rebirth territory reset and permanent
+retention in the working live build. Phase 7B implementation follows below. Crew,
 Random Events, collection expansion and additional permanent trees remain deferred;
 Phase 7 as a whole is not complete. No full city redesign or final district art exists.
+
+
+Phase 7B implementation is complete; live verification is pending. Heat is bounded
+0–100 with five tiers, three gain sources, exact per-minute decay, one Lay Low action
+and HOT/MANHUNT job-cash penalties through the central evaluator. Shared elapsed
+batches use starting Heat for rewards, then Dispatcher Heat, then cooling. No
+cross-batch Heat counter exists. v9→v10 migration starts Heat at zero and preserves
+all previous progression. CE1, import timing, durable offline/Rebirth replacement,
+permanent skills/Garage and the shared 8/10/12h cap remain intact. Heat resets with
+Waterfront-only territory ownership on Rebirth. Phase 7C Crew is next/deferred;
+Random Events, collections and other later work remain deferred. Phase 7 as a whole
+is not complete. No RNG, policing events or additional content was implemented.

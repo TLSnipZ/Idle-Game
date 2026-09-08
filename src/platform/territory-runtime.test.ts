@@ -50,7 +50,7 @@ describe('territory runtime and persistence boundaries', () => {
     f.at(250); f.tick(); expect(f.events.filter(e => e.type === 'write')).toHaveLength(writes);
     f.at(5000); f.wall(6000); f.autosave();
     const state = f.game.getSnapshot().result.state, exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 9, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 10, state } });
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state } });
     f.game.stop(); f.game.start(); f.game.start(); expect(f.timers()).toBe(2); f.game.stop();
     const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(state);
@@ -59,13 +59,13 @@ describe('territory runtime and persistence boundaries', () => {
   it('ordinary save failure reports error with valid acquisition live and prior durable save intact', () => {
     const f = rebirthRuntime(territoryState()), raw = f.raw(); f.fail();
     f.game.execute(s => acquireTerritory(s, N.id));
-    expect(f.game.getSnapshot().result).toMatchObject({ ok: true, state: { city: { ownedTerritoryIds: [W.id, N.id] } } });
+    expect(f.game.getSnapshot().result).toMatchObject({ ok: true, state: { city: { heat: 10, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } } });
     expect(f.game.getSnapshot().persistence).toEqual({ kind: 'error', error: 'storage-write' });
     expect(f.raw()).toBe(raw); f.game.stop();
   });
   it('import preserves grandfathered ownership without historical rewards or acquisition feedback', () => {
     const base = createInitialGameState();
-    const candidate = { ...base, city: { ownedTerritoryIds: [W.id, N.id] },
+    const candidate = { ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
       permanentProgression: { empirePoints: 4, rebirthCount: 2, skills: { [FAST]: 1 } } };
     const exported = exportSaveCode(candidate, 0); if (!exported.ok) throw Error('fixture');
     const f = rebirthRuntime(territoryState()); f.at(90000); f.wall(100000);
@@ -82,7 +82,7 @@ describe('territory runtime and persistence boundaries', () => {
     expect(f.raw()).toBe(raw); expect(f.game.getSnapshot().result.state).toBe(state); f.game.stop();
   });
   it.each([false, true])('Rebirth resets city only after durable success (failed write=%s)', failed => {
-    const state = { ...rebirthState(), city: { ownedTerritoryIds: [W.id, N.id] },
+    const state = { ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
       permanentProgression: { empirePoints: 3, rebirthCount: 1, skills: { [ROOT]: 1, [FAST]: 1 } } };
     const f = rebirthRuntime(state), raw = f.raw(); if (failed) f.fail();
     f.at(3000); f.wall(4000); const result = f.game.rebirth(); expect(result.ok).toBe(!failed);

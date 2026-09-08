@@ -14,9 +14,10 @@ export function formatProduction(value: Rational | Money): string {
   return `${n % d === 0n ? '' : '≈'}${formatCash(cents)}${extra}`;
 }
 export function formatBonus(basisPoints: number): string {
-  const units = BigInt(basisPoints);
+  const signed = BigInt(basisPoints);
+  const units = signed < 0n ? -signed : signed;
   const decimals = (units % 100n).toString().padStart(2, '0').replace(/0+$/, '');
-  return `+${units / 100n}${decimals ? `.${decimals}` : ''}%`;
+  return `${signed < 0n ? '-' : '+'}${units / 100n}${decimals ? `.${decimals}` : ''}%`;
 }
 
 export function formatModifier(modifier: Modifier): string {

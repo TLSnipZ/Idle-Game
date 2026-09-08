@@ -1,3 +1,4 @@
+import { gainHeat, dispatcherHeatGain, requireHeatState } from '../features/heat';
 import { awardXp } from './xp-reward';
 import type { XpError } from '../features/progression';
 import { DELIVERY_DISPATCHER, isAutomationState } from '../features/automation';
@@ -15,10 +16,11 @@ export interface AutomationSummary {
 export type AutomationSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: XpError | Extract<SimulationResult, { ok: false }>['error'] }
   | { readonly ok: true; readonly state: GameState; readonly automation: AutomationSummary };
 
-/** Batch identical jobs at the current reward; no per-cycle loop or clock. */
+/** Batch identical jobs at the starting reward, then gain Heat; cooling belongs to simulateGameElapsed. */
 export function simulateAutomation(state: GameState, elapsedMs: unknown): AutomationSimulationResult {
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
   if (!isAutomationState(state.automation)) throw new RangeError('Invalid authoritative automation');
+  requireHeatState(state.city);
   const empty = { completedJobs: 0, income: moneyFromMinorUnits('0'), xpEarned: 0 };
   if (state.automation.unlockedIds.length === 0) return { ok: true, state, automation: empty };
   // The sum may exceed Number precision; only bounded quotient/remainder become Numbers.
@@ -40,5 +42,5 @@ export function simulateAutomation(state: GameState, elapsedMs: unknown): Automa
   if (!credit.ok) return { ok: false, state, error: credit.error };
   return { ok: true, automation: { completedJobs, income, xpEarned: xp.state.xp - state.progression.xp },
     state: completedJobs === 0 && progress === state.automation.starterJobElapsedMs ? state
-      : { ...state, progression: xp.state, economy: credit.state, automation: { ...state.automation, starterJobElapsedMs: progress } } };
+      : { ...state, city: gainHeat(state.city, dispatcherHeatGain(completedJobs)), progression: xp.state, economy: credit.state, automation: { ...state.automation, starterJobElapsedMs: progress } } };
 }

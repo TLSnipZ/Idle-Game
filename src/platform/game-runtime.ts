@@ -1,3 +1,4 @@
+import type { LayLowResult } from '../game/lay-low';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
 import type { PurchaseSkillResult } from '../game/purchase-skill-rank';
 import type { PurchaseVehicleResult } from '../game/purchase-vehicle';
@@ -16,7 +17,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 

@@ -5,7 +5,7 @@ import { createInitialGameState } from '../game/game-state';
 import type { GameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
 import { purchaseBusiness } from '../game/purchase-business';
-import { simulateElapsed } from '../game/simulate-elapsed';
+import { simulateGameElapsed as simulateElapsed } from '../game/simulate-game-elapsed';
 import { browserTiming, createGameRuntime, RUNTIME_CADENCE_MS } from './game-runtime';
 
 function funded(): GameState {
@@ -90,15 +90,15 @@ describe('mounted game runtime', () => {
     f.runtime.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     expect(f.state().economy.cash).toBe('0');
     f.at(1500); f.tick();
-    expect(f.state()).toEqual(simulateElapsed(owned(), 500).state);
+    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 500).state);
   });
   it('does not transfer fractional unowned time into a newly purchased business', () => {
     const f = fixture(funded()); f.runtime.start(); f.at(1000.75);
     f.runtime.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     f.at(1014); f.tick(); // 13.25 ms owned: only 13 whole ms are eligible.
-    expect(f.state()).toEqual(simulateElapsed(owned(), 13).state);
+    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 13).state);
     f.at(1014.75); f.tick();
-    expect(f.state()).toEqual(simulateElapsed(owned(), 14).state);
+    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 14).state);
   });
   it('starter jobs retain fractional producing time at their boundary', () => {
     const f = fixture(); f.runtime.start(); f.at(0.75);

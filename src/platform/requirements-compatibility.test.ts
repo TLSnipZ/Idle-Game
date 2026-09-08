@@ -39,9 +39,9 @@ describe('acquisition-only gates preserve live saves', () => {
   });
   it('retains current schema/CE1 and exact gated ownership on roundtrip even without any business', () => {
     const state={ ...grandfathered(), businesses: createInitialGameState().businesses };
-    expect(CURRENT_SAVE_VERSION).toBe(9);
+    expect(CURRENT_SAVE_VERSION).toBe(10);
     const serialized=serializeSave(state,42); if (!serialized.ok) throw Error('fixture');
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 9, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 10, state } });
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));

@@ -1,3 +1,4 @@
+import { HeatPanel } from './HeatPanel';
 import { CITY_NAME, TERRITORY_CATALOG } from '../features/territories';
 import type { TerritoryId } from '../features/territories';
 import type { GameState } from '../game/game-state';
@@ -6,14 +7,15 @@ import { formatCash } from '../features/economy/ui';
 import { territoryPresentation } from './territory-presentation';
 import { RequirementList } from './RequirementList';
 
-export function City({ state, paused, onAcquire }: {
-  readonly state: GameState; readonly paused: boolean; readonly onAcquire: (id: TerritoryId) => void;
+export function City({ state, paused, onAcquire, onLayLow }: {
+  readonly onLayLow: () => void; readonly state: GameState; readonly paused: boolean; readonly onAcquire: (id: TerritoryId) => void;
 }) {
   const city = selectCity(state);
   return <section className="city" aria-labelledby="city-heading">
     <div className="panel-heading"><h2 id="city-heading">{CITY_NAME}</h2>
       <span>Territories controlled: {city.ownedTerritoryCount} / {city.totalConfiguredTerritories}</span></div>
     <p>Build influence block by block.</p>
+    <HeatPanel state={state} paused={paused} onLayLow={onLayLow} />
     <div className="territory-catalog">{TERRITORY_CATALOG.map(territory => {
       const view = territoryPresentation(state, territory.id);
       if (!view) return null;
@@ -24,6 +26,7 @@ export function City({ state, paused, onAcquire }: {
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.status}</span></div>
         <p>{territory.description}</p><p className="territory-effect">{view.effect}</p>
         {view.owned ? <p>{view.availability}</p> : <>
+          <p>Acquisition generates +{territory.acquisitionHeat} Heat.</p>
           <p>Price: <strong>{formatCash(territory.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
           <p>{view.availability}</p>

@@ -1,15 +1,16 @@
+import { NEON_MILE_ACQUISITION_HEAT } from '../../heat';
 import { STARTER_BUSINESS } from '../../businesses';
 import { moneyFromMinorUnits } from '../../economy';
 import type { TerritoryDefinition } from '../model/territory';
 
 export const CITY_NAME = 'SOLARA CITY';
 export const WATERFRONT: TerritoryDefinition = {
-  id: 'territory:waterfront', name: 'Waterfront', starting: true,
+  id: 'territory:waterfront', name: 'Waterfront', starting: true, acquisitionHeat: 0,
   description: 'Docks, garages and service roads. Your first foothold in Solara City.',
   purchaseCost: moneyFromMinorUnits('0'), requirements: [], modifiers: [],
 };
 export const NEON_MILE: TerritoryDefinition = {
-  id: 'territory:neon-mile', name: 'Neon Mile', starting: false,
+  id: 'territory:neon-mile', name: 'Neon Mile', starting: false, acquisitionHeat: NEON_MILE_ACQUISITION_HEAT,
   description: 'Nightclubs, glowing signs and late-night traffic. Make the strip part of your operation.',
   purchaseCost: moneyFromMinorUnits('10000000'),
   requirements: [

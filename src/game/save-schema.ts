@@ -1,4 +1,4 @@
-import { createInitialCityState, isCityState } from '../features/territories';
+import { isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
 import { isSkillRanks } from '../features/skills';
 import { isPermanentValue } from '../features/permanent-progression';
 import { findVehicle } from '../features/vehicles';
@@ -14,7 +14,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 9;
+export const CURRENT_SAVE_VERSION = 10;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -102,9 +102,13 @@ function validateState(value: unknown, version: number): GameState | null {
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
   const skills = version >= 8 ? permanent.skills : {};
   if (!isSkillRanks(skills)) return null;
-  const city = version >= 9 ? value.city : createInitialCityState();
+  let city: unknown = version >= 9 ? value.city : createInitialCityState();
+  if (version === 9) {
+    if (!isTerritoryOwnership(city)) return null;
+    city = { ...city, heat: 0, heatDecayElapsedMs: 0 };
+  }
   if (!isCityState(city)) return null;
-  return { city: { ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills } }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills } }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -148,7 +152,11 @@ function migrateV7ToV8(value: unknown): unknown {
   const { city: _city, ...legacy } = valid;
   return legacy;
 }
-function migrateV8ToV9(value: unknown): GameState | null { return validateState(value, 8); }
+function migrateV8ToV9(value: unknown): unknown {
+  const valid = validateState(value, 8);
+  return valid ? { ...valid, city: { ownedTerritoryIds: valid.city.ownedTerritoryIds } } : null;
+}
+function migrateV9ToV10(value: unknown): GameState | null { return validateState(value, 9); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -169,6 +177,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 6) migrated = migrateV6ToV7(migrated);
   if (value.version <= 7) migrated = migrateV7ToV8(migrated);
   if (value.version <= 8) migrated = migrateV8ToV9(migrated);
+  if (value.version <= 9) migrated = migrateV9ToV10(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

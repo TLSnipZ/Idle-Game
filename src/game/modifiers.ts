@@ -12,7 +12,7 @@ interface ModifierIdentity {
 }
 export type Modifier = ModifierIdentity & ({ readonly operation: 'add-flat'; readonly amount: Money } | {
   readonly operation: 'multiply-basis-points';
-  /** Positive percentage delta: 2500 means +25%, 10000 means +100%. */
+  /** Signed percentage delta (-10000 through 1000000): 2500 means +25%, 10000 means +100%. */
   readonly bonusBasisPoints: number;
 });
 export type StatEvaluation<T extends Money | bigint = Money> = { readonly ok: true; readonly base: T; readonly effective: Rational; readonly applied: readonly Modifier[] }
@@ -33,7 +33,7 @@ export function evaluateStat<T extends Money | bigint>(base: T, target: StatTarg
   const ids = new Set<string>();
   for (const m of modifiers) {
     if (!m.id || !m.sourceId || ids.has(m.id) || (m.operation === 'add-flat' ? !isMoney(m.amount) : m.operation !== 'multiply-basis-points'
-        || !Number.isSafeInteger(m.bonusBasisPoints) || m.bonusBasisPoints < 0 || m.bonusBasisPoints > MAX_BONUS_BASIS_POINTS)) throw new RangeError('Invalid modifier');
+        || !Number.isSafeInteger(m.bonusBasisPoints) || m.bonusBasisPoints < -10_000 || m.bonusBasisPoints > MAX_BONUS_BASIS_POINTS)) throw new RangeError('Invalid modifier');
     ids.add(m.id);
   }
   const applied = modifiers.filter(m => m.target.stat === target.stat

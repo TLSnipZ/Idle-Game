@@ -1,3 +1,4 @@
+import { MAX_HEAT } from '../features/heat';
 import { findTerritory } from '../features/territories';
 import type { TerritoryDefinition } from '../features/territories';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
@@ -21,7 +22,7 @@ export function territoryPresentation(state: GameState, id: unknown) {
 }
 export function describeTerritoryAcquisition(result: AcquireTerritoryResult, id: unknown): string {
   const territory = findTerritory(id);
-  if (result.ok && territory) return `${territory.name} controlled. -${formatCash(territory.purchaseCost)} · ${describeTerritoryEffect(territory)}.`;
+  if (result.ok && territory) return `${territory.name} controlled. -${formatCash(territory.purchaseCost)} · ${describeTerritoryEffect(territory)} · +${territory.acquisitionHeat} Heat (maximum ${MAX_HEAT}).`;
   if (result.ok) return 'Territory controlled.';
   switch (result.error) {
     case 'requirements-not-met': return 'Requirements not met: ' + result.requirements.requirements

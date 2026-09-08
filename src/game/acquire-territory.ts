@@ -1,3 +1,4 @@
+import { gainHeat } from '../features/heat';
 import { findTerritory } from '../features/territories';
 import { spendCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
@@ -20,5 +21,5 @@ export function acquireTerritory(state: GameState, id: unknown): AcquireTerritor
   const payment = spendCash(state.economy, territory.purchaseCost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
   return { ok: true, state: { ...state, economy: payment.state,
-    city: { ownedTerritoryIds: [...state.city.ownedTerritoryIds, territory.id] } } };
+    city: { ...gainHeat(state.city, territory.acquisitionHeat), ownedTerritoryIds: [...state.city.ownedTerritoryIds, territory.id] } } };
 }

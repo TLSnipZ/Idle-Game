@@ -43,7 +43,7 @@ describe('Solara City catalog and acquisition', () => {
   });
   it('fresh city costs nothing, grants no rewards, and is an independent fresh array', () => {
     const state = createInitialGameState();
-    expect(state.city).toEqual({ ownedTerritoryIds: [W.id] }); expect(state.city).not.toBe(createInitialGameState().city);
+    expect(state.city).toEqual({ heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] }); expect(state.city).not.toBe(createInitialGameState().city);
     expect(state.economy.cash).toBe('0'); expect(state.progression.xp).toBe(0);
     expect(state.permanentProgression).toEqual({ empirePoints: 0, rebirthCount: 0, skills: {} });
     expect(selectCity(state)).toEqual({ ownedTerritoryCount: 1, totalConfiguredTerritories: 2 });
@@ -72,7 +72,7 @@ describe('Solara City catalog and acquisition', () => {
     const before = JSON.stringify(state), result = acquireTerritory(state, N.id);
     expect(result.ok).toBe(true); expect(result.state.economy.cash).toBe('0');
     expect(result.state.city.ownedTerritoryIds).toEqual([W.id, N.id]);
-    expect(result.state).toEqual({ ...state, economy: { cash: '0' }, city: { ownedTerritoryIds: [W.id, N.id] } });
+    expect(result.state).toEqual({ ...state, economy: { cash: '0' }, city: { heat: 10, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });
     expect(JSON.stringify(state)).toBe(before); expect(selectCity(result.state).ownedTerritoryCount).toBe(2);
     expect(acquireTerritory(result.state, N.id)).toEqual({ ok: false, state: result.state, error: 'already-owned' });
   });
@@ -133,7 +133,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(manual.state.progression.xp - state.progression.xp).toBe(11);
     const batch = simulateAutomation(state, 30000); if (!batch.ok) throw Error('fixture');
     expect(batch.automation).toEqual({ completedJobs: 3, income: '13068', xpEarned: 16 });
-    const without = simulateAutomation({ ...state, city: { ownedTerritoryIds: [W.id] } }, 30000);
+    const without = simulateAutomation({ ...state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] } }, 30000);
     expect(batch.state.progression).toEqual(without.state.progression);
     expect(batch.state.automation).toEqual(without.state.automation);
   });
@@ -163,7 +163,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(result.state).toEqual(online.state);
     expect(result.progress).toMatchObject({ capMs: cap, rewardedElapsedMs: cap, actualElapsedMs: 50400000, capped: true, automation: online.automation });
     expect(result.state.automation.starterJobElapsedMs).toBe(5000);
-    const without = reconcileOffline({ ...state, city: { ownedTerritoryIds: [W.id] } }, 1000, 1000 + 14 * 3600000);
+    const without = reconcileOffline({ ...state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] } }, 1000, 1000 + 14 * 3600000);
     if (!without.ok) throw Error('fixture');
     expect(result.progress.businessIncome).toEqual(without.progress.businessIncome);
     expect(result.progress.xpEarned).toEqual(without.progress.xpEarned);
@@ -171,7 +171,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
   });
   it('Rebirth resets the full temporary matrix, retains permanent slices and allows paid reacquisition', () => {
     const base = rebirthState();
-    const state = freeze({ ...base, city: { ownedTerritoryIds: [W.id, N.id] },
+    const state = freeze({ ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
       permanentProgression: { empirePoints: 3, rebirthCount: 2, skills: { [ROOT]: 1, [FAST]: 1 } } });
     const result = performRebirth(state); if (!result.ok) throw Error('fixture');
     expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
@@ -185,12 +185,12 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(evaluateJobReward(result.state)).toMatchObject({ reward: '2750' });
     expect(acquireTerritory(result.state, N.id)).toMatchObject({ ok: false, error: 'requirements-not-met' });
     const rebuilt = { ...result.state, economy: territoryState().economy, businesses: territoryState().businesses, progression: territoryState().progression };
-    expect(acquireTerritory(rebuilt, N.id)).toMatchObject({ ok: true, state: { economy: { cash: '0' }, city: state.city } });
+    expect(acquireTerritory(rebuilt, N.id)).toMatchObject({ ok: true, state: { economy: { cash: '0' }, city: { ...state.city, heat: 10 } } });
   });
   it('accepts grandfathered Neon Mile below acquisition gates, rejects corrupt authoritative ownership', () => {
-    const state = { ...createInitialGameState(), city: { ownedTerritoryIds: [W.id, N.id] } };
+    const state = { ...createInitialGameState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } };
     expect(isCityState(state.city)).toBe(true); expect(evaluateJobReward(state)).toMatchObject({ reward: '2750' });
-    const invalid = { ...state, city: { ownedTerritoryIds: [N.id] } };
+    const invalid = { ...state, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [N.id] } };
     expect(() => acquireTerritory(invalid, W.id)).toThrow(RangeError);
     expect(() => evaluateJobReward(invalid)).toThrow(RangeError);
   });
