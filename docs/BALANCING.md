@@ -439,3 +439,31 @@ Businesses, Dispatcher Money and Dispatcher XP use that same credited duration.
 No discarded time survives in progress. Buying the skill after an 8h-capped return
 does not recover previously discarded time. The cap and all ranks survive Rebirth;
 the derived cap is not persisted. Further trees/content and final balance are deferred.
+
+## Phase 7A — provisional Solara City territories
+
+Exactly two territories, with stable IDs independent of future display names:
+
+| ID / Name | Acquisition | Requirements | Effect | Rebirth |
+| --- | --- | --- | --- | --- |
+| `territory:waterfront` / Waterfront | Fresh baseline; no cost | Always owned in valid current state | None | Restored as fresh baseline |
+| `territory:neon-mile` / Neon Mile | $100,000 (10,000,000 cents), once per run | Player Level 12; Dockside owned at Level 15 | +10% starter-job and Dispatcher Money | Resets; must be acquired again |
+
+All values are provisional. Waterfront grants no free cash, XP, EP or bonus. Neon
+Mile grants no XP/EP and does not change business production, automation timing,
+XP rewards or offline caps. Existing prices, gates, player thresholds and Rebirth
+rewards are unchanged. Player Level 12 starts at 12,100 XP; 12,099 XP fails. Dockside
+Level 14 fails, Level 15 meets its gate. Cash affordability is a separate decision.
+
+Neon Mile contributes one exact +1,000 basis-point job modifier. Canonical payout:
+`($25 + $5) × 1.20 × 1.10 × 1.10 = $43.56` with Express Tips, Street Connections,
+Fast Talker rank 1 and Neon Mile. Only final discrete payout floors to cents; no
+intermediate rounding or percentage addition occurs. Manual and Dispatcher share it.
+Learn the Streets independently modifies XP with the existing final/batch floor policy.
+
+Offline Dispatcher uses the same territory bonus within the shared skill-derived
+8/10/12h credited duration; no territory passive income or separate offline cap
+exists. Rebirth removes Neon Mile and temporary upgrades, leaving Fast Talker rank 1
+(if owned) at `$25 × 1.10 = $27.50`. All acquisition requirements and the $100,000
+price apply again on the next run. Vehicles and permanent skills remain retained.
+Heat, Crew, Random Events, further territories and final city art remain deferred.

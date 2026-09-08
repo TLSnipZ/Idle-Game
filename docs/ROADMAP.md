@@ -25,8 +25,10 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 5C — Vehicle collection foundation (complete) | One collectible, Garage, central requirements/modifier source, v6 migration | Atomic acquisition, exact stacking, save/runtime/offline and presentation tests |
 | Future — Collection expansion | Additional cars, final art, collections and set bonuses | Separately scoped; stable IDs and replaceable assets |
 | 6A — Rebirth foundation (complete; user verified live) | Rebirth, EP/count, permanent garage, v7 migration | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
-| 6B — Permanent skill foundation (implementation complete; live pending) | One Empire Foundations tree, five skills, EP spending, v8 migration | Exact effects/XP flooring, permanent retention, shared derived cap |
-| 7 — City systems | Territories, heat, crew, random events, one at a time | Each uses public contracts, deterministic inputs and compatible saves |
+| 6B — Permanent skill foundation (complete; user verified live) | One Empire Foundations tree, five skills, EP spending, v8 migration | Exact effects/XP flooring, permanent retention, shared derived cap |
+| 7A — Territory foundation (implementation complete; live pending) | Solara City, Waterfront/Neon Mile, temporary ownership, v9 migration | Atomic acquisition, central job modifier, Rebirth baseline and save/runtime/offline tests |
+| 7B — Heat (deferred / next) | Separately scoped Heat foundation | Preserve shared requirements, modifiers, save and runtime contracts |
+| Later Phase 7 — Crew and Random Events (deferred) | Separately scoped city systems | No implementation or placeholder state in Phase 7A |
 | 8 — Long-term progression | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
@@ -92,7 +94,7 @@ Level 7 / Dockside Level 10, +15% global production through the central evaluato
 Garage presentation and sequential v5→v6 migration. No final art, second vehicle,
 set bonuses or equipped system is included. Preserve acquisition-only gates,
 CE1-, exact fractions, command reconciliation and durable offline/import publication.
-Collection expansion remains deferred. Phase 6A implementation is complete: central reset/retention policy, banked Empire Points and Rebirth count, exact reward preview, explicit confirmation, durable write-before-publication, and sequential v6→v7 migration. The user manually verified Phase 6A eligibility, reward preview, confirmation/reset, EP/count persistence, permanent garage/modifier behavior and reload/export/import in the functioning live build. Phase 6B implementation is complete; live verification remains pending.
+Collection expansion remains deferred. Phase 6A implementation is complete: central reset/retention policy, banked Empire Points and Rebirth count, exact reward preview, explicit confirmation, durable write-before-publication, and sequential v6→v7 migration. The user manually verified Phase 6A eligibility, reward preview, confirmation/reset, EP/count persistence, permanent garage/modifier behavior and reload/export/import in the functioning live build. Phase 6B is complete and manually verified live by the user.
 
 
 Phase 6B adds precisely five ranked skills in Empire Foundations, atomic unspent-EP
@@ -102,3 +104,17 @@ Skills survive Rebirth without refund. CE1-, savedAt, one-time catch-up and the
 strong Rebirth/import/offline persistence transactions remain intact. Additional
 permanent skill trees, collection expansion and the next content phase are deferred.
 Final permanent-progression balance is not complete; no respec or passive EP exists.
+
+
+The user manually verified Phase 6B Empire Foundations, EP spending and remaining
+balance, persistent ranks, Rebirth retention without refunds, production/job/XP
+bonuses, Never Sleeps cap, reload and export/import in the functioning live build.
+
+Phase 7A implementation is complete: **Solara City**, exactly two territories,
+Waterfront baseline ownership, paid Neon Mile acquisition at Player Level 12 and
+Dockside Level 15 for $100,000, central +10% job/Dispatcher Money modifier, temporary
+territory reset on Rebirth, shared requirement presentation and v8→v9 migration.
+Phase 7A live verification is pending; no new live verification is claimed.
+Phase 7B Heat is the next separately authorized scope and remains deferred. Crew,
+Random Events, collection expansion and additional permanent trees remain deferred;
+Phase 7 as a whole is not complete. No full city redesign or final district art exists.

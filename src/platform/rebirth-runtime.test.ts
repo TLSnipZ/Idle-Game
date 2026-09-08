@@ -86,7 +86,7 @@ describe('durable Rebirth transaction', () => {
     const f=rebirthRuntime();expect(f.game.rebirth().ok).toBe(true);const state=f.game.getSnapshot().result.state;
     f.at(5000);f.wall(6000);f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state}});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:8,state}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:9,state}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);
     expect(f.game.getSnapshot().result.state).toEqual(state);f.game.stop();expect(f.timers()).toBe(0);
   });

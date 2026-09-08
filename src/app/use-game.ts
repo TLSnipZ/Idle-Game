@@ -1,3 +1,5 @@
+import { acquireTerritory } from '../game/acquire-territory';
+import { describeTerritoryAcquisition } from './territory-presentation';
 import { purchaseSkillRank } from '../game/purchase-skill-rank';
 import { describeSkillPurchase } from './skill-presentation';
 import { purchaseVehicle } from '../game/purchase-vehicle';
@@ -76,6 +78,14 @@ export function useGame() {
     });
   }
 
+  function takeTerritory(id: unknown) {
+    runtime.execute(state => {
+      const result = acquireTerritory(state, id);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeTerritoryAcquisition(result, id) }));
+      return result;
+    });
+  }
+
   function buySkill(id: unknown) {
     runtime.execute(state => {
       const result = purchaseSkillRank(state, id);
@@ -90,5 +100,5 @@ export function useGame() {
     return result;
   }
 
-  return { buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

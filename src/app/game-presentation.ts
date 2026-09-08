@@ -27,6 +27,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'unknown-territory': return 'This territory is unavailable.';
     case 'unknown-skill': return 'This permanent skill is unavailable.';
     case 'insufficient-empire-points': return 'Not enough Empire Points.';
     case 'max-rank-reached': return 'This skill is already at max rank.';
@@ -38,6 +39,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'already-unlocked': return 'This dispatcher is already hired.';
     case 'unknown-upgrade': return 'This upgrade is unavailable.';
     case 'already-purchased': return 'This upgrade is already purchased.';
+    case 'requirements-not-met':
     case 'prerequisite-not-met': return 'Requirements not met: ' + result.requirements.requirements.filter(detail => !detail.met).map(detail => detail.description).join('; ') + '.';
     case 'not-owned': return 'Acquire this business before upgrading.';
     case 'max-level-reached': return 'This business is at max level.';

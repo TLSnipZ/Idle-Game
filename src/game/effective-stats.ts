@@ -1,3 +1,4 @@
+import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
 import { findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
@@ -24,7 +25,7 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
     seen.add(id);
     return vehicle.modifier;
   });
-  return [...upgrades, ...vehicles, ...collectSkillModifiers(state.permanentProgression.skills)];
+  return [...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
   const business = findBusiness(id);

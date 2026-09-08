@@ -1,3 +1,4 @@
+import type { TerritoryId } from '../features/territories';
 import type { SkillId } from '../features/skills';
 import type { BusinessId } from '../features/businesses';
 import type { UpgradeId } from '../features/upgrades';
@@ -5,6 +6,7 @@ import type { AutomationId } from '../features/automation';
 
 /** Content configuration only. Lists are ANDed in explicit declaration order. */
 export type Requirement =
+  | { readonly type: 'territory-owned'; readonly territoryId: TerritoryId }
   | { readonly type: 'skill-rank'; readonly skillId: SkillId; readonly minimumRank: number }
   | { readonly type: 'player-level'; readonly minimumLevel: number }
   | { readonly type: 'business-owned'; readonly businessId: BusinessId }

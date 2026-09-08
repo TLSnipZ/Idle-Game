@@ -1,3 +1,4 @@
+import { findTerritory, requireCityState, TERRITORY_CATALOG } from '../features/territories';
 import { findSkill, getSkillRank } from '../features/skills';
 import { VEHICLE_CATALOG } from '../features/vehicles';
 import { findBusiness, getBusinessLevel, MAX_BUSINESS_LEVEL, STARTER_BUSINESS } from '../features/businesses';
@@ -19,6 +20,12 @@ function businessDefinition(id: unknown) {
 export function evaluateRequirements(state: GameState, requirements: readonly Requirement[]): RequirementResult {
   const details = requirements.map((requirement): RequirementDetail => {
     switch (requirement.type) {
+      case 'territory-owned': {
+        const territory = findTerritory(requirement.territoryId);
+        if (!territory) throw new RangeError('Unknown territory requirement');
+        requireCityState(state.city);
+        return { requirement, met: state.city.ownedTerritoryIds.includes(territory.id), description: `Control ${territory.name}` };
+      }
       case 'skill-rank': {
         const skill = findSkill(requirement.skillId);
         if (!skill) throw new RangeError('Unknown skill requirement');
@@ -64,6 +71,7 @@ export function newlyEligibleContent(before: GameState, after: GameState): reado
     ...UPGRADE_CATALOG.map(definition => ({ definition, owned: after.upgrades.purchasedIds.includes(definition.id) })),
     { definition: DELIVERY_DISPATCHER, owned: after.automation.unlockedIds.includes(DELIVERY_DISPATCHER.id) },
     ...VEHICLE_CATALOG.map(definition => ({ definition, owned: after.garage.ownedVehicleIds.includes(definition.id) })),
+    ...TERRITORY_CATALOG.map(definition => ({ definition, owned: after.city.ownedTerritoryIds.includes(definition.id) })),
   ];
   return content.filter(({ definition, owned }) => !owned
     && !evaluateRequirements(before, definition.requirements).met

@@ -166,3 +166,10 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .skill-nodes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .skill-node:first-child { grid-column: 1 / -1; }
 @media (max-width: 740px) { .skill-nodes { grid-template-columns: minmax(0, 1fr); } }
+
+/* Solara City starts with two readable district cards, not a map. */
+.city, .territory-card { min-width: 0; overflow-wrap: anywhere; }
+.territory-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.territory-card { border-top: 2px solid var(--color-cool); padding: 1.5rem; }
+.territory-effect { font-weight: 600; }
+@media (max-width: 740px) { .territory-catalog { grid-template-columns: minmax(0, 1fr); } }

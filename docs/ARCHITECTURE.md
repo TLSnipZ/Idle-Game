@@ -1396,5 +1396,99 @@ EP shortage is distinct from a prerequisite lock. Existing polite action feedbac
 shows exact rank/EP changes and evaluated integer XP; Rebirth confirmation lists
 Permanent skills under You keep. No new notification history, scheduler or UI library.
 
-Phase 6B implementation is complete; live verification is pending. No second tree,
+Phase 6B implementation is complete and was manually verified live by the user. No second tree,
 sixth skill, respec, refunds, passive EP, extra currency or follow-on content exists.
+
+## Phase 7A — Solara City territory foundation
+
+**SOLARA CITY** is the canonical current city display identity; the repository,
+`crime-empire-save` format and CE1- transport retain their names. The dedicated
+`features/territories` public boundary owns two stable typed TerritoryIds,
+immutable configuration, explicit presentation order and ownership validation.
+Display names can change without changing saved identity. Renaming or retiring a
+persistent ID requires an explicit migration, never silently ignoring ownership.
+
+GameState adds only `city: { ownedTerritoryIds: TerritoryId[] }`. Every valid current
+state must own `territory:waterfront`; `territory:neon-mile` is optional. The slice
+contains unique known IDs only. Missing/malformed shapes, unknown/duplicate IDs,
+missing Waterfront, accessors and non-JSON properties are rejected. No prices,
+effects, labels, counts, requirements, territory levels or progress are stored.
+Fresh state creates its own Waterfront ownership array, without charging cash or
+awarding XP/EP. Waterfront has no modifier.
+
+`acquireTerritory(state, id)` is the sole paid acquisition coordinator. It validates
+authoritative state, checks identity/ownership, evaluates configured requirements
+through the central AND evaluator, then calls `spendCash`. Money and territory
+ownership change together or not at all; no XP, EP or Rebirth count reward exists.
+Failures are `unknown-territory`, `already-owned`, `requirements-not-met` with
+structured requirement details, and the existing economy failures (in particular
+`insufficient-funds`). Failures return the entire original state. Waterfront is
+already owned, so it has no acquisition action.
+
+Neon Mile costs $100,000 and requires Player Level 12, Dockside ownership and Dockside
+Level 15. These are acquisition-only gates. Valid imported ownership remains active
+below its former gates. Nothing automatically grants Neon Mile when eligible. No
+existing content gains a territory gate; manual work and the original progression
+path remain open. A typed `territory-owned` requirement is supported centrally and
+tested synthetically; it is not added to existing content. Type-only references keep
+configuration independent of the requirement evaluator. Presentation and level-up
+eligibility announcements use the same ordered requirement results.
+
+### One shared modifier and time path
+
+`collectModifiers` now includes `collectTerritoryModifiers(state.city)` alongside
+normal upgrades, vehicles and permanent skills. Waterfront contributes nothing;
+Neon Mile contributes exactly `modifier:territory-neon-mile-job-reward`, a +1,000
+basis-point `job-reward` modifier with Neon Mile as source. `evaluateStat` is unchanged:
+flat additions first, then multiplicative rational factors in stable modifier-ID
+order, no intermediate rounding. Manual and Dispatcher Money use their existing
+shared evaluated payout. XP, business production, Dispatcher interval/progress and
+the derived offline cap are not modified by territory ownership.
+
+Acquisition goes through `runtime.execute`: reconcile business and completed
+Dispatcher jobs using OLD territory ownership, then acquire, then save through the
+normal meaningful-command path. Later jobs use the new ownership; unfinished whole-ms
+cycle progress survives. The existing conservative sub-millisecond runtime boundary
+applies to territory changes too. Neither earned production remainder is reset.
+No new scheduler or simulation formula exists.
+
+Ordinary acquisition preserves the existing publish-then-save policy: write failures
+leave the valid acquisition live, retain the prior durable save and expose the normal
+persistence warning; later autosave may save it. It is not reported as durably saved
+on failure. Rebirth, import and offline bootstrap retain their stronger durable
+write-before-publication transactions. Autosave cadence remains five seconds.
+
+Offline uses the same shared elapsed simulation and one skill-derived 8h/10h/12h
+credited duration. Neon Mile affects Dispatcher Money only, with no territory-specific
+catch-up. Production fractions, cycle remainder, XP batch flooring, future-clock
+rebasing and one-time timestamp consumption remain unchanged.
+
+### Temporary territory reset and save v9
+
+The exhaustive Rebirth policy marks `city` as reset. The existing fresh-run constructor
+restores exactly Waterfront owned / Neon Mile unowned. Rebirth retains garage,
+unspent EP plus its unchanged reward, incremented count and permanent skill ranks;
+all other temporary slices still reset. Neon Mile's bonus disappears, while Fast
+Talker rank 1 continues making the post-Rebirth base job $27.50. Reacquisition needs
+the same gates and full price again; no lifetime territory flags exist.
+
+Save schema **v9** adds city. The sequential v1→…→v8→v9 pipeline validates historical
+shapes; valid v8 gains only the fresh Waterfront baseline. Every prior field, both
+production fractions, all permanent ranks/balances and savedAt survive exactly.
+Older v6→v7 and v7→v8 steps continue emitting their historical shapes before v9.
+Migration neither spends Money nor infers Neon Mile ownership from progression.
+No current malformed city is repaired. Unsupported future versions remain rejected.
+
+Local saves and CE1- codes use this single schema. Export reconciles first; import
+retains city and all valid progression without acquisition checks, charging, feedback,
+Rebirth or historical Money/jobs/XP/EP. It rebases local savedAt at import time and
+writes before replacement. No separate city storage key exists.
+
+The compact Solara City section has exactly two responsive district cards and derived
+1/2 or 2/2 controlled counts. Central selectors provide ownership, eligibility and
+affordability; shared requirement text distinguishes locks from insufficient cash.
+Controlled cards omit acquisition, and Waterfront explicitly states no gameplay
+bonus. Existing action feedback and modifier breakdown identify Neon Mile by name.
+Rebirth confirmation lists loss of territories beyond the starting Waterfront foothold.
+No map, final district art, Heat, Crew or Random Events are implemented.
+Phase 7A implementation is complete; live verification is pending. Phase 7B is deferred.

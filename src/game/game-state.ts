@@ -1,3 +1,5 @@
+import { createInitialCityState } from '../features/territories';
+import type { CityState } from '../features/territories';
 import { createInitialPermanentProgression } from '../features/permanent-progression';
 import type { PermanentProgressionState } from '../features/permanent-progression';
 import type { GarageState } from '../features/vehicles';
@@ -11,6 +13,7 @@ import { createInitialEconomyState } from '../features/economy';
 import type { EconomyState } from '../features/economy';
 
 export interface GameState {
+  readonly city: CityState;
   readonly permanentProgression: PermanentProgressionState;
   readonly garage: GarageState;
   readonly progression: ProgressionState;
@@ -21,5 +24,5 @@ export interface GameState {
 }
 
 export function createInitialGameState(): GameState {
-  return { permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
+  return { city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
 }
