@@ -16,13 +16,13 @@ function render(state=initial(),paused=false) {return renderToStaticMarkup(<Auto
 describe('explicit automatic spending presentation',()=>{
   it('shows a locked card, exact price/gates and spending disclosure',()=>{
     const html=render(createInitialGameState());
-    for(const text of ['BUSINESS AUTO-UPGRADER','$250,000.00','Player Level 20','Own Dockside Detail','Dockside Detail Level 25','Control Neon Mile','every 30 seconds','Automatically spends cash','LOCKED'])expect(html).toContain(text);
+    for(const text of ['BUSINESS AUTO-UPGRADER','$50,000.00','Player Level 12','Own Dockside Detail','Dockside Detail Level 15','Control Neon Mile','every 30 seconds','Automatically spends cash','LOCKED'])expect(html).toContain(text);
     expect(html).toContain('disabled=""');expect(html).toContain('aria-describedby="auto-upgrader-requirements auto-upgrader-spending"');
   });
   it('separates insufficient cash from satisfied requirements; ready purchase remains explicit',()=>{
     const s=initial(),available={...s,automation:createInitialGameState().automation};
     expect(render(available)).toContain('Ready to purchase. Starts disabled');expect(render(available)).not.toContain('disabled=""');
-    const poor={...initial(25,'24999900'),automation:createInitialGameState().automation};
+    const poor={...initial(25,'4999900'),automation:createInitialGameState().automation};
     expect(render(poor)).toContain('More cash needed');expect(render(poor)).not.toContain('LOCKED');expect(render(poor)).toContain('disabled=""');
   });
   it('purchase starts disabled, removes buying, then enabled/disabled states follow the command',()=>{

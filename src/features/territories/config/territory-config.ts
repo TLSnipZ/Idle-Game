@@ -12,7 +12,7 @@ export const WATERFRONT: TerritoryDefinition = {
 export const NEON_MILE: TerritoryDefinition = {
   id: 'territory:neon-mile', name: 'Neon Mile', starting: false, acquisitionHeat: NEON_MILE_ACQUISITION_HEAT,
   description: 'Nightclubs, glowing signs and late-night traffic. Make the strip part of your operation.',
-  purchaseCost: moneyFromMinorUnits('10000000'),
+  purchaseCost: moneyFromMinorUnits('5000000'),
   requirements: [
     { type: 'player-level', minimumLevel: 12 },
     { type: 'business-owned', businessId: STARTER_BUSINESS.id },

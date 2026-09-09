@@ -35,14 +35,14 @@ describe('Solara City presentation and interaction', () => {
   });
   it('shows exact price/effect and central met/unmet requirements with accessible disabled action', () => {
     const html = render();
-    expect(html).toContain('$100,000.00'); expect(html).toContain('+10% starter-job &amp; Dispatcher cash reward');
+    expect(html).toContain('$50,000.00'); expect(html).toContain('+10% starter-job &amp; Dispatcher cash reward');
     expect(html).toContain('XP unchanged'); expect(html).toContain('LOCKED');
     for (const label of ['Player Level 12', 'Own Dockside Detail', 'Dockside Detail Level 15']) expect(html).toContain(`Not met — ${label}`);
     expect(html).toContain('aria-label="Take control of Neon Mile"');
     expect(html).toContain('aria-describedby="territory:neon-mile-requirements"'); expect(html).toContain('disabled=""');
   });
   it('keeps cash shortage distinct from requirement locks', () => {
-    const state = { ...territoryState(), economy: { cash: moneyFromMinorUnits('9000000') } };
+    const state = { ...territoryState(), economy: { cash: moneyFromMinorUnits('4999999') } };
     const view = territoryPresentation(state, N.id);
     expect(view).toMatchObject({ status: 'AVAILABLE', eligible: true, affordable: false, canAcquire: false });
     const html = render(state); expect(html).toContain('Requirements satisfied · Insufficient cash.');
@@ -57,7 +57,7 @@ describe('Solara City presentation and interaction', () => {
     const html = render(f.game.getSnapshot().result.state);
     expect(html).toContain('Territories controlled: 2 / 2'); expect(html.match(/CONTROLLED/g)).toHaveLength(2);
     expect(html).not.toContain('aria-label="Take control'); expect(feedback).toContain('Neon Mile controlled');
-    expect(feedback).toContain('-$100,000.00'); expect(feedback).toContain('+10%'); f.game.stop();
+    expect(feedback).toContain('-$50,000.00'); expect(feedback).toContain('+10%'); f.game.stop();
   });
   it('grandfathered ownership stays controlled below acquisition requirements', () => {
     const state = { ...createInitialGameState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } };

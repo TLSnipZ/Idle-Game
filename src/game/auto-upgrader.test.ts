@@ -36,27 +36,27 @@ function withDispatcher(s: GameState) { return { ...s, automation: { ...s.automa
 describe('Business Auto-Upgrader purchase and explicit opt-in', () => {
   it('adds exactly one configured automation with exact identity and acquisition data', () => {
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, 'automation:business-auto-upgrader']);
-    expect(A).toMatchObject({ name: 'Business Auto-Upgrader', purchaseCost: '25000000', intervalMs: 30000, targetBusinessId: B.id });
-    expect(A.requirements).toEqual([{ type: 'player-level', minimumLevel: 20 }, { type: 'business-owned', businessId: B.id },
-      { type: 'business-level', businessId: B.id, minimumLevel: 25 }, { type: 'territory-owned', territoryId: 'territory:neon-mile' }]);
+    expect(A).toMatchObject({ name: 'Business Auto-Upgrader', purchaseCost: '5000000', intervalMs: 30000, targetBusinessId: B.id });
+    expect(A.requirements).toEqual([{ type: 'player-level', minimumLevel: 12 }, { type: 'business-owned', businessId: B.id },
+      { type: 'business-level', businessId: B.id, minimumLevel: 15 }, { type: 'territory-owned', territoryId: 'territory:neon-mile' }]);
     expect(ACHIEVEMENT_CATALOG).toHaveLength(6); expect(CUMULATIVE_STATISTICS).toHaveLength(7);
   });
-  it.each([19,20])('requires derived player Level %i at the exact boundary', n => {
+  it.each([11,12])('requires derived player Level %i at the exact boundary', n => {
     const s = unowned(), state = { ...s, progression: { xp: getXpThresholdForLevel(n) } };
-    expect(purchaseAutomation(state, A.id).ok).toBe(n === 20);
+    expect(purchaseAutomation(state, A.id).ok).toBe(n === 12);
   });
-  it.each([null,24,25])('requires owned Dockside Level %s', n => {
+  it.each([null,14,15])('requires owned Dockside Level %s', n => {
     const s = unowned(), state = { ...s, businesses: { ...s.businesses, owned: n === null ? {} : { [B.id]: { level: n } } } };
-    expect(purchaseAutomation(state, A.id).ok).toBe(n === 25);
+    expect(purchaseAutomation(state, A.id).ok).toBe(n === 15);
   });
   it('requires Neon Mile, separately from affordability', () => {
     const s = unowned(), state = { ...s, city: createInitialGameState().city };
     expect(purchaseAutomation(state, A.id)).toMatchObject({ ok: false, error: 'prerequisite-not-met', state });
-    const poor = { ...s, economy: { cash: moneyFromMinorUnits('24999900') } };
+    const poor = { ...s, economy: { cash: moneyFromMinorUnits('4999900') } };
     expect(selectAutoUpgrader(poor)).toMatchObject({ requirements: { met: true }, affordable: false });
     expect(purchaseAutomation(poor, A.id)).toEqual({ ok: false, state: poor, error: 'insufficient-funds' });
   });
-  it('spends exactly $250k, starts disabled, grants nothing; immutable and one-time', () => {
+  it('spends exactly $50k, starts disabled, grants nothing; immutable and one-time', () => {
     const base = unowned(), s = { ...base, economy: { cash: A.purchaseCost } }, before = structuredClone(s);
     const result = purchaseAutomation(s, A.id); expect(result.ok).toBe(true);
     expect(result.state).toEqual({ ...s, economy: { cash: '0' }, automation: { ...s.automation, unlockedIds: [A.id] } });

@@ -34,8 +34,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 8B — Lifetime Statistics Foundation (complete; user verified live) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
 | 8C — Late-Game Automation Foundation (complete; user verified live) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
 | 9A — UX & Information Architecture (complete; user verified live) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
-| 9B — Accessibility & Interaction Polish (implementation complete; live pending) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
-| 9C — Balance & Progression Pass (next / deferred) | Deliberate economy review | Explicitly scoped values and regression evidence |
+| 9B — Accessibility & Interaction Polish (complete; user verified live) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
+| 9C — Balance & Progression Pass (implementation complete; live pending) | Deterministic progression audit; three acquisition adjustments | Reproducible models, unchanged v15/CE1 and runtime contracts |
+| 9D — Performance & Runtime Hardening (next / deferred) | Runtime/performance review | Preserve post-9C balance, deterministic batching and durable persistence |
 | Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
 ## Current status
@@ -219,11 +220,29 @@ Navigation is local React state; one central runtime continues independently. Im
 and Rebirth controllers retain their interaction state above the active section.
 Save v15, CE1, balance, all content catalogs and timing remain unchanged.
 [The feature review checklist](UX_CHECKLIST.md) maps the previous page to the sections.
-Phase 9B Accessibility & Interaction Polish is implemented, with live verification pending. Phase 9C Balance & Progression Pass is next/deferred; post-roadmap Rebranding has not begun. No new artwork, palette or fonts were added.
+Phase 9B Accessibility & Interaction Polish is implemented and manually verified live by the user. Phase 9C is documented below; post-roadmap Rebranding has not begun. No new artwork, palette or fonts were added.
 
 
 Phase 9B adds native control context, skip/focus behavior, quieter live feedback,
 progress descriptions, inline import confirmation focus and centralized reduced motion.
 DOM interaction and style checks preserve all Phase 9A navigation/runtime contracts.
-Real-browser zoom, keyboard traversal and screen-reader review remain pending; this is
-not a certification claim. Phase 9 remains incomplete. No balance, save or content change.
+The user manually verified the live build, keyboard navigation, skip/focus, Rebirth/import,
+Event/automation controls, reduced motion, zoom and mobile behavior. Dedicated
+screen-reader certification was not performed; this is not a certification claim. Phase 9 remains incomplete. No balance, save or content change.
+
+
+Phase 9C Balance & Progression Pass implementation is complete; **live verification
+remains pending**. [BALANCE_AUDIT.md](BALANCE_AUDIT.md) records deterministic Active,
+Idle-Leaning and Optimized routes, baseline findings, paybacks and limitations.
+Only three acquisition groups change: Dispatcher price, Neon Mile price and
+Auto-Upgrader price/level gates. Current values are in BALANCING.md. Existing saves
+keep their exact state; v15/CE1, rewards, production, Heat, batching, Events,
+automation chronology, achievements/statistics, offline durability and 9A/9B UI
+contracts remain unchanged. No new content or system was added.
+
+**Phase 9D Performance & Runtime Hardening is next/deferred**, with explicit
+preservation of post-9C balance, Dispatcher XP/Heat batching, Mara remainder,
+outer Event RNG/online-only opportunities, Auto-Upgrader chronology, offline
+write-before-publication, import timing, achievement/statistics semantics and
+9A navigation / 9B accessibility, focus and live regions. Phase 9 is not complete.
+Post-roadmap Rebranding has not started.

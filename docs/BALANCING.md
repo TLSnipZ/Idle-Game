@@ -1,645 +1,252 @@
-# Balancing policy
+# Base Game balance
 
-## Phase 1A
+Current authoritative values after **Phase 9C**. Values remain provisional, but
+this document describes the implemented game only. Feature config and central domain
+helpers are the source of truth; UI uses their selectors. Phase 9C evidence and
+before/after comparisons live in [BALANCE_AUDIT.md](BALANCE_AUDIT.md).
 
-The Phase 1A balance values live in
-`src/features/economy/config/economy-config.ts`: initial cash is 0 cents and the
-waterfront delivery reward is 2,500 cents ($25.00). The reward validates the domain
-slice; it is provisional starter tuning, not a progression curve or clicker loop.
-Phase 1B adds the single fixed purchase cost below; Phase 1C.1 adds one fixed
-production rate. No cooldowns exist. Candidate models below remain future proposals.
+## Exact units and evaluation
 
-## Source of truth
+Cash is a canonical non-negative integer-cent string, at most 100 digits
+(0 through 10^100 − 1 cents). BigInt arithmetic preserves exact spends/additions;
+invalid values and overflow fail atomically, never silently clamp or round cash.
+Continuous production uses exact rational modifiers and retains both the 0–999
+milli-cent remainder and the reduced sub-milli-cent fraction. Discrete job cash
+floors once to cents after all modifiers. Flat additions precede multiplicative
+percentage factors; distinct percentage sources multiply, not add. Ranks within
+a skill sum their own percentage before joining that evaluation.
 
-Place typed balance/content definitions in each feature's config directory. Shared
-constants require a real shared owner. UI consumes definitions and selectors; it
-must not duplicate costs, growth rates, thresholds, caps or bonus magnitudes.
-Presentation tokens belong in styles and are unrelated to game balance.
+## Opening and business progression
 
-Use explicit units and state whether a value is base or effective. Costs and income
-must follow the economy's agreed numeric range and rounding policy. Derive values
-where possible instead of keeping contradictory config fields.
+Fresh cash: **$0**. The manual waterfront delivery pays **$25**, **10 base XP** and
+**+1 Heat after payout**. There is no cooldown. Six base deliveries fund Dockside;
+ten reach Player Level 2. Heat cash penalties do not apply during those ten jobs.
 
-## Candidate models for later evaluation
+**Dockside Detail** (`business:dockside-detail`):
 
-| Concern | Candidate | Decision required before implementation |
-| --- | --- | --- |
-| Business cost scaling | baseCost × growthRate^owned | Growth curve, limits, rounding and bulk purchase behavior |
-| Production | Base rate adjusted by effective modifiers | Units, level curve, cycle/rate semantics and caps |
-| Upgrade value | Cost / additional effective income | Target payback windows and meaningful alternatives |
-| Rebirth reward | Function of eligible run achievement | Eligibility, scaling, reset/retention matrix and exploit prevention |
-| Offline reward | Shared simulation over bounded elapsed time | Cap, efficiency, clock changes, expired effects and random event policy |
-| Collections | Explicit set requirements and modifier sources | Duplicate ownership and stacking eligibility |
-| Heat | Explicit penalties/recovery tied to actions/time | Bounds, risk visibility and active/idle fairness |
+- Purchase: **$150**, no requirements, starts at Level 1.
+- Production: **$0.75/sec × current business level**, before modifiers.
+- Each paid upgrade: **$150 × current Level²**, buys exactly one level, **25 base XP**.
+- Maximum: **Level 100**. Initial purchase gives no XP and is not a paid-level statistic.
+- Level 100 has no further purchase price. No bulk discount or refund exists.
 
-Modifier evaluation order is owned by ARCHITECTURE.md; do not redefine it per
-feature. Keep prices, income and speed as distinct targets with explicit clamps
-and rounding. For example, doubling production speed need not mean doubling a
-stored duration: the stat semantics must say which quantity is modified.
+| Current level | Next level price | Base production/sec | Total cash to acquire this level, including initial purchase |
+| --- | --- | --- | --- |
+| 1 | $150 | $0.75 | $150 |
+| 5 | $3,750 | $3.75 | $4,650 |
+| 10 | $15,000 | $7.50 | $42,900 |
+| 15 | $33,750 | $11.25 | $152,400 |
+| 25 | $93,750 | $18.75 | $735,150 |
+| 50 | $375,000 | $37.50 | $6,063,900 |
+| 100 | MAX LEVEL | $75 | $49,252,650 |
 
-## Goals and tuning practice
+The initial purchase repays its $150 in **200 seconds** of unmodified production.
+At 75 cents/sec, 14ms credits one cent with 50 milli-cent units retained. Partitioning
+unchanged production never loses fractional earnings.
 
-Measure time to first purchase, time to automation, marginal upgrade payback,
-collection completion pace, rebirth duration and the value of permanent choices.
-Set actual target ranges in the relevant phase. Preserve useful choices instead
-of one dominant purchase path; automation should remove repetition without making
-all decisions disappear. Temporary bonuses, permanent bonuses and collectibles
-must not multiply without understood bounds.
+## Player XP
 
-Record balance changes here or beside the relevant config with: rationale, changed
-values, simulation scenario, observed progression impact and save compatibility.
-Balance-only changes normally recalculate derived stats; changes to owned state,
-ID meaning or numeric representation may require migrations. No balancing tools,
-simulators, spreadsheets or telemetry infrastructure are needed in Phase 0.
+Player level is derived from cumulative XP: **100 × (Level − 1)²**, maximum displayed
+level **100**. XP is not spent and can continue to Number.MAX_SAFE_INTEGER; overflow
+fails the entire action. No income bonus or reward comes merely from leveling up.
 
-## Validation once systems exist
-
-Test affordability at boundaries; no NaN/Infinity, negative funds or overflow;
-modifier stacking/expiry/scopes; active vs automated action consistency; online vs
-offline progression; prestige retention; and save migrations. Use deterministic
-fixtures and simulations for actual rules, not duplicated implementation tests.
-
-## Exact cash and limits
-
-Store canonical integer-cent strings, with at most 100 digits: 0 through
-10^100 − 1 cents. Native BigInt performs exact helper arithmetic without floating
-point drift. Equal amounts compare exactly. Add/subtract never round; fractional
-cents, Number inputs, nonfinite values, negative values and noncanonical strings
-are invalid. No implicit dollar-to-cent conversion exists. Enter config amounts
-through `moneyFromMinorUnits`; never calculate or duplicate rewards in React.
-
-Zero earns/spends succeed; insufficient funds and exceeding the maximum fail
-without changing state. Invalid amounts fail explicitly, rather than clamping.
-The numeric limit is a resource bound, not a cap designed to be reached by players.
-Balance tests pin the starter reward through repeated-action outcomes; update those
-expectations deliberately if tuning changes. Arithmetic precision fixtures are
-technical boundary values, not additional balance configuration.
-
-Phase 1C.1 defines exact fractional accrual for integer cents/second below. Future
-modifiers still require a separate precision and rounding policy. A future representation change must preserve callers'
-economy APIs and explicitly migrate any persisted integer-cent strings. Increasing
-the digit bound also requires revisiting older-client validation. See architecture
-for serialization and error contracts. No actual save system is implemented.
-
-## Phase 1B — provisional first acquisition
-
-- Business: **Dockside Detail** (`business:dockside-detail`), an original small
-  waterfront detailing garage chosen for the automotive/Florida setting.
-- Definition and price source: `src/features/businesses/config/business-config.ts`.
-- Purchase cost: **15,000 cents ($150.00)**, validated through `moneyFromMinorUnits`.
-- Initial cash remains **$0.00**. Each existing delivery still earns **$25.00**.
-  Exactly **six deliveries** fund the purchase; spending the exact cost leaves zero.
-- One-time ownership only: no repeat purchases, levels, scaling, refunds or pricing
-  curve. The cost is deliberately provisional and is not a realistic property valuation.
-- There is no production rate, passive income, clock, manager or offline behavior.
-  Ownership has no economic effect beyond its one-time purchase cost in this phase.
-
-Integration tests pin six deliveries, the exact spend and duplicate-purchase
-rejection. Boundary fixtures above Number's safe-integer range verify that buying
-still preserves cents through the existing money/spend API. The explicitly chosen
-Phase 1C.1 rate follows; runtime clock tuning remains separate.
-
-## Phase 1C.1 — provisional base production
-
-Dockside Detail produces **75 cents per second ($0.75/sec)** in pure simulation.
-The rate lives only in `baseProductionCentsPerSecond` on the existing business
-config, constructed through `moneyFromMinorUnits('75')`. The $150 purchase cost
-is recovered in exactly **200 seconds (3 minutes 20 seconds)**. A $25 delivery
-still equals about 33.33 seconds of base production, so active earning retains
-value. This is one provisional rate, not a scaling or modifier system.
-
-Integer elapsed milliseconds multiply whole cents/second exactly. The intermediate
-unit is thousandths of a cent (1,000 per cent). Retain a pooled integer remainder
-0..999 in `businesses.productionRemainderMilliCents`. At 75 cents/sec, 1 ms earns
-75 remainder units; 13 ms earns 975; 14 ms credits 1 cent and retains 50. A 100 ms
-step credits 7 cents and retains 500, so a second 100 ms step credits 8 cents.
-A full second or any valid partition of it credits exactly 75 cents, without
-per-step rounding loss. Multiple rates are summed before extracting whole cents.
-
-There are no fractional-cent/second config rates, levels, bonuses, growth formulas
-or offline caps. Invalid elapsed is rejected; valid elapsed ranges from zero to
-Number.MAX_SAFE_INTEGER integer ms. Integer quotient/modulo keeps earned fractions,
-never silently clamps income. If the Money limit is exceeded, the whole transition
-fails and both cash and remainder stay unchanged. Partition equivalence assumes
-successful intervals and unchanged rates/ownership; rejected overflow intervals
-cannot be treated as partially applied. Architecture documents validation and the
-future runtime clock boundary.
-
-## Phase 1C.2 — runtime cadence (no balance changes)
-
-The browser now supplies measured `performance.now()` intervals to the same
-`simulateElapsed` function every 250 ms. Four updates per second balance visible
-cash changes with mobile CPU/battery cost; cadence never defines an earning reward.
-Delayed callbacks in the same open session catch up by elapsed duration. Purchase
-and starter-job boundaries reconcile first, preventing retroactive purchase income
-and preserving accrued earnings.
-
-Fractional runtime milliseconds are retained separately from authoritative
-milli-cent production. The first purchase starts its producing interval at the
-purchase timestamp, without transferring fractional unowned time. The 75-cent/sec
-rate and 200-second payback remain unchanged. Overflow suspends the runtime with
-its last valid cash/remainder; no partial or capped credit is applied. See
-ARCHITECTURE.md for lifecycle, fractional precision and terminal failure policy.
-Reload resets the game. Offline progression, saves and automation are absent;
-Phase 1C.3 visual production feedback/polish remains deferred.
-
-## Phase 3A — provisional offline cap
-
-`OFFLINE_CAP_MS` in `src/game/offline-progress.ts` is **28,800,000 ms (eight hours)**.
-This allows a normal sleep/work absence to earn at the unchanged full production
-rate while bounding long absences. No efficiency multiplier or cap upgrade exists.
-Only elapsed time is capped; the sole production path remains `simulateElapsed`.
-Dockside Detail still earns 75 cents/second, with exact authoritative milli-cent
-carry. Eight credited hours at that rate earn $21,600.00. This is provisional
-single-business tuning, not a progression curve or promise for later levels.
-Negative wall-clock differences receive zero time and rebase safely. Absence beyond
-the cap is consumed when the new current timestamp is durably saved. No extra
-rounding is introduced; saved fractions combine exactly with offline production.
-The welcome card's positive-whole-cent threshold affects presentation only.
-No business levels, modifiers, managers or other balance changes are included.
-
-## Phase 3B — provisional business levels
-
-The named maximum is **100** in the public business level module. Newly purchased
-Dockside Detail starts at level 1 for the unchanged **$150.00**, earning **$0.75/sec**.
-Each definition now supplies its own `baseUpgradeCost`; Dockside uses **15,000 cents**.
-For current level L below the cap, the upgrade price is exactly
-`baseUpgradeCost × L²` whole cents. There is no price at level 100. The quadratic
-curve makes the first upgrade comparable to purchase, with increasingly long waits
-later, without exponential growth or rounding. All values are provisional.
-
-| Upgrade | Exact price |
+| Level | Cumulative XP |
 | --- | --- |
-| 1 → 2 | $150.00 |
-| 2 → 3 | $600.00 |
-| 3 → 4 | $1,350.00 |
-| 10 → 11 | $15,000.00 |
-| 99 → 100 | $1,470,150.00 |
-
-Production is exactly `baseProductionCentsPerSecond × level`: $0.75/sec at level 1,
-$1.50/sec at level 2, $5.25/sec at level 7 and $75.00/sec at level 100. Prices and
-rates are derived, never cached in saves. BigInt-backed economy scaling preserves
-integer cents. Fractional earned milli-cents survive all upgrades and saves.
-Future businesses may set independent purchase cost, base rate and base upgrade
-cost under these shared curves. No modifiers or cap upgrades exist. The offline
-cap remains eight hours and uses these same derived production rates.
-
-
-## Phase 4A — provisional first equipment and modifier policy
-
-Exactly one upgrade is configured in `src/features/upgrades/config/upgrade-config.ts`:
-**Commercial Pressure Washer** (`upgrade:commercial-pressure-washer`), priced at
-**250,000 cents ($2,500)**. It requires owning Dockside Detail, has no level
-prerequisite, can be purchased once, and adds **+25% Dockside production** through
-2,500 integer basis points. It never affects other businesses or delivery rewards.
-
-The price places it after early acquisitions/levels rather than alongside the first
-$150 purchase. Its value grows with the business level: at level 5 its extra
-$0.9375/sec repays $2,500 in about 44 minutes 27 seconds; at level 10, about
-22 minutes 13 seconds. This creates a choice against increasingly costly levels.
-The price/effect are provisional, not a full upgrade economy. Purchase price,
-quadratic level costs, level cap 100 and base production remain unchanged.
-
-| Level | Base production/sec | With equipment/sec |
-| --- | --- | --- |
-| 1 | $0.75 | $0.9375 |
-| 4 | $3.00 | $3.75 |
-| 5 | $3.75 | $4.6875 |
-| 100 | $75.00 | $93.75 |
-
-Effective production is `(75 cents × level) × 12500/10000`. All current/future
-eligible percentage factors compound exactly in stable modifier-ID order. There
-is no per-tick or per-second rounding. The integer milli-cent remainder plus its
-new reduced sub-milli-cent fraction preserves all earned value (see architecture).
-UI precision is independent from simulation. Starter delivery still pays $25.00
-through the central evaluator; future fractional job rewards floor once at payout.
-The eight-hour offline cap is unchanged, using the identical effective rate.
-No other equipment, modifiers as content, new businesses or automation are added.
-
-## Phase 4B — five-upgrade catalog (provisional)
-
-The Phase 4A washer remains unchanged. Four additions provide choices between
-active delivery income, stronger Dockside output and a global milestone. Delivery
-upgrades are cheaper so they can matter before later business levels; production
-upgrades require a substantially larger investment. No level prerequisites apply.
-
-| ID | Name | Cost | Effect | Requirement |
-| --- | --- | --- | --- | --- |
-| `upgrade:commercial-pressure-washer` | Commercial Pressure Washer | $2,500 | +25% Dockside production | Own Dockside |
-| `upgrade:industrial-detailing-line` | Industrial Detailing Line | $10,000 | +50% Dockside production | Own Dockside |
-| `upgrade:fleet-logistics` | Fleet Logistics | $15,000 | +10% all business production | Own any business |
-| `upgrade:street-connections` | Street Connections | $750 | +20% starter-job reward | None |
-| `upgrade:express-tips` | Express Tips | $400 | +$5 starter-job reward | None |
-
-Each is purchased once. This table also defines explicit catalog display order.
-Evaluation applies flats first, then compounds percentages, with stable IDs within
-each operation group. Base delivery remains $25: either job upgrade alone yields
-$30; both yield `($25 + $5) × 1.20 = $36`, irrespective of purchase order.
-
-Base production stays `$0.75/sec × level`. At level 4: $3 base, $3.75 with washer
-alone, $4.50 with detailing line alone, $3.30 with logistics alone. All three yield
-`$3 × 1.25 × 1.50 × 1.10 = $6.1875/sec` exactly. Factors are rational, never added
-together or rounded between operations. Both production remainders retain all
-fractions across callbacks, saves and offline catch-up. UI precision is display
-only. Business purchase/level costs, level cap and eight-hour offline cap are
-unchanged. Phase 4C automation and additional content are deferred.
-
-## Phase 4C — provisional delivery delegation
-
-**Delivery Dispatcher** (`automation:delivery-dispatcher`) costs **750,000 cents
-($7,500)** and requires ownership of Dockside Detail. One permanent unlock performs
-one centrally evaluated starter job per **10,000 ms (10 seconds)**; manual jobs
-remain available. No level requirement, worker scaling or second automation exists.
-The price sits between the washer and stronger production upgrades as a choice
-between active-delivery support and business investment.
-
-| Job modifiers | Exact reward every 10 seconds |
-| --- | --- |
-| None | $25.00 |
-| Street Connections | $30.00 |
-| Express Tips | $30.00 |
-| Both | $36.00 |
-
-Base reward, the five upgrades, business rates/level costs and the offline cap are
-unchanged. Both systems share the same eight-hour offline credit window. From zero
-progress, eight hours completes 2,880 deliveries ($72,000 without job upgrades or
-$103,680 with both). Five seconds of saved progress plus 25 seconds credited offline
-completes three deliveries: **$108 with both job upgrades**, progress zero. Extra
-absence beyond the cap does not advance the cycle. Values are provisional.
-
-Cycle payouts use the modifier set when the cycle completes; upgrades reconcile
-already-completed jobs first and retain unfinished progress. Completed cycles are
-batched mathematically, with no per-cycle loop and no fractional money rounding
-between modifiers. Future automation/content remains a separately authorized phase.
-
-## Phase 5A — provisional player progression
-
-XP is an exact, non-spendable integer independent of cash. Start at **0 XP,
-player Level 1**. Maximum displayed player level is **100**. Cumulative XP needed
-for level L is **100 × (L − 1)²**; thresholds and rewards are centralized in the
-progression feature. No player level affects income or unlocks content yet.
-
-| Player level | Cumulative XP threshold |
-| --- | --- |
-| 1 | 0 |
 | 2 | 100 |
 | 3 | 400 |
-| 4 | 900 |
 | 5 | 1,600 |
+| 7 | 3,600 |
+| 8 | 4,900 |
 | 10 | 8,100 |
+| 12 | 12,100 |
+| 20 | 36,100 |
 | 25 | 57,600 |
-| 50 | 240,100 |
 | 100 | 980,100 |
 
-Early manual progression reaches Level 2 after ten deliveries; later intervals
-grow by 200 XP per level. For example, 1,850 total XP is Level 5 with **250 / 900
-XP toward Level 6**, not 1,850 XP within that level. XP may continue beyond the
-Level 100 threshold up to **9,007,199,254,740,991**; overflow fails atomically
-without clamping or partial cash/level changes.
+Sources: manual job **10**, Dispatcher cycle **5**, paid business level **25** base XP.
+No other source awards XP. Learn the Streets modifies each award; Dispatcher first
+combines the completed cycles into one base-XP batch, then floors once. At rank 1,
+three cycles in one batch award 16 XP, while three separate single-cycle batches
+award 15. Three separate business upgrades award 27 + 27 + 27 = **81 XP**, not 82.
 
-| Successful source | XP |
-| --- | --- |
-| Manual starter delivery | 10 per action |
-| Completed Delivery Dispatcher cycle | 5 per cycle |
-| Business level increase | 25 per level purchased |
+## Five normal upgrades
 
-These are the only sources. Business acquisition, equipment/delegation purchases,
-passive business cash, time itself and leveling the player award no XP. Money
-modifiers keep their existing $25/$30/$36 behavior and never change XP rewards.
-Manual and automated execution remain independent.
+All are once-per-run purchases. Acquisition conditions are AND lists and do not
+revoke already-owned content. Cash affordability is separate from requirements.
 
-Offline dispatcher jobs also earn 5 XP each within the same **eight-hour** cap:
-2,880 jobs yield **14,400 XP**, regardless of cash modifiers. Five seconds saved
-plus 25 seconds credited yields three jobs, **15 XP** and $108 with both job
-upgrades. Discarded absence earns no XP and adds no cycle progress. Imported old
-timestamps award no XP. All existing money costs, production formulas, modifiers
-and automation timing remain unchanged. Skills, XP multipliers, level-up rewards,
-level-based income and future unlock requirements are deferred.
-
-## Phase 5B — acquisition gates
-
-Only acquisition requirements change; costs, effects, business level costs,
-XP rewards, production math and dispatcher timing remain unchanged.
-
-| Content | Requirements (all must be met) |
-| --- | --- |
-| Dockside Detail purchase | None |
-| Express Tips ($400, +$5/job) | None |
-| Street Connections ($750, +20%/job) | Player Level 2 (100 XP) |
-| Commercial Pressure Washer ($2,500, +25% Dockside) | Own Dockside Detail |
-| Industrial Detailing Line ($10,000, +50% Dockside) | Dockside Detail Level 5, implying ownership |
-| Fleet Logistics ($15,000, +10% all businesses) | Own any business; own Commercial Pressure Washer; Player Level 5 (1,600 XP) |
-| Delivery Dispatcher ($7,500, every 10s) | Own Dockside Detail; Player Level 3 (400 XP) |
-
-Requirements are checked only on purchase. Existing owned content is grandfathered:
-it remains active even below these levels or without new prerequisites, including
-after reload/import and offline. It does not need to be purchased again.
-
-99/100, 399/400 and 1,599/1,600 XP are the exact locked/eligible level boundaries.
-Dockside Level 4/5 is the Industrial Detailing Line boundary. Cash affordability
-is a separate check. Fresh players can earn manually, acquire Dockside after six
-base deliveries while still Level 1, and reach Level 2 after ten total deliveries.
-No XP reward or income bonus is granted merely for becoming eligible.
-These gates are provisional content balancing. No new content is introduced.
-
-
-## Phase 5C — provisional first collectible vehicle
-
-Exactly one vehicle, **Vortex S9** (`vehicle:starter-sport-sedan`), is a temporary
-fictional performance-sedan identity. Price: **5,000,000 cents ($50,000)**, purchased
-once. Acquisition requires **Player Level 7 (3,600 XP)**, **Dockside ownership** and
-**Dockside Level 10**. This is a milestone after early equipment and delegation;
-all price, label and art choices are provisional. Existing content costs, gates,
-XP rewards, business levels and Dispatcher timing remain unchanged.
-
-Ownership provides **+15% global business production**, exactly the factor
-`11500/10000 = 23/20`, through the central modifier evaluator. It awards no XP and
-does not affect delivery rewards. At Dockside Level 4 with washer, detailing line,
-logistics and vehicle, effective production is exactly
-`$3 × 1.25 × 1.50 × 1.10 × 1.15 = $7.115625/sec`.
-This is a mathematical/grandfathered-ownership example; acquiring the vehicle
-normally requires Dockside Level 10. UI may show `≈$7.1156/sec`; authoritative
-simulation retains every fraction with no per-second rounding.
-
-The same vehicle effect applies online and during the unchanged eight-hour offline
-window. Requirements never revoke owned bonuses. No collection/set reward, equip
-restriction, vehicle progression or additional vehicle is included.
-
-
-## Phase 6A — provisional Rebirth balance
-
-Eligibility requires Player Level 20 AND Dockside Detail Level 25, centrally
-configured. No cash, vehicle, equipment or Dispatcher requirement exists.
-
-`EP gained = floor(playerLevel / 10) + floor(DocksideLevel / 10)`.
-
-| Player / Dockside level | Empire Points gained |
-| --- | --- |
-| 20 / 25 | 4 EP |
-| 37 / 48 | 7 EP |
-| 100 / 100 | 20 EP |
-
-EP and Rebirth count are exact non-negative safe integers; overflow fails without
-resetting anything. Each successful Rebirth adds its reward and one count. Thus
-4 EP then 7 EP produces 11 EP and two Rebirths. Neither currency nor count provides
-bonuses, and EP cannot be spent in Phase 6A. No XP or cash is awarded for Rebirth.
-
-Cash, business ownership/levels, all normal upgrades, Dispatcher ownership/progress,
-XP and both fractional production remainders reset. Garage ownership and permanent
-EP/count survive. A retained Vortex S9 still applies +15% when Dockside is repurchased:
-$0.75/s × 1.15 = $0.8625/s. Acquisition gates apply again to reset temporary content.
-Existing business prices, XP sources, modifier rules and eight-hour offline cap are
-unchanged. The reward formula and eligibility are provisional; skills and spending
-belong to the separately deferred Phase 6B.
-
-
-## Phase 6B — provisional permanent skill balance
-
-Exactly one tree: **Empire Foundations** (`tree:empire-foundations`). All values
-below are provisional. Empire Points are unspent currency, not lifetime earnings.
-
-| Stable SkillId / Name | Max rank | EP per rank | Prerequisite | Effect per rank |
-| --- | --- | --- | --- | --- |
-| `skill:streetwise-investment` / Streetwise Investment | 3 | 1 | None | +5% global business production |
-| `skill:fast-talker` / Fast Talker | 2 | 1 | Streetwise Rank 1 | +10% starter-job Money reward |
-| `skill:learn-the-streets` / Learn the Streets | 2 | 2 | Streetwise Rank 1 | +10% XP gain |
-| `skill:silent-partner` / Silent Partner | 2 | 3 | Streetwise Rank 3 | +10% global business production |
-| `skill:never-sleeps` / Never Sleeps | 2 | 2 | Streetwise Rank 2 | +2 hours offline cap |
-
-Ranks sum their bonus within a skill: Streetwise ranks 1/2/3 give +5/+10/+15%;
-other percentage skills give +10/+20%. Distinct sources multiply exactly after
-flat additions. Maxing the entire tree costs 19 EP. No respec or refunds exist.
-Rebirth adds its unchanged reward to remaining EP and retains every purchased rank.
-For example 4 EP minus a 2 EP purchase plus a later 7 EP Rebirth leaves 9 EP.
-
-Canonical production: `$0.75 × 1.15 × 1.10 × 1.10 = $1.043625/s` with Vortex,
-Streetwise rank 2 and Silent Partner rank 1. The latter is valid retained/imported
-ownership even though acquiring it currently requires Streetwise rank 3.
-Production keeps exact rational fractions without intermediate rounding.
-
-Canonical job: `($25 + $5) × 1.20 × 1.10 = $39.60` with Express Tips, Street
-Connections and Fast Talker rank 1. After Rebirth removes normal upgrades, Fast
-Talker rank 1 still makes the base job $27.50. Dispatcher uses the same Money reward.
-
-| XP source | Base | Learn rank 1 (+10%) | Learn rank 2 (+20%) |
+| Name / stable ID | Price | Effect | Requirements |
 | --- | --- | --- | --- |
-| Manual job | 10 | 11 | 12 |
-| Business level increase | 25 | 27 | 30 |
-| One dispatcher batch of 3 jobs | 15 | 16 | 18 |
+| Commercial Pressure Washer / `upgrade:commercial-pressure-washer` | $2,500 | +25% Dockside production | Dockside owned |
+| Industrial Detailing Line / `upgrade:industrial-detailing-line` | $10,000 | +50% Dockside production | Dockside Level 5 |
+| Fleet Logistics / `upgrade:fleet-logistics` | $15,000 | +10% global business production | Any business, Pressure Washer, Player Level 5 |
+| Street Connections / `upgrade:street-connections` | $750 | +20% job cash | Player Level 2 |
+| Express Tips / `upgrade:express-tips` | $400 | +$5 job cash | None |
 
-XP floors once after exact modified evaluation at each award boundary. Dispatcher
-first combines N×5 base XP and floors the modified batch once. Consequently three
-separate single-cycle batches at rank 1 yield 15 XP, while a single three-cycle batch
-yields 16 XP. There is deliberately no saved fractional XP remainder; this policy
-makes fractional XP depend on batching. Money/cycle/remainder partition guarantees
-are unchanged. Level thresholds, base XP values and all old Money costs stay intact.
+Either job upgrade alone gives $30 at COLD; both give **($25 + $5) × 1.20 = $36**.
+At Dockside Level 4, the three production upgrades give
+**$3 × 1.25 × 1.50 × 1.10 = $6.1875/sec**. Pressure Washer at Level 5 adds
+$0.9375/sec, repaying its price in about 44 minutes 27 seconds.
 
-Never Sleeps derives one shared cap: 8h at rank 0, 10h at rank 1, 12h at rank 2.
-Businesses, Dispatcher Money and Dispatcher XP use that same credited duration.
-No discarded time survives in progress. Buying the skill after an 8h-capped return
-does not recover previously discarded time. The cap and all ranks survive Rebirth;
-the derived cap is not persisted. Further trees/content and final balance are deferred.
+## Automations
 
-## Phase 7A — provisional Solara City territories
+**Delivery Dispatcher** (`automation:delivery-dispatcher`): **$5,000**, requires
+**Dockside owned and Player Level 3**. Ownership always activates one delivery per
+**10,000ms**. It uses current central job cash, 5 base XP per cycle, and the Heat
+batch rule below. Manual jobs remain available. Completed cycles are computed
+mathematically with exact partial progress; no per-cycle simulation loop exists.
+At COLD, no job upgrades / either / both pay **$25 / $30 / $36** per cycle.
 
-Exactly two territories, with stable IDs independent of future display names:
+**Business Auto-Upgrader** (`automation:business-auto-upgrader`):
 
-| ID / Name | Acquisition | Requirements | Effect | Rebirth |
-| --- | --- | --- | --- | --- |
-| `territory:waterfront` / Waterfront | Fresh baseline; no cost | Always owned in valid current state | None | Restored as fresh baseline |
-| `territory:neon-mile` / Neon Mile | $100,000 (10,000,000 cents), once per run | Player Level 12; Dockside owned at Level 15 | +10% starter-job and Dispatcher Money | Resets; must be acquired again |
-
-All values are provisional. Waterfront grants no free cash, XP, EP or bonus. Neon
-Mile grants no XP/EP and does not change business production, automation timing,
-XP rewards or offline caps. Existing prices, gates, player thresholds and Rebirth
-rewards are unchanged. Player Level 12 starts at 12,100 XP; 12,099 XP fails. Dockside
-Level 14 fails, Level 15 meets its gate. Cash affordability is a separate decision.
-
-Neon Mile contributes one exact +1,000 basis-point job modifier. Canonical payout:
-`($25 + $5) × 1.20 × 1.10 × 1.10 = $43.56` with Express Tips, Street Connections,
-Fast Talker rank 1 and Neon Mile. Only final discrete payout floors to cents; no
-intermediate rounding or percentage addition occurs. Manual and Dispatcher share it.
-Learn the Streets independently modifies XP with the existing final/batch floor policy.
-
-Offline Dispatcher uses the same territory bonus within the shared skill-derived
-8/10/12h credited duration; no territory passive income or separate offline cap
-exists. Rebirth removes Neon Mile and temporary upgrades, leaving Fast Talker rank 1
-(if owned) at `$25 × 1.10 = $27.50`. All acquisition requirements and the $100,000
-price apply again on the next run. Vehicles and permanent skills remain retained.
-Heat, Crew, Random Events, further territories and final city art remain deferred.
-
-## Phase 7B — provisional Heat balance
-
-Heat is integer 0–100; zero Heat has no banked cooling progress.
-
-| Heat | Tier | Job / Dispatcher cash factor |
-| --- | --- | --- |
-| 0–19 | COLD | ×1.00 |
-| 20–39 | NOTICED | ×1.00 |
-| 40–59 | WATCHED | ×1.00 |
-| 60–79 | HOT | ×0.90 (−10%) |
-| 80–100 | MANHUNT | ×0.75 (−25%) |
-
-| Action | Exact provisional effect |
+| Property | Value |
 | --- | --- |
-| Successful manual job | +1 Heat after the old-tier payout |
-| Dispatcher batch | +floor(completed jobs / 5) Heat, then cooling |
-| Successful Neon Mile acquisition | +10 Heat, clamped at 100 |
-| Credited elapsed time | −1 Heat per full 60,000ms, remainder retained while positive |
-| Lay Low | $500; −10 Heat down to zero; no cooldown/reward |
-
-The three gain sources are exhaustive. Dispatcher batches do not share a counter:
-3 then 2 jobs generate zero Heat; one batch of 5 generates one. Batch-start Heat
-sets all its job payouts. Gain/clamp precedes cooling over the entire elapsed batch,
-without chronological interleaving. Thus timing partitions can change Heat and future
-job income intentionally; pure business fractions and XP's existing floor rules remain.
-No XP, production, EP, Rebirth, price or offline-cap penalty exists. Manual jobs and
-Dispatcher remain usable at 100; no territory can be lost.
-
-Canonical full job stack: ($25+$5)×1.20×1.10×1.10 = $43.56;
-HOT gives exact $39.204, MANHUNT exact $32.67. Existing discrete payouts floor
-final per-job cents: $39.20 / $32.67; automated batches multiply the same job payout.
-Cooling never banks at zero. Lay Low preserves partial cooling while still positive,
-and clears it at zero. All offline Heat uses the existing shared 8/10/12h credited
-window; discarded time neither heats nor cools. Rebirth resets Heat/progress and
-Neon Mile; permanent Fast Talker rank 1 then pays $27.50 as before.
-All values are provisional. Phase 7B introduced no police events, RNG or Crew balance.
-
-## Phase 7C — provisional Crew balance
-
-Exactly three recruits and two operational slots; all values are provisional.
-
-| Stable ID / Name | Recruitment | Acquisition requirements (AND) | Slot | Effect only while assigned |
-| --- | --- | --- | --- | --- |
-| `crew:rico-vale` / Rico Vale | $20,000 (2,000,000 cents) | Player Level 8 | `operations` | +10% starter-job / Dispatcher Money |
-| `crew:mara-knox` / Mara Knox | $30,000 (3,000,000 cents) | Player Level 10; control Neon Mile | `operations` | Cooling interval 60,000 → 45,000ms per −1 Heat |
-| `crew:jax-mercer` / Jax Mercer | $40,000 (4,000,000 cents) | Player Level 12; Dockside Level 15 | `logistics` | +15% global business production |
-
-Operations deliberately trades Rico's cash against Mara's faster cooling; Jax can
-work independently in Logistics. No passive bench effects, auto-assignment, upkeep,
-recruitment XP/EP/Heat, skill requirements or Crew progression. Assignment,
-replacement and unassignment cost nothing and do not immediately change Heat.
-Recruitment gates apply only to acquisition. Crew resets on Rebirth with no refund.
-Existing prices and requirements remain unchanged; Crew is entirely optional.
-
-Rico full job stack: `($25 + $5) × 1.20 × 1.10 × 1.10 × 1.10 = $47.916`.
-At HOT multiply once more by 0.90: **$43.1244**. Exact rational evaluation precedes
-the unchanged final per-job cent floor: **$47.91 / $43.12**. Dispatcher multiplies
-the same per-job payout; XP and Heat gains are unchanged. No percentage addition.
-Jax canonical production: `$0.75 × 1.15 × 1.10 × 1.10 × 1.15 = $1.20016875/s`
-with Vortex, Streetwise rank 2 and Silent Partner rank 1. Temporary upgrades stack
-through the same central evaluator. Neither production rate nor earned fractions
-round early. These are valid retained/imported-rank examples, not waived purchase gates.
-
-Mara preserves cooling progress numerically when assigned/replaced/unassigned.
-40,000ms then 5,000ms cools once at 45s; an existing 50,000ms is legal and cools
-only on the next positive elapsed call (1ms leaves 5,001ms). Global saved remainder
-remains below 60,000ms, even under Mara. Heat zero banks nothing. Shared starting-tier
-batch rules and Dispatcher floor(jobs/5) Heat per batch remain unchanged. No Crew
-changes XP or the Never Sleeps-only 8/10/12h cap. Crew does not change base balance
-while unassigned. Final balancing remains deferred; Phase 7D events follow below.
-
-
-## Phase 7D — provisional Random Events balance
-
-All values are **provisional**. The online opportunity interval is **600,000ms
-(10 minutes)** with **35%** chance (`roll < 0.35`) when eligible content exists.
-Uniform selection uses configured Hot Tip → Shakedown → Warehouse order. At most
-one attempt occurs per reconciliation, even for multiple completed windows; keep
-only the modulo remainder. No eligible content consumes zero RNG. There is no
-weighted rarity, pity timer, queue, per-event cooldown, history or event chain.
-
-| Event / stable ID | Spawn eligibility | Choice / stable ID | Fixed outcome |
-| --- | --- | --- | --- |
-| Hot Tip / `event:hot-tip` | Player Level 5 | TAKE THE TIP / `choice:take-tip` | +$1,500 cash; +5 Heat |
-| Hot Tip | Player Level 5 | PLAY IT SAFE / `choice:play-safe` | −5 Heat, minimum 0 |
-| Shakedown / `event:shakedown` | Heat ≥20 | PAY THEM OFF / `choice:pay-off` | Spend $1,000; −10 Heat |
-| Shakedown | Heat ≥20 | REFUSE / `choice:refuse` | +10 Heat |
-| Warehouse Opportunity / `event:warehouse-opportunity` | Dockside owned AND Player Level 10 | INVEST / `choice:invest` | Require/spend $2,500, add $4,000; +5 Heat (net +$1,500) |
-| Warehouse Opportunity | Dockside owned AND Player Level 10 | PASS / `choice:pass` | No effect |
-
-Paid choices require current reconciled cash; Warehouse is a spend-then-credit
-atomic transaction, not a net-only credit. Free alternatives are always available.
-All three events award **0 XP and 0 EP**. Fixed Money ignores job bonuses, Heat cash
-penalties, territory/Crew/permanent-skill modifiers. Mara affects natural cooling
-only. Event Heat changes clamp to 0–100; reduction to zero clears cooling progress,
-otherwise the numerical remainder is preserved. Existing Heat tier penalties,
-gain sources outside events and 60s/45s cooling cadence remain unchanged.
-
-Pending freezes only the event timer, not ordinary gameplay. Successful resolution
-clears the event and requires a fresh ten-minute opportunity; failed resolution
-retains it. Spawn conditions are not retention conditions. No event progression or
-RNG occurs offline, regardless of the 8/10/12h economy cap. Rebirth discards pending
-and progress without reward. No hidden random outcomes or police/bust system exists.
-
-## Phase 8A — provisional achievement thresholds
-
-Achievements are permanent recognition only: **no Money, XP, EP or gameplay
-rewards**, and no modifier reads completion. All six are visible from the start.
-These thresholds are provisional.
-
-| Stable AchievementId | Name | Exact condition |
-| --- | --- | --- |
-| `achievement:first-steps` | First Steps | Derived Player Level ≥2 |
-| `achievement:dockside-operator` | Dockside Operator | Dockside Detail owned at Level ≥10 |
-| `achievement:neon-takeover` | Neon Takeover | Neon Mile owned |
-| `achievement:running-hot` | Running Hot | Current Heat ≥60 |
-| `achievement:crew-chief` | Crew Chief | Rico Vale, Mara Knox and Jax Mercer all recruited in the same run; assignments irrelevant |
-| `achievement:first-rebirth` | First Rebirth | Rebirth count ≥1 |
-
-Unlocks survive cooling, temporary progression changes and Rebirth. Current-state
-conditions are evaluated after complete commands or elapsed batches, including
-legitimate offline catch-up. No transient peak is reconstructed: a batch that
-passes 60 Heat internally but finishes below 60 does not unlock Running Hot solely
-from that peak. There are no lifetime statistics or achievement rewards in 8A.
-Migration adds empty ownership; normal bootstrap can recognize currently satisfied
-milestones. Import preserves recorded completion without historical inference.
-
-
-## Phase 8B — observational lifetime statistics
-
-Statistics do not change balance and grant no reward. The eight fields are:
-manual jobs completed, automated jobs completed, business levels purchased,
-territories acquired, Crew members recruited, events resolved, Rebirths completed,
-and peak Heat. Jobs count successful manual actions and completed Dispatcher
-cycles separately. Business upgrades exclude initial purchase. Territory takeovers
-exclude baseline Waterfront and include reacquisition after Rebirth. Crew counts
-recruitment actions across runs, never assignment changes. Every successful event
-choice counts, including PASS; spawn or Rebirth discard does not.
-
-Rebirth preserves history and increments both its existing count and statistics
-count by one atomically. v13 migration initializes only the statistics Rebirth
-count from existing `rebirthCount`; all other fields start zero. Peak Heat records
-the maximum **final authoritative** Heat observed after an action/elapsed batch.
-A hidden Dispatcher peak removed by same-batch cooling is not reconstructed.
-Peak Heat remains after cooling and Rebirth; it grants no benefit and does not
-change Running Hot's current-Heat condition. No existing prices, rewards, caps,
-requirements, achievement thresholds or gameplay formulas change.
-
-
-## Phase 8C — provisional Business Auto-Upgrader
-
-| Property | Provisional value |
-| --- | --- |
-| Stable ID | `automation:business-auto-upgrader` |
-| Purchase cost | $250,000 |
-| Requirements | Player Level 20, owned Dockside Detail Level 25, Neon Mile controlled |
+| Purchase | **$50,000** |
+| Requirements | **Player Level 12, Dockside owned at Level 15, Neon Mile controlled** |
 | Target | Dockside Detail only |
-| Initial setting | Disabled; explicit enable required |
-| Cadence | One attempt per 30 seconds while enabled |
-| Disabled progress | Paused at its exact stored milliseconds |
-| Successful attempt | Buy exactly one level at the current manual upgrade price |
-| Upgrade price | $150 × current Level²; Level 25/26/27 cost $93,750 / $101,400 / $109,350 |
-| XP | Same 25 base XP per level as manual upgrades; floor each modified award separately |
-| Statistic | +1 businessLevelsPurchased per successful upgrade |
-| Heat | No Heat from purchasing/toggling/upgrading |
-| Max/insufficient funds | Consume attempt, no purchase; stays enabled |
-| Offline | Works if enabled, using the shared 8/10/12h credited cap |
-| Rebirth | Ownership, enabled state and progress reset; no refund |
+| Starts | **Disabled**, explicit enable required; no retroactive spending |
+| Cadence | One attempt every **30,000ms** while enabled |
+| Disabled progress | Pauses at the exact stored remainder |
+| Success | One level at the current manual upgrade price, same XP and paid-level statistic |
+| Failure to afford / max level | Consumes attempt, spends nothing, remains enabled |
+| Heat | No Heat from purchase, toggle or upgrade |
+| Offline | Works while enabled, within the shared credited duration |
+| Rebirth | Both automations' ownership, enabled state and progress reset; no refund |
 
-Production before a purchase uses the old level; subsequent production uses the new
-level. Completed Dispatcher earnings can fund purchases only once earned. Dispatcher
-reward/XP/Heat still uses one outer batch; internal purchase boundaries do not add
-Event rolls. Learn the Streets rank 1 yields 27 XP per upgrade: three cost-paying
-upgrades award 81 XP, not 82. There is no reserve/budget or ongoing fee, no auto business
-purchase, and no new achievement/statistic. All other prices and modifiers are unchanged.
+Auto-Upgrader level 25/26/27 purchases cost **$93,750 / $101,400 / $109,350**.
+Production and spendable earnings respect purchase boundaries: old levels produce
+before the purchase, new levels afterward. Dispatcher reward/XP/Heat retain one
+outer batch; internal boundaries never add Event rolls. No reserve/budget exists.
+
+## Garage and territories
+
+**Vortex S9** (`vehicle:starter-sport-sedan`): **$50,000**, requires Player Level 7,
+Dockside owned at Level 10; **+15% global business production**. Ownership survives
+Rebirth, including the modifier once Dockside is repurchased. No equip/tuning system.
+At Dockside Level 4 with all production equipment it gives **$7.115625/sec**;
+this is a valid retained-ownership example, not a waived acquisition requirement.
+
+| Territory / stable ID | Acquisition | Requirements | Effect |
+| --- | --- | --- | --- |
+| Waterfront / `territory:waterfront` | Fresh baseline, free | Always present | No bonus |
+| Neon Mile / `territory:neon-mile` | **$50,000**, once per run | Player Level 12; Dockside owned at Level 15 | +10% manual/Dispatcher cash; +10 Heat on acquisition |
+
+Neon grants no production or XP. It resets on Rebirth; reacquisition pays the current
+price and counts another territory action. Waterfront neither costs nor increments
+the statistic. Acquired content retains ownership when current eligibility changes.
+
+## Heat and Crew
+
+Heat is an integer **0–100**, clamped on gains/reductions. Only job cash is penalized.
+
+| Heat | Tier | Job cash multiplier |
+| --- | --- | --- |
+| 0–19 | COLD | 1.00 |
+| 20–39 | NOTICED | 1.00 |
+| 40–59 | WATCHED | 1.00 |
+| 60–79 | HOT | 0.90 |
+| 80–100 | MANHUNT | 0.75 |
+
+- Manual job: **+1**, after old-tier payout.
+- Dispatcher: **floor(completed cycles / 5)** per outer batch, then cooling.
+- Neon acquisition: **+10**. Event effects are listed below.
+- Cooling: **−1 per 60,000ms**, or **45,000ms with assigned Mara**.
+- Lay Low: **$500**, **−10** to a minimum of zero, no cooldown/reward.
+
+No cross-batch Dispatcher Heat counter exists: batches of 3 then 2 generate zero;
+one batch of 5 generates one. Start-tier cash applies to every job in a batch.
+Gain/clamp precedes cooling across the entire elapsed batch. No hidden transient peak
+is reconstructed for achievements/statistics. Positive Heat retains cooling remainder;
+zero clears it. Assignment changes preserve the numerical remainder; Mara's existing
+50,000ms remainder cools on the next positive elapsed call, not on assignment itself.
+
+| Crew / stable ID | Cost | Requirements | Assigned slot and effect |
+| --- | --- | --- | --- |
+| Rico Vale / `crew:rico-vale` | $20,000 | Player Level 8 | Operations: +10% job/Dispatcher cash |
+| Mara Knox / `crew:mara-knox` | $30,000 | Player Level 10; Neon Mile | Operations: 45-second cooling |
+| Jax Mercer / `crew:jax-mercer` | $40,000 | Player Level 12; Dockside Level 15 | Logistics: +15% global business production |
+
+Only assigned Crew act. Rico and Mara compete for Operations; Jax occupies Logistics.
+Recruitment gives no XP/Heat. Assignment/replacement/unassignment are free, with no
+immediate decay, and all Crew reset on Rebirth. No bench bonuses or upkeep.
+
+Full job example with both normal upgrades, Fast Talker rank 1, Neon and Rico:
+**($25 + $5) × 1.20 × 1.10 × 1.10 × 1.10 = $47.916** before final cent flooring.
+COLD pays **$47.91**, HOT **$43.12**, MANHUNT **$35.93**.
+
+## City Events
+
+Online opportunity: **600,000ms (10 minutes)**, chance **35%** (`roll < 0.35`).
+At most one attempt per outer reconciliation, retaining modulo progress. No eligible
+content consumes zero RNG; otherwise failed chance consumes one value, successful
+chance consumes a second for uniform selection in Hot Tip → Shakedown → Warehouse
+order. No weights, queue, history, pity timer or chains.
+
+| Event / stable ID | Eligibility | Choice ID | Fixed outcome |
+| --- | --- | --- | --- |
+| Hot Tip / `event:hot-tip` | Player Level 5 | `choice:take-tip` | +$1,500, +5 Heat |
+| Hot Tip | Same | `choice:play-safe` | −5 Heat |
+| Shakedown / `event:shakedown` | Heat ≥20 | `choice:pay-off` | Spend $1,000, −10 Heat |
+| Shakedown | Same | `choice:refuse` | +10 Heat |
+| Warehouse Opportunity / `event:warehouse-opportunity` | Dockside owned, Player Level 10 | `choice:invest` | Spend $2,500 then receive $4,000, +5 Heat |
+| Warehouse Opportunity | Same | `choice:pass` | No effect |
+
+Each event has exactly two choices. Paid choices use current reconciled cash;
+Warehouse requires the full $2,500, never just a net transaction. Money is fixed,
+unmodified by job/Heat/Crew/skills, with **no XP or EP**. Heat clamps normally.
+One pending event freezes only its timer; successful resolution resets it to zero.
+No event cadence/RNG/choice occurs offline. Rebirth discards pending and progress.
+
+## Rebirth, Empire Points and permanent skills
+
+Rebirth requires **Player Level 20 AND Dockside Level 25**; neither cash nor other
+content is required. Reward:
+**floor(Player Level / 10) + floor(Dockside Level / 10)**.
+20/25 gives **4 EP**, 37/48 gives **7 EP**, 100/100 gives **20 EP**.
+There is no inherent bonus from EP or Rebirth count. Count and reward update atomically.
+
+Vehicles, unspent EP, Rebirth count, skills, achievements and lifetime statistics
+survive. Cash, XP, businesses/levels/fractions, normal upgrades, both automations,
+Neon, Heat/remainder, Crew and City Events reset; Waterfront is restored. No refunds.
+
+| Empire Foundations skill | Max rank | EP/rank | Requirement | Effect per rank |
+| --- | --- | --- | --- | --- |
+| Streetwise Investment | 3 | 1 | None | +5% global production |
+| Fast Talker | 2 | 1 | Streetwise 1 | +10% job cash |
+| Learn the Streets | 2 | 2 | Streetwise 1 | +10% XP |
+| Silent Partner | 2 | 3 | Streetwise 3 | +10% global production |
+| Never Sleeps | 2 | 2 | Streetwise 2 | +2 hours offline cap |
+
+Exactly five skills, one tree; full cost **19 EP**, no respec. Three Streetwise ranks
+sum to +15%, not three multiplicative 5% factors. Distinct production sources multiply.
+Vortex plus Streetwise 1 gives **$0.75 × 1.15 × 1.05 = $0.905625/sec** at rebuilt
+Dockside 1. Fast Talker 1 gives $27.50 base-job cash after temporary upgrades reset.
+
+## Offline and persistence
+
+One shared credited cap: **8h / 10h / 12h** at Never Sleeps ranks **0 / 1 / 2**.
+Business production, Dispatcher Money/XP/Heat, cooling and enabled Auto-Upgrader
+use that same duration. Discarded time earns nothing. From zero Dispatcher progress,
+eight credited hours complete **2,880 jobs / 14,400 base XP**. At COLD this pays
+$72,000 base, or $103,680 with both job upgrades, before any automated spending.
+Offline is one durable candidate before publication; failures cannot partially credit it.
+Import rebases timing, never simulates historical timestamps.
+
+**Save v15 and CE1 are unchanged.** All stored cash, XP, ownership, levels, progress,
+permanent state and savedAt retain their exact values. New acquisition prices/gates
+apply prospectively. Already-owned items receive no refund and owe no difference.
+
+## Observational progression
+
+Six achievements grant **no rewards**: First Steps (Player 2), Dockside Operator
+(owned Dockside 10), Neon Takeover (Neon owned), Running Hot (current Heat ≥60),
+Crew Chief (all three recruited in the same run), First Rebirth (count ≥1).
+Unlocks are permanent; conditions observe the final authoritative command/batch state.
+
+Eight permanent statistics grant **no rewards/modifiers**: manualJobsCompleted,
+automatedJobsCompleted, businessLevelsPurchased, territoriesAcquired,
+crewMembersRecruited, eventsResolved, rebirthsCompleted, peakHeat. Paid levels exclude
+initial business acquisition; territory actions exclude Waterfront; recruitment counts
+repeat post-Rebirth actions, never assignments; every successful event choice counts,
+including PASS, never spawn/discard. Rebirth increments both counts atomically.
+Peak Heat is the maximum final authoritative Heat observed, not a reconstructed
+within-batch maximum. No balance evaluator reads achievements or statistics.

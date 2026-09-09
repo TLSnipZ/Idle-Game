@@ -140,7 +140,7 @@ describe('five-section presentation navigation', () => {
       city: { ...s.city, ownedTerritoryIds: fresh().city.ownedTerritoryIds } }));
     eligible.select(SECTION.city.id); expect(eligible.render()).toContain('Insufficient cash'); expect(eligible.render()).toContain('Met — Player Level 12');
     const auto = harness(view({ ...s, automation: fresh().automation })); auto.select(SECTION.operations.id);
-    expect(auto.render()).toContain('More cash needed'); expect(auto.render()).toContain('Met — Player Level 20');
+    expect(auto.render()).toContain('More cash needed'); expect(auto.render()).toContain('Met — Player Level 12');
     const owned = harness(view(autoUpgraderState(100))); owned.select(SECTION.operations.id);
     expect(owned.render()).toContain('MAX LEVEL'); expect(owned.render()).toContain('DISABLE');
   });

@@ -23,7 +23,7 @@ describe('auto spending at online, offline and durable boundaries',()=>{
   it('purchase reconciles old elapsed and starts disabled; enabling credits no past purchases',()=>{
     const s=initial(),f=rebirthRuntime({...s,automation:createInitialGameState().automation});f.at(30000);
     f.game.execute(state=>purchaseAutomation(state,A.id));let after=f.game.getSnapshot().result.state;
-    expect(level(after)).toBe(25);expect(after.automation.enabledIds).toEqual([]);expect(after.economy.cash).toBe('75056250');
+    expect(level(after)).toBe(25);expect(after.automation.enabledIds).toEqual([]);expect(after.economy.cash).toBe('95056250');
     f.at(60000);f.game.execute(state=>setAutomationEnabled(state,A.id,true));after=f.game.getSnapshot().result.state;
     expect(level(after)).toBe(25);expect(after.automation.businessAutoUpgradeElapsedMs).toBe(0);
     f.at(89999);f.tick();expect(level(f.game.getSnapshot().result.state)).toBe(25);

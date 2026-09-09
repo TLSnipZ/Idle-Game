@@ -60,7 +60,7 @@ describe('central achievement command and elapsed boundaries', () => {
     expect(f.game.getSnapshot().result.state.progression.xp).toBe(100);
   });
   it('Neon acquisition spends exactly its cost and captures territory plus final Heat', () => {
-    const s = fresh(), f = runtime({ ...s, progression: { xp: getXpThresholdForLevel(12) }, economy: { cash: moneyFromMinorUnits('10000000') }, businesses: { ...s.businesses, owned: { [B.id]: { level: 15 } } }, city: { ...s.city, heat: 50 } });
+    const s = fresh(), f = runtime({ ...s, progression: { xp: getXpThresholdForLevel(12) }, economy: { cash: moneyFromMinorUnits('5000000') }, businesses: { ...s.businesses, owned: { [B.id]: { level: 15 } } }, city: { ...s.city, heat: 50 } });
     f.game.execute(s => acquireTerritory(s,'territory:neon-mile'));
     expect(f.game.getSnapshot().result.state.economy.cash).toBe('0'); expect(f.game.getSnapshot().result.state.city.heat).toBe(60);
     expect(owns(f.game.getSnapshot().result.state)).toContain('achievement:neon-takeover'); expect(owns(f.game.getSnapshot().result.state)).toContain('achievement:running-hot');

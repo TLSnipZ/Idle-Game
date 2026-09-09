@@ -32,7 +32,7 @@ describe('Solara City catalog and acquisition', () => {
     expect(TERRITORY_CATALOG.map(t => t.id)).toEqual(['territory:waterfront', 'territory:neon-mile']);
     expect(new Set(TERRITORY_CATALOG.map(t => t.id)).size).toBe(2);
     expect(W).toMatchObject({ starting: true, purchaseCost: '0', requirements: [], modifiers: [] });
-    expect(N).toMatchObject({ starting: false, purchaseCost: '10000000', requirements: [
+    expect(N).toMatchObject({ starting: false, purchaseCost: '5000000', requirements: [
       { type: 'player-level', minimumLevel: 12 }, { type: 'business-owned', businessId: B.id },
       { type: 'business-level', businessId: B.id, minimumLevel: 15 },
     ], modifiers: [{ id: 'modifier:territory-neon-mile-job-reward', sourceId: N.id,
@@ -66,7 +66,7 @@ describe('Solara City catalog and acquisition', () => {
     expect(result.state).toBe(state);
   });
   it('spends exactly once atomically, retaining XP, EP, count, progress and both fractions', () => {
-    const base = territoryState();
+    const base = { ...territoryState(), economy: { cash: N.purchaseCost } };
     const state = freeze({ ...base, businesses: { ...base.businesses, productionRemainderMilliCents: 975,
       productionRemainderSubMilliCents: { numerator: '1', denominator: '3' } },
       automation: { ...base.automation, starterJobElapsedMs: 7000 } });
@@ -79,7 +79,7 @@ describe('Solara City catalog and acquisition', () => {
   });
   it('distinguishes insufficient funds, duplicate and unknown identity without state changes', () => {
     const base = territoryState();
-    const state = freeze({ ...base, economy: { cash: moneyFromMinorUnits('9999999') } });
+    const state = freeze({ ...base, economy: { cash: moneyFromMinorUnits('4999999') } });
     expect(selectTerritory(state, N.id)).toMatchObject({ eligible: true, affordable: false, canAcquire: false });
     for (const [id, error] of [[N.id, 'insufficient-funds'], [W.id, 'already-owned'], ['territory:missing', 'unknown-territory']]) {
       const result = acquireTerritory(state, id); expect(result).toEqual({ ok: false, state, error }); expect(result.state).toBe(state);
@@ -88,7 +88,7 @@ describe('Solara City catalog and acquisition', () => {
   });
   it('spends precisely at large Money values without Number conversion', () => {
     const state = { ...territoryState(), economy: { cash: moneyFromMinorUnits('900719925474099312345') } };
-    expect(acquireTerritory(state, N.id).state.economy.cash).toBe('900719925474089312345');
+    expect(acquireTerritory(state, N.id).state.economy.cash).toBe('900719925474094312345');
   });
   it('uses pure typed territory requirements in deterministic AND lists', () => {
     const state = freeze(territoryState()), before = JSON.stringify(state);
@@ -186,7 +186,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(evaluateJobReward(result.state)).toMatchObject({ reward: '2750' });
     expect(acquireTerritory(result.state, N.id)).toMatchObject({ ok: false, error: 'requirements-not-met' });
     const rebuilt = { ...result.state, economy: territoryState().economy, businesses: territoryState().businesses, progression: territoryState().progression };
-    expect(acquireTerritory(rebuilt, N.id)).toMatchObject({ ok: true, state: { economy: { cash: '0' }, city: { ...state.city, heat: 10 } } });
+    expect(acquireTerritory({ ...rebuilt, economy: { cash: N.purchaseCost } }, N.id)).toMatchObject({ ok: true, state: { economy: { cash: '0' }, city: { ...state.city, heat: 10 } } });
   });
   it('accepts grandfathered Neon Mile below acquisition gates, rejects corrupt authoritative ownership', () => {
     const state = { ...createInitialGameState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } };

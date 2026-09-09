@@ -1,11 +1,11 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 9A: UX & Information Architecture.**
+idle/tycoon browser game. **Phase 9C: Balance & Progression Pass.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
-Hire the **Delivery Dispatcher** for **$7,500** at Player Level 3 after acquiring Dockside: it performs
+Hire the **Delivery Dispatcher** for **$5,000** at Player Level 3 after acquiring Dockside: it performs
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both
 job upgrades). Manual deliveries remain available and do not reset its progress.
 Existing saves/codes migrate automatically. Pre-XP saves start with XP 0 while preserving existing progress.
@@ -79,7 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C and all of Phase 8 were manually verified live by the user. Phase 9A was manually verified live by the user. Phase 9B live verification remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C and all of Phase 8 were manually verified live by the user. Phase 9A was manually verified live by the user. Phase 9B was manually verified live by the user. Phase 9C live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -140,7 +140,7 @@ XP rounds down once per award; Dispatcher XP rounds once per completed-job batch
 
 
 **Solara City** starts with Waterfront controlled, with no gameplay bonus. Take
-control of **Neon Mile** for **$100,000** at Player Level 12 and Dockside Level 15
+control of **Neon Mile** for **$50,000** at Player Level 12 and Dockside Level 15
 to gain **+10% manual/Dispatcher cash**, including offline Dispatcher jobs. XP and
 business production are unaffected. Territories beyond Waterfront reset on Rebirth;
 vehicles and permanent skills remain. Older saves gain Waterfront only. Manual deliveries, Dispatcher batches and Neon Mile
@@ -168,7 +168,7 @@ and peak Heat. They survive Rebirth and CE1 backups and provide no gameplay bonu
 Older saves retain their exact Rebirth history; other new counters start at zero.
 
 
-**Business Auto-Upgrader** costs **$250,000** at Player Level 20, Dockside Level 25
+**Business Auto-Upgrader** costs **$50,000** at Player Level 12, Dockside Level 15
 and controlled Neon Mile. It starts **disabled**: explicitly enable automatic
 spending to attempt one paid Dockside level upgrade every 30 seconds, online and
 offline. Disabled progress pauses. Each successful purchase uses the same price,

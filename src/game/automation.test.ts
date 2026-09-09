@@ -15,7 +15,7 @@ import { reconcileOffline, OFFLINE_CAP_MS } from './offline-progress';
 import { rational } from '../shared/rational';
 function owned(): GameState {
   const state = createInitialGameState();
-  return { ...state, progression: { xp: 400 }, economy: { cash: moneyFromMinorUnits('750000') },
+  return { ...state, progression: { xp: 400 }, economy: { cash: moneyFromMinorUnits('500000') },
     businesses: { ...state.businesses, owned: { [STARTER_BUSINESS.id]: { level: 4 } },
       productionRemainderMilliCents: 975, productionRemainderSubMilliCents: rational(1n, 3n) } };
 }
@@ -25,7 +25,7 @@ function unlocked(progress = 0): GameState {
 }
 describe('Delivery Dispatcher purchase', () => {
   it('pins the sole delegation identity, prerequisite, exact cost and interval', () => {
-    expect(D).toMatchObject({ id: 'automation:delivery-dispatcher', name: 'Delivery Dispatcher', purchaseCost: '750000', intervalMs: 10000, requirements: [{ type: 'business-owned', businessId: STARTER_BUSINESS.id }, { type: 'player-level', minimumLevel: 3 }] });
+    expect(D).toMatchObject({ id: 'automation:delivery-dispatcher', name: 'Delivery Dispatcher', purchaseCost: '500000', intervalMs: 10000, requirements: [{ type: 'business-owned', businessId: STARTER_BUSINESS.id }, { type: 'player-level', minimumLevel: 3 }] });
     expect(isMoney(D.purchaseCost)).toBe(true);
     expect(createInitialAutomationState()).toEqual({ enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
   });
@@ -34,11 +34,11 @@ describe('Delivery Dispatcher purchase', () => {
     const result = purchaseAutomation(state, D.id);
     expect(result).toMatchObject({ ok: true, state: { economy: { cash: '0' }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } } });
     expect(result.state.businesses).toBe(state.businesses); expect(result.state.upgrades).toBe(state.upgrades);
-    expect(state.economy.cash).toBe('750000'); expect(state.automation.unlockedIds).toEqual([]);
+    expect(state.economy.cash).toBe('500000'); expect(state.automation.unlockedIds).toEqual([]);
   });
   it.each(['unknown-automation', 'already-unlocked', 'insufficient-funds', 'prerequisite-not-met'])('preserves full state on %s', error => {
     const state = error === 'already-unlocked' ? unlocked(1234) : error === 'prerequisite-not-met' ? createInitialGameState()
-      : error === 'insufficient-funds' ? { ...owned(), economy: { cash: moneyFromMinorUnits('749999') } } : owned();
+      : error === 'insufficient-funds' ? { ...owned(), economy: { cash: moneyFromMinorUnits('499999') } } : owned();
     const result = purchaseAutomation(state, error === 'unknown-automation' ? 'automation:missing' : D.id);
     expect(result).toMatchObject({ ok: false, state, error }); expect(result.state).toBe(state);
   });

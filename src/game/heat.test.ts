@@ -133,13 +133,13 @@ describe('atomic Heat sources and exact job penalties', () => {
     }
   });
   it.each([[0,10],[95,100]])('Neon acquisition at %i Heat clamps to %i atomically', (heat,next) => {
-    const s = frozen(heated(heat,heat ? 42000 : 0,territoryState())); const r = acquireTerritory(s,NEON_MILE.id);
+    const s = frozen(heated(heat,heat ? 42000 : 0,{ ...territoryState(), economy: { cash: NEON_MILE.purchaseCost } })); const r = acquireTerritory(s,NEON_MILE.id);
     expect(r.ok).toBe(true); expect(r.state.city.heat).toBe(next); expect(r.state.city.heatDecayElapsedMs).toBe(s.city.heatDecayElapsedMs);
     expect(r.state.economy.cash).toBe('0'); expect(r.state.progression).toBe(s.progression); expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,territoriesAcquired:1,peakHeat:next}});
     expect(acquireTerritory(r.state,NEON_MILE.id).state).toBe(r.state);
   });
   it('failed acquisition never adds Heat or spends', () => {
-    for (const s of [heated(50,0,territoryState(false,11)), { ...heated(50,0,territoryState()), economy: { cash: moneyFromMinorUnits('9999999') } }]) {
+    for (const s of [heated(50,0,territoryState(false,11)), { ...heated(50,0,territoryState()), economy: { cash: moneyFromMinorUnits('4999999') } }]) {
       expect(acquireTerritory(s,NEON_MILE.id).ok).toBe(false); expect(acquireTerritory(s,NEON_MILE.id).state).toBe(s);
     }
     const s = createInitialGameState(); expect(acquireTerritory(s,WATERFRONT.id).state).toBe(s);
