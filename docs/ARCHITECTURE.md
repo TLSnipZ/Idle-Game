@@ -2241,3 +2241,54 @@ scroll behavior, without accessing gameplay timers. Existing palette tokens rema
 representative text and focus contrast pairs passed a numerical spot-check, so no
 rebrand or token adjustment was needed. See `ACCESSIBILITY_REVIEW.md` for evidence
 and the limits of DOM/style checks versus real-browser/assistive-technology review.
+
+## Phase 9D — bounded runtime work and no-op reconciliation
+
+Phase 9C was manually verified live by the user. Its balance remains authoritative
+in BALANCING.md. Phase 9D changes no config, content, GameState or persistence schema:
+**save v15 and CE1 remain unchanged**.
+
+`simulateGameElapsed` returns the identical state and zero result metadata for zero
+elapsed, before production/modifier/Dispatcher evaluation or historical observation.
+The inexpensive automation-shape corruption check remains even at zero elapsed.
+This assumes an authoritative snapshot; it is not a substitute for save validation.
+Bootstrap still has its explicit, separate current-state achievement evaluation.
+The monotonic runtime similarly advances its anchor and retains fractional time when
+less than one whole millisecond is available, without entering simulation or publishing.
+Negative, nonfinite and unsafe clock values retain the existing suspension behavior;
+invalid pure elapsed returns `invalid-elapsed`. Positive small intervals retain both
+production fractions and Heat/automation/event progress exactly.
+
+Auto-Upgrader retains chronological purchase boundaries and now has a **4,096-segment
+technical work budget**. Every segment must advance elapsed; corrupt/nonadvancing
+segments fail loudly. If additional purchase-capable segments are still needed after
+that budget, the whole candidate returns `simulation-limit` with the original state.
+This is an explicit limit for unusually large direct/online calls, not an offline
+credit cap: the maximum 12h catch-up has at most 1,440 attempts plus one trailing
+partial segment. A multi-day suspended browser interval can exceed the budget; the
+existing failure handler pauses without saving partial work, and reload uses the
+normal capped offline transaction. No partial interval or automatic retry is published.
+
+Existing max-level/absent-target behavior remains: collapse all remaining no-purchase
+attempts into one exact production segment and BigInt modulo progress. It can finish
+even after the purchase-segment budget is reached. Disabled/unowned automation uses
+the unsplit simulation path. No analytical affordability approximation was added.
+
+Dispatcher cumulative prefix differences still provide cash at each purchase boundary,
+with one outer XP floor, interval-start Money modifiers, outer `floor(jobs / 5)` Heat
+and final mathematical cooling. Mara's 45s interval preserves the globally valid
+remainder below 60s. Production remains rational, including milli-cent and sub-milli-cent
+remainders. Event progression runs once after successful outer economy simulation:
+zero RNG before opportunity completion, while pending, offline or when nothing is
+eligible; otherwise one chance draw and a second draw only on success. Failures before
+that boundary consume no RNG. Intentional differences between separately reconciled
+Dispatcher/Heat/Event batches are not treated as associativity bugs.
+
+Persistence and React needed no changes: one offline candidate write precedes publication;
+import and Rebirth retain durable replacement, ordinary successful meaningful commands
+retain their existing save boundary, and autosave remains every five seconds rather
+than each 250ms refresh. Autosave also rebases the timestamp, so unchanged state alone
+is not a reason to suppress it. Only the active primary presentation tree renders;
+central runtime, confirmation controllers and stable polite feedback remain mounted.
+No blanket memoization, new timers, worker, cache, dependency or accessibility setting
+was introduced. See RUNTIME_HARDENING.md for the audit/test coverage and limitations.

@@ -1,4 +1,4 @@
-import { BUSINESS_AUTO_UPGRADER } from '../features/automation';
+import { BUSINESS_AUTO_UPGRADER, isAutomationState } from '../features/automation';
 import { simulateAutoUpgrader } from './simulate-auto-upgrader';
 import type { UpgradeBusinessResult } from './upgrade-business';
 import { countStatistic, observePeakHeat } from './statistics';
@@ -10,19 +10,27 @@ import { isElapsedMs } from '../features/economy';
 import { requireXp } from '../features/progression';
 import { simulateElapsed } from './simulate-elapsed';
 import { simulateAutomation } from './simulate-automation';
-import { subtractMoney } from '../features/economy';
+import { moneyFromMinorUnits, subtractMoney } from '../features/economy';
 import type { Money } from '../features/economy';
 import type { AutomationSimulationResult } from './simulate-automation';
 import type { GameState } from './game-state';
 
-export type GameSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: StatisticsError }
+export type GameSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: StatisticsError | 'simulation-limit' }
   | Extract<UpgradeBusinessResult, { ok: false }>
   | Extract<AutomationSimulationResult, { ok: false }>
   | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money; readonly autoUpgrader?: { readonly levelsPurchased: number; readonly spent: Money } });
 /** One transaction: production, start-tier job rewards/XP, batch Heat gain, then cooling. */
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
-  if (elapsedMs > 0 && state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) return simulateAutoUpgrader(state, elapsedMs);
+  // A valid authoritative snapshot needs no evaluation or historical observation
+  // when no time passed. Bootstrap's separate achievement policy remains outside.
+  if (elapsedMs === 0) {
+    // Retain the zero-time corruption check without planning rewards or production.
+    if (!isAutomationState(state.automation)) throw new RangeError('Invalid authoritative automation');
+    return { ok: true, state, businessIncome: moneyFromMinorUnits('0'),
+      automation: { completedJobs: 0, income: moneyFromMinorUnits('0'), xpEarned: 0 } };
+  }
+  if (state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) return simulateAutoUpgrader(state, elapsedMs);
   const business = simulateElapsed(state, elapsedMs);
   if (!business.ok) return business;
   requireXp(state.progression.xp);
@@ -34,7 +42,5 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   const candidate = city === automation.state.city ? automation.state : { ...automation.state, city };
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', automation.automation.completedJobs);
   if (!counted.ok) return counted;
-  // Zero elapsed (including future-clock bootstrap) is not a historical observation.
-  const observed = elapsedMs > 0 ? observePeakHeat(counted.state) : counted.state;
-  return { ...automation, state: elapsedMs > 0 ? unlockEligibleAchievements(observed).state : observed, businessIncome: income.value };
+  return { ...automation, state: unlockEligibleAchievements(observePeakHeat(counted.state)).state, businessIncome: income.value };
 }

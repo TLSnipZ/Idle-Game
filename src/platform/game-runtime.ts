@@ -103,6 +103,12 @@ export function createGameRuntime(
       return false;
     }
     const wholeMs = Math.floor(elapsed);
+    // Retain sub-ms time without entering selectors/simulation or publishing.
+    if (wholeMs === 0) {
+      baseline = now;
+      remainderMs = elapsed;
+      return true;
+    }
     let result: GameSimulationResult;
     try {
       result = simulateOnlineElapsed(snapshot.result.state, wholeMs, timing.random ?? browserRandom);

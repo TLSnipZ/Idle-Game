@@ -1,6 +1,6 @@
 import { BUSINESS_AUTO_UPGRADER } from '../features/automation';
 import { getBusinessLevel, MAX_BUSINESS_LEVEL } from '../features/businesses';
-import { addMoney, earnCash, moneyFromMinorUnits, subtractMoney } from '../features/economy';
+import { addMoney, earnCash, isElapsedMs, moneyFromMinorUnits, subtractMoney } from '../features/economy';
 import { addXp } from '../features/progression';
 import { decayHeat, dispatcherHeatGain, gainHeat } from '../features/heat';
 import { unlockEligibleAchievements } from './achievements';
@@ -12,6 +12,10 @@ import { upgradeBusiness } from './upgrade-business';
 import type { UpgradeBusinessResult } from './upgrade-business';
 import type { GameState } from './game-state';
 import type { GameSimulationResult } from './simulate-game-elapsed';
+
+// Technical work budget, not a gameplay/offline cap. All 1,440 offline boundaries
+// fit. Larger direct inputs either collapse after max level or fail atomically.
+export const MAX_AUTO_UPGRADE_SEGMENTS = 4096;
 
 export function attemptBusinessAutoUpgrade(state: GameState):
   { readonly ok: true; readonly state: GameState; readonly outcome: 'upgraded' | 'insufficient-funds' | 'max-level' | 'not-owned' }
@@ -36,12 +40,18 @@ export function simulateAutoUpgrader(state: GameState, elapsedMs: number): GameS
   let businessIncome = moneyFromMinorUnits('0');
   let spent = moneyFromMinorUnits('0');
   let levelsPurchased = 0;
+  let segments = 0;
   const interval = BUSINESS_AUTO_UPGRADER.intervalMs;
   while (elapsed < elapsedMs) {
     const level = getBusinessLevel(candidate.businesses, BUSINESS_AUTO_UPGRADER.targetBusinessId);
     // With no possible purchase, collapsing all remaining no-op attempts is exact.
     const noPurchases = level === null || level === MAX_BUSINESS_LEVEL;
+    if (!noPurchases && segments >= MAX_AUTO_UPGRADE_SEGMENTS)
+      return { ok: false, state, error: 'simulation-limit' };
     const segment = noPurchases ? elapsedMs - elapsed : Math.min(elapsedMs - elapsed, interval - progress);
+    if (!isElapsedMs(segment) || segment === 0 || elapsed + segment <= elapsed)
+      throw new RangeError('Auto-Upgrader segment must advance elapsed time');
+    segments += 1;
     const business = simulateElapsed(candidate, segment);
     if (!business.ok) return { ...business, state };
     const produced = subtractMoney(business.state.economy.cash, candidate.economy.cash);

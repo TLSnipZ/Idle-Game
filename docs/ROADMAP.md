@@ -35,8 +35,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 8C — Late-Game Automation Foundation (complete; user verified live) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
 | 9A — UX & Information Architecture (complete; user verified live) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
 | 9B — Accessibility & Interaction Polish (complete; user verified live) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
-| 9C — Balance & Progression Pass (implementation complete; live pending) | Deterministic progression audit; three acquisition adjustments | Reproducible models, unchanged v15/CE1 and runtime contracts |
-| 9D — Performance & Runtime Hardening (next / deferred) | Runtime/performance review | Preserve post-9C balance, deterministic batching and durable persistence |
+| 9C — Balance & Progression Pass (complete; user verified live) | Deterministic progression audit; three acquisition adjustments | Reproducible models, unchanged v15/CE1 and runtime contracts |
+| 9D — Performance & Runtime Hardening (implementation complete; live pending) | Runtime/performance review | Preserve post-9C balance, deterministic batching and durable persistence |
+| 9E — Release Candidate / Base Game Freeze (next / deferred) | Regression verification and release readiness | Preserve balance, v15/CE1, runtime and accessibility contracts |
 | Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
 ## Current status
@@ -231,8 +232,8 @@ Event/automation controls, reduced motion, zoom and mobile behavior. Dedicated
 screen-reader certification was not performed; this is not a certification claim. Phase 9 remains incomplete. No balance, save or content change.
 
 
-Phase 9C Balance & Progression Pass implementation is complete; **live verification
-remains pending**. [BALANCE_AUDIT.md](BALANCE_AUDIT.md) records deterministic Active,
+Phase 9C Balance & Progression Pass implementation is complete and **manually verified
+live by the user**. [BALANCE_AUDIT.md](BALANCE_AUDIT.md) records deterministic Active,
 Idle-Leaning and Optimized routes, baseline findings, paybacks and limitations.
 Only three acquisition groups change: Dispatcher price, Neon Mile price and
 Auto-Upgrader price/level gates. Current values are in BALANCING.md. Existing saves
@@ -240,9 +241,23 @@ keep their exact state; v15/CE1, rewards, production, Heat, batching, Events,
 automation chronology, achievements/statistics, offline durability and 9A/9B UI
 contracts remain unchanged. No new content or system was added.
 
-**Phase 9D Performance & Runtime Hardening is next/deferred**, with explicit
+**Phase 9D Performance & Runtime Hardening is implemented; live verification is pending**, with explicit
 preservation of post-9C balance, Dispatcher XP/Heat batching, Mara remainder,
 outer Event RNG/online-only opportunities, Auto-Upgrader chronology, offline
 write-before-publication, import timing, achievement/statistics semantics and
 9A navigation / 9B accessibility, focus and live regions. Phase 9 is not complete.
 Post-roadmap Rebranding has not started.
+
+
+Phase 9D adds zero/sub-millisecond fast paths and bounded Auto-Upgrader work with
+atomic failure on unsupported direct workloads. Exact pre-9D twelve-hour fixtures,
+RNG counts, fraction arithmetic, persistence and navigation/accessibility regressions
+protect existing behavior. Max-level collapse, disabled/unowned unsplit simulation,
+250ms refresh and five-second autosave were reviewed and retained. No balance,
+schema, content, render architecture or dependency change was needed.
+
+**Phase 9E Release Candidate / Base Game Freeze is next/deferred.** Preserve post-9C
+balance, all 9D safeguards, v15/CE1, deterministic Event RNG, offline durability,
+atomic import/Rebirth, Phase 9A navigation and Phase 9B accessibility. Prioritize
+regression verification and release readiness, not new features. Phase 9 remains
+incomplete; Rebranding has not started.
