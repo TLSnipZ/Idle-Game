@@ -19,14 +19,14 @@ function eligible() {
 describe('Garage presentation',()=>{
   it('shows 0/1, scoped effect, accessible unmet requirements and disabled purchase',()=>{
     const html=render(createInitialGameState());expect(html).toContain('Owned vehicles: 0 / 1');
-    expect(html).toContain('Not met — Player Level 7');expect(html).toContain('Not met — Own Dockside Detail');
-    expect(html).toContain('Not met — Dockside Detail Level 10');expect(html).toContain('LOCKED');
-    expect(html).toContain('+15% global business production');expect(html).toContain('$50,000.00');
+    expect(html).toContain('Required — Player Level 7');expect(html).toContain('Required — Own Dockside Detail');
+    expect(html).toContain('Required — Dockside Detail Level 10');expect(html).toContain('LOCKED');
+    expect(html).toContain('+15% global business production');expect(html).toContain('$50,000');
     expect(html).toContain('aria-label="Buy Vortex S9"');expect(html).toContain('aria-describedby');expect(html).toContain('disabled');
   });
   it('distinguishes readiness, insufficient cash and paused session',()=>{
     expect(render(eligible())).toContain('Ready to collect');expect(render(eligible())).not.toContain('disabled');
-    expect(render({...eligible(),economy:{cash:moneyFromMinorUnits('0')}})).toContain('More cash needed');
+    expect(render({...eligible(),economy:{cash:moneyFromMinorUnits('0')}})).toContain('INSUFFICIENT CASH');
     expect(render(eligible(),true)).toContain('Session paused');expect(render(eligible(),true)).toContain('disabled');
   });
   it('shows grandfathered ownership active with no locks or repurchase button',()=>{

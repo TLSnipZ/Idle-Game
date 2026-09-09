@@ -74,7 +74,7 @@ Sunset orange-to-magenta is reserved for future special moments, not every panel
 - **Status cards:** compact Overview summaries and HUD. Cash/Level lead; Heat and
   EP remain visible. Overview routes to management rather than duplicating it.
 - **Standard cards:** shared surface, quiet border, coherent padding. Requirements
-  remain readable even when locked. Met/Not met text stays separate from cash.
+  remain readable even when locked. Met/Required text stays separate from cash.
 - **Feature cards:** Rebirth, City Events and the Vortex showroom use elevated
   surfaces, more space and selective accent edges. No empty fake artwork slot.
 - **Primary actions:** purchases, upgrades and delivery share magenta/violet with
@@ -256,3 +256,39 @@ Local browser review was attempted but returned `ERR_BLOCKED_BY_CLIENT`. Desktop
 mobile, zoom and visual identity therefore have structural/static review only in
 this environment. Live visual verification remains pending; no GitHub Pages visual
 review or accessibility certification is claimed.
+
+## POST 1C presentation conventions
+
+The approved POST 1A identity and POST 1B hierarchy remain unchanged. Live findings
+are addressed through compact spacing/copy, never smaller touch targets or hidden
+core HUD values. On mobile, whole navigation controls wrap; labels never split.
+Cash, Level, Heat and EP stay visible. The redundant mobile tagline may be hidden.
+Healthy autosave is a quiet, non-live header label; saving failures retain visible,
+polite feedback. Overview has a direct VIEW CREW shortcut to City.
+
+| Context | Deterministic English/US display policy |
+| --- | --- |
+| Cash balance | Full exact cents, fixed two decimals, grouping: `$1,234.56`. No compact balance by default. |
+| Purchase / exact costs | Full exact value; omit `.00` on whole-dollar prices: `$50,000`. Never compact a purchase requirement. |
+| Cash rewards | Full exact cents, fixed two decimals; signed outcomes put the sign before `$`. |
+| Business rates | Round only display to nearest cent, half up: `$49.40/sec`, `$51.55/sec`, `$0.86/sec`. Fixed two decimals, no approximation prefix. |
+| XP / EP / levels / statistics / Heat | Integers, grouped where useful; no decimal zeros. |
+| Percent effects | Signed concise percentages, e.g. `+15%`, `-10%`, `+0.01%`; no trailing fractional zeros. |
+| Optional large summaries | Central helper keeps values below 1,000,000 full; M/B/T use two decimals. Beyond the T range, retain full digits. Not applied to prices, costs, rewards or current Cash. |
+
+`src/app/number-format.ts` consumes exact already-derived cents/rationals and never
+feeds display rounding back to simulation. Existing `formatCash` and XP/bonus
+entry points reuse that policy. `RateValue` groups the rate and `/sec` in an inline
+flex row; exceptionally long digits can wrap inside the value while the unit stays
+beside it. Never apply nowrap to whole panels or hide exact prices in tooltips.
+
+Status: LOCKED means missing progression prerequisites, followed by concrete
+Required/Met rows. Avoid repeating generic “requirements not met” beneath them.
+AVAILABLE means unlocked, not necessarily funded; show INSUFFICIENT CASH/EP when
+needed. Skills with funds say READY TO PURCHASE, maxed skills retain MAX RANK.
+Empty slots have one absence message and static assignment guidance. Normal cards
+explain consequences, not fractional remainders or batch-rounding internals.
+
+No gameplay, assets, fonts, dependencies or guidance engine are introduced. Preserve
+these conventions in POST 2A along with approved reference governance. See
+[POST_ROADMAP.md](POST_ROADMAP.md) for current status and deferred priorities.

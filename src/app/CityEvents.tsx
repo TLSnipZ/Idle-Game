@@ -34,7 +34,7 @@ export function CityEvents({ state, paused, announcement, onChoose }: {
     </> : <>
       <p>No active event</p>
       <p>Next opportunity: {view.countdown}</p>
-      <p>Events may appear during active play.</p>
+      <p>A city situation may appear when the online opportunity timer completes.</p>
     </>}
   </section>;
 }

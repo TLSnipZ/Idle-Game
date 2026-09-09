@@ -17,7 +17,7 @@ describe('non-blocking City Events presentation',()=>{
     const s={...createInitialGameState(),events:{pendingEventId:null,opportunityElapsedMs}};
     expect(eventPresentation(s).countdown).toBe(countdown);const html=render(s);
     expect(html).toContain('CITY EVENTS');expect(html).toContain('No active event');expect(html).toContain(`Next opportunity: ${countdown}`);
-    expect(html).toContain('Events may appear during active play');expect(html).not.toMatch(/guaranteed|Hot Tip|SHAKEDOWN|event-history|<button/);
+    expect(html).toContain('A city situation may appear when the online opportunity timer completes');expect(html).not.toMatch(/guaranteed|Hot Tip|SHAKEDOWN|event-history|<button/);
   });
   it.each(EVENT_CATALOG)('$name exposes exactly two deterministic choices and outcomes without blocking play',event=>{
     const s=eventState(event.id),view=eventPresentation(s),html=render(s);
@@ -35,7 +35,7 @@ describe('non-blocking City Events presentation',()=>{
   it.each([[SHAKE,'99999','$1,000.00'],[WAREHOUSE,'249999','$2,500.00']] as const)('%s keeps free alternative enabled when cash is short',(id,cash,cost)=>{
     const s=eventState(id,cash),html=render(s),view=eventPresentation(s);
     expect(view.choices.map(c=>c.canChoose)).toEqual([false,true]);expect(html.match(/disabled=""/g)).toHaveLength(1);
-    expect(html).toContain(`Requires ${cost} — insufficient cash`);expect(html).not.toContain('LOCKED');
+    expect(html).toContain(`Requires ${cost} to choose this option`);expect(html).not.toContain('LOCKED');
   });
   it('persistence/runtime suspension semantically disables both choices',()=>{
     expect(render(eventState(TIP),true).match(/disabled=""/g)).toHaveLength(2);

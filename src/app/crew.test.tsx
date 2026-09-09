@@ -25,10 +25,10 @@ describe('Crew presentation and actions',()=>{
     const html=render();expect(html).toContain('CREW');expect(html).toContain('Recruited: 0 / 3 · Active: 0 / 2');
     expect(html.match(/class="panel crew-card"/g)).toHaveLength(3);expect(html.match(/class="panel crew-slot"/g)).toHaveLength(2);
     expect(html.indexOf('Rico Vale')).toBeLessThan(html.indexOf('Mara Knox'));expect(html.indexOf('Mara Knox')).toBeLessThan(html.indexOf('Jax Mercer'));
-    expect(html.indexOf('OPERATIONS')).toBeLessThan(html.indexOf('LOGISTICS'));expect(html).toContain('No active specialist');expect(html).toContain('crew-catalog');
+    expect(html.indexOf('OPERATIONS')).toBeLessThan(html.indexOf('LOGISTICS'));expect(html).toContain('No specialist assigned.');expect(html).toContain('crew-catalog');
     expect(html).toContain('Operations is a choice');expect(html).not.toMatch(/<img|auto.assign|wages|crew-xp/);
   });
-  it.each([[R,'$20,000.00','Player Level 8'],[M,'$30,000.00','Control Neon Mile'],[J,'$40,000.00','Dockside Detail Level 15']] as const)('shows $0.name price and central requirement text', (member,cost,requirement)=>{
+  it.each([[R,'$20,000','Player Level 8'],[M,'$30,000','Control Neon Mile'],[J,'$40,000','Dockside Detail Level 15']] as const)('shows $0.name price and central requirement text', (member,cost,requirement)=>{
     const html=render();expect(html).toContain(cost);expect(html).toContain(requirement);
     expect(html).toContain(`aria-label="Recruit ${member.name}"`);expect(html).toContain(`aria-describedby="${member.id}-requirements"`);
     expect(crewPresentation(createInitialGameState(),member.id)).toMatchObject({status:'LOCKED',canRecruit:false});

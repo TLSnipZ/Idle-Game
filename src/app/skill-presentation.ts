@@ -8,7 +8,7 @@ type SkillView = NonNullable<ReturnType<typeof selectSkill>>;
 export function describeSkillEffect(effect: SkillView['currentEffect']): string {
   if (effect.type === 'offline-cap') return `${formatOfflineDuration(effect.capMs)} offline cap`;
   const scope = effect.target.stat === 'business-production' ? 'global business production'
-    : effect.target.stat === 'job-reward' ? 'starter-job Money reward' : 'XP gain';
+    : effect.target.stat === 'job-reward' ? 'Starter Job cash reward' : 'XP gain';
   return `${formatBonus(effect.basisPoints)} ${scope}`;
 }
 export function describeSkillPurchase(result: PurchaseSkillResult, id: unknown): string {

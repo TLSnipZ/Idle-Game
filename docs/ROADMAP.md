@@ -274,14 +274,10 @@ post-roadmap status. The frozen baseline is `21c5858ad6a11b1ec9d1260cd580fe94d22
 The approved Solara palette, typography, tokens and [ART_DIRECTION.md](ART_DIRECTION.md)
 remain the visual foundation.
 
-**POST 1B Deep UI Transformation implementation complete; live visual verification
-pending.** Overview, Operations, City, Garage and Empire now use distinct feature/
-support compositions within the existing five sections. Responsive structures,
-explicit outcomes and accessible controls remain central. No Golden Reference
-assets generated, no font/image binaries added, and no content expansion started.
-Save v15, CE1, post-9C balance, runtime safeguards and accessibility remain frozen.
+**POST 1B Deep UI Transformation is manually verified live by the user.**
+**POST 1C Live UX Polish & Number Formatting implementation is complete; live
+verification is pending.** No assets, Golden References or content expansion started.
 
-Next visual work may begin a separately requested, controlled Golden Reference set
-with a tiny reviewed batch. Explicit user approval is required before references
-become authoritative. Later UI/art and gameplay expansion phases are not complete
-or automatically authorized by POST 1B.
+[POST_ROADMAP.md](POST_ROADMAP.md) is the current post-roadmap priority/status source:
+POST 1C → POST 2A Vortex S9 Golden Reference → POST 2B Crew/Territory/Event references
+→ controlled asset batches. Future work is neither started nor automatically authorized.

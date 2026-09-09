@@ -2316,3 +2316,14 @@ Heat cooling attribution uses the existing Crew selector. No formulas are copied
 into React. Rebirth/import interaction state remains owned by the stable shell,
 and confirmation focus/live-region contracts are unchanged. Optional future art
 regions are presentation wrappers only, never GameState fields or saved paths.
+
+## POST 1C presentation formatting boundary
+
+`src/app/number-format.ts` centralizes deterministic display categories: balances,
+exact prices/rewards, integer counts, percentages and rational currency rates.
+Rates round with integer arithmetic only when constructing display text; no game,
+feature-model or platform transition consumes these strings. `RateValue` groups
+value/unit markup with overflow-safe layout. Existing Cash/XP/bonus entry points
+reuse the display policy. No GameState, migration, runtime or persistence changes.
+Healthy autosave status moved to a non-live header label; error feedback and the
+five-second persistence cadence remain unchanged. Navigation is still local UI state.

@@ -8,7 +8,7 @@ import { selectRebirth } from '../game/rebirth';
 import { selectAutoUpgrader } from '../game/automation-selectors';
 import { effectiveProductionRates } from '../game/effective-stats';
 import { getLevelProgress } from '../features/progression';
-import { formatCash } from '../features/economy/ui';
+import { formatCash } from './number-format';
 import { addRational, ZERO_RATIONAL } from '../shared/rational';
 import { formatProduction } from './stat-format';
 import { eventPresentation } from './event-presentation';

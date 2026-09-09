@@ -1,6 +1,6 @@
 import { ModifierBreakdown } from './ModifierBreakdown';
 import { evaluateJobReward } from '../game/effective-stats';
-import { formatCash } from '../features/economy/ui';
+import { formatCash } from './number-format';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { UpgradeCard } from './UpgradeCard';
@@ -22,7 +22,7 @@ describe('equipment presentation', () => {
   it('shows real requirement, effect and price with an accessible disabled button', () => {
     const view = selectUpgrade(createInitialGameState(), PRESSURE_WASHER.id);
     const html = renderToStaticMarkup(<UpgradeCard view={view} paused={false} onPurchase={() => {}} />);
-    expect(html).toContain('Commercial Pressure Washer'); expect(html).toContain('$2,500.00');
+    expect(html).toContain('Commercial Pressure Washer'); expect(html).toContain('$2,500');
     expect(html).toContain('+25% Dockside Detail production'); expect(html).toContain('Own Dockside Detail');
     expect(html).toContain('disabled=""'); expect(html).toContain('aria-labelledby="upgrade:commercial-pressure-washer-heading"');
     expect(html).toContain('aria-describedby="upgrade:commercial-pressure-washer-requirement"');
@@ -30,7 +30,7 @@ describe('equipment presentation', () => {
   it('shows affordability and enables exactly at the purchase price', () => {
     const poor = selectUpgrade(owned('249999'), PRESSURE_WASHER.id);
     expect(poor?.canPurchase).toBe(false);
-    expect(renderToStaticMarkup(<UpgradeCard view={poor} paused={false} onPurchase={() => {}} />)).toContain('More cash needed');
+    expect(renderToStaticMarkup(<UpgradeCard view={poor} paused={false} onPurchase={() => {}} />)).toContain('INSUFFICIENT CASH');
     const ready = selectUpgrade(owned(), PRESSURE_WASHER.id);
     expect(ready?.canPurchase).toBe(true);
     expect(renderToStaticMarkup(<UpgradeCard view={ready} paused={false} onPurchase={() => {}} />)).not.toContain('disabled');
@@ -48,10 +48,10 @@ describe('equipment presentation', () => {
     const state = purchaseUpgrade(owned(), PRESSURE_WASHER.id).state;
     const progress = selectBusinessProgress(state, STARTER_BUSINESS.id);
     const html = renderToStaticMarkup(<BusinessCard progress={progress} onUpgrade={() => {}} owned canPurchase={false} paused={false} onPurchase={() => {}} />);
-    expect(html).toContain('$4.6875'); expect(html).toContain('$5.625');
-    expect(html).toContain('$3.75/sec'); expect(html).toContain('+25%');
+    expect(html.replace(/<[^>]*>/g, '')).toContain('$4.69/sec'); expect(html.replace(/<[^>]*>/g, '')).toContain('$5.63/sec');
+    expect(html.replace(/<[^>]*>/g, '')).toContain('$3.75/sec'); expect(html).toContain('+25%');
   });
-  it.each([[75n, 1n, '$0.75'], [375n, 4n, '$0.9375'], [1875n, 4n, '$4.6875'], [1n, 3n, '≈$0.0033'], [100000000n, 1n, '$1,000,000.00']])('formats rational rate %# without Number conversion', (n, d, expected) => {
+  it.each([[75n, 1n, '$0.75/sec'], [375n, 4n, '$0.94/sec'], [1875n, 4n, '$4.69/sec'], [1n, 3n, '$0.00/sec'], [100000000n, 1n, '$1,000,000.00/sec']])('formats rational rate %# without Number conversion', (n, d, expected) => {
     if (typeof n !== 'bigint' || typeof d !== 'bigint') throw Error('fixture');
     expect(formatProduction(rational(n, d))).toBe(expected);
   });
@@ -66,14 +66,14 @@ it.each(UPGRADE_CATALOG)('catalog card $name exposes readiness, requirement and 
     upgrades: { purchasedIds: upgrade.id === 'upgrade:fleet-logistics' ? [PRESSURE_WASHER.id] : [] } });
   const poor = selectUpgrade(eligible('0'), upgrade.id);
   const render = (state: ReturnType<typeof selectUpgrade>) => renderToStaticMarkup(<UpgradeCard view={state} paused={false} onPurchase={() => {}} />);
-  expect(render(poor)).toContain('More cash needed'); expect(render(poor)).toContain('disabled=""');
+  expect(render(poor)).toContain('INSUFFICIENT CASH'); expect(render(poor)).toContain('disabled=""');
   const ready = selectUpgrade(eligible(upgrade.purchaseCost), upgrade.id);
   expect(render(ready)).toContain(`Buy ${upgrade.name}`); expect(render(ready)).not.toContain('disabled');
   const purchased = purchaseUpgrade(eligible(upgrade.purchaseCost), upgrade.id).state;
   expect(render(selectUpgrade(purchased, upgrade.id))).toContain('PURCHASED');
   expect(render(selectUpgrade(purchased, upgrade.id))).not.toContain('<button');
   const fresh = render(selectUpgrade(createInitialGameState(), upgrade.id));
-  expect(fresh).toContain(upgrade.requirements.length === 0 ? 'No requirements' : 'Requirement not met');
+  expect(fresh).toContain(upgrade.requirements.length === 0 ? 'No requirements' : 'Required');
 });
 
 it('explains named production bonuses and the exact combined effective value', () => {
@@ -81,7 +81,7 @@ it('explains named production bonuses and the exact combined effective value', (
   const html = renderToStaticMarkup(<BusinessCard progress={selectBusinessProgress(state, STARTER_BUSINESS.id)} onUpgrade={() => {}} owned canPurchase={false} paused={false} onPurchase={() => {}} />);
   expect(html).toContain('Commercial Pressure Washer: +25%');
   expect(html).toContain('Industrial Detailing Line: +50%'); expect(html).toContain('Fleet Logistics: +10%');
-  expect(html).toContain('$7.7343'); // level 5 display truncation is explicitly approximate
+  expect(html.replace(/<[^>]*>/g, '')).toContain('$7.73/sec'); // Exact production is unchanged; the player-facing rate rounds to cents.
 });
 
 it('explains effective $36 delivery reward with flat-before-percent named sources', () => {

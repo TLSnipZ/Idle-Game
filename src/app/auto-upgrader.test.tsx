@@ -16,14 +16,14 @@ function render(state=initial(),paused=false) {return renderToStaticMarkup(<Auto
 describe('explicit automatic spending presentation',()=>{
   it('shows a locked card, exact price/gates and spending disclosure',()=>{
     const html=render(createInitialGameState());
-    for(const text of ['BUSINESS AUTO-UPGRADER','$50,000.00','Player Level 12','Own Dockside Detail','Dockside Detail Level 15','Control Neon Mile','every 30 seconds','Automatically spends cash','LOCKED'])expect(html).toContain(text);
+    for(const text of ['BUSINESS AUTO-UPGRADER','$50,000','Player Level 12','Own Dockside Detail','Dockside Detail Level 15','Control Neon Mile','every 30 seconds','Automatically spends cash','LOCKED'])expect(html).toContain(text);
     expect(html).toContain('disabled=""');expect(html).toContain('aria-describedby="auto-upgrader-requirements auto-upgrader-spending"');
   });
   it('separates insufficient cash from satisfied requirements; ready purchase remains explicit',()=>{
     const s=initial(),available={...s,automation:createInitialGameState().automation};
     expect(render(available)).toContain('Ready to purchase. Starts disabled');expect(render(available)).not.toContain('disabled=""');
     const poor={...initial(25,'4999900'),automation:createInitialGameState().automation};
-    expect(render(poor)).toContain('More cash needed');expect(render(poor)).not.toContain('LOCKED');expect(render(poor)).toContain('disabled=""');
+    expect(render(poor)).toContain('INSUFFICIENT CASH');expect(render(poor)).not.toContain('LOCKED');expect(render(poor)).toContain('disabled=""');
   });
   it('purchase starts disabled, removes buying, then enabled/disabled states follow the command',()=>{
     const s=initial(),purchased=purchaseAutomation({...s,automation:createInitialGameState().automation},A.id).state;
@@ -34,7 +34,7 @@ describe('explicit automatic spending presentation',()=>{
   });
   it('shows exact level/cost and accessible paused/current progress without a new UI clock',()=>{
     const s=initial(),state={...s,automation:{...s.automation,businessAutoUpgradeElapsedMs:20001}},html=render(state);
-    for(const text of ['Dockside Level 25','$93,750.00','Next attempt in 10s','for="auto-upgrader-progress"','max="30000"','value="20001"'])expect(html).toContain(text);
+    for(const text of ['Dockside Level 25','$93,750','Next attempt in 10s','for="auto-upgrader-progress"','max="30000"','value="20001"'])expect(html).toContain(text);
     expect(render(state,true)).toContain('PAUSED');expect(render(state,true)).toContain('disabled=""');
     expect(html).toContain('panel upgrade-panel');expect(html).not.toMatch(/<canvas|<svg|<select/);
   });

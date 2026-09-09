@@ -3,7 +3,7 @@ import type { CrewEffect } from '../features/crew';
 import { selectCrewMember } from '../game/crew-selectors';
 import type { GameState } from '../game/game-state';
 import type { CrewCommandResult } from '../game/crew-commands';
-import { formatCash } from '../features/economy/ui';
+import { formatPrice } from './number-format';
 import { formatModifier } from './stat-format';
 
 export function describeCrewEffect(effect: CrewEffect): string {
@@ -16,7 +16,7 @@ export function crewPresentation(state: GameState, id: unknown) {
   return { ...view, effect: describeCrewEffect(view.definition.effect),
     status: view.assignment ? 'ACTIVE' : view.recruited ? 'RECRUITED' : !view.requirements.met ? 'LOCKED' : 'AVAILABLE',
     availability: view.assignment ? `Active in ${view.assignment.name}` : view.recruited ? 'Unassigned — effect inactive'
-      : !view.requirements.met ? 'Meet the recruitment requirements' : !view.affordable ? 'Insufficient cash' : 'Ready to recruit',
+      : !view.requirements.met ? '' : !view.affordable ? 'Insufficient cash' : 'Ready to recruit',
   };
 }
 export function describeCrewCommand(result: CrewCommandResult, action: 'recruit' | 'assign' | 'unassign', id?: unknown, slotId?: unknown): string {
@@ -37,6 +37,6 @@ export function describeCrewCommand(result: CrewCommandResult, action: 'recruit'
   if (action === 'unassign') return `${slot?.name ?? 'Crew slot'} unassigned. Specialist remains recruited; effect inactive.`;
   const member = findCrewMember(id);
   if (!member) return 'Crew updated.';
-  return action === 'recruit' ? `${member.name} recruited. -${formatCash(member.recruitmentCost)} · Available for ${member.allowedSlots.map(id => findCrewSlot(id)?.name).join(', ')}. Effect inactive until assigned.`
+  return action === 'recruit' ? `${member.name} recruited. -${formatPrice(member.recruitmentCost)} · Available for ${member.allowedSlots.map(id => findCrewSlot(id)?.name).join(', ')}. Effect inactive until assigned.`
     : `${member.name} assigned to ${slot?.name}. ${describeCrewEffect(member.effect)}.`;
 }

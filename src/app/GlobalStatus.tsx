@@ -1,3 +1,4 @@
+import { formatInteger } from './number-format';
 import type { dashboardPresentation } from './dashboard-presentation';
 import { Navigation } from './Navigation';
 import { SECTION } from './navigation';
@@ -12,7 +13,7 @@ export function GlobalStatus({ view, active, onNavigate, paused }: {
         <div className="hud-cash"><dt>Cash</dt><dd>{view.cash}</dd></div>
         <div className="hud-level"><dt>Player Level</dt><dd>{view.player.currentLevel}</dd></div>
         <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>Heat</dt><dd>{view.heat.heat} · {view.heat.tier.label}</dd></div>
-        <div className="hud-empire"><dt>Empire Points</dt><dd>{view.empire.empirePoints} EP</dd></div>
+        <div className="hud-empire"><dt>Empire Points</dt><dd>{formatInteger(view.empire.empirePoints)} EP</dd></div>
       </dl>
       <Navigation active={active} onNavigate={onNavigate} />
       {(view.event.pending || view.autoActive || paused) && <div className="global-indicators">

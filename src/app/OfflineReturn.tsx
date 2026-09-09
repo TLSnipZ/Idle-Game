@@ -1,6 +1,6 @@
 import { describeLevelIncrease, formatXp } from './progression-presentation';
 import type { OfflineProgress } from '../game/offline-progress';
-import { formatCash } from '../features/economy/ui';
+import { formatCash } from './number-format';
 import { formatOfflineDuration, showOfflineReward } from './offline-presentation';
 
 export function OfflineReturn({ progress, onDismiss }: {

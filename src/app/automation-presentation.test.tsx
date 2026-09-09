@@ -25,14 +25,14 @@ describe('delegation presentation', () => {
     const state = createInitialGameState(); const view = selectDispatcher(state);
     expect(view).toMatchObject({ unlocked: false, eligible: false, canPurchase: false, reward: '2500', intervalMs: 10000, progressMs: 0, remainingMs: 10000 });
     const html = render(state);
-    expect(html).toContain('Delivery Dispatcher'); expect(html).toContain('$5,000.00');
+    expect(html).toContain('Delivery Dispatcher'); expect(html).toContain('$5,000');
     expect(html).toContain('Runs every 10s'); expect(html).toContain('$25.00 per delivery');
-    expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Requirement not met');
+    expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Required');
     expect(html).toContain('disabled'); expect(html).not.toContain('ACTIVE');
     expect(html).toContain('aria-describedby="dispatcher-requirement"');
   });
   it('distinguishes unaffordable and ready states with semantic buttons', () => {
-    expect(render(eligible(moneyFromMinorUnits('499999')))).toContain('More cash needed');
+    expect(render(eligible(moneyFromMinorUnits('499999')))).toContain('INSUFFICIENT CASH');
     const html = render(eligible()); expect(html).toContain('Ready to hire'); expect(html).toContain('<button'); expect(html).not.toContain('disabled');
     expect(render(eligible(), true)).toContain('Session paused');
   });

@@ -1,7 +1,7 @@
 import type { useGame } from './use-game';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
-import { formatCash } from '../features/economy/ui';
+import { formatReward } from './number-format';
 import { selectBusinessProgress, selectOwnsBusiness, selectCanPurchaseBusiness, selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { evaluateXpReward } from '../game/xp-reward';
@@ -25,17 +25,15 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
     <div className="operations-anchor">
       <section className="panel starter-panel" aria-labelledby="starter-heading"><h2 id="starter-heading">Starter job</h2>
             <div className="delivery-block">
-              <p className="eyebrow">Make a connection</p>
-              <h3>A quick run. A fresh start.</h3>
               <p>Take a waterfront delivery and put cash toward your first set of keys.</p>
-              <dl className="action-outcomes"><div><dt>Payout</dt><dd>{reward.ok ? formatCash(reward.reward) : 'Unavailable'}</dd></div>
+              <dl className="action-outcomes"><div><dt>Payout</dt><dd>{reward.ok ? formatReward(reward.reward) : 'Unavailable'}</dd></div>
                 <div><dt>XP</dt><dd>+{xp.ok ? formatXp(xp.reward) : 'Unavailable'}</dd></div>
                 <div><dt>Heat</dt><dd>+{MANUAL_JOB_HEAT}</dd></div></dl>
               <button className="action-button delivery-button" onClick={runStarterJob} disabled={paused}>
                 <span>{STARTER_JOB.label}</span>
-                <span className="reward">+{reward.ok ? formatCash(reward.reward) : 'Unavailable'} <span aria-hidden="true">↗</span></span>
+                <span className="reward">+{reward.ok ? formatReward(reward.reward) : 'Unavailable'} <span aria-hidden="true">↗</span></span>
               </button>
-              {reward.ok && reward.applied.length > 0 && <><p>Base reward: {formatCash(reward.base)}</p><ModifierBreakdown modifiers={reward.applied} /><p>Effective reward: {formatCash(reward.reward)}</p></>}
+              {reward.ok && reward.applied.length > 0 && <><p>Base reward: {formatReward(reward.base)}</p><ModifierBreakdown modifiers={reward.applied} /><p>Effective reward: {formatReward(reward.reward)}</p></>}
             </div>
       </section>
       <section className="operations-business" aria-labelledby="businesses-heading"><h2 id="businesses-heading">Businesses</h2>

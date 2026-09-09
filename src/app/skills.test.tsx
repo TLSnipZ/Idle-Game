@@ -39,7 +39,7 @@ describe('Empire Foundations presentation and interactions', () => {
     expect(render()).toContain('LOCKED'); expect(render()).toContain('Streetwise Investment Rank 1');
     const broke = skillState({ [ROOT]: 1 }, 0);
     expect(selectSkill(broke, FAST)).toMatchObject({ canPurchase: false, insufficientEp: true, requirements: { met: true } });
-    expect(render(broke)).toContain('Not enough Empire Points.');
+    expect(render(broke)).toContain('AVAILABLE · INSUFFICIENT EP');
     expect(selectSkill(skillState({ [ROOT]: 1 }), FAST)).toMatchObject({ canPurchase: true, nextCost: 1 });
     const maxed = skillState({ [ROOT]: 3, [FAST]: 2, [LEARN]: 2, [SILENT]: 2, [NEVER]: 2 });
     expect(render(maxed).match(/MAXED/g)).toHaveLength(5); expect(render(maxed)).not.toContain('Purchase rank');

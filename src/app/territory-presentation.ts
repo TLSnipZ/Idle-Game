@@ -4,25 +4,25 @@ import type { TerritoryDefinition } from '../features/territories';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
 import { selectTerritory } from '../game/territory-selectors';
 import type { GameState } from '../game/game-state';
-import { formatCash } from '../features/economy/ui';
+import { formatPrice } from './number-format';
 import { formatModifier } from './stat-format';
 
 export function describeTerritoryEffect(definition: TerritoryDefinition): string {
   if (definition.modifiers.length === 0) return 'Starting foothold · No gameplay bonus';
-  return definition.modifiers.map(modifier => `${formatModifier(modifier)} starter-job & Dispatcher cash reward`).join(' · ') + ' · XP unchanged';
+  return definition.modifiers.map(modifier => `${formatModifier(modifier)} Starter Job & Dispatcher cash reward`).join(' · ') + ' · XP unchanged';
 }
 export function territoryPresentation(state: GameState, id: unknown) {
   const view = selectTerritory(state, id);
   if (!view) return null;
   return { ...view, effect: describeTerritoryEffect(view.definition),
     status: view.owned ? 'CONTROLLED' : view.eligible ? 'AVAILABLE' : 'LOCKED',
-    availability: view.owned ? 'Under your control.' : !view.eligible ? 'Requirements not met.'
-      : view.affordable ? 'Ready to take control.' : 'Requirements satisfied · Insufficient cash.',
+    availability: view.owned ? 'Under your control.' : !view.eligible ? ''
+      : view.affordable ? 'Ready to take control.' : 'INSUFFICIENT CASH',
   };
 }
 export function describeTerritoryAcquisition(result: AcquireTerritoryResult, id: unknown): string {
   const territory = findTerritory(id);
-  if (result.ok && territory) return `${territory.name} controlled. -${formatCash(territory.purchaseCost)} · ${describeTerritoryEffect(territory)} · +${territory.acquisitionHeat} Heat (maximum ${MAX_HEAT}).`;
+  if (result.ok && territory) return `${territory.name} controlled. -${formatPrice(territory.purchaseCost)} · ${describeTerritoryEffect(territory)} · +${territory.acquisitionHeat} Heat (maximum ${MAX_HEAT}).`;
   if (result.ok) return 'Territory controlled.';
   switch (result.error) {
     case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';

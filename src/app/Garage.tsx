@@ -1,7 +1,7 @@
 import { VEHICLE_CATALOG } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
 import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
-import { formatCash } from '../features/economy/ui';
+import { formatPrice } from './number-format';
 import { formatModifier } from './stat-format';
 import { RequirementList } from './RequirementList';
 
@@ -20,14 +20,14 @@ export function Garage({ state, paused, onPurchase }: {
       return <article key={vehicle.id} className={`panel vehicle-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
         <header className="showroom-stage"><p className="eyebrow">Performance collection · Permanent ownership</p>
         <div className="panel-heading"><h3 id={heading}>{vehicle.name}</h3>
-          <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? 'OWNED' : 'NOT OWNED'}</span></div>
+          <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? 'OWNED' : view.eligible ? 'AVAILABLE' : 'LOCKED'}</span></div>
         <p className="eyebrow">{vehicle.category}</p></header><div className="vehicle-specification"><p>{vehicle.description}</p>
         <p className="ownership-badge">PERMANENT VEHICLE · Kept through Rebirth</p>
         <p className="production">{formatModifier(vehicle.modifier)} global business production{view.owned ? paused ? ' · Session paused' : ' · Active' : ''}</p>
         {!view.owned && <>
-          <p>Price: <strong>{formatCash(vehicle.purchaseCost)}</strong></p>
+          <p>Price: <strong>{formatPrice(vehicle.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
-          <p>{!view.eligible ? 'LOCKED — Requirements not met.' : view.affordable ? 'Ready to collect.' : 'More cash needed.'}</p>
+          {view.eligible && <p>{view.affordable ? 'Ready to collect.' : 'INSUFFICIENT CASH'}</p>}
           <button className="action-button purchase-button" disabled={paused || !view.canPurchase} aria-describedby={requirements}
             aria-label={`Buy ${vehicle.name}`} onClick={() => onPurchase(vehicle.id)}>{paused ? 'Session paused' : 'Collect vehicle'}</button>
         </>}

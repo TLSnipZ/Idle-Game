@@ -113,7 +113,7 @@ describe('five-section presentation navigation', () => {
     for (const text of ['$1,000,000.00','18.75','Heat 0','Territories controlled: 2 / 2','Recruited: 0 / 3','Active assignments: 0 / 2','Rebirth requirements met']) expect(html).toContain(text);
     expect(html).not.toMatch(/Buy Business|Lay low to|Recruit Rico|Confirm Rebirth|achievement-card|statistics-entry|skill-node|territory-card/);
     for (const button of buttons(component)) button.onClick();
-    expect(navigate.mock.calls.map(call => call[0])).toEqual([SECTION.operations.id, SECTION.city.id, SECTION.empire.id, SECTION.collection.id]);
+    expect(navigate.mock.calls.map(call => call[0])).toEqual([SECTION.operations.id, SECTION.city.id, SECTION.empire.id, SECTION.city.id, SECTION.collection.id]);
     expect(JSON.stringify(s)).toBe(before);
   });
   it('global Cash/Level/Heat/EP and Overview refresh from one supplied live state', () => {
@@ -151,12 +151,12 @@ describe('five-section presentation navigation', () => {
   });
   it('preserves distinct locked, insufficient-cash and owned states in the moved cards', () => {
     const locked = harness(); locked.select(SECTION.city.id);
-    for (const text of ['Not met — Player Level 12','Recruit Rico Vale','Not met — Player Level 8']) expect(locked.render()).toContain(text);
+    for (const text of ['Required — Player Level 12','Recruit Rico Vale','Required — Player Level 8']) expect(locked.render()).toContain(text);
     const s = autoUpgraderState(25,'0'), eligible = harness(view({ ...s, automation: fresh().automation,
       city: { ...s.city, ownedTerritoryIds: fresh().city.ownedTerritoryIds } }));
     eligible.select(SECTION.city.id); expect(eligible.render()).toContain('Insufficient cash'); expect(eligible.render()).toContain('Met — Player Level 12');
     const auto = harness(view({ ...s, automation: fresh().automation })); auto.select(SECTION.operations.id);
-    expect(auto.render()).toContain('More cash needed'); expect(auto.render()).toContain('Met — Player Level 12');
+    expect(auto.render()).toContain('INSUFFICIENT CASH'); expect(auto.render()).toContain('Met — Player Level 12');
     const owned = harness(view(autoUpgraderState(100))); owned.select(SECTION.operations.id);
     expect(owned.render()).toContain('MAX LEVEL'); expect(owned.render()).toContain('DISABLE');
   });

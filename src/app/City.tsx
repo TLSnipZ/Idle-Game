@@ -3,7 +3,7 @@ import { CITY_NAME, TERRITORY_CATALOG } from '../features/territories';
 import type { TerritoryId } from '../features/territories';
 import type { GameState } from '../game/game-state';
 import { selectCity } from '../game/territory-selectors';
-import { formatCash } from '../features/economy/ui';
+import { formatPrice } from './number-format';
 import { territoryPresentation } from './territory-presentation';
 import { RequirementList } from './RequirementList';
 
@@ -27,9 +27,9 @@ export function City({ state, paused, onAcquire, onLayLow }: {
         <div className="territory-story"><p>{territory.description}</p></div><p className="territory-effect">{view.effect}</p>
         {view.owned ? <p>{view.availability}</p> : <>
           <p className="acquisition-warning">Acquisition generates +{territory.acquisitionHeat} Heat.</p>
-          <p>Price: <strong>{formatCash(territory.purchaseCost)}</strong></p>
+          <p>Price: <strong>{formatPrice(territory.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
-          <p>{view.availability}</p>
+          {view.availability && <p>{view.availability}</p>}
           <button className="action-button purchase-button" disabled={paused || !view.canAcquire}
             aria-label={`Take control of ${territory.name}`} aria-describedby={requirements}
             onClick={() => onAcquire(territory.id)}>{paused ? 'Session paused' : 'Take control'}</button>

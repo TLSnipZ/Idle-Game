@@ -27,7 +27,7 @@ describe('Heat presentation and city interaction',()=>{
     expect(html).not.toMatch(/wanted-star|siren|police encounter/);
   });
   it.each([0,20,59])('shows no penalty below HOT (%i)',heat=>{
-    expect(render(state(heat))).toContain('No starter-job cash penalty');
+    expect(render(state(heat))).toContain('No Starter Job cash penalty');
   });
   it.each([[60,'-10%'],[80,'-25%']] as const)('explains the active cash penalty at %i', (heat,penalty)=>{
     expect(render(state(heat))).toContain(`Starter jobs &amp; Dispatcher cash ${penalty}`);
@@ -46,7 +46,7 @@ describe('Heat presentation and city interaction',()=>{
   it('distinguishes cold, cash shortage, ready and paused controls',()=>{
     expect(render()).toContain('Already cold');expect(render()).toContain('disabled=""');
     const broke=render(state(20,0,'49900'));expect(broke).toContain('Insufficient cash');expect(broke).toContain('disabled=""');
-    const ready=render(state(20));expect(ready).toContain('Reduce Heat by 10');expect(ready).toContain('$500.00');
+    const ready=render(state(20));expect(ready).toContain('Reduce Heat by 10');expect(ready).toContain('$500');
     expect(ready).toContain('aria-label="Lay low to reduce Heat"');expect(ready).not.toContain('disabled=""');
     expect(render(state(20),true)).toContain('Session paused');
   });

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
-import { formatCash } from '../features/economy/ui';
+import { formatPrice, formatReward } from './number-format';
 import { createInitialGameState } from '../game/game-state';
 import { businessPresentation, describeAction } from './game-presentation';
 import { BusinessCard } from './BusinessCard';
@@ -19,7 +19,7 @@ describe('business presentation', () => {
     expect(view.productionLabel).toBe('Potential production');
     expect(view.status).toBe('Not owned');
     expect(view.disabled).toBe(true);
-    expect(view.buttonLabel).toBe('More cash needed');
+    expect(view.buttonLabel).toBe('INSUFFICIENT CASH');
   });
   it('affordability enables acquisition without implying production has started', () => {
     const view = businessPresentation(false, true, false);
@@ -44,8 +44,8 @@ describe('business presentation', () => {
   });
   it('renders configured prospective price/rate and a described disabled purchase button', () => {
     const html = renderToStaticMarkup(<BusinessCard progress={null} onUpgrade={() => {}} owned={false} canPurchase={false} paused={false} onPurchase={() => {}} />);
-    expect(html).toContain(formatCash(STARTER_BUSINESS.purchaseCost));
-    expect(html).toContain(formatCash(STARTER_BUSINESS.baseProductionCentsPerSecond));
+    expect(html).toContain(formatPrice(STARTER_BUSINESS.purchaseCost));
+    expect(html.replace(/<[^>]*>/g, '')).toContain(formatProduction(STARTER_BUSINESS.baseProductionCentsPerSecond));
     expect(html).toContain('Potential production');
     expect(html).toContain('disabled=""');
     expect(html).toContain('aria-describedby="purchase-note"');
@@ -55,7 +55,7 @@ describe('business presentation', () => {
     const html = renderToStaticMarkup(<BusinessCard progress={progress} onUpgrade={() => {}} owned canPurchase={false} paused={false} onPurchase={() => {}} />);
     expect(html).toContain('business-card is-owned');
     expect(html).toContain('Live production');
-    expect(html).toContain(`+${formatCash(STARTER_BUSINESS.baseProductionCentsPerSecond)}`);
+    expect(html.replace(/<[^>]*>/g, '')).toContain(`+${formatProduction(STARTER_BUSINESS.baseProductionCentsPerSecond)}`);
     expect(html).toContain('Upgrade to Level 2');
     expect(html).toContain('disabled=""');
   });
@@ -71,7 +71,7 @@ describe('business presentation', () => {
 
 describe('action feedback', () => {
   it('describes delivery success using the configured reward', () => {
-    expect(describeAction('delivery', { ok: true, state })).toBe(`Delivery completed. +${formatCash(STARTER_JOB.reward)} · +10 XP.`);
+    expect(describeAction('delivery', { ok: true, state })).toBe(`Delivery completed. +${formatReward(STARTER_JOB.reward)} · +10 XP.`);
   });
   it('announces acquisition and the beginning of production', () => {
     const message = describeAction('purchase', { ok: true, state });
@@ -98,12 +98,12 @@ it.each([2, 4, 100])('renders owned level %s with derived rates, costs and max s
   if (!progress) throw Error('fixture');
   const html = renderToStaticMarkup(<BusinessCard owned progress={progress} onUpgrade={() => {}} canPurchase={false} paused={false} onPurchase={() => {}} />);
   expect(html).toContain(`Level ${level}`);
-  expect(html).toContain(formatProduction(progress.production));
+  expect(html.replace(/<[^>]*>/g, '')).toContain(formatProduction(progress.production));
   expect(html).toContain('disabled=""');
   if (progress.upgradeCost && progress.nextProduction) {
-    expect(html).toContain(formatCash(progress.upgradeCost));
-    expect(html).toContain(formatProduction(progress.nextProduction));
-    expect(html).toContain('More cash needed');
+    expect(html).toContain(formatPrice(progress.upgradeCost));
+    expect(html.replace(/<[^>]*>/g, '')).toContain(formatProduction(progress.nextProduction));
+    expect(html).toContain('INSUFFICIENT CASH');
   } else {
     expect(html).toContain('MAX LEVEL'); expect(html).not.toContain('Upgrade to Level 101');
   }

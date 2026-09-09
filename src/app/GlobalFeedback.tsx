@@ -21,6 +21,5 @@ export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
     {rebirthMessage && <p role="status">{rebirthMessage}</p>}
     <div role="alert">{paused && <div className="runtime-error"><strong>Session paused. Production has stopped.</strong><p>Reload to restore the last available local save. Unsaved progress may be lost.</p></div>}</div>
     <div role="status" aria-live="polite" aria-atomic="true" className={storageError ? 'runtime-error' : undefined}>{storageError ? describePersistence(persistence) : ''}</div>
-    {!storageError && <p className="persistence-note">{describePersistence(persistence)}</p>}
   </aside>;
 }

@@ -94,6 +94,18 @@ describe('mounted navigation and one live runtime', () => {
     expect(container.querySelector('.global-indicators')?.textContent).toContain('AUTO-UPGRADER ACTIVE');
     await click('AUTO-UPGRADER ACTIVE · SPENDING ENABLED'); expect(content()).toContain('Automatically spends cash');
   });
+  it('VIEW CREW changes only presentation and leaves saving and RNG idle', async () => {
+    const f = await mount(), before = f.game().getSnapshot().result.state;
+    const writes = f.writes(), reads = f.reads(), raw = f.raw();
+    expect(container.querySelector('.save-health')?.textContent).toBe('Autosave on');
+    expect(container.querySelector('.save-health')?.closest('[aria-live]')).toBeNull();
+    await click('VIEW CREW');
+    expect(content()).toContain('Active assignments');
+    expect(content()).toContain('No specialist assigned.');
+    expect(f.game().getSnapshot().result.state).toBe(before);
+    expect(f.writes()).toBe(writes); expect(f.reads()).toBe(reads); expect(f.raw()).toBe(raw);
+    expect(f.random.next).not.toHaveBeenCalled();
+  });
   it('runtime advances across all sections with unchanged outer batching and one Event RNG attempt', async () => {
     const s = autoUpgraderState(), state: GameState = { ...s, city: { ...s.city, heat: 80 },
       automation: { ...s.automation, unlockedIds: [...s.automation.unlockedIds,DELIVERY_DISPATCHER.id] },

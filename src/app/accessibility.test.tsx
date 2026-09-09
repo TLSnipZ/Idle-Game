@@ -90,16 +90,16 @@ describe('presentation accessibility contracts', () => {
     const s=createInitialGameState(), props={paused:false,onRecruit:noop,onAssign:noop,onUnassign:noop};
     const locked=dom(<CrewPanel {...props} state={s}/>);
     expect(locked.querySelector('[aria-label="Recruit Rico Vale"]')?.hasAttribute('disabled')).toBe(true);
-    expect(locked.textContent).toContain('Not met');
+    expect(locked.textContent).toContain('Required');
     const recruited=dom(<CrewPanel {...props} state={{...s,crew:{recruitedIds:['crew:rico-vale','crew:mara-knox','crew:jax-mercer'],assignments:{operations:null,logistics:null}}}}/>);
     expect([...recruited.querySelectorAll('button')].map(b=>b.getAttribute('aria-label'))).toEqual(['Assign Rico Vale to Operations','Assign Mara Knox to Operations','Assign Jax Mercer to Logistics']);
-    expect(recruited.textContent).toContain('No active specialist');
+    expect(recruited.textContent).toContain('No specialist assigned.');
   });
   it('territory requirements and affordability remain separate text', () => {
     const s=autoUpgraderState(), state={...s,city:{...s.city,ownedTerritoryIds:['territory:waterfront'] as const},economy:{cash:moneyFromMinorUnits('0')}};
     const root=dom(<City state={state} paused={false} onAcquire={noop} onLayLow={noop}/>);
     expect(root.querySelector('[aria-label="Take control of Neon Mile"]')?.hasAttribute('disabled')).toBe(true);
-    expect(root.textContent).toContain('Insufficient cash'); expect(root.textContent).toContain('Met');
+    expect(root.textContent).toContain('INSUFFICIENT CASH'); expect(root.textContent).toContain('Met');
   });
   it('five skills have named purchases and explicit prerequisites independent of graphics', () => {
     const root=dom(<SkillTree state={createInitialGameState()} paused={false} onPurchase={noop}/>);

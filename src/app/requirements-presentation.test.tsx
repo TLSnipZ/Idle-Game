@@ -19,16 +19,16 @@ function upgrade(xp:number) {
 }
 describe('requirements presentation',()=>{
   it('distinguishes a rich but locked player from eligibility and cash shortfall',()=>{
-    expect(upgrade(99)).toContain('Not met — Player Level 2'); expect(upgrade(99)).toContain('disabled');
+    expect(upgrade(99)).toContain('Required — Player Level 2'); expect(upgrade(99)).toContain('disabled');
     expect(upgrade(100)).toContain('Met — Player Level 2'); expect(upgrade(100)).not.toContain('disabled');
     const poor={...createInitialGameState(),progression:{xp:100}};
-    expect(renderToStaticMarkup(<UpgradeCard view={selectUpgrade(poor,S.id)} paused={false} onPurchase={()=>{}} />)).toContain('More cash needed');
+    expect(renderToStaticMarkup(<UpgradeCard view={selectUpgrade(poor,S.id)} paused={false} onPurchase={()=>{}} />)).toContain('INSUFFICIENT CASH');
   });
   it('lists all fleet requirements in order with accessible states',()=>{
     const html=renderToStaticMarkup(<UpgradeCard view={selectUpgrade(rich(),F.id)} paused={false} onPurchase={()=>{}} />);
-    expect(html).toContain('Not met — Own at least one business');
-    expect(html).toContain('Not met — Purchase Commercial Pressure Washer');
-    expect(html).toContain('Not met — Player Level 5');
+    expect(html).toContain('Required — Own at least one business');
+    expect(html).toContain('Required — Purchase Commercial Pressure Washer');
+    expect(html).toContain('Required — Player Level 5');
     expect(html.indexOf('Own at least')).toBeLessThan(html.indexOf('Purchase Commercial'));
     expect(html).toContain('aria-describedby');
     expect(describeAction('equipment',purchaseUpgrade(rich(),F.id))).toContain('Player Level 5');
@@ -44,9 +44,9 @@ describe('requirements presentation',()=>{
     const initial=rich();
     const render=(xp:number,owned:boolean)=>renderToStaticMarkup(<AutomationCard view={selectDispatcher({...initial,progression:{xp},
       businesses:{...initial.businesses,owned:owned?{[B.id]:{level:1}}:{}}})} event={undefined} paused={false} onPurchase={()=>{}} />);
-    expect(render(399,true)).toContain('Not met — Player Level 3');
+    expect(render(399,true)).toContain('Required — Player Level 3');
     expect(render(400,true)).toContain('Ready to hire');
-    expect(render(400,false)).toContain('Not met — Own Dockside Detail');
+    expect(render(400,false)).toContain('Required — Own Dockside Detail');
   });
   it('announces available content alongside level feedback without persistent unlock flags',()=>{
     const html=renderToStaticMarkup(<PlayerProgress xp={400} paused={false} event={{fromLevel:2,toLevel:3,sequence:1,unlocks:[D.name]}} />);

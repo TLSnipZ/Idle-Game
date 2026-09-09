@@ -1,3 +1,4 @@
+import { formatInteger } from './number-format';
 import { useEffect, useRef, useState } from 'react';
 import { REBIRTH_POLICY, selectRebirth } from '../game/rebirth';
 import type { GameState } from '../game/game-state';
@@ -29,18 +30,18 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
     <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>Rebirth</h2>
       <span className="ownership-badge">{preview.eligible ? 'REBIRTH AVAILABLE' : 'BUILD YOUR LEGACY'}</span></div>
     <div className="rebirth-brief"><p>Restart your temporary operation in exchange for permanent Empire Points.</p>
-    <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{preview.empirePoints} EP</dd></div>
-      <div><dt>Rebirths</dt><dd>{preview.rebirthCount}</dd></div></dl>
+    <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{formatInteger(preview.empirePoints)} EP</dd></div>
+      <div><dt>Rebirths</dt><dd>{formatInteger(preview.rebirthCount)}</dd></div></dl>
     <p>Invest unspent Empire Points in permanent skills that survive Rebirth.</p>
     <RequirementList result={preview.requirements} id="rebirth-requirements" />
-    <p className="production rebirth-reward">Reward: {preview.reward === null ? 'Not eligible' : `+${preview.reward} Empire Points`}</p>
+    <p className="production rebirth-reward">Reward: {preview.reward === null ? 'Not eligible' : `+${formatInteger(preview.reward)} Empire Points`}</p>
     </div><div id="rebirth-policy" className="rebirth-policy">
-      <div className="rebirth-keep"><h3>You keep</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
-      <div className="rebirth-lose"><h3>You lose</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
+      <div className="rebirth-keep"><h3>You keep</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label.replace(' (both fractional remainders)', '')}</li>)}</ul></div>
+      <div className="rebirth-lose"><h3>You lose</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label.replace(' (both fractional remainders)', '')}</li>)}</ul></div>
     </div>
     {interaction.confirming ? <div className="save-confirm" role="group" aria-labelledby="rebirth-warning" aria-describedby="rebirth-policy">
       <h3 id="rebirth-warning">Confirm your Rebirth</h3>
-      <p>{preview.reward === null ? 'Requirements are no longer met.' : `Reset the listed temporary progress for +${preview.reward} Empire Points?`}</p>
+      <p>{preview.reward === null ? 'Requirements are no longer met.' : `Reset the listed temporary progress for +${formatInteger(preview.reward)} Empire Points?`}</p>
       <p>The reward is recalculated from current progress when confirmed. This replaces your local save.</p>
       <div className="confirmation-actions"><button ref={cancel} aria-label="Cancel Rebirth" className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>Cancel</button>
       <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
