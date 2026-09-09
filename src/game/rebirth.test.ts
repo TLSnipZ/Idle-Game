@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from './achievements';
 import { describe, expect, it } from 'vitest';
 import { performRebirth, selectRebirth, REBIRTH_POLICY } from './rebirth';
 import { rebirthState } from './test-fixtures/rebirth-state';
@@ -37,7 +38,7 @@ describe('Rebirth eligibility and rewards', () => {
   it.each([[20,25,4],[37,48,7],[100,100,20]])('preview and award agree: %i / %i => %i EP', (player,business,reward) => {
     const state=rebirthState(player,business);
     expect(selectRebirth(state).reward).toBe(reward);
-    expect(performRebirth(state)).toMatchObject({ok:true,reward,state:{permanentProgression:{skills: {}, empirePoints:reward,rebirthCount:1}}});
+    expect(performRebirth(state)).toMatchObject({ok:true,reward,state:{permanentProgression:{ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:reward,rebirthCount:1}}});
   });
   it('ignores cash/collection/equipment/automation and within-level XP in reward', () => {
     const state=rebirthState(37,48);const fresh=createInitialGameState();
@@ -49,7 +50,7 @@ describe('Rebirth eligibility and rewards', () => {
 });
 describe('explicit reset and retention', () => {
   it('resets every temporary field, retains garage and accumulates permanent counters immutably', () => {
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:12,rebirthCount:3}};
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:12,rebirthCount:3}};
     const before=JSON.stringify(state);
     Object.freeze(state);Object.freeze(state.garage);Object.freeze(state.garage.ownedVehicleIds);
     const result=performRebirth(state);expect(result.ok).toBe(true);const after=result.state;
@@ -60,31 +61,31 @@ describe('explicit reset and retention', () => {
     expect(after.businesses.productionRemainderMilliCents).toBe(0);
     expect(after.businesses.productionRemainderSubMilliCents).toEqual(rational(0n));
     expect(after.garage).toBe(state.garage);expect(after.garage.ownedVehicleIds).toEqual([V.id]);
-    expect(after.permanentProgression).toEqual({skills: {}, empirePoints:16,rebirthCount:4});
-    expect(after).toEqual({...createInitialGameState(),garage:state.garage,permanentProgression:{skills: {}, empirePoints:16,rebirthCount:4}});
+    expect(after.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4});
+    expect(after).toEqual({...createInitialGameState(),garage:state.garage,permanentProgression:{ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4}});
     expect(JSON.stringify(state)).toBe(before);expect(result).toEqual(performRebirth(state));
     expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
   });
   it('supports repeat Rebirths: 4 then 7 EP, count 2, same collection', () => {
     const first=performRebirth(rebirthState()).state;
-    expect(first.permanentProgression).toEqual({skills: {}, empirePoints:4,rebirthCount:1});
+    expect(first.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:4,rebirthCount:1});
     const rebuilt={...rebirthState(37,48),garage:first.garage,permanentProgression:first.permanentProgression};
     const second=performRebirth(rebuilt).state;
-    expect(second.permanentProgression).toEqual({skills: {}, empirePoints:11,rebirthCount:2});
+    expect(second.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:11,rebirthCount:2});
     expect(second.garage).toEqual(first.garage);
-    expect(second).toEqual({...createInitialGameState(),garage:first.garage,permanentProgression:{skills: {}, empirePoints:11,rebirthCount:2}});
+    expect(second).toEqual({...createInitialGameState(),garage:first.garage,permanentProgression:{ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:11,rebirthCount:2}});
     expect(performRebirth(second).ok).toBe(false);
   });
   it.each(['empirePoints','rebirthCount'] as const)('rejects %s overflow without any reset', field => {
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0,[field]:MAX_PERMANENT_VALUE}};
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0,[field]:MAX_PERMANENT_VALUE}};
     expect(performRebirth(state)).toEqual({ok:false,error:'overflow',state});expect(performRebirth(state).state).toBe(state);
   });
   it('accepts exact maximum permanent sums',()=>{
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:MAX_PERMANENT_VALUE-4,rebirthCount:MAX_PERMANENT_VALUE-1}};
-    expect(performRebirth(state).state.permanentProgression).toEqual({skills: {}, empirePoints:MAX_PERMANENT_VALUE,rebirthCount:MAX_PERMANENT_VALUE});
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:MAX_PERMANENT_VALUE-4,rebirthCount:MAX_PERMANENT_VALUE-1}};
+    expect(performRebirth(state).state.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:MAX_PERMANENT_VALUE,rebirthCount:MAX_PERMANENT_VALUE});
   });
   it('fails loudly on corrupt authoritative values without hiding them with a fresh run', () => {
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:-1,rebirthCount:0}};
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:-1,rebirthCount:0}};
     const before=JSON.stringify(state);expect(()=>performRebirth(state)).toThrow(RangeError);expect(JSON.stringify(state)).toBe(before);
     expect(()=>performRebirth({...rebirthState(),garage:{ownedVehicleIds:['vehicle:unknown']}})).toThrow(RangeError);
     expect(()=>performRebirth({...rebirthState(),businesses:{...rebirthState().businesses,productionRemainderMilliCents:1000}})).toThrow(RangeError);
@@ -104,11 +105,11 @@ describe('explicit reset and retention', () => {
     expect(reconcileOffline(state,0,1000).state).toEqual(simulateGameElapsed(state,1000).state);
   });
   it('permanent counters provide no stats and never accrue offline', () => {
-    const state=rebirthState();const permanent={...state,permanentProgression:{skills: {}, empirePoints:999999,rebirthCount:99}};
+    const state=rebirthState();const permanent={...state,permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:999999,rebirthCount:99}};
     expect(evaluateBusinessProduction(permanent,B.id,25)).toEqual(evaluateBusinessProduction(state,B.id,25));
     expect(evaluateJobReward(permanent)).toEqual(evaluateJobReward(state));
     const offline=reconcileOffline(permanent,0,12*3600000);
-    expect(offline.state.permanentProgression).toBe(permanent.permanentProgression);
+    expect(offline.state.permanentProgression).toEqual(unlockEligibleAchievements(permanent).state.permanentProgression);
     expect(offline.state).toEqual(simulateGameElapsed(permanent,OFFLINE_CAP_MS).state);
     expect(offline.ok&&offline.progress).toMatchObject({capped:true,xpEarned:14400});
   });

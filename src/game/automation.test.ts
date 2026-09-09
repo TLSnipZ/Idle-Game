@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from './achievements';
 import { describe, expect, it } from 'vitest';
 import { DELIVERY_DISPATCHER as D, createInitialAutomationState, isAutomationState } from '../features/automation';
 import { STARTER_BUSINESS } from '../features/businesses';
@@ -51,7 +52,7 @@ describe('deterministic batch automation', () => {
   });
   it('locked automation ignores elapsed time completely', () => {
     const state = owned(); expect(simulateAutomation(state, Number.MAX_SAFE_INTEGER)).toMatchObject({ ok: true, state, automation: { completedJobs: 0, income: '0' } });
-    expect(simulateGameElapsed(state, 25000).state).toEqual(simulateElapsed(state, 25000).state);
+    expect(simulateGameElapsed(state, 25000).state).toEqual(unlockEligibleAchievements(simulateElapsed(state, 25000).state).state);
   });
   it('retains progress across arbitrary partitions and both business fractions', () => {
     const state = unlocked(5000);
@@ -101,7 +102,7 @@ describe('shared offline window', () => {
   });
   it.each([0, 1, OFFLINE_CAP_MS - 1, OFFLINE_CAP_MS, OFFLINE_CAP_MS + 1234, 12 * 3600000, Number.MAX_SAFE_INTEGER])('uses the same capped interval for both systems %#', elapsed => {
     const state = unlocked(5000); const result = reconcileOffline(state, 0, elapsed);
-    expect(result.state).toEqual(simulateGameElapsed(state, Math.min(elapsed, OFFLINE_CAP_MS)).state);
+    expect(result.state).toEqual(unlockEligibleAchievements(simulateGameElapsed(state, Math.min(elapsed, OFFLINE_CAP_MS)).state).state);
     if (elapsed >= OFFLINE_CAP_MS) {
       expect(result.state.automation.starterJobElapsedMs).toBe(5000);
       expect(result.ok && result.progress.automation?.completedJobs).toBe(2880);
@@ -109,6 +110,6 @@ describe('shared offline window', () => {
   });
   it('future timestamps award no jobs or progress', () => {
     const state = unlocked(9999); const result = reconcileOffline(state, 2000, 1000);
-    expect(result.state).toBe(state); expect(result).toMatchObject({ ok: true, progress: { clockAnomaly: true, automation: { completedJobs: 0, income: '0' } } });
+    expect(result.state).toEqual(unlockEligibleAchievements(state).state); expect(result).toMatchObject({ ok: true, progress: { clockAnomaly: true, automation: { completedJobs: 0, income: '0' } } });
   });
 });

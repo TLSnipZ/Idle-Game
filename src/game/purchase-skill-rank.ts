@@ -16,6 +16,7 @@ export function purchaseSkillRank(state: GameState, id: unknown): PurchaseSkillR
   if (!view.requirements.met) return { ok: false, state, error: 'prerequisite-not-met', requirements: view.requirements };
   if (!view.affordable) return { ok: false, state, error: 'insufficient-empire-points' };
   return { ok: true, state: { ...state, permanentProgression: {
+    ...state.permanentProgression,
     empirePoints: Number(BigInt(state.permanentProgression.empirePoints) - BigInt(view.nextCost)),
     rebirthCount: state.permanentProgression.rebirthCount,
     skills: { ...state.permanentProgression.skills, [skill.id]: view.rank + 1 },

@@ -192,7 +192,7 @@ describe('offline and fresh/Rebirth contracts', () => {
       const r = reconcileOffline(s,1000,1000+duration);
       expect(r.ok && r.progress).toMatchObject({ rewardedElapsedMs: Math.min(cap,duration), actualElapsedMs: duration, capped: duration >= cap, capMs: cap });
       expect(r.state).toEqual(simulateGameElapsed(s,Math.min(cap,duration)).state);
-      expect(r.state.permanentProgression).toEqual(s.permanentProgression);
+      expect(r.state.permanentProgression).toEqual({...s.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover']});
     }
   });
   it('Rebirth clears territory/Heat/remainder and every temporary field, retaining permanent state', () => {

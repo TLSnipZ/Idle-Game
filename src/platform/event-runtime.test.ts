@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it, vi } from 'vitest';
 import { eventState, fakeRandom, TIP, SHAKE, WAREHOUSE } from '../game/test-fixtures/event-state';
 import { rebirthState } from '../game/test-fixtures/rebirth-state';
@@ -26,7 +27,7 @@ import { recruitCrewMember, assignCrewMember, unassignCrewSlot } from '../game/c
 import { getHeatDecayIntervalMs } from '../game/heat-decay-interval';
 function active():GameState {
   const s=rebirthState(),c=crewState({operations:'crew:rico-vale',logistics:'crew:jax-mercer'});
-  return {...s,crew:c.crew,city:{...c.city,heat:79,heatDecayElapsedMs:30000},permanentProgression:{empirePoints:20,rebirthCount:3,skills:{}},
+  return {...s,crew:c.crew,city:{...c.city,heat:79,heatDecayElapsedMs:30000},permanentProgression:{ unlockedAchievementIds: [],empirePoints:20,rebirthCount:3,skills:{}},
     events:{pendingEventId:TIP,opportunityElapsedMs:200000}};
 }
 describe('online event command boundaries',()=>{
@@ -50,7 +51,7 @@ describe('online event command boundaries',()=>{
   });
   it('invalid selection RNG also preserves the whole pre-interval candidate',()=>{
     const s={...active(),events:{opportunityElapsedMs:599999,pendingEventId:null}},f=rebirthRuntime(s,fakeRandom(0,1));f.at(10000);
-    expect(()=>f.tick()).toThrow(RangeError);expect(f.game.getSnapshot().result.state).toEqual(s);f.game.stop();
+    expect(()=>f.tick()).toThrow(RangeError);expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(s).state);f.game.stop();
   });
   it('pending resolution reconciles old modifiers first, then awards a fixed outcome and saves',()=>{
     const s=active(),rng=fakeRandom(),f=rebirthRuntime(s,rng);f.at(50000);f.wall(51000);
@@ -84,7 +85,7 @@ describe('online event command boundaries',()=>{
   });
   it('ordinary choice save failure reports persistence failure and retains the completed live command plus recoverable old save',()=>{
     const s=eventState(TIP),f=rebirthRuntime(s,fakeRandom()),raw=f.raw();f.fail();f.game.execute(state=>resolveEventChoice(state,TIP,'choice:take-tip'));
-    expect(f.game.getSnapshot().persistence.kind).toBe('error');expect(f.game.getSnapshot().result.state).toEqual(resolveEventChoice(s,TIP,'choice:take-tip').state);expect(f.raw()).toBe(raw);f.game.stop();
+    expect(f.game.getSnapshot().persistence.kind).toBe('error');expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(resolveEventChoice(s,TIP,'choice:take-tip').state).state);expect(f.raw()).toBe(raw);f.game.stop();
   });
   it.each([false,true])('Rebirth clears event spawned during final reconciliation only after durable success (failure=%s)',fail=>{
     const s={...active(),events:{pendingEventId:null,opportunityElapsedMs:599999}},rng=fakeRandom(0,0),f=rebirthRuntime(s,rng),raw=f.raw();f.at(1);if(fail)f.fail();
@@ -92,7 +93,7 @@ describe('online event command boundaries',()=>{
     const current=f.game.getSnapshot().result.state;
     if(fail){expect(current.events.pendingEventId).toBe(TIP);expect(f.raw()).toBe(raw);}else{
       expect(current.events).toEqual(createInitialGameState().events);expect(current.economy.cash).toBe('0');expect(current.city).toEqual(createInitialGameState().city);expect(current.crew).toEqual(createInitialGameState().crew);
-      expect(current.garage).toEqual(s.garage);expect(current.permanentProgression).toEqual({...s.permanentProgression,empirePoints:24,rebirthCount:4});
+      expect(current.garage).toEqual(s.garage);expect(current.permanentProgression).toEqual({...s.permanentProgression,empirePoints:24,rebirthCount:4,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
       const write=f.events.findIndex(e=>e.type==='write');const reset=f.events.findIndex(e=>e.type==='publish'&&e.state.events.pendingEventId===null);expect(write).toBeLessThan(reset);
     }f.game.stop();
   });
@@ -166,10 +167,10 @@ describe('offline and import event exclusion',()=>{
   it('a future saved clock credits zero and preserves pending state without RNG',()=>{
     const s=active(),encoded=serializeSave(s,100000);if(!encoded.ok)throw Error('fixture');let raw=encoded.serialized;const rng=fakeRandom();
     const game=createPersistentGame(()=>{},createLocalSave(()=>({getItem:()=>raw,setItem:(_key,value)=>{raw=value;}}),()=>1000),{random:rng,now:()=>0,schedule:()=>()=>{}},()=>()=>{});
-    game.start();expect(game.getSnapshot().result.state).toEqual(s);expect(game.getSnapshot().offline).toMatchObject({clockAnomaly:true,rewardedElapsedMs:0});expect(rng.calls()).toBe(0);game.stop();
+    game.start();expect(game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(s).state);expect(game.getSnapshot().offline).toMatchObject({clockAnomaly:true,rewardedElapsedMs:0});expect(rng.calls()).toBe(0);game.stop();
   });
   it('failed import writes preserve previous pending event and existing online clock',()=>{
     const s=active(),f=rebirthRuntime(s,fakeRandom()),code=exportSaveCode(eventState(SHAKE),0),raw=f.raw();if(!code.ok)throw Error('fixture');f.at(1234);f.fail();
-    expect(f.game.importCode(code.code).ok).toBe(false);expect(f.game.getSnapshot().result.state).toEqual(s);expect(f.raw()).toBe(raw);f.tick();expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(s,1234).state);f.game.stop();
+    expect(f.game.importCode(code.code).ok).toBe(false);expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(s).state);expect(f.raw()).toBe(raw);f.tick();expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(s,1234).state);f.game.stop();
   });
 });

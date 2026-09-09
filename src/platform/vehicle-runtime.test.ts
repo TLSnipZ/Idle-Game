@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { createPersistentGame } from './persistent-game';
 import { createLocalSave } from './local-save';
@@ -68,7 +69,7 @@ describe('vehicle runtime and durable progression',()=>{
     f.at(250);f.wall(1250);f.tick();expect(f.writes()).toBe(writes);
     f.at(5000);f.wall(6000);const exported=game.exportCode();if(!exported.ok)throw Error('export');
     const expected=onlineElapsed(initial(true),5000).state;
-    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version:12,savedAt:6000,state:expected}});
+    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 13,savedAt:6000,state:expected}});
     f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
     game.stop();game.start();game.start();expect(f.timers()).toBe(2);game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
@@ -89,9 +90,9 @@ describe('vehicle runtime and durable progression',()=>{
   });
   it('future clock preserves state and rebases without income or XP',()=>{
     const state=initial(true);const f=fixture(state,2000);const game=f.make();game.start();
-    expect(game.getSnapshot().result.state).toEqual(state);
+    expect(game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(state).state);
     expect(game.getSnapshot().offline).toMatchObject({clockAnomaly:true,incomeEarned:'0',xpEarned:0});
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:1000,state}});game.stop();
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:1000,state:unlockEligibleAchievements(state).state}});game.stop();
   });
   it.each(['storage','overflow'] as const)('failed %s bootstrap preserves old save and never starts timers',failure=>{
     const state=failure==='overflow'?{...initial(true),economy:{cash:moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS))}}:initial(true);
@@ -124,7 +125,7 @@ it('v5 local migration consumes its saved timestamp without losing offline time'
   const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>26000);
   const expected=simulateGameElapsed(state,25000).state;
   expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version:12,savedAt:26000,state:expected}});
+  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 13,savedAt:26000,state:expected}});
   expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
 });
 

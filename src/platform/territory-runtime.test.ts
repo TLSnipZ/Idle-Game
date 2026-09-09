@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
 import { territoryState } from '../game/test-fixtures/territory-state';
@@ -21,10 +22,10 @@ describe('territory runtime and persistence boundaries', () => {
     const reconciled = onlineElapsed(initial, 25000); if (!reconciled.ok) throw Error('fixture');
     expect(reconciled.automation.income).toBe('5000');
     const acquired = acquireTerritory(reconciled.state, N.id).state;
-    expect(f.game.getSnapshot().result.state).toEqual(acquired);
+    expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(acquired).state);
     expect(f.game.getSnapshot().automationEvent?.income).toBe('5000');
     expect(acquired.automation.starterJobElapsedMs).toBe(5000);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 26000, state: acquired } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 26000, state: unlockEligibleAchievements(acquired).state } });
     f.at(30000); f.wall(31000); f.tick();
     expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(acquired, 5000).state);
     expect(f.game.getSnapshot().automationEvent).toMatchObject({ completedJobs: 1, income: '2750' });
@@ -51,7 +52,7 @@ describe('territory runtime and persistence boundaries', () => {
     f.at(250); f.tick(); expect(f.events.filter(e => e.type === 'write')).toHaveLength(writes);
     f.at(5000); f.wall(6000); f.autosave();
     const state = f.game.getSnapshot().result.state, exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 12, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 13, state } });
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state } });
     f.game.stop(); f.game.start(); f.game.start(); expect(f.timers()).toBe(2); f.game.stop();
     const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(state);
@@ -67,14 +68,14 @@ describe('territory runtime and persistence boundaries', () => {
   it('import preserves grandfathered ownership without historical rewards or acquisition feedback', () => {
     const base = createInitialGameState();
     const candidate = { ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
-      permanentProgression: { empirePoints: 4, rebirthCount: 2, skills: { [FAST]: 1 } } };
+      permanentProgression: { unlockedAchievementIds: [], empirePoints: 4, rebirthCount: 2, skills: { [FAST]: 1 } } };
     const exported = exportSaveCode(candidate, 0); if (!exported.ok) throw Error('fixture');
     const f = rebirthRuntime(territoryState()); f.at(90000); f.wall(100000);
     expect(f.game.importCode(exported.code)).toEqual({ ok: true });
     expect(f.game.getSnapshot().result.state).toEqual(candidate);
     expect(f.game.getSnapshot().automationEvent).toBeUndefined(); expect(f.game.getSnapshot().offline).toBeNull();
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 100000, state: candidate } });
-    f.game.stop(); const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(candidate); reload.stop();
+    f.game.stop(); const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(unlockEligibleAchievements(candidate).state); reload.stop();
   });
   it('failed imported replacement leaves current city and durable save intact', () => {
     const f = rebirthRuntime(territoryState()), raw = f.raw(), state = f.game.getSnapshot().result.state;
@@ -84,7 +85,7 @@ describe('territory runtime and persistence boundaries', () => {
   });
   it.each([false, true])('Rebirth resets city only after durable success (failed write=%s)', failed => {
     const state = { ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
-      permanentProgression: { empirePoints: 3, rebirthCount: 1, skills: { [ROOT]: 1, [FAST]: 1 } } };
+      permanentProgression: { unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 1, skills: { [ROOT]: 1, [FAST]: 1 } } };
     const f = rebirthRuntime(state), raw = f.raw(); if (failed) f.fail();
     f.at(3000); f.wall(4000); const result = f.game.rebirth(); expect(result.ok).toBe(!failed);
     if (failed) {
@@ -129,7 +130,7 @@ describe('territory runtime and persistence boundaries', () => {
   it('future timestamp rebases without territory income, jobs or XP', () => {
     const state = territoryState(true), encoded = serializeSave(state, 10000); if (!encoded.ok) throw Error('fixture'); let raw = encoded.serialized;
     const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 500);
-    expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state, offline: { clockAnomaly: true, rewardedElapsedMs: 0, incomeEarned: '0', xpEarned: 0 } });
-    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { savedAt: 500, state } });
+    expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: unlockEligibleAchievements(state).state, offline: { clockAnomaly: true, rewardedElapsedMs: 0, incomeEarned: '0', xpEarned: 0 } });
+    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { savedAt: 500, state: unlockEligibleAchievements(state).state } });
   });
 });

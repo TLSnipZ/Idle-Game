@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
@@ -49,9 +50,9 @@ describe('skill command boundaries and persistence', () => {
     const f = rebirthRuntime(skillState({ [ROOT]: 1 }));
     f.game.execute(s => purchaseSkillRank(s, FAST)); const state = f.game.getSnapshot().result.state;
     expect(state.permanentProgression.empirePoints).toBe(29);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 12, state } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 13, state } });
     const exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 12, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 13, state } });
     f.autosave(); f.game.stop(); const reload = f.make(); reload.start(); reload.start();
     expect(reload.getSnapshot().result.state).toEqual(state); expect(f.timers()).toBe(2); reload.stop(); expect(f.timers()).toBe(0);
   });
@@ -79,7 +80,7 @@ describe('skill command boundaries and persistence', () => {
     f.at(50000); f.wall(1000000); expect(f.game.importCode(code.code).ok).toBe(true);
     expect(f.game.getSnapshot().result.state).toEqual(state);
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 1000000, state } });
-    f.game.execute(performStarterJob); expect(f.game.getSnapshot().result.state).toEqual(performStarterJob(state).state);
+    f.game.execute(performStarterJob); expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(performStarterJob(state).state).state);
     f.game.stop();
   });
 });
@@ -93,7 +94,7 @@ describe('derived-cap durable offline bootstrap', () => {
     expect(result).toMatchObject({ kind: 'loaded', state: expected });
     expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { savedAt: now, state: expected } });
     expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { xpEarned: 0, incomeEarned: '0' } });
-    expect(expected.permanentProgression).toEqual(state.permanentProgression);
+    expect(expected.permanentProgression).toEqual({...state.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:first-rebirth']});
   });
   it('failed offline write or XP simulation never publishes candidate or overwrites original', () => {
     for (const overflow of [false, true]) {
@@ -110,6 +111,6 @@ describe('derived-cap durable offline bootstrap', () => {
     const state = skillState({ [NEVER]: 2, [LEARN]: 1 }); const encoded = serializeSave(state, 10000);
     if (!encoded.ok) throw Error('fixture'); let raw = encoded.serialized;
     const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 500);
-    expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state, offline: { clockAnomaly: true, rewardedElapsedMs: 0, capMs: 43200000 } });
+    expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: unlockEligibleAchievements(state).state, offline: { clockAnomaly: true, rewardedElapsedMs: 0, capMs: 43200000 } });
   });
 });

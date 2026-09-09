@@ -29,8 +29,10 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 7A — Territory foundation (complete; user verified live) | Solara City, Waterfront/Neon Mile, temporary ownership, v9 migration | Atomic acquisition, central job modifier, Rebirth baseline and save/runtime/offline tests |
 | 7B — Deterministic Heat (complete; user verified live) | Integer Heat, exact gain/decay, job cash penalties, Lay Low, v10 migration | Atomic start-tier batching, cooling remainder, shared offline cap and Rebirth reset |
 | 7C — Crew (complete; user verified live) | Three recruits, two assignment slots, exact active effects, v11 migration | Atomic recruitment/assignment, old-effect reconciliation, Mara remainder, shared offline and Rebirth reset |
-| 7D — Random Events (implementation complete; live pending) | Three events, two choices each, injected RNG, online-only opportunities, v12 migration | Atomic choices, one pending event, offline exclusion, Rebirth reset and deterministic tests |
-| 8 — Long-term progression (next / deferred) | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
+| 7D — Random Events (complete; user verified live) | Three events, two choices each, injected RNG, online-only opportunities, v12 migration | Atomic choices, one pending event, offline exclusion, Rebirth reset and deterministic tests |
+| 8A — Achievement Foundation (implementation complete; live pending) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
+| 8B — Statistics (next / deferred) | Separately scoped statistics expansion | Preserve achievement IDs, permanent completion and existing transaction boundaries |
+| Future — Late-game automation (deferred) | Separately scoped automation | Consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
 ## Current status
@@ -152,7 +154,7 @@ The user manually verified Phase 7C recruitment without automatic activation,
 Operations replacement, Rico cash, Mara cooling and switching back, Jax production,
 reload/offline/export/import and Crew reset with permanent retention in the live build.
 
-Phase 7D implementation is complete; **live verification is pending**. Three city
+Phase 7D implementation is complete and was **manually verified live by the user**. Three city
 events have two transparent choices each. Injected RNG selects uniformly after a
 35% online ten-minute opportunity, with at most one attempt per elapsed batch.
 One pending event pauses only event cadence. Current-state atomic Money/Heat choices
@@ -160,7 +162,21 @@ reset cadence on success. Offline consumes no event progress/RNG; Rebirth clears
 pending/progress. v11→v12 adds empty events; CE1 and durable boundaries are preserved.
 
 Phase 7's city-system foundation now includes **Territories, Heat, Crew and Random
-Events**. The next roadmap area is **Phase 8 Long-Term Progression**: achievements,
-statistics expansion and late-game automation, all deferred to separate tasks.
+Events**. Phase 8 Long-Term Progression begins with Achievement Foundation below;
+statistics expansion and late-game automation remain separately scoped.
 Collection expansion, extra skill trees, final art and overall balance remain
-unfinished. Phase 8 and unrelated future work are not implemented or complete.
+unfinished. Unrelated future work and Phase 8 as a whole are not complete.
+
+
+The user manually verified Phase 7D event cadence/choices, pending persistence,
+offline exclusion and Rebirth reset in the functioning live build. The complete
+Phase 7 city-system foundation — Territories, Heat, Crew and Random Events — is
+now implemented and manually verified live. Earlier phase-local deferral notes
+above record history rather than the current implementation status.
+
+Phase 8A Achievement Foundation implementation is complete; **live verification
+is pending**. Exactly six achievements permanently recognize current-state
+milestones with no gameplay rewards. Central command/runtime/offline evaluation,
+pre-/post-Rebirth ordering, v12→v13 migration and CE1 compatibility are covered.
+Phase 8B Statistics is next/deferred. Late-game automation remains deferred;
+Phase 8 as a whole is not complete. No lifetime or peak-Heat statistics were added.

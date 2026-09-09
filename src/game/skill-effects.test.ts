@@ -108,13 +108,13 @@ describe('permanent offline and Rebirth effects', () => {
       expect(result.progress).toMatchObject({ capMs: cap, actualElapsedMs: elapsed,
         rewardedElapsedMs: Math.min(cap, elapsed), capped: elapsed >= cap });
       expect(result.state).toEqual(simulateGameElapsed(state, Math.min(cap, elapsed)).state);
-      expect(result.state.permanentProgression).toEqual(state.permanentProgression);
+      expect(result.state.permanentProgression).toEqual({...state.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:first-rebirth']});
     }
   });
   it('all skill effects survive Rebirth, no refunds, and no temporary bonuses remain', () => {
     const before = { ...rebirthState(), permanentProgression: skillState({ [ROOT]: 2, [SILENT]: 1, [FAST]: 1, [LEARN]: 1, [NEVER]: 2 }, 3).permanentProgression };
     const result = performRebirth(before); expect(result.ok).toBe(true); const reset = result.state;
-    expect(reset.permanentProgression).toEqual({ ...before.permanentProgression, empirePoints: 7, rebirthCount: 2 });
+    expect(reset.permanentProgression).toEqual({ ...before.permanentProgression, empirePoints: 7, rebirthCount: 2, unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'] });
     expect(getOfflineCapMs(reset)).toBe(12 * 3600000);
     const job = performStarterJob(reset); expect(job.state.economy.cash).toBe('2750'); expect(job.state.progression.xp).toBe(11);
     let state = reset; for (let i = 0; i < 6; i++) state = performStarterJob(state).state;

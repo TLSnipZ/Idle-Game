@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from './achievements';
 import { STARTER_BUSINESS, getBusinessLevel } from '../features/businesses';
 import { getPlayerLevel } from '../features/progression';
 import { addRebirthReward } from '../features/permanent-progression';
@@ -23,7 +24,7 @@ export const REBIRTH_POLICY = {
   automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress'] },
   progression: { action: 'reset', labels: ['Player XP / Level (returns to Level 1)'] },
   garage: { action: 'retain', labels: ['Vehicles'] },
-  permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills'] },
+  permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills', 'Achievements'] },
 } as const satisfies Record<keyof GameState, { readonly action: 'reset' | 'retain' | 'accumulate'; readonly labels: readonly string[] }>;
 
 /** One reward path for preview and command. Ineligible states have no payable reward. */
@@ -44,9 +45,9 @@ export function performRebirth(state: GameState): RebirthResult {
   if (!validateSaveState(state)) throw new RangeError('Invalid authoritative state for Rebirth');
   const preview = selectRebirth(state);
   if (preview.reward === null) return { ok: false, state, error: 'requirements-not-met', requirements: preview.requirements };
-  const permanent = addRebirthReward(state.permanentProgression, preview.reward);
+  const permanent = addRebirthReward(unlockEligibleAchievements(state).state.permanentProgression, preview.reward);
   if (!permanent.ok) return { ok: false, state, error: permanent.error };
   // Authoritative reset construction: fresh temporary slices, explicit permanent retention.
   const candidate: GameState = { ...createInitialGameState(), garage: state.garage, permanentProgression: permanent.state };
-  return { ok: true, state: candidate, reward: preview.reward };
+  return { ok: true, state: unlockEligibleAchievements(candidate).state, reward: preview.reward };
 }

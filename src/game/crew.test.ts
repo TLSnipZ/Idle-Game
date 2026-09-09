@@ -225,11 +225,11 @@ describe('Crew offline and Rebirth contracts', () => {
   });
   it('Rebirth explicitly resets Crew/all temporary slices, retains permanents and never refunds; repeated rebuild works', () => {
     const base=rebirthState();const s=frozen({...base,crew:crewState({operations:R.id,logistics:J.id}).crew,
-      city:heat(crewState(),90,50000).city, permanentProgression:{empirePoints:3,rebirthCount:2,skills:{[FAST]:1,[ROOT]:2,[SILENT]:1,[LEARN]:1,[NEVER]:1}}});
+      city:heat(crewState(),90,50000).city, permanentProgression:{ unlockedAchievementIds: [],empirePoints:3,rebirthCount:2,skills:{[FAST]:1,[ROOT]:2,[SILENT]:1,[LEARN]:1,[NEVER]:1}}});
     const r=performRebirth(s);expect(r).toMatchObject({ok:true,reward:4});
     const fresh=createInitialGameState();expect(r.state.crew).toEqual(fresh.crew);expect(r.state.city).toEqual(fresh.city);
     for(const key of ['economy','businesses','upgrades','automation','progression'] as const)expect(r.state[key]).toEqual(fresh[key]);
-    expect(r.state.garage).toEqual(s.garage);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:7,rebirthCount:3});
+    expect(r.state.garage).toEqual(s.garage);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:7,rebirthCount:3,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
     expect(evaluateJobReward(r.state)).toMatchObject({reward:'2750'});expect(getHeatDecayIntervalMs(r.state)).toBe(60000);expect(collectCrewModifiers(r.state.crew)).toEqual([]);
     const rebuilt=purchaseBusiness({...r.state,economy:{cash:B.purchaseCost}},B.id).state;
     expect(evaluateBusinessProduction(rebuilt,B.id,1)).toMatchObject({effective:rational(8349n,80n)});

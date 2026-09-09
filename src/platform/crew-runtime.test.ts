@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { RICO_VALE as R, MARA_KNOX as M, JAX_MERCER as J, createInitialCrewState } from '../features/crew';
 import { crewState } from '../game/test-fixtures/crew-state';
@@ -28,9 +29,9 @@ describe('Crew runtime boundaries and persistence',()=>{
     const reconciled=onlineElapsed(s,12000).state;
     f.game.execute(state=>{expect(state).toEqual(reconciled);return recruitCrewMember(state,M.id);});
     const expected=recruitCrewMember(reconciled,M.id).state;
-    expect(f.game.getSnapshot().result.state).toEqual(expected);expect(expected.crew.assignments).toEqual(s.crew.assignments);
-    expect(f.events.filter(e=>e.type==='write').map(e=>e.state)).toEqual([expected]);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version:12,savedAt:13000,state:expected}});
+    expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(expected).state);expect(expected.crew.assignments).toEqual(s.crew.assignments);
+    expect(f.events.filter(e=>e.type==='write').map(e=>e.state)).toEqual([unlockEligibleAchievements(expected).state]);
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 13,savedAt:13000,state:unlockEligibleAchievements(expected).state}});
   });
   it('Rico → Mara and reverse switch use old Money/decay before replacement and new effects after',()=>{
     const s=heated(R.id),f=rebirthRuntime(s);f.at(30000);
@@ -85,7 +86,7 @@ describe('Crew runtime boundaries and persistence',()=>{
     f.game.execute(state=>recruitCrewMember(state,R.id));f.game.execute(state=>assignCrewMember(state,'operations',R.id));
     f.game.execute(state=>recruitCrewMember(state,J.id));f.game.execute(state=>assignCrewMember(state,'logistics',J.id));
     f.at(4321);f.wall(5321);f.autosave();const expected=f.game.getSnapshot().result.state;
-    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:12,savedAt:5321,state:expected}});
+    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 13,savedAt:5321,state:expected}});
     f.game.stop();const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
     reload.stop();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);expect(f.timers()).toBe(2);
     reload.execute(state=>unassignCrewSlot(state,'operations'));expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:{crew:{recruitedIds:[R.id,J.id],assignments:{operations:null,logistics:J.id}}}}});
@@ -144,7 +145,7 @@ describe('Crew runtime boundaries and persistence',()=>{
   it('future clock credits zero, preserving Mara remainder above her interval without normalization',()=>{
     const s={...heated(M.id),city:{...heated(M.id).city,heatDecayElapsedMs:50000}};const encoded=serializeSave(s,100000);if(!encoded.ok)throw Error('fixture');let raw=encoded.serialized;
     const result=createLocalSave(()=>({getItem:()=>raw,setItem:(_k,v)=>{raw=v;}}),()=>1000).bootstrap();
-    expect(result).toMatchObject({kind:'loaded',state:s,offline:{clockAnomaly:true,rewardedElapsedMs:0}});
+    expect(result).toMatchObject({kind:'loaded',state:unlockEligibleAchievements(s).state,offline:{clockAnomaly:true,rewardedElapsedMs:0}});
   });
   it('invalid Crew suspends shared simulation and cannot publish partial income',()=>{
     const s=heated();let now=0;const runtime=createGameRuntime(s,()=>{}, {random: { next: () => 0.99 }, now: () =>now,schedule:()=>()=>{}});runtime.start();

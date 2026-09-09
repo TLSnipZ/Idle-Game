@@ -1,3 +1,4 @@
+import type { GameState } from '../game/game-state';
 import { performRebirth } from '../game/rebirth';
 import type { RebirthResult } from '../game/rebirth';
 import type { OfflineProgress } from '../game/offline-progress';
@@ -59,6 +60,7 @@ export function createPersistentGame(
       const loaded = saves.bootstrap();
       view = { ...view,
         result: { ok: true, state: loaded.kind === 'loaded' || loaded.kind === 'offline-error' ? loaded.state : view.result.state },
+        ...(loaded.kind === 'loaded' && loaded.offline.newlyUnlockedAchievements?.length ? { achievementEvent: { ids: loaded.offline.newlyUnlockedAchievements, sequence: 1 } } : {}),
         offline: loaded.kind === 'loaded' ? loaded.offline : null,
         persistence: loaded.kind === 'offline-error' ? { kind: 'offline-error', error: loaded.error } : loaded.kind === 'error' ? { kind: 'blocked', error: loaded.error }
           : { kind: loaded.kind === 'loaded' ? 'loaded' : 'ready' },
@@ -66,7 +68,7 @@ export function createPersistentGame(
       runtime = createGameRuntime(view.result.state, snapshot => {
         view = { ...snapshot, persistence: view.persistence, offline: view.offline };
         publish(view);
-      }, timing);
+      }, timing, view.achievementEvent);
       publish(view);
     }
     if (view.persistence.kind === 'offline-error') return;
@@ -88,15 +90,17 @@ export function createPersistentGame(
   }
   function execute(command: Parameters<ReturnType<typeof createGameRuntime>['execute']>[0]) {
     if (!active || !runtime) return;
-    let changed = false;
+    let commandInput: GameState | null = null;
+    let succeeded = false;
     runtime.execute(state => {
       const result = command(state);
-      changed = result.ok && result.state !== state;
+      commandInput = state;
+      succeeded = result.ok;
       return result;
     });
     // Execute has published the completed command. Never persist reconciliation's
     // intermediate snapshot or read a possibly stale React render here.
-    if (changed) saveCurrent();
+    if (succeeded && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
   }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
@@ -118,11 +122,12 @@ export function createPersistentGame(
   }
   /** Called only after explicit in-app confirmation; never use execute's publish-before-save path. */
   function rebirth(): RebirthTransactionResult {
+    const achievementBaseline = view.result.state.permanentProgression.unlockedAchievementIds;
     if (!active || !runtime || !runtime.reconcile()) return { ok: false, error: 'runtime-unavailable' };
     if (view.persistence.kind === 'blocked') return { ok: false, error: 'persistence-failure', detail: 'storage-conflict' };
     const candidate = performRebirth(runtime.getSnapshot().result.state);
     if (!candidate.ok) return candidate;
-    const commit = runtime.prepareReplacement(candidate.state);
+    const commit = runtime.prepareReplacement(candidate.state, achievementBaseline);
     if (!commit) return { ok: false, error: 'runtime-unavailable' };
     // Normal guarded save protects corrupt/changed storage; Rebirth is not an import override.
     const written = saves.save(candidate.state);

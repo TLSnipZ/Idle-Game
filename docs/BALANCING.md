@@ -571,3 +571,26 @@ clears the event and requires a fresh ten-minute opportunity; failed resolution
 retains it. Spawn conditions are not retention conditions. No event progression or
 RNG occurs offline, regardless of the 8/10/12h economy cap. Rebirth discards pending
 and progress without reward. No hidden random outcomes or police/bust system exists.
+
+## Phase 8A — provisional achievement thresholds
+
+Achievements are permanent recognition only: **no Money, XP, EP or gameplay
+rewards**, and no modifier reads completion. All six are visible from the start.
+These thresholds are provisional.
+
+| Stable AchievementId | Name | Exact condition |
+| --- | --- | --- |
+| `achievement:first-steps` | First Steps | Derived Player Level ≥2 |
+| `achievement:dockside-operator` | Dockside Operator | Dockside Detail owned at Level ≥10 |
+| `achievement:neon-takeover` | Neon Takeover | Neon Mile owned |
+| `achievement:running-hot` | Running Hot | Current Heat ≥60 |
+| `achievement:crew-chief` | Crew Chief | Rico Vale, Mara Knox and Jax Mercer all recruited in the same run; assignments irrelevant |
+| `achievement:first-rebirth` | First Rebirth | Rebirth count ≥1 |
+
+Unlocks survive cooling, temporary progression changes and Rebirth. Current-state
+conditions are evaluated after complete commands or elapsed batches, including
+legitimate offline catch-up. No transient peak is reconstructed: a batch that
+passes 60 Heat internally but finishes below 60 does not unlock Running Hot solely
+from that peak. There are no lifetime statistics or achievement rewards in 8A.
+Migration adds empty ownership; normal bootstrap can recognize currently satisfied
+milestones. Import preserves recorded completion without historical inference.

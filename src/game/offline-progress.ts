@@ -1,3 +1,5 @@
+import { unlockEligibleAchievements } from './achievements';
+import type { AchievementId } from '../features/achievements';
 import { getOfflineCapMs } from './offline-cap';
 export { OFFLINE_CAP_MS } from './offline-cap';
 import { getLevelIncrease } from '../features/progression';
@@ -12,6 +14,7 @@ import type { GameSimulationResult } from './simulate-game-elapsed';
 
 
 export interface OfflineProgress {
+  readonly newlyUnlockedAchievements?: readonly AchievementId[];
   readonly actualElapsedMs: number;
   readonly capMs: number;
   readonly rewardedElapsedMs: number;
@@ -39,7 +42,10 @@ export function reconcileOffline(state: GameState, savedAt: unknown, now: unknow
   if (!result.ok) return result;
   const income = subtractMoney(result.state.economy.cash, state.economy.cash);
   if (!income.ok) throw new Error('Production must not reduce cash');
-  return { ok: true, state: result.state, progress: {
+  const achievements = unlockEligibleAchievements(result.state);
+  const newlyUnlocked = achievements.state.permanentProgression.unlockedAchievementIds.filter(id => !state.permanentProgression.unlockedAchievementIds.includes(id));
+  return { ok: true, state: achievements.state, progress: {
+    ...(newlyUnlocked.length ? { newlyUnlockedAchievements: newlyUnlocked } : {}),
     actualElapsedMs, rewardedElapsedMs, capMs, capped: actualElapsedMs >= capMs,
     incomeEarned: income.value, clockAnomaly,
     xpEarned: result.state.progression.xp - state.progression.xp,

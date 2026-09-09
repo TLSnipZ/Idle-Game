@@ -13,8 +13,8 @@ function legacy() {
 }
 describe('v7 permanent progression schema',()=>{
   it('migrates realistic v6 preserving every prior field and timestamp; never performs Rebirth',()=>{
-    const old=legacy();const text=JSON.stringify(old);expect(CURRENT_SAVE_VERSION).toBe(12);
-    const expected={ok:true,envelope:{...old,version:12,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0}}}};
+    const old=legacy();const text=JSON.stringify(old);expect(CURRENT_SAVE_VERSION).toBe(13);
+    const expected={ok:true,envelope:{...old,version: 13,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0}}}};
     expect(parseSave(text)).toEqual(expected);expect(validateSaveCode(encodeSaveText(text))).toEqual(expected);
     expect(JSON.stringify(old)).toBe(text);
   });
@@ -27,14 +27,14 @@ describe('v7 permanent progression schema',()=>{
       ...(version>=4?{automation:source.automation}:{}),...(version>=5?{progression:source.progression}:{}),
       ...(version>=6?{garage:source.garage}:{})};
     const encoded=encodeSaveText(JSON.stringify({...old,version,state}));const result=validateSaveCode(encoded);
-    expect(result).toMatchObject({ok:true,envelope:{version:12,savedAt:old.savedAt,state:{economy:source.economy,
-      city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0},businesses:{owned:{[B.id]:{level:version===1?1:48}},productionRemainderMilliCents:975}}}});
+    expect(result).toMatchObject({ok:true,envelope:{version: 13,savedAt:old.savedAt,state:{economy:source.economy,
+      city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0},businesses:{owned:{[B.id]:{level:version===1?1:48}},productionRemainderMilliCents:975}}}});
   });
   it.each([0,11,MAX_PERMANENT_VALUE])('roundtrips exact counters %i without runtime/UI state',value=>{
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:value,rebirthCount:value}};
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:value,rebirthCount:value}};
     const serialized=serializeSave(state,42);const code=exportSaveCode(state,42);
     if(!serialized.ok||!code.ok)throw Error('fixture');
-    expect(parseSave(serialized.serialized)).toMatchObject({ok:true,envelope:{version:12,savedAt:42,state}});
+    expect(parseSave(serialized.serialized)).toMatchObject({ok:true,envelope:{version: 13,savedAt:42,state}});
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));
     expect(serialized.serialized).not.toMatch(/confirming|rebirth-policy|reward|message/);
   });
@@ -52,9 +52,9 @@ describe('v7 permanent progression schema',()=>{
   });
   it('rejects missing slice, extra fields, wrong prototypes and future schemas',()=>{
     expect(validateSaveState(legacy().state)).toBeNull();
-    for(const permanentProgression of [null,[],{empirePoints:0,rebirthCount:0,skills:[]},Object.create({empirePoints:0,rebirthCount:0})])
+    for(const permanentProgression of [null,[],{ unlockedAchievementIds: [],empirePoints:0,rebirthCount:0,skills:[]},Object.create({empirePoints:0,rebirthCount:0})])
       expect(validateSaveState({...rebirthState(),permanentProgression})).toBeNull();
-    expect(parseSave(JSON.stringify({...legacy(),version:13}))).toEqual({ok:false,error:'unsupported-version'});
+    expect(parseSave(JSON.stringify({...legacy(),version:14}))).toEqual({ok:false,error:'unsupported-version'});
     expect(parseSave(JSON.stringify({...legacy(),state:rebirthState()}))).toEqual({ok:false,error:'invalid-state'});
   });
   it('retains the v6 timestamp for ordinary offline migration and consumes it once',()=>{
@@ -62,7 +62,7 @@ describe('v7 permanent progression schema',()=>{
     const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>wall);
     const expected=simulateGameElapsed(rebirthState(37,48),25000).state;
     expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-    expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version:12,savedAt:wall,state:expected}});
+    expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 13,savedAt:wall,state:expected}});
     expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
   });
 });

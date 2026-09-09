@@ -1,3 +1,4 @@
+import { isAchievementIds } from '../features/achievements';
 import { createInitialEventState, isEventState } from '../features/events';
 import { createInitialCrewState, isCrewState } from '../features/crew';
 import { isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
@@ -16,7 +17,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 12;
+export const CURRENT_SAVE_VERSION = 13;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -100,8 +101,10 @@ function validateState(value: unknown, version: number): GameState | null {
     }
   }
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
-  if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : [])])
+  if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : []), ...(version >= 13 ? ['unlockedAchievementIds'] : [])])
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
+  const unlockedAchievementIds = version >= 13 ? permanent.unlockedAchievementIds : [];
+  if (!isAchievementIds(unlockedAchievementIds)) return null;
   const skills = version >= 8 ? permanent.skills : {};
   if (!isSkillRanks(skills)) return null;
   let city: unknown = version >= 9 ? value.city : createInitialCityState();
@@ -114,7 +117,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills } }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -156,27 +159,35 @@ function migrateV7ToV8(value: unknown): unknown {
   const valid = validateState(value, 7);
   if (!valid) return null;
   const { events: _events, crew: _crew, city: _city, ...legacy } = valid;
-  return legacy;
+  return withoutAchievements(legacy);
 }
 function migrateV8ToV9(value: unknown): unknown {
   const valid = validateState(value, 8);
   if (!valid) return null;
   const { events: _events, crew: _crew, ...legacy } = valid;
-  return { ...legacy, city: { ownedTerritoryIds: valid.city.ownedTerritoryIds } };
+  return { ...withoutAchievements(legacy), city: { ownedTerritoryIds: valid.city.ownedTerritoryIds } };
 }
 function migrateV9ToV10(value: unknown): unknown {
   const valid = validateState(value, 9);
   if (!valid) return null;
   const { events: _events, crew: _crew, ...legacy } = valid;
-  return legacy;
+  return withoutAchievements(legacy);
 }
 function migrateV10ToV11(value: unknown): unknown {
   const valid = validateState(value, 10);
   if (!valid) return null;
   const { events: _events, ...legacy } = valid;
-  return legacy;
+  return withoutAchievements(legacy);
 }
-function migrateV11ToV12(value: unknown): GameState | null { return validateState(value, 11); }
+function withoutAchievements<T extends { readonly permanentProgression: GameState['permanentProgression'] }>(state: T) {
+  const { unlockedAchievementIds: _achievements, ...permanentProgression } = state.permanentProgression;
+  return { ...state, permanentProgression };
+}
+function migrateV11ToV12(value: unknown): unknown {
+  const valid = validateState(value, 11);
+  return valid ? withoutAchievements(valid) : null;
+}
+function migrateV12ToV13(value: unknown): GameState | null { return validateState(value, 12); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -200,6 +211,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 9) migrated = migrateV9ToV10(migrated);
   if (value.version <= 10) migrated = migrateV10ToV11(migrated);
   if (value.version <= 11) migrated = migrateV11ToV12(migrated);
+  if (value.version <= 12) migrated = migrateV12ToV13(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

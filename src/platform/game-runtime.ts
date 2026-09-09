@@ -1,3 +1,5 @@
+import { unlockEligibleAchievements } from '../game/achievements';
+import type { AchievementId } from '../features/achievements';
 import { browserRandom } from './random-source';
 import type { RandomSource, EventId } from '../features/events';
 import type { EventResolutionResult } from '../game/resolve-event-choice';
@@ -26,6 +28,7 @@ type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
 export interface RuntimeSnapshot {
+  readonly achievementEvent?: { readonly ids: readonly AchievementId[]; readonly sequence: number };
   readonly cityEvent?: { readonly id: EventId; readonly sequence: number };
   readonly result: CommandResult;
   readonly runtimeError: RuntimeError | null;
@@ -53,8 +56,9 @@ export function createGameRuntime(
   initialState: GameState,
   publish: (snapshot: RuntimeSnapshot) => void,
   timing: RuntimeTiming = browserTiming,
+  initialAchievementEvent?: RuntimeSnapshot['achievementEvent'],
 ) {
-  let snapshot: RuntimeSnapshot = { result: { ok: true, state: initialState }, runtimeError: null };
+  let snapshot: RuntimeSnapshot = { ...(initialAchievementEvent ? { achievementEvent: initialAchievementEvent } : {}), result: { ok: true, state: initialState }, runtimeError: null };
   let baseline: number | null = null;
   let remainderMs = 0;
   let cancel: (() => void) | null = null;
@@ -83,6 +87,11 @@ export function createGameRuntime(
       ...(unlocks.length ? { unlocks } : {}) } };
   }
 
+  function achievementEventFor(state: GameState, before = snapshot.result.state.permanentProgression.unlockedAchievementIds) {
+    const ids = state.permanentProgression.unlockedAchievementIds.filter(id => !before.includes(id));
+    return ids.length ? { achievementEvent: { ids, sequence: (snapshot.achievementEvent?.sequence ?? 0) + 1 } } : {};
+  }
+
   function reconcile(): boolean {
     if (baseline === null || snapshot.runtimeError !== null) return false;
     const now = timing.now();
@@ -109,7 +118,7 @@ export function createGameRuntime(
     if (result.state !== snapshot.result.state) {
       const spawned = snapshot.result.state.events.pendingEventId === null ? result.state.events.pendingEventId : null;
       // Automatic income must not erase feedback from the last player command.
-      snapshot = { ...snapshot, ...(spawned ? { cityEvent: { id: spawned, sequence: (snapshot.cityEvent?.sequence ?? 0) + 1 } } : {}), ...levelEventFor(result.state), result: { ...snapshot.result, state: result.state },
+      snapshot = { ...snapshot, ...(spawned ? { cityEvent: { id: spawned, sequence: (snapshot.cityEvent?.sequence ?? 0) + 1 } } : {}), ...levelEventFor(result.state), ...achievementEventFor(result.state), result: { ...snapshot.result, state: result.state },
         ...(result.automation.completedJobs > 0 ? { automationEvent: {
           ...result.automation, sequence: (snapshot.automationEvent?.sequence ?? 0) + 1,
         } } : {}),
@@ -120,9 +129,11 @@ export function createGameRuntime(
   }
 
   function execute(command: (state: GameState) => CommandResult) {
+    const beforeAchievements = snapshot.result.state.permanentProgression.unlockedAchievementIds;
     if (!reconcile()) return;
     const previous = snapshot.result.state;
-    const result = command(previous);
+    const transition = command(previous);
+    const result = transition.ok ? { ...transition, state: unlockEligibleAchievements(transition.state).state } : transition;
     // Rate changes and completed event choices start a fresh elapsed boundary.
     // Runtime sub-ms duration is dropped; earned authoritative fractions are never reset.
     if (result.ok && ((previous.events.pendingEventId !== null && result.state.events.pendingEventId === null)
@@ -133,7 +144,7 @@ export function createGameRuntime(
         || result.state.permanentProgression.skills !== previous.permanentProgression.skills
         || result.state.upgrades !== previous.upgrades
         || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
-    snapshot = { ...snapshot, ...(result.ok ? levelEventFor(result.state) : {}), result };
+    snapshot = { ...snapshot, ...(result.ok ? { ...levelEventFor(result.state), ...achievementEventFor(result.state, beforeAchievements) } : {}), result };
     publish(snapshot);
   }
 
@@ -153,14 +164,14 @@ export function createGameRuntime(
 
   // Prepare without mutation. Caller must durably write before invoking commit,
   // synchronously in this same task (no await between preparation and commit).
-  function prepareReplacement(state: GameState): (() => void) | null {
+  function prepareReplacement(state: GameState, achievementBaseline?: readonly AchievementId[]): (() => void) | null {
     if (baseline === null || snapshot.runtimeError !== null) return null;
     const now = timing.now();
     if (!Number.isFinite(now) || now < baseline) return null;
     return () => {
       baseline = now;
       remainderMs = 0;
-      snapshot = { result: { ok: true, state }, runtimeError: null };
+      snapshot = { ...(achievementBaseline ? achievementEventFor(state, achievementBaseline) : {}), result: { ok: true, state }, runtimeError: null };
       publish(snapshot);
     };
   }

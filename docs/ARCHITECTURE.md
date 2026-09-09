@@ -1835,3 +1835,61 @@ without imagery, flashing, modal traps or browser dialogs.
 
 No weighted rarity, chains, history, police/bust mechanics, hidden outcomes,
 Crew-specific options, extra content or Phase 8 systems are implemented.
+
+## Phase 8A — permanent Achievement Foundation
+
+Phase 7D and the complete Phase 7 city-system foundation were manually verified
+live by the user. Phase 8A implementation is complete; **live verification is pending**.
+
+Exactly six stable `AchievementId`s live in the explicit ordered achievement catalog.
+Config owns names, descriptions and typed current-state conditions. The only saved
+addition is `permanentProgression.unlockedAchievementIds: AchievementId[]`.
+Ownership is unique and permanent, with no reward, timestamp, progress cache,
+category or lifetime statistics. Validation accepts historical completion even
+when its current condition is false; malformed/unknown/duplicate IDs are rejected.
+
+`game/achievements.ts` owns the pure condition/progress path and
+`unlockEligibleAchievements`. It returns all newly satisfied IDs in configured
+order and preserves object identity when nothing unlocks. Conditions use derived
+player level, current business level, territory ownership, final Heat, the three
+specified recruited Crew IDs, and Rebirth count. React renders selectors only.
+No gameplay formula reads achievement ownership; recognition changes no balance.
+
+Successful runtime commands evaluate their complete candidate centrally before
+publication and normal meaningful-command persistence. Failed commands do not
+unlock anything through their failed outcome; preceding successful elapsed
+reconciliation remains authoritative. Shared elapsed simulation evaluates only
+its completed candidate, after Dispatcher Money/XP/Heat and Heat decay. There is
+no per-cycle milestone scan or peak-Heat reconstruction. If Heat temporarily
+crosses 60 inside a batch but ends below 60, Running Hot does not unlock from that
+unobserved peak. This also applies offline; Phase 8B may separately introduce
+statistics, but Phase 8A stores none.
+
+Bootstrap policy: after valid load/migration and legitimate offline reconciliation,
+evaluate currently satisfied conditions, including when credited elapsed is zero.
+The candidate with permanent unlocks is durably written before publication.
+A failed write preserves the old save and publishes no new rewards/unlocks. Reload
+cannot duplicate completion. Offline uses the same simulation and existing shared
+8/10/12h cap; City Event progress still does not advance offline.
+
+Rebirth reconciles first. Its pure reset constructor evaluates the eligible
+pre-reset state (even a migrated state with no elapsed time), carries its unlocks
+through the explicit permanent retention, increments Rebirth count, and evaluates
+again. First Rebirth is therefore inside the single durable reset candidate.
+Garage, EP, count, skills and achievements persist. All existing temporary fields
+still reset, including Crew, Heat, territories beyond Waterfront and City Events.
+
+Save schema **v13** retains sequential v1→…→v12→v13 migration. v12→v13 adds only an
+empty achievement collection and preserves every previous field and `savedAt`.
+Migration itself never evaluates milestones. Bootstrap evaluation is a separate
+normal gameplay boundary. **CE1- is unchanged**. Import preserves exported IDs
+exactly, performs no historical simulation or achievement inference, and retains
+write-before-replacement. A later successful command or positive elapsed runtime
+may unlock currently satisfied conditions. Past lost territories, Crew combinations
+or Heat peaks are never fabricated.
+
+The Achievements panel shows all six named cards, current progress while locked,
+and permanent completion after unlocking. Grouped runtime announcements include
+all new names in configured order, including a command that unlocks milestones
+both during reconciliation and afterward. Bootstrap and successful Rebirth use
+the same ephemeral announcement shape; no notification history is saved.

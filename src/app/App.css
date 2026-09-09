@@ -192,3 +192,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .event-choice { min-width: 0; overflow-wrap: anywhere; }
 .event-choice .action-button { width: 100%; white-space: normal; }
 @media (max-width: 740px) { .event-choices { grid-template-columns: minmax(0, 1fr); } }
+
+.achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
+.achievement-card { min-width: 0; overflow-wrap: anywhere; padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.75rem; }
+.achievement-card.is-unlocked { border-color: var(--color-accent); }

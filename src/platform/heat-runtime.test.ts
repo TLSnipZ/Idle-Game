@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
 import { territoryState } from '../game/test-fixtures/territory-state';
@@ -26,8 +27,8 @@ describe('shared Heat runtime and durable boundaries', () => {
     expect(f.game.getSnapshot().automationEvent).toMatchObject({completedJobs:5,income:'12500'});
     const r=onlineElapsed(s,50000);expect(r.state.city).toMatchObject({heat:51,heatDecayElapsedMs:50000});
     const after=acquireTerritory(r.state,NEON_MILE.id).state;
-    expect(f.game.getSnapshot().result.state).toEqual(after);expect(after.city.heat).toBe(61);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:51000,state:after}});
+    expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(after).state);expect(after.city.heat).toBe(61);
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:51000,state:unlockEligibleAchievements(after).state}});
     f.at(60000);f.tick();expect(f.game.getSnapshot().automationEvent).toMatchObject({income:'2475'});
     expect(f.game.getSnapshot().result.state.city).toMatchObject({heat:60,heatDecayElapsedMs:0});
     f.game.execute(performStarterJob);expect(f.game.getSnapshot().result).toMatchObject({moneyEarned:'2475'});f.game.stop();
@@ -58,7 +59,7 @@ describe('shared Heat runtime and durable boundaries', () => {
     f.at(5000);f.wall(6000);f.autosave();const saved=f.game.getSnapshot().result.state;
     expect(saved.city).toMatchObject({heat:70,heatDecayElapsedMs:50000});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:12,savedAt:6000,state:saved}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 13,savedAt:6000,state:saved}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);expect(f.game.getSnapshot().result.state).toEqual(saved);f.game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(saved);reload.stop();
   });
@@ -113,8 +114,8 @@ describe('shared Heat runtime and durable boundaries', () => {
   it('future timestamp rebases with no Heat gain/cooling, and runtime corruption suspends atomically', () => {
     const s=initial(70,45000),encoded=serializeSave(s,10000);if(!encoded.ok)throw Error('fixture');let raw=encoded.serialized;
     const saves=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,v:string)=>{raw=v;}}),()=>500);
-    expect(saves.bootstrap()).toMatchObject({kind:'loaded',state:s,offline:{clockAnomaly:true,rewardedElapsedMs:0}});
-    expect(parseSave(raw)).toMatchObject({ok:true,envelope:{savedAt:500,state:s}});
+    expect(saves.bootstrap()).toMatchObject({kind:'loaded',state:unlockEligibleAchievements(s).state,offline:{clockAnomaly:true,rewardedElapsedMs:0}});
+    expect(parseSave(raw)).toMatchObject({ok:true,envelope:{savedAt:500,state:unlockEligibleAchievements(s).state}});
     const bad={...s,city:{...s.city,heat:101}};let now=0,cancelled=false;
     const runtime=createGameRuntime(bad,()=>{},{random: { next: () => 0.99 }, now: () =>now,schedule:()=>()=>{cancelled=true;}});runtime.start();now=50000;
     expect(()=>runtime.reconcile()).toThrow(RangeError);expect(runtime.getSnapshot().result.state).toBe(bad);expect(cancelled).toBe(true);expect(runtime.getSnapshot().runtimeError).toBe('invalid-state');
@@ -122,6 +123,6 @@ describe('shared Heat runtime and durable boundaries', () => {
   it.each(['money','xp'] as const)('elapsed %s overflow publishes no partial Heat/cooling/economy', kind => {
     const base=initial(90,42000),s=kind==='money'?{...base,economy:{cash:moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS))}}:{...base,progression:{xp:Number.MAX_SAFE_INTEGER}};
     const f=rebirthRuntime(s),raw=f.raw();f.at(50000);f.tick();
-    expect(f.game.getSnapshot().result.state).toEqual(s);expect(f.game.getSnapshot().runtimeError).not.toBeNull();expect(f.raw()).toBe(raw);f.autosave();expect(f.raw()).toBe(raw);f.game.stop();
+    expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(s).state);expect(f.game.getSnapshot().runtimeError).not.toBeNull();expect(f.raw()).toBe(raw);f.autosave();expect(f.raw()).toBe(raw);f.game.stop();
   });
 });

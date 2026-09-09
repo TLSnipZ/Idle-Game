@@ -1,3 +1,4 @@
+import { Achievements } from './Achievements';
 import { CityEvents } from './CityEvents';
 import { CrewPanel } from './CrewPanel';
 import { CITY_NAME } from '../features/territories';
@@ -28,7 +29,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { chooseEvent, cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { achievementEvent, chooseEvent, cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const reward = evaluateJobReward(snapshot.state);
   const paused = runtimeError !== null;
@@ -97,6 +98,7 @@ export function App() {
         <Garage state={snapshot.state} paused={paused} onPurchase={buyVehicle} />
         <RebirthPanel state={snapshot.state} unavailable={paused || persistence.kind === 'blocked'} onRebirth={rebirth} />
         <SkillTree state={snapshot.state} paused={paused} onPurchase={buySkill} />
+        <Achievements state={snapshot.state} announcement={achievementEvent} />
         <SaveManagement actions={saveActions} />
         <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(getOfflineCapMs(snapshot.state))}.</p>
       </main>

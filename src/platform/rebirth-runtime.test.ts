@@ -1,3 +1,4 @@
+import { unlockEligibleAchievements } from '../game/achievements';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
@@ -49,7 +50,7 @@ describe('durable Rebirth transaction', () => {
     expect(f.game.rebirth()).toMatchObject({ok:false,error:'persistence-failure',detail:'storage-write'});
     const beforeReset=onlineElapsed(initial,10000).state;
     expect(f.game.getSnapshot().result.state).toEqual(beforeReset);expect(f.raw()).toBe(oldRaw);
-    expect(f.game.getSnapshot().result.state.permanentProgression).toEqual({skills: {}, empirePoints:0,rebirthCount:0});
+    expect(f.game.getSnapshot().result.state.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator'],skills: {}, empirePoints:0,rebirthCount:0});
     expect(f.events.every(event=>event.state.businesses.owned[B.id]?.level===25)).toBe(true);
     expect(f.events.some(event=>event.type==='write')).toBe(false);
     f.at(11000);f.tick();f.autosave();expect(f.raw()).toBe(oldRaw);
@@ -57,9 +58,9 @@ describe('durable Rebirth transaction', () => {
     expect(f.game.getSnapshot().result.state.permanentProgression.rebirthCount).toBe(0);f.game.stop();
   });
   it.each(['empirePoints','rebirthCount'] as const)('permanent %s overflow never writes or resets',field=>{
-    const state={...rebirthState(),permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0,[field]:MAX_PERMANENT_VALUE}};
+    const state={...rebirthState(),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0,[field]:MAX_PERMANENT_VALUE}};
     const f=rebirthRuntime(state);const raw=f.raw();expect(f.game.rebirth()).toMatchObject({ok:false,error:'overflow'});
-    expect(f.game.getSnapshot().result.state).toEqual(state);expect(f.raw()).toBe(raw);expect(f.events).toEqual([]);f.game.stop();
+    expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(state).state);expect(f.raw()).toBe(raw);expect(f.events).toEqual([]);f.game.stop();
   });
   it('ineligible or stopped runtime cannot reset and cannot write',()=>{
     const f=rebirthRuntime(rebirthState(19,25));const raw=f.raw();
@@ -87,20 +88,20 @@ describe('durable Rebirth transaction', () => {
     const f=rebirthRuntime();expect(f.game.rebirth().ok).toBe(true);const state=onlineElapsed(f.game.getSnapshot().result.state,5000).state;
     f.at(5000);f.wall(6000);f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state}});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:12,state}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 13,state}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);
     expect(f.game.getSnapshot().result.state).toEqual(state);f.game.stop();expect(f.timers()).toBe(0);
   });
   it('v7 import restores both permanent and temporary state without historical rewards or Rebirth',()=>{
-    const f=rebirthRuntime();const imported={...rebirthState(37,48),permanentProgression:{skills: {}, empirePoints:11,rebirthCount:2}};
+    const f=rebirthRuntime();const imported={...rebirthState(37,48),permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:11,rebirthCount:2}};
     const code=exportSaveCode(imported,1);if(!code.ok)throw Error('fixture');
     f.at(50000);f.wall(1000000);expect(f.game.importCode(code.code)).toEqual({ok:true});
     expect(f.game.getSnapshot().result.state).toEqual(imported);
     expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:1000000,state:imported}});
-    f.game.stop();const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(imported);
+    f.game.stop();const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(unlockEligibleAchievements(imported).state);
     expect(reload.getSnapshot().offline).toMatchObject({incomeEarned:'0',xpEarned:0});reload.stop();
     f.wall(1010000);const later=f.make();later.start();expect(later.getSnapshot().result.state).toEqual(simulateGameElapsed(imported,10000).state);
-    expect(later.getSnapshot().result.state.permanentProgression).toEqual(imported.permanentProgression);later.stop();
+    expect(later.getSnapshot().result.state.permanentProgression).toEqual(unlockEligibleAchievements(imported).state.permanentProgression);later.stop();
   });
 });
 
@@ -110,16 +111,16 @@ it('failed pre-Rebirth XP reconciliation suspends without resetting or saving a 
   const f = rebirthRuntime(initial), raw = f.raw();
   f.at(10000);
   expect(f.game.rebirth()).toEqual({ ok: false, error: 'runtime-unavailable' });
-  expect(f.game.getSnapshot().result.state).toEqual(initial);
+  expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(initial).state);
   f.autosave(); expect(f.raw()).toBe(raw);
   expect(f.events.some(event => event.type === 'write')).toBe(false); f.game.stop();
 });
 it('future-clock reload preserves permanent counters and safely rebases without reward', () => {
-  const initial = { ...rebirthState(), permanentProgression: { skills: {}, empirePoints: 11, rebirthCount: 2 } };
+  const initial = { ...rebirthState(), permanentProgression: { unlockedAchievementIds: [], skills: {}, empirePoints: 11, rebirthCount: 2 } };
   const f = rebirthRuntime(initial); f.game.stop(); f.wall(500);
   const reload = f.make(); reload.start();
-  expect(reload.getSnapshot().result.state).toEqual(initial);
+  expect(reload.getSnapshot().result.state).toEqual(unlockEligibleAchievements(initial).state);
   expect(reload.getSnapshot().offline).toMatchObject({ clockAnomaly: true, rewardedElapsedMs: 0, xpEarned: 0 });
-  expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 500, state: initial } });
+  expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 500, state: unlockEligibleAchievements(initial).state } });
   reload.stop();
 });

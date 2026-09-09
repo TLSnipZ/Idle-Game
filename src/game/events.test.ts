@@ -114,7 +114,7 @@ describe('atomic current-event choice resolution',()=>{
   it.each([0,60,90,100])('all stat sources and Heat %i leave event Money/XP unchanged',heat=>{
     const b=rebirthState(),crew=crewState({operations:'crew:rico-vale',logistics:'crew:jax-mercer'});
     for(const id of [TIP,WAREHOUSE] as const){const s={...b,...eventState(id,'1000000',heat),upgrades:b.upgrades,garage:b.garage,crew:crew.crew,
-      city:{...crew.city,heat,heatDecayElapsedMs:heat?30000:0},permanentProgression:{empirePoints:10,rebirthCount:2,skills:{'skill:fast-talker':2,'skill:learn-the-streets':2,'skill:streetwise-investment':3,'skill:silent-partner':2,'skill:never-sleeps':2}}};
+      city:{...crew.city,heat,heatDecayElapsedMs:heat?30000:0},permanentProgression:{ unlockedAchievementIds: [],empirePoints:10,rebirthCount:2,skills:{'skill:fast-talker':2,'skill:learn-the-streets':2,'skill:streetwise-investment':3,'skill:silent-partner':2,'skill:never-sleeps':2}}};
       const r=resolveEventChoice(s,id,id===TIP?'choice:take-tip':'choice:invest');expect(r.ok).toBe(true);expect(r.state.economy.cash).toBe('1150000');expect(r.state.progression).toBe(s.progression);expect(r.state.permanentProgression).toBe(s.permanentProgression);}
   });
   it('current cash changes availability without resnapshotting or eligibility rechecks',()=>{
@@ -125,6 +125,6 @@ describe('atomic current-event choice resolution',()=>{
   it.each([null,TIP,SHAKE,WAREHOUSE] as const)('Rebirth discards %s and timer without resolving/refunding',pendingEventId=>{
     const s={...rebirthState(),events:{opportunityElapsedMs:123456,pendingEventId}},r=performRebirth(s);expect(r.ok).toBe(true);
     expect(r.state.events).toEqual(createInitialGameState().events);expect(r.state.economy.cash).toBe('0');expect(r.state.garage).toEqual(s.garage);
-    expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:4,rebirthCount:1});
+    expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:4,rebirthCount:1,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth']});
   });
 });
