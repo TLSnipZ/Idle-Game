@@ -92,7 +92,7 @@ Sunset orange-to-magenta is reserved for future special moments, not every panel
   Tier text remains authoritative and visible. No siren, flashing or shimmer.
 
 Operations favors turquoise utility lines; City favors magenta/nightlife and Heat
-semantics; Collection favors a spacious premium showroom; Empire favors gold and
+semantics; Collection favors a compact premium showroom; Empire favors gold and
 violet permanence. All share one card/button language. The five section identities,
 order, grouping and central runtime are unchanged.
 
@@ -349,3 +349,30 @@ Preserve its warm-white 1990s three-door hatch, greenhouse/proportions, period
 lamps, compact grille, restrained lip/spoiler, wheel family and functional stance.
 Shared Vehicle Art Style remains separately authoritative: future other vehicles
 reuse rendering/scene language, not KX-R body shape. No separate Kairo logo exists.
+
+
+## POST 2D — compact progression and Garage polish
+
+The four-region HUD keeps XP inside PLAYER LEVEL: prominent Level, thin static
+cyan semantic progress, grouped integer **local XP / level requirement XP** text.
+MAX LEVEL replaces the progress target at the configured cap. The bar is readable
+on demand, never a live announcement, tooltip-only detail or fifth stat tile.
+Its modest reserved internal space avoids height changes at max-level transitions.
+
+Below navigation, a reserved gold Rebirth opportunity slot shows REBIRTH READY
+and the authoritative +EP reward with a 44px Review action. Narrow copy shortens
+the action visually while preserving its accessible name. No pulse, modal,
+dismissal state or notification framework. Transient messages coexist in their
+own compact, keyboard-scrollable reserved area; overflow remains accessible.
+
+The KX-R feature card now stops at 68rem and balances its two columns at 1.15:1,
+with 1.5rem stage/detail padding and a moderately smaller 2.4–3.25rem model name.
+At a full-width desktop card the image is approximately 532px wide (roughly
+300px natural height), materially smaller than the previous ~760px image. These
+are layout estimates, not browser measurements or pixel-test acceptance limits.
+The columns stack at 1000px before details become cramped; narrow layouts retain
+full available-width artwork, natural source aspect ratio and flexible card height.
+Owned, locked, unaffordable and purchasable use the same composition and artwork.
+No filler specifications, new controls, filters, crop, asset conversion or image
+changes. Canonical PNG, production WebP, lazy/async delivery and alt treatment
+remain exactly POST 2C. Desktop/mobile live visual acceptance remains pending.

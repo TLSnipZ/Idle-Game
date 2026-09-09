@@ -11,7 +11,7 @@ export function useActionFocus() {
     if ((document.activeElement === document.body || document.activeElement === action.button)
       && (!action.button.isConnected || action.button.disabled)) {
       action.heading.tabIndex = -1;
-      action.heading.focus();
+      action.heading.focus({ preventScroll: true });
     }
   });
   return (event: MouseEvent<HTMLDivElement>) => {

@@ -13,6 +13,11 @@ import { serializeSave, parseSave } from '../game/save-schema';
 import { exportSaveCode } from '../game/save-code';
 import { simulateOnlineElapsed } from '../game/simulate-online-elapsed';
 import { DELIVERY_DISPATCHER } from '../features/automation';
+import { STARTER_BUSINESS } from '../features/businesses';
+import { moneyFromMinorUnits } from '../features/economy';
+import { getLevelProgress, getXpThresholdForLevel } from '../features/progression';
+import { selectBusinessProgress } from '../game/selectors';
+import { selectRebirth } from '../game/rebirth';
 import { PRIMARY_SECTIONS } from './navigation';
 
 vi.mock('../platform/persistent-game', async importOriginal => {
@@ -240,7 +245,11 @@ describe('mounted navigation and one live runtime', () => {
   });
   it('focused event resolution hands focus to its surviving heading, without extra actions', async () => {
     const s = autoUpgraderState(); const f = await mount({ ...s, events: { pendingEventId: 'event:hot-tip', opportunityElapsedMs: 0 } });
-    await navigate('CITY'); button('PLAY IT SAFE').focus(); await click('PLAY IT SAFE');
+    await navigate('CITY'); button('PLAY IT SAFE').focus();
+    const eventHeading = container.querySelector<HTMLElement>('#city-events-heading'); if (!eventHeading) throw Error('heading');
+    const recovery = vi.spyOn(eventHeading, 'focus');
+    await click('PLAY IT SAFE');
+    expect(recovery).toHaveBeenCalledWith({ preventScroll: true });
     expect(document.activeElement?.id).toBe('city-events-heading');
     expect(f.game().getSnapshot().result.state.events.pendingEventId).toBeNull();
     expect(f.game().getSnapshot().result.state.permanentProgression.statistics.eventsResolved).toBe(1);
@@ -248,7 +257,11 @@ describe('mounted navigation and one live runtime', () => {
   });
   it('Crew assignment and unassignment keep a usable focus destination and announce outcomes', async () => {
     const s = autoUpgraderState(); const f = await mount({ ...s, crew: { recruitedIds: ['crew:mara-knox'], assignments: { operations: null, logistics: null } } });
-    await navigate('CITY'); button('Assign Mara Knox to Operations').focus(); await click('Assign Mara Knox to Operations');
+    await navigate('CITY'); button('Assign Mara Knox to Operations').focus();
+    const crewHeading = document.getElementById('crew:mara-knox-heading'); if (!crewHeading) throw Error('heading');
+    const recovery = vi.spyOn(crewHeading, 'focus');
+    await click('Assign Mara Knox to Operations');
+    expect(recovery).toHaveBeenCalledWith({ preventScroll: true });
     expect(document.activeElement?.id).toBe('crew:mara-knox-heading');
     expect(container.querySelector('.global-feedback [role="status"]')?.textContent).toContain('Mara Knox');
     button('Unassign Operations').focus(); await click('Unassign Operations');
@@ -283,4 +296,113 @@ describe('mounted navigation and one live runtime', () => {
     }
   });
 
+});
+
+
+describe('POST 2D local interaction and progression', () => {
+  it('repeated Dockside upgrades retain the same section, card and usable focused button', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('OPERATIONS');
+    const card = container.querySelector('.business-card'), section = container.querySelector('#section-content');
+    const upgrade = button('Upgrade Dockside Detail to Level 26'); upgrade.focus();
+    vi.mocked(window.scrollTo).mockClear();
+    for (let level = 26; level <= 28; level++) {
+      await click(`Upgrade Dockside Detail to Level ${level}`);
+      expect(f.game().getSnapshot().result.state.businesses.owned[STARTER_BUSINESS.id]?.level).toBe(level);
+      expect(button(`Upgrade Dockside Detail to Level ${level + 1}`)).toBe(upgrade);
+      expect(document.activeElement).toBe(upgrade); expect(upgrade.disabled).toBe(false);
+      expect(container.querySelector('.business-card')).toBe(card); expect(container.querySelector('#section-content')).toBe(section);
+    }
+    expect(section?.getAttribute('data-section')).toBe('operations'); expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(f.random.next).not.toHaveBeenCalled();
+  });
+  it('exhausting upgrade Cash recovers the local heading without scrolling it into view', async () => {
+    const state = autoUpgraderState(), cost = selectBusinessProgress(state, STARTER_BUSINESS.id)?.upgradeCost;
+    if (!cost) throw Error('cost');
+    const f = await mount({ ...state, economy: { cash: cost } }); await navigate('OPERATIONS');
+    const upgrade = button('Upgrade Dockside Detail to Level 26'); upgrade.focus();
+    const heading = container.querySelector<HTMLElement>('#business-name'); if (!heading) throw Error('heading');
+    const focus = vi.spyOn(heading, 'focus'); vi.mocked(window.scrollTo).mockClear();
+    await click('Upgrade Dockside Detail to Level 26');
+    expect(upgrade.disabled).toBe(true); expect(document.activeElement).toBe(heading);
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true }); expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(f.game().getSnapshot().result.state.economy.cash).toBe(moneyFromMinorUnits('0'));
+  });
+  it('Skill purchase that consumes the available EP recovers locally without top navigation', async () => {
+    const state = createInitialGameState(); const f = await mount({ ...state,
+      permanentProgression: { ...state.permanentProgression, empirePoints: 1 } });
+    await navigate('EMPIRE');
+    const purchase = button('Purchase next rank of Streetwise Investment'); purchase.focus();
+    const heading = purchase.closest('article')?.querySelector('h3'); if (!heading) throw Error('heading');
+    const focus = vi.spyOn(heading, 'focus'); vi.mocked(window.scrollTo).mockClear();
+    await click('Purchase next rank of Streetwise Investment');
+    expect(f.game().getSnapshot().result.state.permanentProgression.empirePoints).toBe(0);
+    expect(document.activeElement).toBe(heading); expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(window.scrollTo).not.toHaveBeenCalled(); expect(container.querySelector('[data-section]')?.getAttribute('data-section')).toBe('empire');
+  });
+  it('KX-R purchase removes its button but preserves the local heading and artwork', async () => {
+    await mount(autoUpgraderState()); await navigate('COLLECTION');
+    const buy = button('Buy Kairo KX-R'); buy.focus(); const image = container.querySelector('.vehicle-artwork');
+    const heading = buy.closest('article')?.querySelector('h3'); if (!heading) throw Error('heading');
+    const focus = vi.spyOn(heading, 'focus'); vi.mocked(window.scrollTo).mockClear();
+    await click('Buy Kairo KX-R');
+    expect(document.activeElement).toBe(heading); expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(container.querySelector('.vehicle-artwork')).toBe(image); expect(content()).toContain('OWNED');
+    expect(buy.isConnected).toBe(false); expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+  it('global XP survives all sections and resets its range on a Job level-up without focus movement', async () => {
+    const state = createInitialGameState(); const f = await mount({ ...state, progression: { xp: getXpThresholdForLevel(2) - 10 } });
+    const progress = container.querySelector<HTMLProgressElement>('.hud-xp-progress');
+    for (const section of PRIMARY_SECTIONS) {
+      await navigate(section.label); expect(container.querySelector('.hud-xp-progress')).toBe(progress);
+      expect(container.querySelectorAll('.global-status > div')).toHaveLength(4);
+    }
+    await navigate('OPERATIONS'); const delivery = container.querySelector<HTMLButtonElement>('.delivery-button'); delivery?.focus();
+    vi.mocked(window.scrollTo).mockClear(); await act(() => delivery?.click());
+    const authority = getLevelProgress(f.game().getSnapshot().result.state.progression.xp);
+    expect(authority.currentLevel).toBe(2); expect(progress?.value).toBe(authority.xpIntoLevel); expect(progress?.max).toBe(authority.xpNeededForLevel);
+    expect(document.activeElement).toBe(delivery); expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(progress?.closest('[role="status"], [aria-live]')).toBeNull();
+  });
+  it('passive Rebirth eligibility coexists with feedback and preserves Operations focus', async () => {
+    const state = autoUpgraderState(24);
+    const f = await mount({ ...state, progression: { xp: getXpThresholdForLevel(20) - 25 } });
+    await navigate('OPERATIONS'); const upgrade = button('Upgrade Dockside Detail to Level 25'); upgrade.focus();
+    const section = container.querySelector('[data-section]'); const feedback = container.querySelector('.global-feedback');
+    expect(container.querySelector('.rebirth-notice')).toBeNull(); vi.mocked(window.scrollTo).mockClear();
+    await click('Upgrade Dockside Detail to Level 25');
+    expect(container.querySelector('.rebirth-notice')?.textContent).toContain(`+${selectRebirth(f.game().getSnapshot().result.state).reward} EP`);
+    expect(container.querySelector('[data-section]')).toBe(section); expect(section?.getAttribute('data-section')).toBe('operations');
+    expect(document.activeElement).toBe(upgrade); expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(container.querySelector('.global-feedback')).toBe(feedback); expect(feedback?.textContent).toContain('LEVEL UP');
+    const announcement = container.querySelector('.rebirth-notice-slot [role="status"]')?.textContent;
+    await f.advance(250); expect(container.querySelector('.rebirth-notice-slot [role="status"]')?.textContent).toBe(announcement);
+    expect(document.activeElement).toBe(upgrade);
+  });
+  it('Review Rebirth only navigates/focuses, including from Empire; explicit confirmation clears notice', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('COLLECTION');
+    const before = f.game().getSnapshot().result.state, reads = f.reads(), writes = f.writes();
+    vi.mocked(window.scrollTo).mockClear();
+    await click('Review Rebirth in Empire');
+    expect(document.activeElement?.id).toBe('rebirth-heading'); expect(content()).not.toContain('Confirm your Rebirth');
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
+    expect(f.random.next).not.toHaveBeenCalled(); expect(window.scrollTo).not.toHaveBeenCalled();
+    const target = container.querySelector<HTMLElement>('#rebirth-heading'); if (!target) throw Error('target');
+    const scroll = vi.spyOn(target, 'scrollIntoView');
+    await click('Review Rebirth in Empire'); expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'instant' });
+    await click('Review Rebirth'); expect(document.activeElement?.getAttribute('aria-label')).toBe('Cancel Rebirth');
+    await click('Confirm Rebirth'); expect(container.querySelector('.rebirth-notice')).toBeNull();
+    expect(f.game().getSnapshot().result.state.permanentProgression.rebirthCount).toBe(1);
+    expect(document.activeElement?.id).toBe('rebirth-heading');
+  });
+});
+
+it('ordinary automation toggles preserve focus and section without extra navigation', async () => {
+  await mount(autoUpgraderState()); await navigate('OPERATIONS');
+  const toggle = button('Disable Business Auto-Upgrader'); toggle.focus();
+  vi.mocked(window.scrollTo).mockClear();
+  await click('Disable Business Auto-Upgrader');
+  expect(button('Enable Business Auto-Upgrader')).toBe(toggle); expect(document.activeElement).toBe(toggle);
+  await click('Enable Business Auto-Upgrader');
+  expect(button('Disable Business Auto-Upgrader')).toBe(toggle); expect(document.activeElement).toBe(toggle);
+  expect(window.scrollTo).not.toHaveBeenCalled();
 });

@@ -14,7 +14,9 @@ Phase 9B accessibility remain preserved contracts.
   analysis only; live-game changes: none. See [VEHICLE_CATALOG.md](VEHICLE_CATALOG.md).
 - POST 2B: **Kairo KX-R Final Refinement approved** as canonical Model Reference.
 - POST 2C: **Kairo KX-R Production Integration implementation complete**;
-  **live verification pending**. One vehicle only; Save v16 / CE1.
+  **manually reviewed live by the user; canonical KX-R visually approved**. One vehicle only; Save v16 / CE1.
+- POST 2D: **Interaction & Progression Polish implemented; live verification pending**.
+  In-section focus/scroll stability, global HUD XP, Rebirth Ready and compact KX-R layout.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately
@@ -37,7 +39,6 @@ and the shared camera/lighting/showroom language. No automatic next-phase work.
 | P2 | City Visual Layer | District imagery, compact city overview and eventually a Solara map with ownership/Heat/Event context. |
 | P2 | Crew Visual Identity | Approved portraits, role icons and assignment visualization within the Golden Reference style. |
 | P2 | Event Discoverability | Stronger active priority/direct access and eventual art. POST 1C only clarifies existing timer copy and navigation. |
-| High QoL | Global HUD Level / XP Progress | Future thin XP bar under/near Player Level across all five primary sections; current XP / next-level context and MAX LEVEL. Use existing authoritative XP/Level selectors, semantic accessible progress and compact mobile treatment. Not implemented in POST 2C. |
 | High QoL | Reset Progress / New Game | Explicit destructive warning and strong confirmation; canonical fresh replacement erases ALL temporary/permanent progress and statistics, rebases runtime/savedAt. CE1 export remains separately available. No placeholder control now. |
 
 ## Major expansions retained
@@ -85,9 +86,37 @@ The built local preview starts, but Cloud Browser rejects its address with
 owned/locked visual review were **not completed in a browser**. DOM/static tests
 cover states, image semantics, intrinsic/contained sizing, native purchase controls
 and existing navigation/accessibility. No live GitHub Pages review is claimed.
-The user must manually verify deployment before the next Garage phase.
+The user subsequently manually reviewed POST 2C live and approved the KX-R presentation; the browser limitation above records the implementation environment.
 
 Authenticated GitHub shell credentials are unavailable; the completed local commit
 is retained without a push. Future work must preserve canonical KX-R identity,
 approved Art Style, v16 migration/CE1 and one-vehicle authority until a separately
 authorized multi-vehicle migration introduces Active Vehicle.
+
+
+## POST 2D verification and handoff
+
+Implemented: global HUD Level/XP (backlog item resolved), derived Rebirth Ready
+notice, local action-focus/feedback stability and compact desktop KX-R Garage.
+Save v16/CE1, historical migration, KX-R balance/artwork and all gameplay remain
+unchanged. No new assets, dependencies, guidance engine, notification center,
+Active Vehicle or Tuning. Broader Rebirth Guidance remains a future item.
+
+Cloud Browser rejected the running local preview with `ERR_BLOCKED_BY_CLIENT`.
+Mounted DOM and CSS checks do not constitute real scroll or visual verification.
+Desktop, 390px, 320px, keyboard/zoom and live Pages acceptance remain pending.
+After deployment, manually check repeated Dockside upgrades and Skill/Crew
+interactions; XP across sections and level-up; Rebirth Ready appearing, Review
+navigation and disappearance after Rebirth; compact desktop Garage and mobile
+Collection. Preserve the explicit-navigation and Import/Rebirth focus exceptions.
+
+
+Fresh `npm ci --no-audit --no-fund`, `npm run typecheck`, `npm run test`,
+`npm run build` and `git diff --check` passed: **1,900 tests in 91 files**,
+including 16 added cases. Existing Event/Crew focus assertions were strengthened;
+the existing HUD markup expectation now includes its XP progress. Migration/CE1,
+Phase 9D runtime, purchase/Rebirth, content counts and balance suites stay intact.
+Baseline comparison confirms both KX-R assets, save/schema/export, XP/Rebirth
+rules and all domain/platform code are unchanged. No dependency changes.
+Authenticated GitHub shell credentials were unavailable; no push was attempted.
+The original unrelated GAME_DESIGN.md edit remains untouched outside this task.

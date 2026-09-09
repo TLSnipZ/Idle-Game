@@ -11,7 +11,7 @@ export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
   const { feedback, levelEvent, achievementEvent, cityEvent, automationEvent, persistence, runtimeError } = game;
   const paused = runtimeError !== null;
   const storageError = persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error';
-  return <aside className="global-feedback" aria-label="Session feedback">
+  return <aside className="global-feedback" aria-label="Session feedback" tabIndex={0}>
     <div className={`feedback-command feedback-${feedback.tone ?? 'info'}`} role="status" aria-live="polite" aria-atomic="true"><span key={feedback.sequence}>{feedback.message}</span></div>
     <div className="feedback-achievement" role="status" aria-live="polite" aria-atomic="true">{achievementEvent && <span key={achievementEvent.sequence}>{achievementAnnouncement(achievementEvent.ids)}</span>}</div>
     <div role="status" aria-live="polite" aria-atomic="true">{levelEvent && !paused && <span key={levelEvent.sequence}>{describeLevelIncrease(levelEvent)}{levelEvent.unlocks?.length ? ` · New unlock available: ${levelEvent.unlocks.join(', ')}` : ''}</span>}</div>

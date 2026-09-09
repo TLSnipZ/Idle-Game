@@ -1,7 +1,7 @@
 # Solara City
 
 A modern coastal crime, luxury and street-culture idle/tycoon browser game.
-The Base Game foundation is complete. **POST 2C Kairo KX-R integration implemented; live verification pending.**
+The Base Game foundation is complete. **POST 2C manually reviewed live; POST 2D interaction/progression polish implemented, live verification pending.**
 See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
@@ -181,3 +181,12 @@ live summary; Operations manages earning and automation, City manages districts/
 Crew/Events, Collection holds the Garage, and Empire holds permanent progression and
 save transfer. Cash, Level, Heat and EP remain global. Switching sections never pauses
 the game or changes your save.
+
+
+The global Player Level tile shows XP earned within the current level / XP needed
+for that level, with semantic progress and MAX LEVEL at the cap. Rebirth Ready
+shows the current +EP reward when eligible; its Review action navigates to Empire
+without opening confirmation or changing gameplay. Ordinary card actions recover
+local focus without scrolling to their headings. The KX-R showroom is capped on
+desktop and stacks with full-width artwork on mobile. These POST 2D changes retain
+Save v16 / CE1 and all gameplay; see POST_ROADMAP.md for pending live acceptance.

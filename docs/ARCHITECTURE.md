@@ -2367,3 +2367,49 @@ dimensions and concise alt text. The reference PNG is unimported source authorit
 Collection displays static responsive contained artwork with lazy loading/async
 decode. Name, effect, exact price, gates/status and native purchase action remain
 HTML. Owned state hides purchase clutter; no ACTIVE/equip/Tuning UI is introduced.
+
+
+## POST 2D — interaction and progression presentation
+
+Presentation only: Save v16, CE1, v15→v16 migration, domain commands, all economy,
+XP/Rebirth formulas, content and runtime/persistence boundaries are unchanged.
+
+Ordinary commands retain the active section and stable card/control DOM. The
+shared action-focus helper previously called bare `heading.focus()` when the
+focused button disappeared or became disabled (including Dockside affordability
+after purchase). That recovery can scroll back to the card heading. It now uses
+`focus({ preventScroll: true })`, preserving the same Phase 9B local destination.
+Enabled controls retain focus. There are no scroll-coordinate snapshots, history
+hacks, unstable gameplay-derived keys or command-specific scroll restoration.
+
+Audit: Starter Job, business purchase/upgrade, Lay Low, territory purchase, Crew
+recruit/assign/unassign, Event choice, Dispatcher/Auto-Upgrader purchase and toggle,
+vehicle and Skill purchase all use the same section-level capture/recovery path.
+None submits a form or explicitly navigates. Import forms and Rebirth confirmation
+retain their own intentional Cancel-first/replacement focus behavior. Explicit
+primary navigation still focuses the section heading and goes to the section top.
+
+Transient feedback previously inserted variable-height blocks above the section.
+Its existing aside now reserves a compact scrollable message area, keyboard
+focusable and named, so adding feedback does not move the whole section. No message
+is discarded or truncated; overflow is available by keyboard/touch. Rebirth has a
+separate reserved slot and never replaces command/achievement/Event feedback.
+Browser-native document anchoring remains enabled. This addresses the identified
+focus and feedback movement paths; actual browser scroll acceptance is still
+required because the local preview was blocked in Cloud Browser.
+
+The HUD consumes `dashboardPresentation.player` from `getLevelProgress`; numeric
+XP means **XP earned in this level / XP needed for this level**, matching Overview.
+A native named progress element uses those same values, bounded for presentation.
+Invalid progress values display an unavailable fallback without repairing state.
+The configured cap (currently 100) displays MAX LEVEL with no nonexistent next
+level or progress target. No per-tick live region or new progression formula.
+
+The notice consumes the same `selectRebirth` result as the review/command. Its
+visual reward updates while eligibility remains true; a separate polite region
+announces only false→true eligibility, including an eligible session on mount.
+It clears on ineligibility and can recur in a later run. A ref/message in React
+is ephemeral, not Save state. Review Rebirth only changes local section/target
+request, then focuses and instantly scrolls to `rebirth-heading`; it neither opens
+confirmation nor calls the runtime, clock, RNG or storage. The existing panel's
+Review/Cancel/Confirm flow still owns actual Rebirth.

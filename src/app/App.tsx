@@ -13,6 +13,7 @@ import { dashboardPresentation } from './dashboard-presentation';
 import { GlobalStatus } from './GlobalStatus';
 import { GlobalFeedback } from './GlobalFeedback';
 import { useActionFocus } from './use-action-focus';
+import { RebirthNotice } from './RebirthNotice';
 import './App.css';
 import './sections.css';
 
@@ -27,20 +28,31 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const main = useRef<HTMLElement>(null);
   const captureAction = useActionFocus();
   const previous = useRef(active);
+  const [reviewRequest, setReviewRequest] = useState(0);
+  const handledReview = useRef(0);
   useEffect(() => {
-    if (previous.current !== active) {
+    if (reviewRequest !== handledReview.current && active === SECTION.empire.id) {
+      const target = main.current?.querySelector<HTMLElement>('#rebirth-heading');
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView({ block: 'start', behavior: 'instant' });
+      handledReview.current = reviewRequest;
+    } else if (previous.current !== active) {
       heading.current?.focus({ preventScroll: true });
       window.scrollTo({ top: 0 });
-      previous.current = active;
     }
-  }, [active]);
+    previous.current = active;
+  }, [active, reviewRequest]);
   const section = PRIMARY_SECTIONS.find(section => section.id === active) ?? SECTION.overview;
   const paused = game.runtimeError !== null;
+  const dashboard = dashboardPresentation(game.snapshot.state);
   return <div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>Skip to main content</a>
     <header className="app-header"><span className="wordmark">{CITY_NAME}</span><span className="edition">Own the night</span>{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">Autosave on</span>}</header>
-    <GlobalStatus view={dashboardPresentation(game.snapshot.state)} active={active} onNavigate={setActive} paused={paused} />
+    <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
+      <RebirthNotice preview={dashboard.empire} onReview={() => {
+        setActive(SECTION.empire.id); setReviewRequest(request => request + 1);
+      }} />
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />
       {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => setActive(SECTION.empire.id)}>Return to Empire · Confirmation awaiting your choice</button>}
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />

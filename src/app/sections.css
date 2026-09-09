@@ -91,14 +91,16 @@
 
 /* Collection: canonical wide artwork; gameplay information stays in HTML. */
 .garage-catalog { display: grid; gap: var(--space-xl); margin-block: var(--space-sm); }
-.vehicle-card { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); padding: 0; }
-.showroom-stage { min-width: 0; padding: clamp(1.5rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center; position: relative; background: var(--color-warm-tint); }
+.vehicle-card { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); max-width: 68rem; padding: 0; align-items: start; }
+.showroom-stage { min-width: 0; padding: var(--space-lg); display: flex; flex-direction: column; position: relative; background: var(--color-warm-tint); }
 .showroom-stage::after { content: ''; pointer-events: none; position: absolute; inset: auto var(--space-xl) var(--space-lg); height: 1px; background: var(--color-warm); }
 .showroom-stage .panel-heading { display: block; }
-.showroom-stage h3 { font-size: clamp(2.4rem, 5vw, 4rem); }
+.showroom-stage h3 { font-size: clamp(2.4rem, 4vw, 3.25rem); margin-block: var(--space-sm); }
 .vehicle-manufacturer { display: block; font-size: 1rem; letter-spacing: var(--tracking-label); text-transform: uppercase; }
 .vehicle-artwork { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 1672 / 941; object-fit: contain; border-radius: var(--radius-card); margin-block: var(--space-md); }
-.vehicle-specification { min-width: 0; padding: var(--space-xl); }
+.vehicle-specification { min-width: 0; padding: var(--space-lg); }
+.garage > .panel-heading h2 { margin-block: var(--space-sm); }
+.showroom-stage .eyebrow { margin-block: var(--space-sm); }
 .vehicle-specification .production { font-size: 1.35rem; padding-block: var(--space-sm); border-block: 1px solid var(--color-border); }
 
 /* Empire: consequential reset, readable branches, permanent record and transfer. */
@@ -133,7 +135,7 @@
 
 /* Existing tablet/mobile breakpoints; DOM order and visible text remain primary. */
 @media (max-width: 1000px) {
-  .district-pressure-layout, .rebirth-panel { grid-template-columns: minmax(0, 1fr); }
+  .district-pressure-layout, .rebirth-panel, .vehicle-card { grid-template-columns: minmax(0, 1fr); }
   .district-zone .territory-catalog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operations-anchor { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
 }
@@ -148,3 +150,30 @@
   .confirmation-actions { flex-direction: column; }
   .confirmation-actions .action-button { flex-basis: auto; }
 }
+
+/* POST 2D: presentation-only progression, stable feedback and local focus. */
+.hud-level dd { min-block-size: 3.5rem; }
+.hud-xp-progress { display: block; width: 100%; height: .35rem; margin-block: .2rem; accent-color: var(--color-cool); background: var(--color-background); border: 0; border-radius: .2rem; }
+.hud-xp-progress::-webkit-progress-bar { background: var(--color-background); border-radius: .2rem; }
+.hud-xp-progress::-webkit-progress-value { background: var(--color-cool); border-radius: .2rem; }
+.hud-xp-progress::-moz-progress-bar { background: var(--color-cool); }
+.hud-xp-text { display: block; font-size: .72rem; line-height: 1.3; font-weight: 500; color: var(--color-secondary); }
+/* Reserve space before eligibility and messages change; overflow remains readable
+   with keyboard scrolling instead of moving the whole document below. */
+.rebirth-notice-slot { min-block-size: 3.25rem; position: relative; }
+.rebirth-notice { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-height: 44px; color: var(--color-warm); font-size: .85rem; border-inline-start: 2px solid var(--color-warm); padding-inline: .5rem; background: var(--color-warm-tint); border-radius: var(--radius-control); }
+.rebirth-notice > span { min-width: 0; }
+.rebirth-notice button { min-height: 44px; flex-shrink: 0; padding: .4rem .65rem; color: inherit; background: transparent; border: 1px solid var(--color-warm); border-radius: var(--radius-control); font: inherit; cursor: pointer; }
+.rebirth-review-mobile { display: none; }
+.global-feedback { block-size: 4.75rem; overflow: auto; scrollbar-gutter: stable; padding: .25rem; }
+.global-feedback:focus-visible, .rebirth-notice button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+#rebirth-heading { scroll-margin-block-start: 14rem; }
+@media (max-width: 740px) {
+  .rebirth-review-desktop { display: none; }
+  .rebirth-review-mobile { display: inline; }
+  .rebirth-notice { font-size: .75rem; }
+  .rebirth-notice button { padding-inline: .5rem; }
+  #rebirth-heading { scroll-margin-block-start: 1rem; }
+}
+@media (max-height: 600px) { #rebirth-heading { scroll-margin-block-start: 1rem; } }

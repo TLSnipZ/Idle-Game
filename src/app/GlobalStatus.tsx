@@ -1,6 +1,7 @@
 import { formatInteger } from './number-format';
 import type { dashboardPresentation } from './dashboard-presentation';
 import { Navigation } from './Navigation';
+import { HudPlayerProgress } from './HudPlayerProgress';
 import { SECTION } from './navigation';
 import type { Navigate, SectionId } from './navigation';
 export function GlobalStatus({ view, active, onNavigate, paused }: {
@@ -11,7 +12,7 @@ export function GlobalStatus({ view, active, onNavigate, paused }: {
     <div className="global-chrome-inner">
       <dl className="global-status" aria-label="Current player status">
         <div className="hud-cash"><dt>Cash</dt><dd>{view.cash}</dd></div>
-        <div className="hud-level"><dt>Player Level</dt><dd>{view.player.currentLevel}</dd></div>
+        <div className="hud-level"><dt>Player Level</dt><dd>{view.player.currentLevel}<HudPlayerProgress progress={view.player} /></dd></div>
         <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>Heat</dt><dd>{view.heat.heat} · {view.heat.tier.label}</dd></div>
         <div className="hud-empire"><dt>Empire Points</dt><dd>{formatInteger(view.empire.empirePoints)} EP</dd></div>
       </dl>

@@ -290,7 +290,18 @@ That design pass implemented no artwork, Garage expansion or Tuning.
 
 POST 2A catalog design is complete; POST 2B Final Refinement is explicitly approved
 as the canonical Kairo KX-R Model Reference. POST 2C production integration is
-implemented; live verification pending. Current Save v16 maps Vortex ownership to
+implemented and subsequently manually reviewed live by the user. Current Save v16 maps Vortex ownership to
 KX-R; CE1 is unchanged. One production vehicle only. See POST_ROADMAP.md for the
-current priorities, including future global HUD Level/XP progress. Active Vehicle,
+current priorities; global HUD Level/XP progress is implemented in POST 2D below. Active Vehicle,
 Tier 1 expansion and Tuning remain separately scoped future work.
+
+
+## POST 2D handoff
+
+POST 2C has been manually reviewed live by the user; KX-R is visually approved.
+POST 2D Interaction & Progression Polish is implemented, live verification pending:
+local action/focus stability, global local-level XP progress, derived Rebirth Ready
+navigation and compact desktop Garage. Save v16, CE1, canonical assets and all
+balance/runtime contracts are unchanged. POST_ROADMAP.md owns the current backlog;
+HUD XP is resolved, while broader Guidance, Reset Progress and Garage expansion
+remain future separate scopes. No automatic next phase.

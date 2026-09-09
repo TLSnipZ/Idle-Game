@@ -121,7 +121,7 @@ describe('five-section presentation navigation', () => {
     const after = { ...initial, economy: { cash: moneyFromMinorUnits('123456789') }, progression: { xp: getXpThresholdForLevel(12) },
       city: { ...initial.city, heat: 60 }, permanentProgression: { ...initial.permanentProgression, empirePoints: 9 } };
     const html = render(<GlobalStatus view={dashboardPresentation(after)} active={SECTION.collection.id} onNavigate={() => {}} paused={false} />);
-    for (const text of ['$1,234,567.89','Player Level','<dd>12</dd>','60 · HOT','9 EP']) expect(html).toContain(text);
+    for (const text of ['$1,234,567.89','Player Level','<dd>12<progress','60 · HOT','9 EP']) expect(html).toContain(text);
     expect(dashboardPresentation(initial).cash).toBe('$0.00');
     expect(render(<OverviewSection state={after} paused={false} onNavigate={() => {}} />)).toContain('$1,234,567.89');
   });
