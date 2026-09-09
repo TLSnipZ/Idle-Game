@@ -49,7 +49,7 @@ fallbacks provide a sturdy display stack. No remote font request or font binary.
 | Text wordmark | Uppercase, bold, wide tracking; no GTA-like lettering |
 | Section h1 | Responsive 1.7–2.5rem, wide uppercase; one active heading |
 | Subsection / card headings | Strong weight, logical h2/h3; appearance never determines semantics |
-| Vortex model name | 2–3.5rem display emphasis, future showroom anchor |
+| Vehicle model name | 2–3.5rem display emphasis, future showroom anchor |
 | Body | 1rem default, comfortable line height, readable supporting copy |
 | HUD / stats | Tabular numbers, `--text-stat`, wrapping for very large Money |
 | Labels / badges | `--text-label`, restrained tracking, explicit words |
@@ -75,7 +75,7 @@ Sunset orange-to-magenta is reserved for future special moments, not every panel
   EP remain visible. Overview routes to management rather than duplicating it.
 - **Standard cards:** shared surface, quiet border, coherent padding. Requirements
   remain readable even when locked. Met/Required text stays separate from cash.
-- **Feature cards:** Rebirth, City Events and the Vortex showroom use elevated
+- **Feature cards:** Rebirth, City Events and the vehicle showroom use elevated
   surfaces, more space and selective accent edges. No empty fake artwork slot.
 - **Primary actions:** purchases, upgrades and delivery share magenta/violet with
   white text. **Secondary** management uses dark surfaces and cool borders.
@@ -159,7 +159,7 @@ Future folders under `src/assets/`: `branding/`, `vehicles/`, `crew/`, `business
 `territories/`, `events/`, `ui/`, plus `reference/vehicles/`, `reference/crew/`,
 `reference/businesses/`, `reference/territories/`, `reference/events/` for approvals.
 
-Use lowercase descriptive names, e.g. `vehicle_vortex_s9_showroom.webp`,
+Use lowercase descriptive names, e.g. `kairo-kx-r.webp`,
 `crew_rico_vale_portrait.webp`, `territory_neon_mile_hero.webp`. Filenames are
 presentation details, **not stable gameplay IDs**. GameState never stores asset
 paths. A presentation registry can replace art without a save migration.
@@ -306,16 +306,16 @@ production model. No image is integrated or promoted by this documentation pass.
 
 An **Art-Style Reference** defines shared camera, rendering, lighting, environment
 and composition. A **Vehicle Model Reference** defines one canonical fictional
-body, proportions, lamps, grille, surfaces, aero, wheels and badges. No Golden
-Vehicle Model Reference exists yet. Kairo Motors / Kairo KX-R is the confirmed
-future first-car concept; Vortex stays live pending explicit implementation.
+body, proportions, lamps, grille, surfaces, aero, wheels and badges. Kairo KX-R
+Final Refinement is the first user-approved Vehicle Model Reference;
+POST 2C integrates it without redesign. Vortex is historical identity only.
 
 Future models may strongly evoke real automotive eras/archetypes, but must alter
 identifying lamps, intakes, bumpers, rear graphics, surfaces, aero and branding.
 Do not commission exact real cars with logos removed. Real-model references stay
 in developer notes; player names and badges are fictional. The KX-R keeps compact
-1990s performance-hatch DNA with its own canonical details. The next phase is
-**POST 2B — Kairo KX-R Golden Reference**, a small user-reviewed candidate set.
+1990s performance-hatch DNA with its own canonical details. POST 2B
+completed that controlled review; Final Refinement was explicitly selected by the user.
 
 Future tuning uses each approved base Model Reference to create controlled reviewed
 variants while retaining identity and the shared Art Style. Favor curated feasible
@@ -324,3 +324,28 @@ or thousands of full renders. Keep files independent of saved vehicle/build IDs.
 Inspect this document, the applicable explicitly approved assets and catalog model
 notes before any generation. Missing approved image sources must be recovered or
 requested, never replaced silently. User approval precedes reference promotion.
+
+## POST 2C — approved Kairo KX-R reference and delivery
+
+The exact user-approved `kairo_kxr_final_refinement.png` is preserved byte-for-byte
+as `src/assets/reference/vehicles/kairo-kx-r-reference.png` (1672×941 PNG,
+2,074,748 bytes). This generated, user-provided approved source is the canonical
+base/OEM+ **Model Reference**, not First Build or rejected candidates. No generation,
+retouching, cropping or redesign occurred in POST 2C.
+
+`src/assets/vehicles/kairo-kx-r.webp` is its ordinary Pillow WebP conversion,
+quality 90 / method 6, same 1672×941 dimensions, 247,612 bytes. No upscaling or
+new dependency. Only this derivative is imported by the presentation registry;
+Vite emits it with its relative GitHub Pages base. The PNG is not runtime-imported.
+
+Collection preserves the whole composition with responsive width, intrinsic
+aspect ratio and contain sizing; mobile stacks identity/artwork before HTML facts
+and action. Static lazy/async image, concise alt “Kairo KX-R in the Solara City
+garage”, no focus/interaction, filters or animation. Locked and owned use the same
+art. Name, status, price, gates and effect remain accessible without image loading.
+
+Future KX-R tuning must inspect this model before creating controlled variants.
+Preserve its warm-white 1990s three-door hatch, greenhouse/proportions, period
+lamps, compact grille, restrained lip/spoiler, wheel family and functional stance.
+Shared Vehicle Art Style remains separately authoritative: future other vehicles
+reuse rendering/scene language, not KX-R body shape. No separate Kairo logo exists.

@@ -2,37 +2,35 @@
 
 ## Status & scope
 
-**POST 2A — Vehicle Catalog Design Pass: design/analysis/documentation complete.**
-Baseline: `f0efb0942a41e8f8c34a57d8a1608f99d609bf69`, POST 1C manually verified
-live by the user. This document is the planning authority, not live balance/config.
-Kairo Motors and Kairo KX-R are **CONFIRMED FUTURE CONCEPTS**. The other names,
-prices, gates and effects below are **PROPOSED FUTURE VALUES**, subject to design
-review and later implementation verification. Exactly 14 vehicles are planned;
-the legacy Vortex is not a fifteenth catalog entry.
+**POST 2A design complete; POST 2B Model Reference approved; POST 2C integration
+implemented, live verification pending.** POST 2C descends from
+`10f170447d09e12f7ef1293539ef979c506fa563`.
 
-### Current live behavior — unchanged
+This catalog contains fourteen identities: **Kairo KX-R implemented, thirteen
+remaining vehicles planned**. Proposed names/values for rows 2–14 are not live.
+Active Vehicle and Tuning remain future systems. BALANCING.md is live balance authority.
 
-Inspected authority: `src/features/vehicles/config/vehicle-config.ts`, the vehicles
-model/public API, `game/purchase-vehicle.ts`, `effective-stats.ts`, `save-schema.ts`,
-`save-code.ts`, `rebirth.ts`, and the Garage presentation.
+### Current production behavior
 
-| Current property | Actual implementation |
+| Current property | Implementation |
 | --- | --- |
-| Name / stable ID | Vortex S9 / `vehicle:starter-sport-sedan` |
-| Price | $50,000 (`5000000` integer cents) |
-| Acquisition | Player Level 7, Dockside owned, Dockside Level 10 |
-| Effect | +15% global Business Production (1,500 basis points) while owned |
-| Modifier ID | `modifier:starter-sport-sedan-production` |
-| Permanence | Garage ownership survives Rebirth; effect resumes when a business returns |
-| State | `garage: { ownedVehicleIds: [...] }`; unique known IDs, no active/build/manufacturer field |
-| Save / transfer | Envelope `format: 'crime-empire-save'`, `version: 15`, `savedAt`, `state`; `CE1-` transport |
+| Name / stable ID | Kairo KX-R / `vehicle:kairo-kx-r` |
+| Manufacturer / role | Kairo Motors / Business starter |
+| Price | $25,000 (`2500000` integer cents) |
+| Acquisition | Player Level 5, Dockside owned at Level 5; no additional gate |
+| Effect | +10% global Business Production (1,000 basis points) while owned |
+| Modifier ID | `modifier:kairo-kx-r-production` |
+| Permanence | Ownership survives Rebirth; bonus applies to rebuilt businesses |
+| State | `garage: { ownedVehicleIds: [...] }`; one current vehicle, no active/build/manufacturer fields |
+| Save / transfer | Save v16 / unchanged `CE1-` container |
+| Model Reference | User-approved Final Refinement, first canonical Vehicle Model Reference |
 
-Owner example: `garage: { ownedVehicleIds: ['vehicle:starter-sport-sedan'] }`.
-Non-owner: the same array empty. No stats, price or image filename are saved in
-Garage. Current ownership modifiers all apply, but the catalog contains only one
-vehicle. No Active Vehicle, tuning, selling, new Garage cards or replacement is live.
-The existing six Achievements/eight Statistics are unaffected. BALANCING.md remains
-live authority; none of this document's proposed values supersedes it today.
+An owner stores `garage: { ownedVehicleIds: ['vehicle:kairo-kx-r'] }`; fresh players
+have an empty array. Images, price, bonuses and manufacturer are not saved.
+The former Vortex S9 was `$50,000 / P7 / D10 / +15%`, stored as
+`vehicle:starter-sport-sedan`. Historical ownership migrates, without compensation,
+to KX-R. No hidden Vortex catalog entry remains. Six Achievements and eight
+Statistics are unchanged. See the migration record below.
 
 ## Vehicle design philosophy
 
@@ -54,8 +52,8 @@ TUNER FOUNDATION**, first purchasable vehicle. No free car is added before it.
 
 Candidate A from the earlier external review is **APPROVED VEHICLE ART-STYLE
 DIRECTION ONLY**. Its depicted sedan is **not a canonical vehicle** and must not
-be integrated as Vortex or KX-R. B/C have no reference authority. No Golden Vehicle
-Model Reference exists; canonical KX-R artwork has not been created.
+be integrated as Vortex or KX-R. B/C have no reference authority. **Kairo KX-R Final Refinement is user-approved
+as the first canonical Vehicle Model Reference**, integrated in POST 2C.
 
 - **Art-Style Reference:** shared front 3/4 composition, low believable camera,
   natural automotive focal-length feel, vehicle-dominant framing with crop room,
@@ -67,9 +65,10 @@ Model Reference exists; canonical KX-R artwork has not been created.
   lighting signatures, grille, surfacing, aero, badges and wheels. It identifies
   one model independently from the shared lighting/environment treatment.
 
-The next KX-R approval can establish the first Model Reference using the approved
-Art Style. Do not treat any ordinary image, rejected candidate or renamed file as
-an approved reference. No candidate files are promoted or added by POST 2A.
+The KX-R Model Reference preserves the separately approved shared Art Style. Do not treat any ordinary image, rejected candidate or renamed file as
+an approved reference. POST 2A itself added no assets; POST 2C retains only the approved reference and WebP derivative.
+Paths: `src/assets/reference/vehicles/kairo-kx-r-reference.png` and
+`src/assets/vehicles/kairo-kx-r.webp`.
 
 ## Fictionalization rules
 
@@ -106,13 +105,13 @@ Avelin, Calder and Orsella each occupy one deliberate specialist slot in this in
 JDM-weighted selection; they are not arbitrary new brands for ordinary cars. Toseki's
 rally sedans and GT division remain recognizably related, not Italian or American
 cars under a Japanese badge. Do not preserve **Vortex** as a manufacturer: it adds
-no needed niche here. Vortex S9 remains legacy placeholder terminology until migration.
+no needed niche here. Vortex S9 is historical placeholder terminology, retired by the v16 migration.
 
 ## Initial vehicle catalog
 
 Two tables share row numbers: this identity table and the pricing/effect table below
 together define every vehicle. Distribution is **3 / 3 / 4 / 2 / 2** across five tiers.
-All entries are unimplemented. Row 1 is confirmed concept; rows 2–14 proposed concepts.
+Row 1 is implemented in POST 2C; rows 2–14 remain proposed concepts.
 Real-world names in this table describe developer archetypes, never player-facing names.
 
 | # / Tier | Fictional manufacturer / model | Developer archetype | Body / era | Identity and future tuning personality |
@@ -152,7 +151,8 @@ different model/era from Raizan. No future image prompts or logos are produced h
 
 ## Vehicle progression & pricing
 
-**All values below are future proposals, assuming ONE active vehicle's effects.**
+**Row 1 is live and applies while owned. Rows 2–14 are future proposals assuming
+ONE active vehicle; Active Vehicle is not implemented yet.**
 P = current Player Level; D = owned Dockside Level; R = lifetime Rebirth count;
 N = Neon Mile controlled. These are acquisition-only gates: resetting temporary
 requirements never deactivates an owned vehicle. No previous-car ownership gates.
@@ -166,7 +166,7 @@ pass; do not ship a guessed gate. Exactly **11 C / 3 F** unlock proposals.
 
 | # / Vehicle | Tier | Price proposal | Unlock proposal (AND) | Role | Base effect while active | Compatibility / expected window | Status |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 1 Kairo KX-R | T1 | $25,000 | P5, D5 | BUSINESS STARTER | +10% Business Production | C / early first-run investment | Confirmed concept; balance proposed |
+| 1 Kairo KX-R | T1 | $25,000 | P5, D5 | BUSINESS STARTER | +10% Business Production | C / early first-run investment | Implemented — POST 2C |
 | 2 Kairo Senda | T1 | $40,000 | P6, D7 | STREET EARNER | +12% Manual Job Cash | C / first-run active alternative | Proposed |
 | 3 Namera Lilt | T1 | $55,000 | P7, D8 | COOL RUNNER | Cooling interval −3 seconds: 60→57s; Mara 45→42s | C / first-run short-break utility choice | Proposed |
 | 4 Namera Serein | T2 | $80,000 | P9, D10 | DRIFT SPECIALIST | +16% Manual Job Cash | C / later first run; drift/racing depth future | Proposed |
@@ -244,7 +244,7 @@ is execution headroom for nine routes, not a performance acceptance threshold.
 
 MODELED time **h:mm:ss**, measured from fresh state, not guaranteed player playtime:
 
-| Policy | Dispatcher (all three scenarios) | Current Vortex bought | Proposed KX-R bought | First Rebirth: no car | First Rebirth: Vortex | First Rebirth: KX-R |
+| Policy | Dispatcher (all three scenarios) | Historical Vortex bought | KX-R bought | First Rebirth: no car | First Rebirth: Vortex | First Rebirth: KX-R |
 | --- | --- | --- | --- | --- | --- | --- |
 | Active | 0:30:30 | 4:38:55 (D19) | 2:29:25 (D13) | 7:33:50 | 7:32:40 | 7:25:20 |
 | Greedy payback / optimized | 0:17:20 | 2:42:15 (D14) | 2:01:20 (D12) | 6:39:40 | 6:39:30 | 6:34:00 |
@@ -424,94 +424,69 @@ sizes, mobile crops and model consistency before expanding. No asset work in POS
 
 ## Stable ID strategy
 
-Recommend documented future `vehicle:kairo-kx-r`, following the existing
+Current canonical ID is `vehicle:kairo-kx-r`, following the existing
 `vehicle:` namespace and kebab-case conventions. Use `vehicle:<make>-<model>` for
 new models at implementation, with collision review. Price, tier, real archetype,
 bonus, asset path and build never belong in identity. Manufacturer definitions may
 be static config; ownership does not require separately saved manufacturer state.
-No production ID has been introduced by this design document.
+POST 2C introduced only KX-R; remaining model IDs are future work.
 
-## Vortex S9 → Kairo KX-R migration plan — future only
+## Vortex S9 → Kairo KX-R migration — implemented in POST 2C
 
-| Strategy | Benefit | Cost / decision |
-| --- | --- | --- |
-| A: retain `vehicle:starter-sport-sedan`, relabel/reconfigure | Rename/art alone can preserve v15 ownership without identity migration | Misleading hatch ID; placeholder debt spreads into builds. Active selection still needs a schema addition later. Not recommended |
-| B: map to `vehicle:kairo-kx-r` in a future sequential migration | Clean identity before catalog/build growth; deterministic historical support | Requires version-aware validation, migration and CE1/regression tests. **Recommended** |
+Strategy A (retain `vehicle:starter-sport-sedan` while relabeling) would avoid an ID
+migration, but leave misleading placeholder identity in future builds/config.
+Strategy B is implemented: **sequential v15 → v16**, mapping that exact legacy ID
+to `vehicle:kairo-kx-r`. This changes no state shape and adds no fields.
 
-**Owner → KX-R owner; non-owner → non-owner.** No repurchase, free award to
-non-owners, refund, EP/token compensation or historical simulation. Cash, XP, all
-other slices, both production fractions and migration `savedAt` remain exact.
-Current $50k/7/10/+15% versus proposed $25k/5/5/+10% is an explicit **future balance
-change**, not migration arithmetic. Apply one canonical KX-R effect to everyone
-prospectively. No hidden old-owner 15% versus new-owner 10% flags. Ownership preserves
-the investment; the lower future price is not automatically refunded. Early placeholder
-replacement before mature catalog/builds justifies a unified rebalance; communicate
-it in that release and revisit only if implementation evidence shows material harm.
+**Owner → KX-R owner; non-owner → non-owner.** No repurchase, refund, XP/EP/Heat,
+statistics, achievement, price history or historical income is added. Cash, all
+unrelated slices, both production fractions and raw migration `savedAt` stay exact.
+One canonical +10% effect applies to every owner; no hidden legacy +15% version.
+The explicit rebalance from the foundation placeholder preserves ownership while
+avoiding permanent account divergence early in catalog development. No price refund.
 
-### Historical validation must survive retirement
+Historical v6–v15 validation accepts only the original ID and rejects duplicate or
+unknown IDs. Sequential steps preserve it until v16 mapping; current validation
+accepts only current config IDs. There is no hidden runtime Vortex or legacy
+modifier branch. Migration is deterministic, with no clock/RNG/storage calls.
 
-Important repository finding: `validateState(value, version)` currently resolves
-Garage IDs via the **current** `findVehicle`, including during earlier migration
-steps. Removing Vortex from the live catalog without changing historical validation
-would reject v6–v15 owners **before** the new mapping runs. Future work must retain
-an explicit historical ID allowlist/validator for historical versions, preserve
-that ID through v1→…→v15, then map at the new boundary and validate only canonical
-IDs in the new schema. Do not keep a hidden purchasable Vortex or accept legacy IDs
-indefinitely in new-version state. Reject unknown/duplicate IDs; do not repair
-arbitrary invalid input or bypass sequential migrations.
+Historical **CE1** imports use the existing sequential pipeline, then durable
+replacement rebases timing without historical earnings. Local bootstrap migrates
+first, then calculates normal capped offline progress with KX-R's current +10%
+modifier, and saves before publishing. There is no stored pre-update rate history
+and no double bonus. Current CE1 re-exports v16/KX-R only.
 
-No v16 is created now. Use the next required version when identity/active fields
-actually ship, from whatever schema is then current. Keep `CE1-` transport; historical
-v15 owner codes migrate normally with no special manual conversion. Pure migration
-preserves historical savedAt; **import** subsequently rebases at durable replacement
-and grants no historical earnings. **Local offline bootstrap** still performs its
-one legitimate capped credit, separately from migration; no duplicate/compensation
-credit. The later release must explicitly describe that canonical post-update effects
-apply to that local catch-up, since no pre-update rate history is stored.
+Tests cover owners/non-owners, historical version chains, exact unrelated-state and
+timestamp retention, strict invalid IDs, CE1 import/roundtrip/re-export, durable
+failure, Rebirth retention and online/offline modifier semantics. The standalone
+purchase writes the completed candidate before ownership/success publication.
+A failed write retains reconciled old state and reports failure without spending.
 
-If identity and Active Vehicle ship together: sole migrated KX-R owner selects it;
-empty Garage selects null. Future validation: null or valid owned canonical ID,
-with normal commands ensuring a populated Garage has one selected vehicle. If active
-state is introduced after several vehicles, choose the first owned ID in documented
-catalog order, never RNG; preserve an existing valid selection. Invalid explicit
-selection is rejected, not silently repaired. Add active/build state only when used.
-Migrate KX-R identity before keying any tuning data; artwork filenames are never
-part of migration. Remove the legacy modifier source; only the selected canonical
-vehicle contributes under Active Vehicle architecture, never both effects.
+### Future selection/build migration — not implemented
 
-### Required future verification (not claimed as implemented here)
-
-- v15 owner/non-owner → new owner/non-owner; also representative v6–v14 owners
-  through all intermediate steps. Reject malformed, unknown and duplicate IDs.
-- Preserve Cash, XP, EP/count/skills, Achievements/Statistics, business levels and
-  both fractions, territories/Heat, Crew, Events, both automations/progress, savedAt.
-  No invented purchase history, milestone, refund or reset.
-- Historical CE1 ownership → canonical owner, rebased import timing without prior
-  production/XP/upgrades/Event rolls; invalid import and durable failure unchanged.
-- Rebirth retains migrated ownership/active selection/build; no duplicate modifier.
-- One canonical new effect for legacy and new buyers; exact rational output and
-  future manual/Dispatcher contexts/Heat intervals, including fractional boundary cases.
-- Free switch uses old effects first, persists before publication, preserves progress,
-  rejects unowned/unknown IDs, handles same-ID requests, and rolls back failed writes.
-  Immediate reload/offline cannot re-credit, retroactively switch or add RNG draws.
+Introduce Active Vehicle before a second production vehicle. Existing sole KX-R
+owners should select it; empty garages select null. Future invariants permit null
+or a valid owned canonical ID; deterministic catalog order handles pre-existing
+multiple ownership, preserving any valid selection. No randomness or saved asset
+paths. Add build state only when Tuning ships, keyed by canonical ID. Future tests
+must cover free old-effect-first switching, durable rollback, selection/build
+Rebirth persistence and no retroactive offline switching.
 
 ## Golden Reference / asset production and implementation order
 
-1. POST 2A planning complete; review proposed catalog values/names before shipping.
-2. **POST 2B — Kairo KX-R Golden Reference:** small candidate set using approved Art
-   Style and distinct 1990s hatch identity; explicit user model approval mandatory.
-3. Integrate approved KX-R identity/art and explicit ownership migration in a separate
-   implementation task; create catalog-ready definitions and Active Vehicle boundaries.
-   Combining identity + active architecture in one carefully scoped schema change is
-   preferable if ready; otherwise add active selection before a second vehicle ships.
-4. Expand Tier 1 in controlled batches, then Tuning Foundation on KX-R, then later tiers
-   as dependencies/pacing are verified. No automatic mass vehicle generation.
-5. First canonical Raizan/Luma/Tenrai/Arashi designs require individual user review.
-   Crew/Territory/Event reference work remains a separate controlled roadmap branch.
+1. POST 2A catalog design complete; remaining values/names still need review.
+2. POST 2B Final Refinement explicitly user-approved as KX-R Model Reference.
+3. POST 2C integrates KX-R only, Save v16 identity migration and approved artwork;
+   **live verification pending**. Active Vehicle/Tuning are not bundled into v16.
+4. After live verification, separately design Active Vehicle and controlled Tier 1
+   expansion (Kairo Senda / Namera Lilt), including its own save/runtime boundary.
+5. Pilot Tuning on canonical KX-R, then expand gradually. No mass asset generation.
+6. First Raizan/Luma/Tenrai/Arashi models need individual user approval; other asset
+   categories remain separate controlled branches.
 
 ## Deferred decisions and validation limits
 
-Names except Kairo/KX-R and proposed numeric values need user/design review; no legal
+Names and proposed numeric values for rows 2–14 need user/design review; no legal
 clearance is claimed. No simulation of all fourteen cars, optimal play solver, player
 telemetry or guaranteed completion time exists. Only KX-R/Vortex/no-car policies were
 modeled. Re-run later tiers with Active Vehicle integration, real unlock extensions
@@ -523,8 +498,7 @@ Objective, long-section navigation, Purchase Intelligence, Rebirth Guidance, Hea
 Police, city, Crew/Event and Garage/Tuning branches in POST_ROADMAP.md. This catalog
 plan does not authorize those implementations.
 
-POST 2A verification is documentation review plus the existing regression suite and
-three isolated analysis tests. Live game/browser behavior is unchanged; no new live
-visual review or canonical model approval is claimed. Full command results are
-reported with the implementation commit; save v15/CE1 and all production files remain
-unchanged. No images, fonts, dependencies or production catalog entries added.
+Historical POST 2A verification covered documentation, the regression suite and
+three isolated analysis tests. That design phase left save v15/CE1 and production
+unchanged and added no artwork. POST 2C is the separately authorized integration
+above; its deployed live verification remains pending.

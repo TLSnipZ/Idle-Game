@@ -13,7 +13,7 @@ import type { PersistenceStatus } from '../platform/persistent-game';
 
 export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown): string {
   if (result.ok) {
-    if (action === 'vehicle') return `${findVehicle(contentId)?.name ?? 'Vehicle'} added to your garage. Production bonus is active.`;
+    if (action === 'vehicle') return `${findVehicle(contentId)?.name ?? 'Vehicle'} added to your garage permanently. Kept through Rebirth.`;
     if (action === 'automation' && contentId === BUSINESS_AUTO_UPGRADER.id) return 'Business Auto-Upgrader purchased. Disabled until you enable automatic spending.';
     if (action === 'automation') return `${DELIVERY_DISPATCHER.name} hired. Automated deliveries are active.`;
     if (action === 'equipment') {

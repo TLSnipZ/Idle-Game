@@ -15,8 +15,8 @@ describe('shared v8 skill schema', () => {
   it('migrates realistic v7 by adding only empty skills; no EP spending, reset or timestamp change', () => {
     const old = legacy(), before = stringifySaveFixture(old);
     const result = parseSave(before);
-    expect(CURRENT_SAVE_VERSION).toBe(15);
-    expect(result).toEqual({ ok: true, envelope: { ...old, version: 15, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
+    expect(CURRENT_SAVE_VERSION).toBe(16);
+    expect(result).toEqual({ ok: true, envelope: { ...old, version: 16, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
       permanentProgression: { ...old.state.permanentProgression, statistics: createInitialStatistics(4), skills: {}, unlockedAchievementIds: [] } } } });
     expect(validateSaveCode(encodeSaveText(before))).toEqual(result); expect(stringifySaveFixture(old)).toBe(before);
   });
@@ -25,7 +25,7 @@ describe('shared v8 skill schema', () => {
     const serialized = serializeSave(state, 42), exported = exportSaveCode(state, 42);
     if (!serialized.ok || !exported.ok) throw Error('fixture');
     expect(exported.code.startsWith('CE1-')).toBe(true);
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 15, savedAt: 42, state } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 16, savedAt: 42, state } });
     expect(validateSaveCode(exported.code)).toEqual(parseSave(serialized.serialized));
     expect(serialized.serialized).not.toMatch(/capMs|nextCost|prerequisites|currentEffect|lifetime|skillPoints/);
   });
@@ -36,13 +36,13 @@ describe('shared v8 skill schema', () => {
   it.each([null, [], 'skills', { 'skill:unknown': 1 }, { [ROOT]: 0 }, { [ROOT]: -1 }, { [ROOT]: .5 },
     { [ROOT]: Number.MAX_SAFE_INTEGER + 1 }, { [ROOT]: '1' }, { [ROOT]: NaN }, { [ROOT]: Infinity }])('rejects malformed current skills %#', skills => {
     const old = legacy();
-    expect(parseSave(stringifySaveFixture({ ...old, version: 15, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
+    expect(parseSave(stringifySaveFixture({ ...old, version: 16, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
       permanentProgression: { ...old.state.permanentProgression, statistics: createInitialStatistics(4), skills, unlockedAchievementIds: [] } } }))).toEqual({ ok: false, error: 'invalid-state' });
   });
   it('requires current skills but rejects smuggled skills in a legacy envelope and future versions', () => {
     const old = legacy();
-    expect(parseSave(stringifySaveFixture({ ...old, version: 15, state: { ...old.state, permanentProgression: { ...old.state.permanentProgression, statistics: createInitialStatistics(4), unlockedAchievementIds: [] }, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] } } }))).toEqual({ ok: false, error: 'invalid-state' });
+    expect(parseSave(stringifySaveFixture({ ...old, version: 16, state: { ...old.state, permanentProgression: { ...old.state.permanentProgression, statistics: createInitialStatistics(4), unlockedAchievementIds: [] }, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] } } }))).toEqual({ ok: false, error: 'invalid-state' });
     expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, permanentProgression: { ...old.state.permanentProgression, skills: {} } } }))).toEqual({ ok: false, error: 'invalid-state' });
-    expect(parseSave(stringifySaveFixture({ ...old, version: 16 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(stringifySaveFixture({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

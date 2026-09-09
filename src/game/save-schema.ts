@@ -18,7 +18,10 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 15;
+export const CURRENT_SAVE_VERSION = 16;
+// Historical identity is accepted only before v16, never by current catalog lookup.
+const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
+const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -102,9 +105,11 @@ function validateState(value: unknown, version: number): GameState | null {
   if (version >= 6) {
     if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds']) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
     for (const id of value.garage.ownedVehicleIds) {
-      const vehicle = findVehicle(id);
-      if (!vehicle || ownedVehicleIds.includes(vehicle.id)) return null;
-      ownedVehicleIds.push(vehicle.id);
+      const vehicleId = version < 16
+        ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
+        : findVehicle(id)?.id;
+      if (!vehicleId || ownedVehicleIds.includes(vehicleId)) return null;
+      ownedVehicleIds.push(vehicleId);
     }
   }
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
@@ -207,6 +212,14 @@ function migrateV13ToV14(value: unknown): GameState | null { return validateStat
 
 function migrateV14ToV15(value: unknown): GameState | null { return validateState(value, 14); }
 
+/** Identity only: historical strict validation rejects duplicates/unknown IDs. */
+function migrateV15ToV16(value: unknown): GameState | null {
+  const valid = validateState(value, 15);
+  return valid ? { ...valid, garage: { ownedVehicleIds: valid.garage.ownedVehicleIds.map(
+    id => id === LEGACY_VEHICLE_ID ? KXR_VEHICLE_ID : id,
+  ) } } : null;
+}
+
 /** Emit historical automation shape between sequential legacy migrations. */
 function legacyAutomation(value: unknown): unknown {
   if (!record(value) || !record(value.automation)) return value;
@@ -239,6 +252,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 12) migrated = legacyAutomation(migrateV12ToV13(migrated));
   if (value.version <= 13) migrated = legacyAutomation(migrateV13ToV14(migrated));
   if (value.version <= 14) migrated = migrateV14ToV15(migrated);
+  if (value.version <= 15) migrated = migrateV15ToV16(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

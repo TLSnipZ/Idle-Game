@@ -53,8 +53,8 @@ describe('Phase 9D clock and durable transaction boundaries', () => {
       expect(game.getSnapshot().persistence.kind).toBe('offline-error');
     } else {
       const candidate = game.getSnapshot().result.state;
-      expect(candidate.economy.cash).toBe('6792454'); expect(candidate.progression.xp).toBe(60427);
-      expect(candidate.permanentProgression.statistics.businessLevelsPurchased).toBe(21);
+      expect(candidate.economy.cash).toBe('16332342'); expect(candidate.progression.xp).toBe(60400);
+      expect(candidate.permanentProgression.statistics.businessLevelsPurchased).toBe(20);
       expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { savedAt: 43201000, state: candidate } });
       expect(saves().bootstrap()).toMatchObject({ kind: 'loaded', state: candidate, offline: { incomeEarned: '0', xpEarned: 0 } });
     }

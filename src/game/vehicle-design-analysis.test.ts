@@ -1,6 +1,6 @@
 /** POST 2A counterfactual analysis only; never imported by production.
- * Reuses the Phase 9C purchase policies and real domain arithmetic. The legacy ID
- * is a test stand-in, NOT a proposed migration or a new live vehicle definition.
+ * Reuses the Phase 9C purchase policies and real domain arithmetic. The Vortex scenario explicitly mocks historical balance; current KX-R config
+ * remains authoritative outside this isolated counterfactual.
  */
 import { afterEach, expect, it, vi } from 'vitest';
 import type { GameState } from './game-state';
@@ -23,7 +23,7 @@ it.each<PlayerModel>(['active', 'optimized', 'idle-leaning'])('%s: compares firs
       vi.doMock('./purchase-vehicle', () => ({ purchaseVehicle: (state: GameState) =>
         ({ ok: false, state, error: 'already-owned' }) }));
     }
-    if (scenario === 'kx-r') {
+    if (scenario === 'vortex') {
       vi.doMock('../features/vehicles', async () => {
         const actual = await vi.importActual<typeof import('../features/vehicles')>('../features/vehicles');
         const { moneyFromMinorUnits } = await import('../features/economy');
@@ -31,10 +31,10 @@ it.each<PlayerModel>(['active', 'optimized', 'idle-leaning'])('%s: compares firs
         if (actual.STARTER_VEHICLE.modifier.operation !== 'multiply-basis-points')
           throw new Error('Analysis expects the live percentage vehicle modifier');
         const vehicle: typeof actual.STARTER_VEHICLE = {
-          ...actual.STARTER_VEHICLE, name: 'Kairo KX-R', purchaseCost: moneyFromMinorUnits('2500000'),
-          requirements: [{ type: 'player-level', minimumLevel: 5 },
-            { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 5 }],
-          modifier: { ...actual.STARTER_VEHICLE.modifier, bonusBasisPoints: 1000 },
+          ...actual.STARTER_VEHICLE, name: 'Vortex S9', purchaseCost: moneyFromMinorUnits('5000000'),
+          requirements: [{ type: 'player-level', minimumLevel: 7 },
+            { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 10 }],
+          modifier: { ...actual.STARTER_VEHICLE.modifier, bonusBasisPoints: 1500 },
         };
         return { ...actual, STARTER_VEHICLE: vehicle, VEHICLE_CATALOG: [vehicle],
           findVehicle: (id: unknown) => id === vehicle.id ? vehicle : undefined };
@@ -59,7 +59,7 @@ it.each<PlayerModel>(['active', 'optimized', 'idle-leaning'])('%s: compares firs
       rebirth: result.checkpoints['Rebirth eligible']?.seconds });
   }
   const live = await vi.importActual<typeof import('../features/vehicles')>('../features/vehicles');
-  expect(live.STARTER_VEHICLE.purchaseCost).toBe('5000000');
-  expect(live.STARTER_VEHICLE.modifier).toMatchObject({ operation: 'multiply-basis-points', bonusBasisPoints: 1500 });
+  expect(live.STARTER_VEHICLE.purchaseCost).toBe('2500000');
+  expect(live.STARTER_VEHICLE.modifier).toMatchObject({ operation: 'multiply-basis-points', bonusBasisPoints: 1000 });
   console.info('POST 2A modeled seconds', model, JSON.stringify(rows));
 }, 60_000);

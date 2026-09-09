@@ -17,7 +17,7 @@ import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { ACHIEVEMENT_CATALOG } from '../features/achievements';
 
 describe('Phase 9E Base Game release flow', () => {
-  it('fresh state has no inferred history and exports a valid v15 CE1 backup', () => {
+  it('fresh state has no inferred history and exports a valid v16 CE1 backup', () => {
     const state = createInitialGameState();
     expect(state.economy.cash).toBe('0');
     expect(state.city).toEqual({ ownedTerritoryIds: ['territory:waterfront'], heat: 0, heatDecayElapsedMs: 0 });
@@ -31,7 +31,7 @@ describe('Phase 9E Base Game release flow', () => {
     expect(validateSaveState(state)).toEqual(state);
     const code = exportSaveCode(state, 123);
     if (!code.ok) throw Error(code.error);
-    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 15, savedAt: 123, state } });
+    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 16, savedAt: 123, state } });
   });
 
   it('legal earnings and acquisitions reach all milestones, then reset and rebuild with permanent benefits', () => {
@@ -41,7 +41,7 @@ describe('Phase 9E Base Game release flow', () => {
     for (let job = 0; job < 60; job++) state = successful(performStarterJob(state));
     const route = runBalanceModel('idle-leaning', state);
     for (const name of ['Player 2', 'Dockside 1', 'Dockside 5', 'Dockside 10', 'Delivery Dispatcher',
-      'Vortex S9', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Business Auto-Upgrader', 'Rebirth eligible'])
+      'Kairo KX-R', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Business Auto-Upgrader', 'Rebirth eligible'])
       expect(route.checkpoints[name], name).toBeDefined();
     state = route.state;
     expect(state.automation.unlockedIds).toEqual(expect.arrayContaining([D.id, A.id]));
@@ -70,7 +70,7 @@ describe('Phase 9E Base Game release flow', () => {
     reset = successful(purchaseSkillRank(reset, 'skill:streetwise-investment'));
     for (let job = 0; job < 6; job++) reset = successful(performStarterJob(reset));
     reset = successful(purchaseBusiness(reset, B.id));
-    expect(productionDollars(reset)).toBeCloseTo(0.905625, 8);
+    expect(productionDollars(reset)).toBeCloseTo(0.86625, 8);
     expect(reset.permanentProgression.statistics.manualJobsCompleted).toBe(state.permanentProgression.statistics.manualJobsCompleted + 6);
     // A subsequent legal run retains the purchased skill and unspent EP too.
     const second = runBalanceModel('idle-leaning', reset).state;

@@ -181,21 +181,21 @@ describe('assigned Crew effects and exact shared math', () => {
   });
   it('Jax canonical production is exact, including earned sub-milli-cents and partitions', () => {
     const s=productionStack();const e=evaluateBusinessProduction(s,B.id,1);
-    expect(e).toMatchObject({ok:true,effective:rational(192027n,1600n)});
+    expect(e).toMatchObject({ok:true,effective:rational(91839n,800n)});
     if(!e.ok)throw Error('fixture');expect(e.applied.map(m=>m.sourceId)).toEqual(expect.arrayContaining([V.id,ROOT,SILENT,J.id]));
     const one=simulateElapsed(s,1).state;
-    expect(one.businesses.productionRemainderMilliCents).toBe(120);expect(one.businesses.productionRemainderSubMilliCents).toEqual(rational(27n,1600n));
+    expect(one.businesses.productionRemainderMilliCents).toBe(114);expect(one.businesses.productionRemainderSubMilliCents).toEqual(rational(639n,800n));
     let split: GameState=s;for(const ms of [1,7,993,2345,7654])split=simulateElapsed(split,ms).state;
     expect(split).toEqual(simulateElapsed(s,11000).state);
     expect(reconcileOffline(s,0,11000).state).toEqual(simulateGameElapsed(s,11000).state);
   });
   it('Jax stacks with all three production upgrades through the same stable path', () => {
     const s={...productionStack(),upgrades:{purchasedIds:UPGRADE_CATALOG.filter(u=>u.modifier.target.stat==='business-production').map(u=>u.id)}};
-    expect(evaluateBusinessProduction(s,B.id,1)).toMatchObject({effective:rational(6336891n,25600n)});
+    expect(evaluateBusinessProduction(s,B.id,1)).toMatchObject({effective:rational(3030687n,12800n)});
     expect(evaluateJobReward(s)).toEqual(evaluateJobReward(unassignCrewSlot(s,'logistics').state));
     expect(evaluateXpReward(s,'manualJob')).toEqual(evaluateXpReward(unassignCrewSlot(s,'logistics').state,'manualJob'));
     expect(getHeatDecayIntervalMs(s)).toBe(60000);
-    expect(evaluateBusinessProduction(unassignCrewSlot(productionStack(),'logistics').state,B.id,1)).toMatchObject({effective:rational(8349n,80n)});
+    expect(evaluateBusinessProduction(unassignCrewSlot(productionStack(),'logistics').state,B.id,1)).toMatchObject({effective:rational(3993n,40n)});
   });
   it('Money/XP overflow with assigned Crew remains whole-state atomic', () => {
     const base=jobStack();for(const s of [{...base,economy:{cash:money('9'.repeat(MAX_MONEY_DIGITS))}}, {...base,progression:{xp:Number.MAX_SAFE_INTEGER}}]) {
@@ -233,7 +233,7 @@ describe('Crew offline and Rebirth contracts', () => {
     expect(r.state.garage).toEqual(s.garage);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics: {...s.permanentProgression.statistics,rebirthsCompleted:3},empirePoints:7,rebirthCount:3,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
     expect(evaluateJobReward(r.state)).toMatchObject({reward:'2750'});expect(getHeatDecayIntervalMs(r.state)).toBe(60000);expect(r.state.permanentProgression.statistics.crewMembersRecruited).toBe(0); expect(collectCrewModifiers(r.state.crew)).toEqual([]);
     const rebuilt=purchaseBusiness({...r.state,economy:{cash:B.purchaseCost}},B.id).state;
-    expect(evaluateBusinessProduction(rebuilt,B.id,1)).toMatchObject({effective:rational(8349n,80n)});
+    expect(evaluateBusinessProduction(rebuilt,B.id,1)).toMatchObject({effective:rational(3993n,40n)});
     const second=performRebirth({...s,permanentProgression:r.state.permanentProgression});expect(second.state.permanentProgression.empirePoints).toBe(11);expect(second.state.crew).toEqual(fresh.crew);
   });
   it('fresh progression and max Heat work without optional Crew', () => {

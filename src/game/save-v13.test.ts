@@ -16,7 +16,7 @@ describe('v13 permanent achievement saves',()=>{
   it('v12 migration adds empty IDs only, despite all six conditions being satisfied',()=>{
     const s=rich(),{statistics:_statistics,unlockedAchievementIds:_ids,...permanentProgression}=s.permanentProgression, old={...s,permanentProgression};
     const raw=stringifySaveFixture(envelope(old,12)); const result=parseSave(raw);
-    expect(CURRENT_SAVE_VERSION).toBe(15); expect(result).toEqual({ok:true,envelope:envelope(s)});
+    expect(CURRENT_SAVE_VERSION).toBe(16); expect(result).toEqual({ok:true,envelope:envelope(s)});
     if(!result.ok)throw Error('fixture'); const {statistics:_statistics2,unlockedAchievementIds,...previous}=result.envelope.state.permanentProgression;
     expect(unlockedAchievementIds).toEqual([]); expect({...result.envelope.state,permanentProgression:previous}).toEqual(old);
     expect(validateSaveCode(encodeSaveText(raw))).toEqual(result); expect(stringifySaveFixture(envelope(old,12))).toBe(raw);
@@ -40,6 +40,6 @@ describe('v13 permanent achievement saves',()=>{
     const s=rich(),state={economy:s.economy,businesses:version===1?{ownedIds:['business:dockside-detail'],productionRemainderMilliCents:975}:{owned:s.businesses.owned,productionRemainderMilliCents:975,...(version>=3?{productionRemainderSubMilliCents:s.businesses.productionRemainderSubMilliCents}:{})},
       ...(version>=3?{upgrades:s.upgrades}:{}),...(version>=4?{automation:s.automation}:{}),...(version>=5?{progression:s.progression}:{}),...(version>=6?{garage:s.garage}:{}),
       ...(version>=7?{permanentProgression:{empirePoints:17,rebirthCount:4,...(version>=8?{skills:s.permanentProgression.skills}:{})}}:{}),...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{}),...(version>=11?{crew:s.crew}:{}),...(version>=12?{events:s.events}:{})};
-    const r=validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state,version)))); expect(r).toMatchObject({ok:true,envelope:{version:15,savedAt:123456789,state:{permanentProgression:{unlockedAchievementIds:[]},economy:s.economy}}});
+    const r=validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state,version)))); expect(r).toMatchObject({ok:true,envelope:{version: 16,savedAt:123456789,state:{permanentProgression:{unlockedAchievementIds:[]},economy:s.economy}}});
   });
 });

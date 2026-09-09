@@ -92,15 +92,28 @@ export function createPersistentGame(
     if (!active || !runtime) return;
     let commandInput: GameState | null = null;
     let succeeded = false;
-    runtime.execute(state => {
+    let durableVehicle = false;
+    const completed = runtime.execute(state => {
       const result = command(state);
       commandInput = state;
       succeeded = result.ok;
       return result;
+    }, (candidate, previous) => {
+      if (candidate.garage === previous.garage) return true;
+      // Permanent vehicle acquisition publishes only after a guarded durable write.
+      durableVehicle = true;
+      const written = view.persistence.kind === 'blocked'
+        ? { ok: false as const, error: 'storage-conflict' as const } : saves.save(candidate);
+      view = { ...view, persistence: written.ok ? { kind: 'saved' }
+        : written.error === 'storage-conflict' ? { kind: 'blocked', error: written.error }
+        : { kind: 'error', error: written.error } };
+      if (!written.ok) publish(view);
+      return written.ok;
     });
     // Execute has published the completed command. Never persist reconciliation's
     // intermediate snapshot or read a possibly stale React render here.
-    if (succeeded && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
+    if (succeeded && !durableVehicle && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
+    return completed;
   }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };

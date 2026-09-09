@@ -2,6 +2,12 @@
 
 ## Current implementation
 
+POST 2C: current Save **v16**, unchanged **CE1** transport, one canonical vehicle
+**Kairo KX-R** (`vehicle:kairo-kx-r`). The numbered phase sections below preserve
+historical architecture decisions; their Vortex/v15 references describe those phases.
+See the POST 2C section for the current identity/migration and acquisition boundary.
+
+
 Through Phase 1C.2, the domain has economy and business ownership, atomic job and
 purchase commands, and pure elapsed-time production simulation. A per-mount browser
 adapter drives live production and reconciles before player commands. React state
@@ -2327,3 +2333,37 @@ value/unit markup with overflow-safe layout. Existing Cash/XP/bonus entry points
 reuse the display policy. No GameState, migration, runtime or persistence changes.
 Healthy autosave status moved to a non-live header label; error feedback and the
 five-second persistence cadence remain unchanged. Navigation is still local UI state.
+
+## POST 2C — Kairo KX-R identity, durability and presentation
+
+The sole vehicle is Kairo KX-R: $25,000, Player Level 5, owned Dockside Level 5,
++10% global Business Production. No additional gates, purchase XP/Heat/EP or new
+statistics. Permanent Garage ownership remains a unique-ID array and survives
+Rebirth. No Active Vehicle, tuning, manufacturer or presentation state was added.
+
+Save v16 is a minimal semantic-ID migration. Historical v6–v15 validators recognize
+`vehicle:starter-sport-sedan`; v15→v16 maps it to `vehicle:kairo-kx-r` exactly once.
+Historical duplicate/unknown IDs remain invalid. Current validation uses current
+config only. Raw migration preserves every unrelated field and savedAt, with no
+clock/RNG/IO, historical simulation or compensation. Earlier sequential migrations
+remain intact. Both existing and new owners use +10%; there is no legacy effect flag.
+
+CE1 encoding is unchanged. Historical imports validate/migrate before durable atomic
+replacement, rebasing import timing without historical income. Local bootstrap
+migrates before normal current-modifier offline simulation and durably publishes
+its capped candidate once. Online/offline use the same modifier evaluator; no
+legacy runtime branch or double modifier. Reference paths never enter GameState.
+
+Ordinary commands retain existing execution. Permanent vehicle purchase adds a
+synchronous pre-publication guard to the existing execute boundary: reconcile old
+state, validate/spend/grant, evaluate normal achievements, guarded save, then publish.
+A failed write publishes storage error only, retaining reconciled state and old
+ownership/Cash. UI purchase success is announced only after committed execution.
+No extra RNG, timer, whole-state replacement or purchase-specific history exists.
+Runtime fractional-time reset occurs only after successful modifier change.
+
+`src/app/vehicle-artwork.ts` maps canonical identity to Vite-imported WebP, intrinsic
+dimensions and concise alt text. The reference PNG is unimported source authority.
+Collection displays static responsive contained artwork with lazy loading/async
+decode. Name, effect, exact price, gates/status and native purchase action remain
+HTML. Owned state hides purchase clutter; no ACTIVE/equip/Tuning UI is introduced.

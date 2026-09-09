@@ -119,10 +119,10 @@ outer batch; internal boundaries never add Event rolls. No reserve/budget exists
 
 ## Garage and territories
 
-**Vortex S9** (`vehicle:starter-sport-sedan`): **$50,000**, requires Player Level 7,
-Dockside owned at Level 10; **+15% global business production**. Ownership survives
+**Kairo KX-R** (`vehicle:kairo-kx-r`): **$25,000**, requires Player Level 5,
+Dockside owned at Level 5; **+10% global Business Production**. Ownership survives
 Rebirth, including the modifier once Dockside is repurchased. No equip/tuning system.
-At Dockside Level 4 with all production equipment it gives **$7.115625/sec**;
+At Dockside Level 4 with all production equipment it gives **$6.80625/sec**;
 this is a valid retained-ownership example, not a waived acquisition requirement.
 
 | Territory / stable ID | Acquisition | Requirements | Effect |
@@ -218,7 +218,7 @@ Neon, Heat/remainder, Crew and City Events reset; Waterfront is restored. No ref
 
 Exactly five skills, one tree; full cost **19 EP**, no respec. Three Streetwise ranks
 sum to +15%, not three multiplicative 5% factors. Distinct production sources multiply.
-Vortex plus Streetwise 1 gives **$0.75 × 1.15 × 1.05 = $0.905625/sec** at rebuilt
+KX-R plus Streetwise 1 gives **$0.75 × 1.10 × 1.05 = $0.86625/sec** at rebuilt
 Dockside 1. Fast Talker 1 gives $27.50 base-job cash after temporary upgrades reset.
 
 ## Offline and persistence
@@ -231,8 +231,10 @@ $72,000 base, or $103,680 with both job upgrades, before any automated spending.
 Offline is one durable candidate before publication; failures cannot partially credit it.
 Import rebases timing, never simulates historical timestamps.
 
-**Save v15 and CE1 are unchanged.** All stored cash, XP, ownership, levels, progress,
-permanent state and savedAt retain their exact values. New acquisition prices/gates
+**POST 2C: Save v16, CE1 unchanged.** Legacy Vortex ownership maps to KX-R;
+all owners use the same current +10% bonus without refund or historical simulation.
+Apart from the vehicle ID mapping, stored Cash, XP, levels, progress, permanent
+state and raw migration savedAt retain their exact values. New acquisition prices/gates
 apply prospectively. Already-owned items receive no refund and owe no difference.
 
 ## Observational progression

@@ -1,7 +1,7 @@
 # Solara City
 
 A modern coastal crime, luxury and street-culture idle/tycoon browser game.
-The Base Game foundation is complete. **POST 1A visual foundation implemented; live visual review pending.**
+The Base Game foundation is complete. **POST 2C Kairo KX-R integration implemented; live verification pending.**
 See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
@@ -19,11 +19,12 @@ Dockside Level 5; Fleet Logistics requires an owned business, Commercial Pressur
 Washer and Player Level 5. Cards show each requirement separately from affordability.
 Dockside and Express Tips remain ungated. These are purchase requirements only:
 already-owned upgrades and automation stay active, including in older saves.
-The Garage introduces one provisional collectible, **Vortex S9**, for **$50,000**.
-It requires Player Level 7 and Dockside Level 10, and adds **+15% global business
-production** while owned, including offline. Vehicles persist through reload and
-save codes; older saves gain an empty garage. Its display name/art are temporary;
-there are no equip slots or set bonuses.
+The Garage contains one canonical **Kairo KX-R**, for **$25,000** at Player Level 5
+and owned Dockside Level 5. It grants **+10% global Business Production** while
+owned, including offline and after Rebirth. Its approved artwork is repository-owned.
+Save v16 maps historical Vortex ownership to KX-R without repurchase, refund or
+historical income. Non-owners receive no vehicle; CE1 remains unchanged. There are
+no Active Vehicle slots, additional cars or Tuning controls yet.
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, businesses and the dispatcher receive the same base maximum **eight hours** (up to twelve with Never Sleeps)
 of offline progress from the last successful local save. A welcome card shows
@@ -125,8 +126,9 @@ it or force-push this standalone foundation.
 ## Foundation verification
 
 The current release audit, automated verification matrix and browser-review limits
-are recorded in [BASE_GAME_RELEASE.md](docs/BASE_GAME_RELEASE.md). Save v15 and
-CE1 remain compatible; the Base Game freeze adds no content or balance changes.
+are recorded in [BASE_GAME_RELEASE.md](docs/BASE_GAME_RELEASE.md). The Base Game
+freeze used v15. POST 2C advances current saves to v16 with ownership-preserving
+vehicle identity migration; historical saves and CE1 remain compatible.
 
 
 Rebirth becomes available at Player Level 20 and Dockside Level 25. Review the

@@ -87,11 +87,12 @@ export function useGame() {
   }
 
   function buyVehicle(id: unknown) {
-    runtime.execute(state => {
-      const result = purchaseVehicle(state, id);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('vehicle', result, id) }));
-      return result;
-    });
+    const result = runtime.execute(state => purchaseVehicle(state, id));
+    if (result) setFeedback(previous => ({ sequence: previous.sequence + 1,
+      tone: result.ok ? 'success' : 'warning', message: describeAction('vehicle', result, id) }));
+    else if (runtime.getSnapshot().persistence.kind === 'error' || runtime.getSnapshot().persistence.kind === 'blocked')
+      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'warning',
+        message: 'Vehicle purchase could not be saved. No purchase was made.' }));
   }
 
   function coolDown() {

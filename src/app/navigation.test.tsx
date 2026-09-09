@@ -85,7 +85,7 @@ describe('five-section presentation navigation', () => {
       [SECTION.overview.id]: ['ECONOMY','PLAYER','CITY PRESSURE','CREW','EMPIRE','CITY EVENT','VIEW COLLECTION'],
       [SECTION.operations.id]: ['Starter job',STARTER_JOB.label,'Businesses','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','BUSINESS AUTO-UPGRADER'],
       [SECTION.city.id]: ['Solara City','Waterfront','Neon Mile','HEAT','LAY LOW','CREW','CITY EVENTS','No active event'],
-      [SECTION.collection.id]: ['Garage','Vortex S9','Owned vehicles: 0 / 1'],
+      [SECTION.collection.id]: ['Garage','Kairo KX-R','Owned vehicles: 0 / 1'],
       [SECTION.empire.id]: ['Rebirth','Empire Points','Empire Foundations','ACHIEVEMENTS','STATISTICS','Save &amp; Transfer','Export save','Validate import'],
     };
     for (const text of surfaces[section.id]) expect(html).toContain(text);
@@ -241,11 +241,11 @@ describe('navigation around the unchanged authoritative runtime', () => {
     h.saveControls.confirm(); expect(f.game.getSnapshot().result.state).toEqual(incoming); expect(h.render()).toContain('Save imported');
     expect(h.props().active).toBe(SECTION.empire.id); f.game.stop();
   });
-  it('v15 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
+  it('v16 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
     const state = autoUpgraderState(), h = harness(view(state)); h.select(SECTION.empire.id); h.rebirthControls.request();
     const saved = serializeSave(state,1234), code = exportSaveCode(state,1234); if (!saved.ok || !code.ok) throw Error('fixture');
-    expect(CURRENT_SAVE_VERSION).toBe(15); expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:15,state}});
+    expect(CURRENT_SAVE_VERSION).toBe(16); expect(code.code.startsWith('CE1-')).toBe(true);
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 16,state}});
     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
   });
 });

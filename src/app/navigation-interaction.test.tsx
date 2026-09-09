@@ -74,7 +74,7 @@ describe('mounted navigation and one live runtime', () => {
     const before = f.game().getSnapshot().result.state, raw = f.raw(), reads = f.reads(), writes = f.writes();
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('OVERVIEW');
     expect(container.querySelector('#business-name')).toBeNull();
-    const mapping = ['ECONOMY','Starter job','LAY LOW','Vortex S9','Save & Transfer'];
+    const mapping = ['ECONOMY','Starter job','LAY LOW','Kairo KX-R','Save & Transfer'];
     for (let i=0; i<PRIMARY_SECTIONS.length; i++) {
       const section = PRIMARY_SECTIONS[i]; if (!section) throw Error('section');
       await navigate(section.label); expect(content()).toContain(mapping[i]);
@@ -89,7 +89,7 @@ describe('mounted navigation and one live runtime', () => {
   it('Overview shortcuts navigate without commands or resetting active spending', async () => {
     const f = await mount(autoUpgraderState()), before = f.game().getSnapshot().result.state, reads = f.reads();
     await click('VIEW OPERATIONS'); expect(content()).toContain('BUSINESS AUTO-UPGRADER');
-    await navigate('OVERVIEW'); await click('VIEW COLLECTION'); expect(content()).toContain('Vortex S9');
+    await navigate('OVERVIEW'); await click('VIEW COLLECTION'); expect(content()).toContain('Kairo KX-R');
     expect(f.game().getSnapshot().result.state).toBe(before); expect(f.reads()).toBe(reads);
     expect(container.querySelector('.global-indicators')?.textContent).toContain('AUTO-UPGRADER ACTIVE');
     await click('AUTO-UPGRADER ACTIVE · SPENDING ENABLED'); expect(content()).toContain('Automatically spends cash');
@@ -191,7 +191,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state.permanentProgression.rebirthCount).toBe(1);
     await navigate('OVERVIEW'); expect(container.querySelector('.global-feedback')?.textContent).toContain('REBIRTH COMPLETE');
   });
-  it('import draft, validated confirmation and export text survive navigation; import stays v15 without another bootstrap', async () => {
+  it('import draft, validated confirmation and export text survive navigation; import stays v16 without another bootstrap', async () => {
     const f = await mount(autoUpgraderState()); await navigate('EMPIRE'); await click('Export save');
     const exported = container.querySelector<HTMLTextAreaElement>('#export-code')?.value;
     expect(exported?.startsWith('CE1-')).toBe(true);
@@ -205,7 +205,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version:15,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 16,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);

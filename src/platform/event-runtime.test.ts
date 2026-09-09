@@ -119,7 +119,7 @@ const normalCommands: readonly {name:string;state:GameState;command:RuntimeComma
   {name:'replace crew',state:base,command:s=>assignCrewMember(s,'operations','crew:mara-knox')},
   {name:'unassign crew',state:base,command:s=>unassignCrewSlot(s,'operations')},
   {name:'acquire Neon',state:{...base,city:{...base.city,ownedTerritoryIds:fresh.city.ownedTerritoryIds}},command:s=>acquireTerritory(s,'territory:neon-mile')},
-  {name:'buy vehicle',state:{...base,garage:fresh.garage},command:s=>purchaseVehicle(s,'vehicle:starter-sport-sedan')},
+  {name:'buy vehicle',state:{...base,garage:fresh.garage},command:s=>purchaseVehicle(s,'vehicle:kairo-kx-r')},
   {name:'buy permanent skill',state:base,command:s=>purchaseSkillRank(s,'skill:streetwise-investment')},
 ];
 describe('pending events do not block the operation',()=>{

@@ -30,13 +30,13 @@ describe('permanent stat sources', () => {
   });
   it('stacks permanent/vehicle/temporary sources exactly, with stable IDs and scoped filtering', () => {
     const state = { ...skillState({ [ROOT]: 2, [SILENT]: 1, [FAST]: 1, [LEARN]: 1 }), garage: { ownedVehicleIds: [V.id] } };
-    const base = evaluateBusinessProduction(state, B.id, 1); expect(base).toMatchObject({ ok: true, effective: rational(8349n, 80n) });
+    const base = evaluateBusinessProduction(state, B.id, 1); expect(base).toMatchObject({ ok: true, effective: rational(3993n, 40n) });
     if (!base.ok) throw Error('fixture');
     expect(base.applied.map(m => m.sourceId).sort()).toEqual([ROOT, SILENT, V.id].sort());
     expect(base.applied.map(m => m.id)).toEqual(base.applied.map(m => m.id).sort());
     const all = { ...state, upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
-    // 104.3625 cents/s × 1.25 × 1.5 × 1.1
-    expect(evaluateBusinessProduction(all, B.id, 1)).toMatchObject({ ok: true, effective: rational(275517n, 1280n) });
+    // 99.825 cents/s × 1.25 × 1.5 × 1.1
+    expect(evaluateBusinessProduction(all, B.id, 1)).toMatchObject({ ok: true, effective: rational(131769n, 640n) });
     expect(evaluateBusinessProduction({ ...all, upgrades: { purchasedIds: [...all.upgrades.purchasedIds].reverse() } }, B.id, 1)).toEqual(evaluateBusinessProduction(all, B.id, 1));
   });
   it('preserves both production fractions through arbitrary split durations with skills', () => {
@@ -119,9 +119,9 @@ describe('permanent offline and Rebirth effects', () => {
     const job = performStarterJob(reset); expect(job.state.economy.cash).toBe('2750'); expect(job.state.progression.xp).toBe(11);
     let state = reset; for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
     state = purchaseBusiness(state, B.id).state; expect(state.upgrades.purchasedIds).toEqual([]);
-    expect(evaluateBusinessProduction(state, B.id, 1)).toMatchObject({ ok: true, effective: rational(8349n, 80n) });
+    expect(evaluateBusinessProduction(state, B.id, 1)).toMatchObject({ ok: true, effective: rational(3993n, 40n) });
     const online = simulateGameElapsed(state, 80000).state;
-    expect(BigInt(online.economy.cash) - BigInt(state.economy.cash)).toBe(8349n);
+    expect(BigInt(online.economy.cash) - BigInt(state.economy.cash)).toBe(7986n);
     expect(reconcileOffline(state, 0, 80000)).toMatchObject({ ok: true, state: online });
   });
 });

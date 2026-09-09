@@ -1,3 +1,4 @@
+import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { describe, expect, it } from 'vitest';
 import { evaluateRequirements, newlyEligibleContent } from './requirements';
 import type { Requirement } from './requirement';
@@ -118,9 +119,9 @@ describe('canonical content gates', () => {
   it('derives useful Level 2/3/5 transitions only when all other gates are met', () => {
     expect(newlyEligibleContent(eligible(99),eligible(100))).toEqual([S.name]);
     expect(newlyEligibleContent(eligible(399),eligible(400))).toEqual([D.name]);
-    expect(newlyEligibleContent(eligible(1599),eligible(1600))).toEqual([F.name]);
+    expect(newlyEligibleContent(eligible(1599),eligible(1600))).toEqual([F.name,V.name]);
     const before = { ...eligible(1599), upgrades: { purchasedIds: [] } };
-    expect(newlyEligibleContent(before,{ ...before, progression: { xp: 1600 } })).toEqual([]);
+    expect(newlyEligibleContent(before,{ ...before, progression: { xp: 1600 } })).toEqual([V.name]);
     const purchased = { ...eligible(99), upgrades: { purchasedIds: [S.id] } };
     expect(newlyEligibleContent(purchased,{ ...purchased, progression: { xp: 100 } })).toEqual([]);
   });

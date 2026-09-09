@@ -24,7 +24,7 @@ describe('v10 Heat migration and portable validation', () => {
     const { statistics: _statistics, unlockedAchievementIds: _ids, ...permanentProgression } = old.permanentProgression;
     const legacyState = { ...old, permanentProgression };
     const raw = stringifySaveFixture(envelope(legacyState,9)); const parsed = parseSave(raw);
-    expect(CURRENT_SAVE_VERSION).toBe(15);
+    expect(CURRENT_SAVE_VERSION).toBe(16);
     expect(parsed).toEqual({ ok: true, envelope: envelope({ ...old, events, crew, city: { ...old.city, heat: 0, heatDecayElapsedMs: 0 } }) });
     if (!parsed.ok) throw Error('fixture');
     const { events: _events, crew: _crew, city, ...previous } = parsed.envelope.state; const { city: oldCity, ...before } = old;
@@ -41,7 +41,7 @@ describe('v10 Heat migration and portable validation', () => {
       ...(version >= 7 ? { permanentProgression: { empirePoints: 17, rebirthCount: 4, ...(version >= 8 ? { skills: s.permanentProgression.skills } : {}) } } : {}),
       ...(version >= 9 ? { city: { ownedTerritoryIds: s.city.ownedTerritoryIds } } : {}) };
     const code = encodeSaveText(stringifySaveFixture(envelope(state,version))); expect(code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code)).toMatchObject({ ok: true, envelope: { version: 15, savedAt: 123456789,
+    expect(validateSaveCode(code)).toMatchObject({ ok: true, envelope: { version: 16, savedAt: 123456789,
       state: { economy: s.economy, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: version === 9 ? [WATERFRONT.id,NEON_MILE.id] : [WATERFRONT.id] } } } });
   });
   it.each([[0,0],[1,0],[59,59999],[100,59999],[70,45000]])('v10 roundtrips Heat %i / remainder %i exactly', (heat,heatDecayElapsedMs) => {
@@ -65,7 +65,7 @@ describe('v10 Heat migration and portable validation', () => {
       { ...s.city, get heat() { throw Error('must not execute'); } }, { ...s.city, ownedTerritoryIds: [NEON_MILE.id] }]) {
       expect(validateSaveState({...s,city})).toBeNull();
     }
-    expect(parseSave(stringifySaveFixture(envelope(s,16)))).toEqual({ok:false,error:'unsupported-version'});
+    expect(parseSave(stringifySaveFixture(envelope(s,CURRENT_SAVE_VERSION+1)))).toEqual({ok:false,error:'unsupported-version'});
     expect(parseSave(stringifySaveFixture(envelope(s,9)))).toEqual({ok:false,error:'invalid-state'});
   });
 });

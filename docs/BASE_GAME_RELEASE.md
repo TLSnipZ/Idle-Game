@@ -146,3 +146,14 @@ authoritative. See ART_DIRECTION.md. POST 1A was subsequently manually verified 
 POST 1B continues the post-roadmap visual transformation within the frozen five
 sections. Its component composition changes preserve the Base Game Save v15/CE1,
 balance, IDs, runtime and persistence contracts; no gameplay or content is added.
+
+## POST 2C compatibility note
+
+The frozen audit above remains the historical Base Game v15 record. POST 2C
+introduces current **Save v16**, retaining **CE1** and the sequential historical
+chain. Only legacy Vortex identity maps to Kairo KX-R; ownership is preserved,
+non-owners receive nothing, and no refund/history is fabricated. Current vehicle
+balance is $25,000 / Player 5 / Dockside 5 / +10% Business Production. Approved
+artwork is integrated; the other thirteen catalog cars, Active Vehicle and Tuning
+remain unimplemented. POST 2C implementation verification is separate from this
+frozen audit; deployed live verification remains pending.

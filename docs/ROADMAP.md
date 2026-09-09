@@ -278,9 +278,19 @@ remain the visual foundation.
 **POST 1C Live UX Polish & Number Formatting is manually verified live by the user.**
 **POST 2A Vehicle Catalog Design Pass implementation is complete; live-game changes
 are none.** [VEHICLE_CATALOG.md](VEHICLE_CATALOG.md) documents proposed vehicles,
-pricing evidence and future ownership/tuning/migration contracts. KX-R is not live.
+pricing evidence and future ownership/tuning/migration contracts. KX-R was not live
+in POST 2A; see the POST 2C handoff below.
 
 [POST_ROADMAP.md](POST_ROADMAP.md) remains the current priority/status source.
-Next: **POST 2B — Kairo KX-R Golden Reference**, a separately approved small candidate
-phase. Candidate A's prior approval concerns Art Style only, not its sedan model.
-No canonical vehicle artwork, Garage expansion or Tuning has been implemented.
+Historical next step after POST 2A: **POST 2B — Kairo KX-R Golden Reference**,
+a separately approved small candidate phase. Candidate A's prior approval concerns Art Style only, not its sedan model.
+That design pass implemented no artwork, Garage expansion or Tuning.
+
+## POST 2C handoff
+
+POST 2A catalog design is complete; POST 2B Final Refinement is explicitly approved
+as the canonical Kairo KX-R Model Reference. POST 2C production integration is
+implemented; live verification pending. Current Save v16 maps Vortex ownership to
+KX-R; CE1 is unchanged. One production vehicle only. See POST_ROADMAP.md for the
+current priorities, including future global HUD Level/XP progress. Active Vehicle,
+Tier 1 expansion and Tuning remain separately scoped future work.

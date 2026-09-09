@@ -135,12 +135,14 @@ export function createGameRuntime(
     return true;
   }
 
-  function execute(command: (state: GameState) => CommandResult) {
+  function execute(command: (state: GameState) => CommandResult,
+    beforeCommit?: (candidate: GameState, previous: GameState) => boolean) {
     const beforeAchievements = snapshot.result.state.permanentProgression.unlockedAchievementIds;
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const transition = command(previous);
     const result = transition.ok ? { ...transition, state: unlockEligibleAchievements(transition.state).state } : transition;
+    if (result.ok && beforeCommit && !beforeCommit(result.state, previous)) return;
     // Rate changes and completed event choices start a fresh elapsed boundary.
     // Runtime sub-ms duration is dropped; earned authoritative fractions are never reset.
     if (result.ok && ((previous.events.pendingEventId !== null && result.state.events.pendingEventId === null)
@@ -154,6 +156,7 @@ export function createGameRuntime(
         || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
     snapshot = { ...snapshot, ...(result.ok ? { ...levelEventFor(result.state), ...achievementEventFor(result.state, beforeAchievements) } : {}), result };
     publish(snapshot);
+    return result;
   }
 
   function start() {

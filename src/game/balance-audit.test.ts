@@ -34,7 +34,7 @@ describe('Phase 9C deterministic progression routes', () => {
   it.each(['active', 'idle-leaning', 'optimized'] as const)('%s can reach every current acquisition gate', model => {
     const run = runBalanceModel(model);
     expect(selectRebirth(run.firstRebirth).eligible).toBe(true);
-    for (const checkpoint of ['Player 2', 'Dockside 1', 'Dockside 5', 'Delivery Dispatcher', 'Vortex S9',
+    for (const checkpoint of ['Player 2', 'Dockside 1', 'Dockside 5', 'Delivery Dispatcher', 'Kairo KX-R',
       'Dockside 10', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Dockside 25', 'Player 20', 'Business Auto-Upgrader']) {
       expect(run.checkpoints[checkpoint], checkpoint).toBeDefined();
     }
@@ -108,7 +108,7 @@ describe('Phase 9C deterministic progression routes', () => {
     const business = { ...s, businesses: { ...s.businesses, owned: { [B.id]: { level: 1 } } } };
     const retained = { ...business, garage: { ownedVehicleIds: [V.id] },
       permanentProgression: { ...s.permanentProgression, skills: { 'skill:streetwise-investment': 1 } } };
-    expect(productionDollars(retained)).toBeCloseTo(.905625, 8);
+    expect(productionDollars(retained)).toBeCloseTo(.86625, 8);
     expect(productionDollars(retained)).toBeGreaterThan(productionDollars(business));
   });
   it('Neon and opt-in spending can be acquired before Rebirth, then fund levels offline', () => {
@@ -137,7 +137,7 @@ describe('Phase 9C deterministic progression routes', () => {
       .toEqual([2,3,3,6,8,1,5,5]);
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, A.id]);
   });
-  it('roundtrips a rich existing v15 save and CE1 code without balance compensation or field changes', () => {
+  it('roundtrips a rich current v16 save and CE1 code without balance compensation or field changes', () => {
     const s = rebirthState(37, 48);
     const rich = { ...s, automation: { ...s.automation, unlockedIds: [D.id, A.id], enabledIds: [A.id], businessAutoUpgradeElapsedMs: 23456 },
       city: { ...s.city, ownedTerritoryIds: [...s.city.ownedTerritoryIds, NEON_MILE.id], heat: 72, heatDecayElapsedMs: 42000 },
@@ -147,10 +147,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(15);
+    expect(CURRENT_SAVE_VERSION).toBe(16);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 15, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 16, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);

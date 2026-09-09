@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+import { moneyFromMinorUnits } from '../features/economy';
 import type { ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -109,17 +110,46 @@ describe('POST 1B system compositions', () => {
     });
     if (event.choices.some(choice => choice.cost !== '0')) expect(panel.textContent).toContain('INSUFFICIENT CASH');
   });
-  it.each([false, true])('Garage stays complete without artwork, owned=%s', owned => {
+  it.each([false, true])('Garage information stays independent of image loading, owned=%s', owned => {
     const s = fresh(), vehicle = VEHICLE_CATALOG[0];
     if (!vehicle) throw Error('catalog fixture');
     const state = owned ? { ...s, garage: { ownedVehicleIds: [vehicle.id] } } : s;
     const panel = dom(<Garage state={state} paused={false} onPurchase={noop} />);
     expect(panel.querySelectorAll('article')).toHaveLength(1);
-    expect(panel.querySelectorAll('img')).toHaveLength(0);
-    expect(panel.textContent).toContain('Vortex S9');
+    expect(panel.querySelectorAll('img')).toHaveLength(1);
+    expect(panel.textContent).toContain('Kairo KX-R');
     expect(panel.textContent).toContain('PERMANENT VEHICLE');
-    expect(panel.textContent).toContain('+15% global business production');
+    expect(panel.textContent).toContain('+10% Business Production');
     expect(panel.querySelectorAll('button')).toHaveLength(owned ? 0 : 1);
     expect(panel.textContent?.includes('Price:')).toBe(!owned);
   });
+});
+
+it.each(['locked', 'unaffordable', 'ready', 'owned'] as const)('KX-R %s uses accessible static artwork and independent HTML facts', mode => {
+  const initial = fresh(), vehicle = VEHICLE_CATALOG[0]; if (!vehicle) throw Error('fixture');
+  const state = { ...initial, progression: { xp: mode === 'locked' ? 0 : 1600 },
+    economy: { cash: moneyFromMinorUnits(mode === 'ready' ? '2500000' : '0') },
+    businesses: { ...initial.businesses, owned: { [STARTER_BUSINESS.id]: { level: 5 } } },
+    garage: { ownedVehicleIds: mode === 'owned' ? [vehicle.id] : [] } };
+  const panel = dom(<Garage state={state} paused={false} onPurchase={noop} />);
+  const image = panel.querySelector('img');
+  expect(image?.getAttribute('alt')).toBe('Kairo KX-R in the Solara City garage');
+  expect(image?.getAttribute('src')).toContain('kairo-kx-r.webp');
+  expect(image?.getAttribute('src')).not.toMatch(/https?:|candidate|first.build|reference|review-assets/);
+  expect(image?.getAttribute('loading')).toBe('lazy'); expect(image?.getAttribute('decoding')).toBe('async');
+  expect(image?.getAttribute('width')).toBe('1672'); expect(image?.getAttribute('height')).toBe('941');
+  expect(image?.hasAttribute('tabindex')).toBe(false); expect(image?.closest('a,button,[role="button"]')).toBeNull();
+  image?.remove(); // Information/action stay usable even when the image is unavailable.
+  expect(panel.textContent).toContain('Kairo KX-R'); expect(panel.textContent).toContain('+10% Business Production');
+  expect(panel.textContent).not.toMatch(/Vortex|SET ACTIVE|TUNE|CUSTOMIZE|EK9|Honda/);
+  if (mode === 'owned') {
+    expect(panel.textContent).toContain('OWNED'); expect(panel.textContent).toContain('PERMANENT');
+    expect(panel.querySelector('button')).toBeNull(); expect(panel.textContent).not.toContain('Required');
+  } else {
+    expect(panel.textContent).toContain('$25,000');
+    expect(panel.querySelector('button')?.disabled).toBe(mode !== 'ready');
+    expect(panel.querySelector('button')?.getAttribute('aria-label')).toBe('Buy Kairo KX-R');
+    expect(panel.textContent?.includes('LOCKED')).toBe(mode === 'locked');
+    expect(panel.textContent?.includes('INSUFFICIENT CASH')).toBe(mode === 'unaffordable');
+  }
 });

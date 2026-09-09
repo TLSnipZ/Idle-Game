@@ -15,7 +15,7 @@ import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { reconcileOffline, OFFLINE_CAP_MS } from '../game/offline-progress';
 import { parseSave, serializeSave } from '../game/save-schema';
-import { exportSaveCode, validateSaveCode } from '../game/save-code';
+import { encodeSaveText, exportSaveCode, validateSaveCode } from '../game/save-code';
 import { rational } from '../shared/rational';
 function initial(owned=false): GameState {
   const state=createInitialGameState();
@@ -70,7 +70,7 @@ describe('vehicle runtime and durable progression',()=>{
     f.at(250);f.wall(1250);f.tick();expect(f.writes()).toBe(writes);
     f.at(5000);f.wall(6000);const exported=game.exportCode();if(!exported.ok)throw Error('export');
     const expected=onlineElapsed(initial(true),5000).state;
-    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 15,savedAt:6000,state:expected}});
+    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 16,savedAt:6000,state:expected}});
     f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
     game.stop();game.start();game.start();expect(f.timers()).toBe(2);game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
@@ -126,7 +126,7 @@ it('v5 local migration consumes its saved timestamp without losing offline time'
   const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>26000);
   const expected=simulateGameElapsed(state,25000).state;
   expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 15,savedAt:26000,state:expected}});
+  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 16,savedAt:26000,state:expected}});
   expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
 });
 
@@ -135,4 +135,62 @@ it('preserves partition equivalence across a vehicle save/reload boundary',()=>{
   const encoded=serializeSave(first,1000);if(!encoded.ok)throw Error('fixture');
   const loaded=parseSave(encoded.serialized);if(!loaded.ok)throw Error('fixture');
   expect(reconcileOffline(loaded.envelope.state,1000,5565).state).toEqual({...simulateGameElapsed(state,4656).state,events:first.events});
+});
+
+it.each([false, true])('permanent purchase persists before publication; failed write=%s never publishes ownership', fail => {
+  const state = initial(), encoded = serializeSave(state, 1000); if (!encoded.ok) throw Error('fixture');
+  let raw = encoded.serialized, failing = false, now = 0;
+  const trace: string[] = [];
+  const random = { next: () => { throw Error('purchase must not draw RNG'); } };
+  const game = createPersistentGame(view => {
+    if (view.result.state.garage.ownedVehicleIds.length) {
+      trace.push('owner'); expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { state: view.result.state } });
+    }
+  }, createLocalSave(() => ({ getItem: () => raw, setItem: (_key, value) => {
+    trace.push('write'); if (failing) throw Error('quota'); raw = value;
+  } }), () => 2000), { random, now: () => now, schedule: () => () => {} }, () => () => {});
+  game.start(); trace.length = 0; failing = fail;
+  const previous = game.getSnapshot().result.state, saved = raw;
+  now = 0; const completed = game.execute(s => purchaseVehicle(s, V.id));
+  if (fail) {
+    expect(completed).toBeUndefined(); expect(game.getSnapshot().result.state).toBe(previous);
+    expect(raw).toBe(saved); expect(trace).toEqual(['write']); expect(game.getSnapshot().persistence.kind).toBe('error');
+  } else {
+    expect(completed?.ok).toBe(true); expect(trace).toEqual(['write', 'owner']);
+    expect(game.getSnapshot().result.state.economy.cash).toBe((BigInt(previous.economy.cash) - 2500000n).toString());
+  }
+  game.stop();
+});
+
+it.each([false, true])('historical v15 CE1 owner=%s imports atomically without historical income and re-exports v16', owner => {
+  const state = initial(owner), legacy = { ...state, garage: { ownedVehicleIds: owner ? ['vehicle:starter-sport-sedan'] : [] } };
+  const code = encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 15, savedAt: 1, state: legacy }));
+  const f = fixture(); const game = f.make(); game.start(); f.wall(1000000);
+  expect(game.importCode(code)).toEqual({ ok: true }); expect(game.getSnapshot().result.state).toEqual(state);
+  const exported = game.exportCode(); if (!exported.ok) throw Error('fixture');
+  expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 16, savedAt: 1000000, state } });
+  expect(f.raw()).not.toContain('vehicle:starter-sport-sedan'); game.stop();
+});
+
+it('historical owner bootstrap migrates before offline evaluation and persists current +10% once', () => {
+  const fresh = createInitialGameState();
+  const state = { ...fresh, businesses: { ...fresh.businesses, owned: { [B.id]: { level: 4 } } }, garage: { ownedVehicleIds: [V.id] } };
+  let raw = JSON.stringify({ format: 'crime-empire-save', version: 15, savedAt: 1000,
+    state: { ...state, garage: { ownedVehicleIds: ['vehicle:starter-sport-sedan'] } } });
+  const saves = createLocalSave(() => ({ getItem: () => raw, setItem: (_key, value) => { raw = value; } }), () => 2000);
+  const result = saves.bootstrap();
+  expect(result).toMatchObject({ kind: 'loaded', state: { garage: state.garage, economy: { cash: '330' } } });
+  expect(raw).not.toContain('vehicle:starter-sport-sedan');
+  expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', offline: { incomeEarned: '0' } });
+});
+
+it.each(['invalid', 'storage'] as const)('historical CE1 %s failure never partially publishes mapped ownership', failure => {
+  const f = fixture(), game = f.make(); game.start();
+  const before = game.getSnapshot().result.state, raw = f.raw();
+  const legacy = { ...initial(true), garage: { ownedVehicleIds: failure === 'invalid'
+    ? ['vehicle:starter-sport-sedan', 'vehicle:unknown'] : ['vehicle:starter-sport-sedan'] } };
+  const code = encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 15, savedAt: 1, state: legacy }));
+  if (failure === 'storage') f.fail();
+  expect(game.importCode(code)).toMatchObject({ ok: false, error: failure === 'invalid' ? 'invalid-state' : 'persistence-failure' });
+  expect(game.getSnapshot().result.state).toBe(before); expect(f.raw()).toBe(raw); game.stop();
 });

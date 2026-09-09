@@ -21,7 +21,7 @@ function envelope(state:unknown,version=CURRENT_SAVE_VERSION){return {format:'cr
 describe('save v11 Crew migration and validation',()=>{
   it('only adds empty Crew to realistic v10, preserving every prior field exactly',()=>{
     const { events: _events, crew: _crew,...old}=rich();const text=stringifySaveFixture(envelope(withoutAchievements(old),10));const parsed=parseSave(text);
-    expect(CURRENT_SAVE_VERSION).toBe(15);expect(parsed).toEqual({ok:true,envelope:envelope({...old,events:createInitialGameState().events,crew:createInitialCrewState()})});
+    expect(CURRENT_SAVE_VERSION).toBe(16);expect(parsed).toEqual({ok:true,envelope:envelope({...old,events:createInitialGameState().events,crew:createInitialCrewState()})});
     if(!parsed.ok)throw Error('fixture');
     const {events:_events2,crew,...previous}=parsed.envelope.state;expect(previous).toEqual(old);expect(crew).toEqual(createInitialCrewState());
     for(const key of ['economy','businesses','upgrades','automation','garage','progression','permanentProgression','city'] as const)expect(previous[key]).toEqual(old[key]);
@@ -36,7 +36,7 @@ describe('save v11 Crew migration and validation',()=>{
       ...(version>=6?{garage:s.garage}:{}),...(version>=7?{permanentProgression:{empirePoints:17,rebirthCount:4,...(version>=8?{skills:s.permanentProgression.skills}:{})}}:{}),
       ...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{})};
     const code=encodeSaveText(stringifySaveFixture(envelope(state,version)));expect(code.startsWith('CE1-')).toBe(true);
-    const parsed=validateSaveCode(code);expect(parsed).toMatchObject({ok:true,envelope:{version: 15,savedAt:123456789,state:{crew:createInitialCrewState(),economy:s.economy}}});
+    const parsed=validateSaveCode(code);expect(parsed).toMatchObject({ok:true,envelope:{version: 16,savedAt:123456789,state:{crew:createInitialCrewState(),economy:s.economy}}});
     if(!parsed.ok)throw Error('fixture');expect(parsed.envelope.state.city.heat).toBe(version===10?70:0);
   });
   it.each([createInitialCrewState(),crewState().crew,crewState({operations:R.id,logistics:null}).crew,
@@ -75,7 +75,7 @@ describe('save v11 Crew migration and validation',()=>{
       {...s.crew,[Symbol('secret')]:true}, Object.create({ ...s.crew }),
       {...s.crew,recruitedIds:Object.defineProperty([],0,{get(){throw Error('must not execute');},enumerable:true})},
     ];for(const crew of bad)expect(isCrewState(crew)).toBe(false);
-    expect(parseSave(stringifySaveFixture(envelope(s,16)))).toEqual({ok:false,error:'unsupported-version'});
+    expect(parseSave(stringifySaveFixture(envelope(s,CURRENT_SAVE_VERSION+1)))).toEqual({ok:false,error:'unsupported-version'});
     expect(parseSave(stringifySaveFixture(envelope(s,10)))).toEqual({ok:false,error:'invalid-state'});
   });
 });

@@ -1,3 +1,4 @@
+import * as vehicles from '../features/vehicles';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createInitialGameState } from './game-state';
 import type { GameState } from './game-state';
@@ -56,7 +57,12 @@ describe('Phase 9D bounded runtime and frozen pre-9D outputs', () => {
     { start: 95, cash: '1000000000', level: 100, finalCash: '1380373120', xp: 59995, levels: 5,
       income: '1069263720', spent: '705825000', milli: 43, numerator: '133', denominator: '192' },
   ])('12h exact pre-9D baseline from Dockside $start, including funding/max collapse', expected => {
-    // Recorded from f3a8631 before runtime changes, not generated from the tested result.
+    // Recorded from f3a8631. Keep its historical +15% vehicle solely for this oracle;
+    // current KX-R +10% and chronology are covered by current production tests.
+    const vehicle = vehicles.STARTER_VEHICLE;
+    if (vehicle.modifier.operation !== 'multiply-basis-points') throw Error('fixture');
+    vi.spyOn(vehicles, 'findVehicle').mockImplementation(id => id === vehicle.id
+      ? { ...vehicle, modifier: { ...vehicle.modifier, operation: 'multiply-basis-points', bonusBasisPoints: 1500 } } : undefined);
     const state = runtimeLoad(expected.start, expected.cash); freeze(state);
     const calls = vi.spyOn(production, 'simulateElapsed');
     const result = simulate(state, 43200000);
