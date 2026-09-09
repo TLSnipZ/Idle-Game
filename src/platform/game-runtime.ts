@@ -1,3 +1,7 @@
+import { browserRandom } from './random-source';
+import type { RandomSource, EventId } from '../features/events';
+import type { EventResolutionResult } from '../game/resolve-event-choice';
+import { simulateOnlineElapsed } from '../game/simulate-online-elapsed';
 import type { CrewCommandResult } from '../game/crew-commands';
 import type { LayLowResult } from '../game/lay-low';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
@@ -13,16 +17,16 @@ import type { UpgradeBusinessResult } from '../game/upgrade-business';
 import type { GameState } from '../game/game-state';
 import type { StarterJobResult } from '../game/perform-starter-job';
 import type { PurchaseBusinessResult } from '../game/purchase-business';
-import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
 export interface RuntimeSnapshot {
+  readonly cityEvent?: { readonly id: EventId; readonly sequence: number };
   readonly result: CommandResult;
   readonly runtimeError: RuntimeError | null;
   readonly levelEvent?: LevelIncrease & { readonly sequence: number; readonly unlocks?: readonly string[] };
@@ -30,6 +34,7 @@ export interface RuntimeSnapshot {
 }
 
 export interface RuntimeTiming {
+  readonly random?: RandomSource;
   readonly now: () => number;
   // Scheduling must defer callbacks; cancellation must prevent future callbacks.
   readonly schedule: (callback: () => void) => () => void;
@@ -90,7 +95,7 @@ export function createGameRuntime(
     const wholeMs = Math.floor(elapsed);
     let result: GameSimulationResult;
     try {
-      result = simulateGameElapsed(snapshot.result.state, wholeMs);
+      result = simulateOnlineElapsed(snapshot.result.state, wholeMs, timing.random ?? browserRandom);
     } catch (error) {
       suspend('invalid-state');
       throw error; // Preserve the domain's fail-loudly corruption policy.
@@ -102,8 +107,9 @@ export function createGameRuntime(
     baseline = now;
     remainderMs = elapsed - wholeMs;
     if (result.state !== snapshot.result.state) {
+      const spawned = snapshot.result.state.events.pendingEventId === null ? result.state.events.pendingEventId : null;
       // Automatic income must not erase feedback from the last player command.
-      snapshot = { ...snapshot, ...levelEventFor(result.state), result: { ...snapshot.result, state: result.state },
+      snapshot = { ...snapshot, ...(spawned ? { cityEvent: { id: spawned, sequence: (snapshot.cityEvent?.sequence ?? 0) + 1 } } : {}), ...levelEventFor(result.state), result: { ...snapshot.result, state: result.state },
         ...(result.automation.completedJobs > 0 ? { automationEvent: {
           ...result.automation, sequence: (snapshot.automationEvent?.sequence ?? 0) + 1,
         } } : {}),
@@ -117,9 +123,10 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // Ownership/level/equipment/delegation/vehicle/skill/territory/assignment changes start a new rate boundary. Runtime sub-ms
-    // duration is dropped; earned authoritative milli-cents are never reset.
-    if (result.ok && (result.state.crew.assignments !== previous.crew.assignments
+    // Rate changes and completed event choices start a fresh elapsed boundary.
+    // Runtime sub-ms duration is dropped; earned authoritative fractions are never reset.
+    if (result.ok && ((previous.events.pendingEventId !== null && result.state.events.pendingEventId === null)
+        || result.state.crew.assignments !== previous.crew.assignments
         || result.state.businesses.owned !== previous.businesses.owned
         || result.state.city.ownedTerritoryIds !== previous.city.ownedTerritoryIds
         || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds

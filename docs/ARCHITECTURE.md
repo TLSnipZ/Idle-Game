@@ -1612,7 +1612,7 @@ Phase 7C follows below.
 ## Phase 7C — Crew assignment foundation
 
 Phase 7B was manually verified live by the user. Phase 7C implementation is complete;
-its live verification is pending. `features/crew` owns exactly three original
+it was manually verified live by the user. `features/crew` owns exactly three original
 specialists, stable CrewMemberIds, fixed config and structural validation. Display
 names are replaceable independently of save identity. Retiring an ID or changing
 slot compatibility needs an explicit migration decision, never silent deletion.
@@ -1697,4 +1697,141 @@ unassignment controls. Pure selectors supply all eligibility, compatibility and
 active effects. Counts and feedback are presentation-only. Responsive grids,
 semantic buttons and existing focus/reduced-motion styles are retained. Rebirth's
 keep/lose summary includes Crew. No automatic assignment, portraits, levels, XP,
-rarity, wages, traits or Random Events exist. The next city-system slice is deferred.
+rarity, wages or traits exist. Phase 7D extends city systems below.
+
+
+## Phase 7D — online city events
+
+Phase 7C recruitment, inactive bench ownership, assignment/replacement, Rico/Mara/Jax
+effects, reload/offline/export/import and temporary Rebirth reset were manually
+verified in the functioning live build by the user. Phase 7D implementation is
+complete; **Phase 7D live verification remains pending**.
+
+`features/events` owns stable `EventId` / `EventChoiceId` types, an explicit ordered
+catalog, strict event-state validation and pure cadence/selection helpers. There
+are exactly three events, each with exactly two choices: Hot Tip, Shakedown, then
+Warehouse Opportunity. Names, descriptions, costs and effects are replaceable config;
+none are persisted. Central requirements evaluate level/business spawn conditions;
+a focused structured minimum-Heat condition covers Shakedown. Spawn eligibility is
+checked against the reconciled state after normal economy/XP/Heat simulation. Once
+pending, an event is retained regardless of later spawn eligibility.
+
+```ts
+events: {
+  opportunityElapsedMs: number, // safe integer 0–599,999
+  pendingEventId: EventId | null
+}
+```
+
+Fresh state is `0 / null`. There is at most one pending event, no queue, history,
+per-event cooldown, chain, seed, RNG cursor or cached selection. A pending event
+freezes only its opportunity progress; all normal commands and economy/Heat/Crew
+simulation continue. Rebirth is the intentional exception that discards the event.
+
+### Online opportunity and RNG boundary
+
+`simulateGameElapsed` remains the common economy/Dispatcher/Heat path. Online
+`simulateOnlineElapsed` composes it with event opportunity progression, using the
+existing monotonic runtime clock and 250ms scheduler. Offline bootstrap calls the
+common simulation directly, never the online wrapper. No new timer exists.
+
+When idle, add integer credited online milliseconds to opportunity progress using
+BigInt arithmetic; keep the modulo 600,000ms remainder. One or more completed
+10-minute windows cause **at most one attempt per reconciliation**. For example,
+590,000 + 20,000 yields one opportunity and 10,000 remainder; 35 minutes from zero
+yields one opportunity and 5 minutes remainder. Missed additional windows are
+intentionally discarded. Pending events preserve/freeze the modulo remainder until
+resolution. This cadence does not guarantee an event every ten minutes.
+
+`RandomSource.next(): number` is injected through `RuntimeTiming.random`.
+`platform/random-source.ts` is the only production adapter calling `Math.random()`;
+authoritative event helpers receive values and have no browser dependency. Tests
+inject exact sequences. Values must be finite and `0 <= value < 1`; invalid output
+throws, suspending the runtime with the previous complete state and no partial
+Money, XP, Heat or event publication. No modulo/clamping repair of RNG output occurs.
+
+RNG consumption is explicit:
+
+- No completed opportunity, pending event, or no eligible content: **zero values**.
+- Eligible opportunity: one chance value, success only when `< 0.35`.
+- Successful chance: one additional selection value; choose `floor(value * N)`
+  from eligible events in configured order, uniformly. No retry in that batch.
+- Rendering, selectors, validation, migration, loading, import, offline simulation
+  and choice effects consume **zero** event RNG values.
+
+Choosing zero rolls when no eligible content exists preserves the no-eligible RNG
+contract. Future rolls need not replay across reloads; no PRNG state is persisted.
+Existing interval-start Money modifiers, Dispatcher XP batching, Dispatcher Heat
+then cooling order and Crew effect boundaries remain unchanged.
+
+### Choice transaction and runtime ordering
+
+`resolveEventChoice(state, eventId, choiceId)` accepts only the current pending
+identity and one of its configured choices. It returns structured no-pending,
+wrong-event, unknown-choice, insufficient-funds and economy failures. Domain failure
+preserves the entire original input, pending ID and timer. Invalid authoritative
+state fails loudly using the existing validation convention.
+
+The runtime first reconciles elapsed economy/Heat with the event still pending and
+its timer frozen. Choice affordability is then evaluated against **current cash**.
+Canonical `spendCash` followed by `earnCash` builds a local candidate; Warehouse must
+first afford/spend $2,500 before adding $4,000. Overflow anywhere publishes no choice
+payment, reward or Heat. Configured Heat uses existing clamp/reduction helpers:
+0–100, numerical cooling remainder retained unless resulting Heat is zero.
+All outcomes are fixed transactions, unaffected by job/production modifiers, Heat
+cash penalties, Crew or skills. Events award zero XP and zero EP and remove no assets.
+
+Every successful choice, including PASS, clears pending and resets progress to zero.
+Runtime-only fractional milliseconds are discarded at this completed-choice boundary
+so a fresh ten minutes is required. Choices consume no RNG. A failed choice leaves
+any legitimate preceding elapsed reconciliation authoritative, but applies no choice
+effect and does not reset the event timer.
+
+Successful choices use the existing meaningful-command save boundary. As with other
+ordinary purchases, a write failure reports a persistence warning while the completed
+live command remains authoritative and the previous durable save remains recoverable.
+No second storage key or retry loop is introduced. Offline, import and Rebirth retain
+their stronger durable write-before-publication/replacement boundaries.
+
+### Offline, save migration and reset policy
+
+Offline catch-up still uses one shared Never Sleeps 8/10/12h credited duration for
+businesses, Dispatcher Money/XP/Heat and cooling with active Crew. **Events do not
+advance or spawn offline**, including discarded time. A saved pending event and its
+frozen remainder survive intact while ordinary systems simulate. Saving 420 seconds
+of event progress, leaving for eight hours, and returning preserves 420 seconds;
+an additional 180 seconds online is required before an opportunity.
+
+Current save **v12** preserves the sequential v1→v2→v3→v4→v5→v6→v7→v8→v9→v10→v11→v12
+boundary. v11→v12 adds only fresh event state. All previous Money, XP, business levels,
+upgrades, Dispatcher/progress, both production fractions, Garage, EP/count/skills,
+territories, Heat/remainder, Crew and savedAt values are preserved exactly. Current
+validation rejects missing/malformed event shape, unsafe/fractional/out-of-range
+progress and unknown pending IDs without repairing them or testing spawn eligibility.
+
+CE1 transport remains unchanged. Export/import preserves exact pending ID/progress;
+import does not charge, roll, resolve, announce or simulate historical savedAt. It
+rebases time and writes before replacement as before. Loaded/imported events need no
+eligibility recheck and remain pending until an explicit valid choice.
+
+Rebirth's explicit policy resets **active city event and opportunity progress** to
+null/zero, after final runtime reconciliation (which may itself spawn an event).
+No choice is auto-resolved and no reward/refund is granted. All previous temporary
+fields reset: cash, businesses/levels/fractions, upgrades, Dispatcher/progress, XP,
+Crew, Neon Mile and Heat/remainder. Waterfront is restored; Garage, unspent EP plus
+Rebirth reward, count and permanent skill ranks retain their established semantics.
+
+### Presentation
+
+The non-blocking CITY EVENTS panel next to Solara City displays an idle countdown or
+one named event with exactly two transparent choices. Pure selectors/presentation
+models own eligibility, current affordability, countdown and effect text. Paid
+choices disable semantically when unaffordable; a free alternative always remains.
+The rest of the app is usable. A runtime-only sequence announces a newly spawned
+event once through a polite status region; existing action feedback describes
+outcomes and structured failures. Reload/import do not announce a new spawn.
+Responsive two-column/one-column cards reuse keyboard/focus/reduced-motion styles,
+without imagery, flashing, modal traps or browser dialogs.
+
+No weighted rarity, chains, history, police/bust mechanics, hidden outcomes,
+Crew-specific options, extra content or Phase 8 systems are implemented.

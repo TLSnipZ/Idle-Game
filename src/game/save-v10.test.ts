@@ -18,12 +18,12 @@ function envelope(state: unknown, version = CURRENT_SAVE_VERSION) {
 }
 describe('v10 Heat migration and portable validation', () => {
   it('v9 migration only adds zero Heat/progress and preserves every existing value', () => {
-    const { crew, ...current } = rich(); const old = { ...current, city: { ownedTerritoryIds: current.city.ownedTerritoryIds } };
+    const { events, crew, ...current } = rich(); const old = { ...current, city: { ownedTerritoryIds: current.city.ownedTerritoryIds } };
     const raw = JSON.stringify(envelope(old,9)); const parsed = parseSave(raw);
-    expect(CURRENT_SAVE_VERSION).toBe(11);
-    expect(parsed).toEqual({ ok: true, envelope: envelope({ ...old, crew, city: { ...old.city, heat: 0, heatDecayElapsedMs: 0 } }) });
+    expect(CURRENT_SAVE_VERSION).toBe(12);
+    expect(parsed).toEqual({ ok: true, envelope: envelope({ ...old, events, crew, city: { ...old.city, heat: 0, heatDecayElapsedMs: 0 } }) });
     if (!parsed.ok) throw Error('fixture');
-    const { crew: _crew, city, ...previous } = parsed.envelope.state; const { city: oldCity, ...before } = old;
+    const { events: _events, crew: _crew, city, ...previous } = parsed.envelope.state; const { city: oldCity, ...before } = old;
     expect(previous).toEqual(before); expect(city.ownedTerritoryIds).toEqual(oldCity.ownedTerritoryIds);
     expect(city.heat).toBe(0); expect(city.heatDecayElapsedMs).toBe(0); expect(parsed.envelope.savedAt).toBe(123456789);
     expect(JSON.stringify(envelope(old,9))).toBe(raw); expect(validateSaveCode(encodeSaveText(raw))).toEqual(parsed);
@@ -37,7 +37,7 @@ describe('v10 Heat migration and portable validation', () => {
       ...(version >= 7 ? { permanentProgression: { empirePoints: 17, rebirthCount: 4, ...(version >= 8 ? { skills: s.permanentProgression.skills } : {}) } } : {}),
       ...(version >= 9 ? { city: { ownedTerritoryIds: s.city.ownedTerritoryIds } } : {}) };
     const code = encodeSaveText(JSON.stringify(envelope(state,version))); expect(code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: 123456789,
+    expect(validateSaveCode(code)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: 123456789,
       state: { economy: s.economy, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: version === 9 ? [WATERFRONT.id,NEON_MILE.id] : [WATERFRONT.id] } } } });
   });
   it.each([[0,0],[1,0],[59,59999],[100,59999],[70,45000]])('v10 roundtrips Heat %i / remainder %i exactly', (heat,heatDecayElapsedMs) => {
@@ -61,7 +61,7 @@ describe('v10 Heat migration and portable validation', () => {
       { ...s.city, get heat() { throw Error('must not execute'); } }, { ...s.city, ownedTerritoryIds: [NEON_MILE.id] }]) {
       expect(validateSaveState({...s,city})).toBeNull();
     }
-    expect(parseSave(JSON.stringify(envelope(s,12)))).toEqual({ok:false,error:'unsupported-version'});
+    expect(parseSave(JSON.stringify(envelope(s,13)))).toEqual({ok:false,error:'unsupported-version'});
     expect(parseSave(JSON.stringify(envelope(s,9)))).toEqual({ok:false,error:'invalid-state'});
   });
 });

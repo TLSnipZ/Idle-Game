@@ -10,6 +10,7 @@ import { createGameRuntime } from './game-runtime';
 import { recruitCrewMember, assignCrewMember, unassignCrewSlot } from '../game/crew-commands';
 import { performStarterJob } from '../game/perform-starter-job';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { simulateElapsed } from '../game/simulate-elapsed';
 import { getHeatDecayIntervalMs } from '../game/heat-decay-interval';
 import { evaluateJobReward } from '../game/effective-stats';
@@ -24,23 +25,23 @@ describe('Crew runtime boundaries and persistence',()=>{
   it('recruitment reconciles first, preserves assignment and saves only the complete purchase',()=>{
     const s={...heated(R.id),crew:{recruitedIds:[R.id,J.id],assignments:{operations:R.id,logistics:J.id}}};
     const f=rebirthRuntime(s);f.at(12000);f.wall(13000);
-    const reconciled=simulateGameElapsed(s,12000).state;
+    const reconciled=onlineElapsed(s,12000).state;
     f.game.execute(state=>{expect(state).toEqual(reconciled);return recruitCrewMember(state,M.id);});
     const expected=recruitCrewMember(reconciled,M.id).state;
     expect(f.game.getSnapshot().result.state).toEqual(expected);expect(expected.crew.assignments).toEqual(s.crew.assignments);
     expect(f.events.filter(e=>e.type==='write').map(e=>e.state)).toEqual([expected]);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version:11,savedAt:13000,state:expected}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version:12,savedAt:13000,state:expected}});
   });
   it('Rico → Mara and reverse switch use old Money/decay before replacement and new effects after',()=>{
     const s=heated(R.id),f=rebirthRuntime(s);f.at(30000);
-    const old=simulateGameElapsed(s,30000).state;
+    const old=onlineElapsed(s,30000).state;
     f.game.execute(state=>{expect(state).toEqual(old);return assignCrewMember(state,'operations',M.id);});
     let switched=f.game.getSnapshot().result.state;expect(switched.city).toEqual(old.city);expect(getHeatDecayIntervalMs(switched)).toBe(45000);
     expect(f.game.getSnapshot().automationEvent?.income).toBe('8166'); // HOT + Neon + Rico, three per-job floored payouts.
-    f.at(50000);const beforeReverse=simulateGameElapsed(switched,20000).state;
+    f.at(50000);const beforeReverse=onlineElapsed(switched,20000).state;
     f.game.execute(state=>{expect(state).toEqual(beforeReverse);return assignCrewMember(state,'operations',R.id);});
     switched=f.game.getSnapshot().result.state;expect(switched.city).toEqual(beforeReverse.city);expect(getHeatDecayIntervalMs(switched)).toBe(60000);
-    f.at(60000);f.tick();expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(switched,10000).state);
+    f.at(60000);f.tick();expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(switched,10000).state);
     const current=f.game.getSnapshot().result.state;f.game.execute(performStarterJob);
     const reward=evaluateJobReward(current);if(!reward.ok)throw Error('fixture');
     expect(f.game.getSnapshot().result).toMatchObject({ok:true,moneyEarned:reward.reward});
@@ -59,23 +60,23 @@ describe('Crew runtime boundaries and persistence',()=>{
   });
   it('Jax assignment and unassignment bracket production exactly with both fractions retained',()=>{
     const s={...crewState(),automation:createInitialGameState().automation},f=rebirthRuntime(s);
-    f.at(1234);const before=simulateGameElapsed(s,1234).state;f.game.execute(state=>assignCrewMember(state,'logistics',J.id));
+    f.at(1234);const before=onlineElapsed(s,1234).state;f.game.execute(state=>assignCrewMember(state,'logistics',J.id));
     const assigned=assignCrewMember(before,'logistics',J.id).state;expect(f.game.getSnapshot().result.state).toEqual(assigned);
-    f.at(5678);const beforeUnassign=simulateGameElapsed(assigned,4444).state;f.game.execute(state=>unassignCrewSlot(state,'logistics'));
+    f.at(5678);const beforeUnassign=onlineElapsed(assigned,4444).state;f.game.execute(state=>unassignCrewSlot(state,'logistics'));
     const unassigned=unassignCrewSlot(beforeUnassign,'logistics').state;expect(f.game.getSnapshot().result.state).toEqual(unassigned);
-    f.at(9000);f.tick();expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(unassigned,3322).state);
+    f.at(9000);f.tick();expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(unassigned,3322).state);
   });
   it('drops only sub-ms runtime duration at active assignment changes, not recruitment/failures',()=>{
     let now=0;const s={...crewState(),automation:createInitialGameState().automation};
-    const runtime=createGameRuntime(s,()=>{}, {now:()=>now,schedule:()=>()=>{}});runtime.start();
+    const runtime=createGameRuntime(s,()=>{}, {random: { next: () => 0.99 }, now: () =>now,schedule:()=>()=>{}});runtime.start();
     now=.5;runtime.execute(state=>assignCrewMember(state,'logistics',J.id));const assigned=runtime.getSnapshot().result.state;
     now=1;runtime.reconcile();expect(runtime.getSnapshot().result.state).toEqual(assigned);
-    now=1.5;runtime.reconcile();expect(runtime.getSnapshot().result.state).toEqual(simulateGameElapsed(assigned,1).state);
+    now=1.5;runtime.reconcile();expect(runtime.getSnapshot().result.state).toEqual(onlineElapsed(assigned,1).state);
     const f=rebirthRuntime({...s,crew:createInitialCrewState()});f.at(.9);f.game.execute(state=>recruitCrewMember(state,R.id));
-    const recruited=f.game.getSnapshot().result.state;f.at(1);f.tick();expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(recruited,1).state);
+    const recruited=f.game.getSnapshot().result.state;f.at(1);f.tick();expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(recruited,1).state);
   });
   it('failed commands preserve reconciled state, assignment, funds and durable save',()=>{
-    const f=rebirthRuntime(heated());const raw=f.raw();f.at(1234);const old=simulateGameElapsed(heated(),1234).state;
+    const f=rebirthRuntime(heated());const raw=f.raw();f.at(1234);const old=onlineElapsed(heated(),1234).state;
     f.game.execute(state=>assignCrewMember(state,'operations',J.id));expect(f.game.getSnapshot().result).toMatchObject({ok:false,state:old});
     expect(f.raw()).toBe(raw);expect(f.events.some(e=>e.type==='write')).toBe(false);
   });
@@ -84,7 +85,7 @@ describe('Crew runtime boundaries and persistence',()=>{
     f.game.execute(state=>recruitCrewMember(state,R.id));f.game.execute(state=>assignCrewMember(state,'operations',R.id));
     f.game.execute(state=>recruitCrewMember(state,J.id));f.game.execute(state=>assignCrewMember(state,'logistics',J.id));
     f.at(4321);f.wall(5321);f.autosave();const expected=f.game.getSnapshot().result.state;
-    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:11,savedAt:5321,state:expected}});
+    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version:12,savedAt:5321,state:expected}});
     f.game.stop();const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
     reload.stop();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);expect(f.timers()).toBe(2);
     reload.execute(state=>unassignCrewSlot(state,'operations'));expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:{crew:{recruitedIds:[R.id,J.id],assignments:{operations:null,logistics:J.id}}}}});
@@ -107,7 +108,7 @@ describe('Crew runtime boundaries and persistence',()=>{
   });
   it.each([R.id,M.id])('final pre-Rebirth reconciliation uses %s plus Jax before durable reset',operations=>{
     const base=rebirthState(),s={...base,crew:crewState({operations,logistics:J.id}).crew,city:heated(operations).city};
-    const f=rebirthRuntime(s);f.at(55001);f.wall(56001);const before=simulateGameElapsed(s,55001).state;
+    const f=rebirthRuntime(s);f.at(55001);f.wall(56001);const before=onlineElapsed(s,55001).state;
     expect(f.game.rebirth()).toMatchObject({ok:true});const after=f.game.getSnapshot().result.state;
     expect(f.events[0]).toEqual({type:'publish',state:before});
     expect(f.events.findIndex(e=>e.type==='write'&&e.state.crew.recruitedIds.length===0)).toBeLessThan(f.events.findIndex(e=>e.type==='publish'&&e.state.crew.recruitedIds.length===0));
@@ -119,7 +120,7 @@ describe('Crew runtime boundaries and persistence',()=>{
   });
   it('failed Rebirth write retains all reconciled Crew and other live progression',()=>{
     const s={...rebirthState(),crew:heated(M.id).crew,city:heated(M.id).city};const f=rebirthRuntime(s),raw=f.raw();f.at(45001);f.fail();
-    const expected=simulateGameElapsed(s,45001).state;expect(f.game.rebirth()).toMatchObject({ok:false,error:'persistence-failure'});
+    const expected=onlineElapsed(s,45001).state;expect(f.game.rebirth()).toMatchObject({ok:false,error:'persistence-failure'});
     expect(f.game.getSnapshot().result.state).toEqual(expected);expect(f.raw()).toBe(raw);
   });
   it.each([0,1,2])('offline rank %i caps all assigned effects once before publication',rank=>{
@@ -128,7 +129,7 @@ describe('Crew runtime boundaries and persistence',()=>{
       const cap=(8+2*rank)*3600000,now=cap+7000123;const encoded=serializeSave(s,0);if(!encoded.ok)throw Error('fixture');let raw=encoded.serialized;
       const expected=simulateGameElapsed(s,cap).state;const order:string[]=[];
       const saves=createLocalSave(()=>({getItem:()=>raw,setItem:(_k,v)=>{order.push('write');raw=v;}}),()=>now);
-      const game=createPersistentGame(view=>{order.push('publish');expect(view.result.state).toEqual(expected);},saves,{now:()=>0,schedule:()=>()=>{}},()=>()=>{});
+      const game=createPersistentGame(view=>{order.push('publish');expect(view.result.state).toEqual(expected);},saves,{random: { next: () => 0.99 }, now: () =>0,schedule:()=>()=>{}},()=>()=>{});
       game.start();expect(order[0]).toBe('write');expect(game.getSnapshot().offline).toMatchObject({capMs:cap,rewardedElapsedMs:cap,actualElapsedMs:now});
       expect(saves.bootstrap()).toMatchObject({kind:'loaded',state:expected,offline:{rewardedElapsedMs:0}});
     }
@@ -136,7 +137,7 @@ describe('Crew runtime boundaries and persistence',()=>{
   it('failed offline write pauses without partial Crew/economy changes and no schedules',()=>{
     const s=heated(M.id),encoded=serializeSave(s,0);if(!encoded.ok)throw Error('fixture');const raw=encoded.serialized;let timers=0;
     const game=createPersistentGame(()=>{},createLocalSave(()=>({getItem:()=>raw,setItem:()=>{throw Error('quota');}}),()=>95000),
-      {now:()=>0,schedule:()=>{timers++;return()=>{};}},()=>{timers++;return()=>{};});
+      {random: { next: () => 0.99 }, now: () =>0,schedule:()=>{timers++;return()=>{};}},()=>{timers++;return()=>{};});
     game.start();expect(game.getSnapshot().persistence.kind).toBe('offline-error');expect(game.getSnapshot().result.state).toEqual(s);expect(timers).toBe(0);
     game.execute(state=>unassignCrewSlot(state,'operations'));expect(game.getSnapshot().result.state).toEqual(s);
   });
@@ -146,7 +147,7 @@ describe('Crew runtime boundaries and persistence',()=>{
     expect(result).toMatchObject({kind:'loaded',state:s,offline:{clockAnomaly:true,rewardedElapsedMs:0}});
   });
   it('invalid Crew suspends shared simulation and cannot publish partial income',()=>{
-    const s=heated();let now=0;const runtime=createGameRuntime(s,()=>{}, {now:()=>now,schedule:()=>()=>{}});runtime.start();
+    const s=heated();let now=0;const runtime=createGameRuntime(s,()=>{}, {random: { next: () => 0.99 }, now: () =>now,schedule:()=>()=>{}});runtime.start();
     // Simulate integration corruption, never accepted through a save boundary.
     Object.defineProperty(s.crew.assignments,'operations',{value:J.id,enumerable:true});now=10000;
     expect(()=>runtime.reconcile()).toThrow(RangeError);expect(runtime.getSnapshot().runtimeError).toBe('invalid-state');expect(runtime.getSnapshot().result.state.economy.cash).toBe(s.economy.cash);

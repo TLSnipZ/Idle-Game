@@ -1,3 +1,4 @@
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import type { GameState } from '../game/game-state';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createInitialGameState } from '../game/game-state';
@@ -21,7 +22,7 @@ function fixture(state: GameState = owned, savedAt = 1000, current = 2000) {
   const publish = vi.fn(() => { events.push('publish'); });
   const interval = (callback: () => void, ms: number) => { const id = setInterval(callback, ms); return () => clearInterval(id); };
   const make = () => createPersistentGame(publish, createLocalSave(() => storage, () => wall), {
-    now: () => monotonic,
+    random: { next: () => 0.99 }, now: () => monotonic,
     schedule: callback => { events.push('start'); return interval(callback, 250); },
   }, callback => interval(callback, AUTOSAVE_CADENCE_MS));
   return { storage, make, publish, events, raw: () => raw, original: raw,
@@ -55,7 +56,7 @@ describe('offline bootstrap transaction', () => {
   it('autosave adds only active runtime elapsed after bootstrap', () => {
     const f = fixture(); const game = f.make(); game.start();
     f.advance(AUTOSAVE_CADENCE_MS);
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned, 1000 + AUTOSAVE_CADENCE_MS).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(simulateElapsed(owned, 1000).state, AUTOSAVE_CADENCE_MS).state);
     expect(JSON.parse(f.raw()).savedAt).toBe(2000 + AUTOSAVE_CADENCE_MS);
     expect(f.storage.setItem).toHaveBeenCalledTimes(2);
   });

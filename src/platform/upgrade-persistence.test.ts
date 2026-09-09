@@ -1,3 +1,4 @@
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { CURRENT_SAVE_VERSION } from '../game/save-schema';
 import { describe, expect, it } from 'vitest';
 import { createPersistentGame } from './persistent-game';
@@ -30,7 +31,7 @@ function fixture(state = owned(), savedAt = 1000) {
     }
     firstPublication = false;
   }, createLocalSave(() => storage, () => wall), {
-    now: () => now, schedule: callback => { tick = callback; activeTimers++; return () => { activeTimers--; }; },
+    random: { next: () => 0.99 }, now: () => now, schedule: callback => { tick = callback; activeTimers++; return () => { activeTimers--; }; },
   }, callback => { autosave = callback; activeTimers++; return () => { activeTimers--; }; });
   };
   return { make, tick: () => tick(), autosave: () => autosave(), raw: () => raw, writes: () => writes,
@@ -53,7 +54,7 @@ describe('equipment runtime, persistence and offline contracts', () => {
     expect(purchased.businesses.productionRemainderMilliCents).toBe(75);
     f.at(1002); f.tick(); expect(game.getSnapshot().result.state).toBe(purchased);
     f.at(1002.75); f.tick();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(purchased, 1).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(purchased, 1).state);
     game.stop();
   });
   it('failed purchase retains reconciled production and the old modifier set', () => {
@@ -61,8 +62,8 @@ describe('equipment runtime, persistence and offline contracts', () => {
     const f = fixture(initial); const game = f.make(); game.start();
     f.at(11000); game.execute(state => purchaseUpgrade(state, PRESSURE_WASHER.id));
     expect(game.getSnapshot().result).toMatchObject({ ok: false, error: 'insufficient-funds' });
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(initial, 10000).state);
-    f.at(12000); f.tick(); expect(game.getSnapshot().result.state).toEqual(simulateElapsed(initial, 11000).state); game.stop();
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 10000).state);
+    f.at(12000); f.tick(); expect(game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 11000).state); game.stop();
   });
   it('autosave, export and reload retain equipment and exact fraction without per-tick writes', () => {
     const initial = purchaseUpgrade(owned(), PRESSURE_WASHER.id).state;
@@ -142,7 +143,7 @@ it('reconciles before every catalog purchase using the previous modifier set', (
   let expected: GameState = initial;
   UPGRADE_CATALOG.forEach((upgrade, index) => {
     f.at(1000 + (index + 1) * 1001); f.wall(1000 + (index + 1) * 1001);
-    expected = purchaseUpgrade(simulateElapsed(expected, 1001).state, upgrade.id).state;
+    expected = purchaseUpgrade(onlineElapsed(expected, 1001).state, upgrade.id).state;
     game.execute(state => purchaseUpgrade(state, upgrade.id));
     expect(game.getSnapshot().result.state).toEqual(expected);
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state: expected } });

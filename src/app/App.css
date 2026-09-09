@@ -186,3 +186,9 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .crew-slot, .crew-card { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); overflow-wrap: anywhere; }
 .crew-card .action-button, .crew-slot .action-button { width: 100%; white-space: normal; }
 @media (max-width: 740px) { .crew-slots, .crew-catalog { grid-template-columns: minmax(0, 1fr); } }
+
+.city-events { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); }
+.event-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.event-choice { min-width: 0; overflow-wrap: anywhere; }
+.event-choice .action-button { width: 100%; white-space: normal; }
+@media (max-width: 740px) { .event-choices { grid-template-columns: minmax(0, 1fr); } }

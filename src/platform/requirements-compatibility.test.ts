@@ -39,9 +39,9 @@ describe('acquisition-only gates preserve live saves', () => {
   });
   it('retains current schema/CE1 and exact gated ownership on roundtrip even without any business', () => {
     const state={ ...grandfathered(), businesses: createInitialGameState().businesses };
-    expect(CURRENT_SAVE_VERSION).toBe(11);
+    expect(CURRENT_SAVE_VERSION).toBe(12);
     const serialized=serializeSave(state,42); if (!serialized.ok) throw Error('fixture');
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 11, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 12, state } });
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));
@@ -61,7 +61,7 @@ describe('acquisition-only gates preserve live saves', () => {
       if (view.offline && view.persistence.kind==='loaded') {
         expect(raw && parseSave(raw)).toMatchObject({ ok:true,envelope:{state:view.result.state} });
       }
-    },save,{ now:()=>now, schedule:()=>()=>{} },()=>()=>{});
+    },save,{ random: { next: () => 0.99 }, now: () =>now, schedule:()=>()=>{} },()=>()=>{});
     const game=make(); game.start();
     const code=exportSaveCode(grandfathered(),1); if (!code.ok) throw Error('fixture');
     expect(game.importCode(code.code)).toEqual({ ok:true });
@@ -80,7 +80,7 @@ describe('acquisition-only gates preserve live saves', () => {
       economy:{cash:moneyFromMinorUnits('100000')} };
     const encoded=serializeSave(state,1); if (!encoded.ok) throw Error('fixture'); raw=encoded.serialized;
     const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>1);
-    const game=createPersistentGame(()=>{},save,{now:()=>now,schedule:()=>()=>{}},()=>()=>{});
+    const game=createPersistentGame(()=>{},save,{random: { next: () => 0.99 }, now: () =>now,schedule:()=>()=>{}},()=>()=>{});
     game.start(); game.dismissOffline();
     now=5000; game.execute(current=>purchaseUpgrade(current,S.id));
     expect(game.getSnapshot().result.ok).toBe(true);

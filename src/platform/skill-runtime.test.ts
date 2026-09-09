@@ -1,8 +1,9 @@
+import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
 import { skillState, ROOT, FAST, LEARN, NEVER } from '../game/test-fixtures/skill-state';
 import { purchaseSkillRank } from '../game/purchase-skill-rank';
-import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { performStarterJob } from '../game/perform-starter-job';
 import { parseSave } from '../game/save-schema';
 import { exportSaveCode, validateSaveCode } from '../game/save-code';
@@ -15,13 +16,13 @@ describe('skill command boundaries and persistence', () => {
     const initial = skillState(id === ROOT ? {} : { [ROOT]: 1 });
     const f = rebirthRuntime(initial); f.at(10000); f.wall(11000);
     f.game.execute(state => purchaseSkillRank(state, id));
-    const before = simulateGameElapsed(initial, 10000).state;
+    const before = onlineElapsed(initial, 10000).state;
     const purchased = purchaseSkillRank(before, id).state;
     expect(f.game.getSnapshot().result.state).toEqual(purchased);
     expect(purchased.progression.xp).toBe(5);
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 11000, state: purchased } });
     f.at(40000); f.wall(41000); f.tick();
-    const expected = simulateGameElapsed(purchased, 30000).state;
+    const expected = onlineElapsed(purchased, 30000).state;
     expect(f.game.getSnapshot().result.state).toEqual(expected);
     expect(expected.progression.xp).toBe(id === LEARN ? 21 : 20);
     f.game.execute(performStarterJob);
@@ -33,24 +34,24 @@ describe('skill command boundaries and persistence', () => {
     f.at(.4); f.game.execute(s => purchaseSkillRank(s, ROOT));
     const bought = f.game.getSnapshot().result.state;
     f.at(1); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(bought);
-    f.at(1.5); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought, 1).state);
+    f.at(1.5); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(bought, 1).state);
     f.game.stop();
   });
   it('failed purchase saves nothing; reconciliation remains current and runtime usable', () => {
     const initial = skillState({}, 0); const f = rebirthRuntime(initial); const raw = f.raw();
     f.at(10000); f.game.execute(s => purchaseSkillRank(s, ROOT));
     expect(f.game.getSnapshot().result).toMatchObject({ ok: false, error: 'insufficient-empire-points' });
-    expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(initial, 10000).state);
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 10000).state);
     expect(f.raw()).toBe(raw); f.at(20000); f.tick();
-    expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(initial, 20000).state); f.game.stop();
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 20000).state); f.game.stop();
   });
   it('new rank and unspent EP survive command save, autosave, export, reload and remount', () => {
     const f = rebirthRuntime(skillState({ [ROOT]: 1 }));
     f.game.execute(s => purchaseSkillRank(s, FAST)); const state = f.game.getSnapshot().result.state;
     expect(state.permanentProgression.empirePoints).toBe(29);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 11, state } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 12, state } });
     const exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 11, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 12, state } });
     f.autosave(); f.game.stop(); const reload = f.make(); reload.start(); reload.start();
     expect(reload.getSnapshot().result.state).toEqual(state); expect(f.timers()).toBe(2); reload.stop(); expect(f.timers()).toBe(0);
   });

@@ -12,6 +12,7 @@ import { purchaseAutomation } from '../game/purchase-automation';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
 import { performStarterJob } from '../game/perform-starter-job';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { serializeSave, parseSave } from '../game/save-schema';
 import { encodeSaveText, validateSaveCode } from '../game/save-code';
 import { OFFLINE_CAP_MS } from '../game/offline-progress';
@@ -35,7 +36,7 @@ function fixture(state = owned(), savedAt = 1000) {
     }
   }, createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => {
     if (fail) throw Error('quota'); raw = value; writes++;
-  } }), () => wall), { now: () => now, schedule: callback => { tick = callback; timers++; return () => { timers--; }; } },
+  } }), () => wall), { random: { next: () => 0.99 }, now: () => now, schedule: callback => { tick = callback; timers++; return () => { timers--; }; } },
   callback => { autosave = callback; timers++; return () => { timers--; }; });
   return { make, raw: () => raw, writes: () => writes, timers: () => timers, tick: () => tick(), autosave: () => autosave(),
     at: (n: number) => { now = n; }, wall: (n: number) => { wall = n; }, fail: () => { fail = true; } };
@@ -46,14 +47,14 @@ describe('delegation runtime transactions', () => {
     f.at(10000); game.execute(state => purchaseAutomation(state, D.id));
     expect(game.getSnapshot().result.state.automation.starterJobElapsedMs).toBe(0);
     const bought = game.getSnapshot().result.state;
-    f.at(11000); f.tick(); expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought, 1000).state);
+    f.at(11000); f.tick(); expect(game.getSnapshot().result.state).toEqual(onlineElapsed(bought, 1000).state);
     expect(game.getSnapshot().automationEvent).toBeUndefined(); game.stop(); expect(f.timers()).toBe(0);
   });
   it('discards pre-purchase sub-ms time without resetting any earned business remainder', () => {
     const f = fixture({ ...owned(false), progression: { xp: 400 } }); const game = f.make(); game.start(); game.dismissOffline();
     f.at(10000.75); game.execute(state => purchaseAutomation(state, D.id)); const bought = game.getSnapshot().result.state;
     f.at(10001); f.tick(); expect(game.getSnapshot().result.state).toBe(bought);
-    f.at(10001.75); f.tick(); expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought, 1).state); game.stop();
+    f.at(10001.75); f.tick(); expect(game.getSnapshot().result.state).toEqual(onlineElapsed(bought, 1).state); game.stop();
   });
   it.each([STREET_CONNECTIONS, EXPRESS_TIPS])('reconciles completed jobs at old reward before $name', upgrade => {
     const f = fixture({ ...owned(), progression: { xp: 100 } }); const game = f.make(); game.start(); game.dismissOffline();
@@ -63,7 +64,7 @@ describe('delegation runtime transactions', () => {
     expect(bought.automation.starterJobElapsedMs).toBe(5000);
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state: bought } });
     f.at(31000); f.tick(); expect(game.getSnapshot().automationEvent).toMatchObject({ completedJobs: 1, income: '3000' });
-    expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought, 5000).state); game.stop();
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(bought, 5000).state); game.stop();
   });
   it('manual job at the command boundary preserves reconciled cycle progress', () => {
     const f = fixture(); const game = f.make(); game.start(); game.dismissOffline();
@@ -79,7 +80,7 @@ describe('delegation runtime transactions', () => {
     expect(f.writes()).toBe(writes);
     f.autosave(); expect(f.writes()).toBe(writes + 1);
     const current = game.getSnapshot().result.state; const code = game.exportCode(); if (!code.ok) throw Error('fixture');
-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: 26001, state: current } });
+    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: 26001, state: current } });
     game.stop(); const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(current);
     expect(reload.getSnapshot().offline?.automation?.completedJobs).toBe(0); reload.stop();
   });
@@ -127,14 +128,14 @@ it('live automation overflow suspends before publication or autosaving partial b
   f.autosave(); f.tick(); expect(f.raw()).toBe(raw); expect(game.getSnapshot().result.state).toBe(original); game.stop();
 });
 it('v3 local bootstrap keeps its original offline timestamp while migrating dispatcher locked', () => {
-  const { crew: _crew, city: _city, permanentProgression: _permanent, garage: _garage, automation: _automation, progression: _progression, ...legacy } = owned(false);
+  const { events: _events, crew: _crew, city: _city, permanentProgression: _permanent, garage: _garage, automation: _automation, progression: _progression, ...legacy } = owned(false);
   let raw = JSON.stringify({ format: 'crime-empire-save', version: 3, savedAt: 1000, state: legacy });
   const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 26000);
   const result = save.bootstrap();
   expect(result).toMatchObject({ kind: 'loaded', state: { automation: { unlockedIds: [], starterJobElapsedMs: 0 } } });
   if (result.kind !== 'loaded') throw Error('fixture');
   expect(result.state).toEqual(simulateGameElapsed(owned(false), 25000).state);
-  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: 26000, state: result.state } });
+  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: 26000, state: result.state } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { incomeEarned: '0' } });
 });
 
@@ -204,11 +205,11 @@ describe('persistent XP transactions', () => {
 it('business level boundary reconciles old production/dispatcher XP then adds 25 XP', () => {
   const initial = owned(); const f = fixture(initial); const game = f.make(); game.start(); game.dismissOffline();
   f.at(11000); game.execute(state => upgradeBusiness(state, STARTER_BUSINESS.id));
-  const expected = upgradeBusiness(simulateGameElapsed(initial,10000).state,STARTER_BUSINESS.id);
+  const expected = upgradeBusiness(onlineElapsed(initial,10000).state,STARTER_BUSINESS.id);
   expect(game.getSnapshot().result).toEqual(expected);
   expect(expected.state.progression.xp).toBe(30);
   f.at(21000); f.tick();
-  expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(expected.state,10000).state); game.stop();
+  expect(game.getSnapshot().result.state).toEqual(onlineElapsed(expected.state,10000).state); game.stop();
 });
 it('job-modifier purchase changes money only after reconciling the old reward and XP', () => {
   const f = fixture({ ...owned(), progression: { xp: 100 } }); const game = f.make(); game.start(); game.dismissOffline();
@@ -220,10 +221,10 @@ it('job-modifier purchase changes money only after reconciling the old reward an
   expect(game.getSnapshot().result.state.progression.xp).toBe(110); game.stop();
 });
 it('v4 migration preserves its timestamp and awards only credited dispatcher XP before durable publication', () => {
-  const { crew: _crew, city: _city, permanentProgression: _permanent, garage: _garage, progression: _progression, ...legacy } = owned(true,5000);
+  const { events: _events, crew: _crew, city: _city, permanentProgression: _permanent, garage: _garage, progression: _progression, ...legacy } = owned(true,5000);
   let raw = JSON.stringify({ format: 'crime-empire-save', version: 4, savedAt: 1000, state: legacy });
   const save = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => 26000);
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: { progression: { xp: 15 } }, offline: { xpEarned: 15 } });
-  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: 26000, state: { progression: { xp: 15 } } } });
+  expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: 26000, state: { progression: { xp: 15 } } } });
   expect(save.bootstrap()).toMatchObject({ kind: 'loaded', offline: { xpEarned: 0 } });
 });

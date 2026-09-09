@@ -1,10 +1,11 @@
+import type { RandomSource } from '../../features/events';
 import { createPersistentGame } from '../persistent-game';
 import { createLocalSave } from '../local-save';
 import { parseSave, serializeSave } from '../../game/save-schema';
 import type { GameState } from '../../game/game-state';
 import { rebirthState } from '../../game/test-fixtures/rebirth-state';
 
-export function rebirthRuntime(state = rebirthState()) {
+export function rebirthRuntime(state = rebirthState(), random: RandomSource = { next: () => 0.99 }) {
   const encoded = serializeSave(state, 1000);
   if (!encoded.ok) throw Error('fixture');
   let raw = encoded.serialized, now = 0, wall = 1000, failed = false, clockReads = 0, timers = 0;
@@ -15,7 +16,7 @@ export function rebirthRuntime(state = rebirthState()) {
       if (failed) throw Error('quota');
       const decoded = parseSave(value); if (!decoded.ok) throw Error('invalid write');
       raw = value; events.push({ type: 'write', state: decoded.envelope.state });
-    } }), () => wall), { now: () => { clockReads++; return now; }, schedule: callback => {
+    } }), () => wall), { random, now: () => { clockReads++; return now; }, schedule: callback => {
       tick = callback; timers++; return () => { timers--; };
     } }, callback => { autosave = callback; timers++; return () => { timers--; }; });
   const game = make(); game.start(); game.dismissOffline(); events.length = 0;

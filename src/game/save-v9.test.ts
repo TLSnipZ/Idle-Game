@@ -18,7 +18,7 @@ function withValidHeat(city: unknown): unknown {
   });
 }
 function legacy() {
-  const { crew: _crew, city: _city, ...state } = rebirthState(37, 48);
+  const { events: _events, crew: _crew, city: _city, ...state } = rebirthState(37, 48);
   return { format: 'crime-empire-save', version: 8, savedAt: 123456789,
     state: { ...state, permanentProgression: { empirePoints: 17, rebirthCount: 4,
       skills: { [ROOT]: 3, [FAST]: 1, [LEARN]: 1, [SILENT]: 2, [NEVER]: 2 } } } };
@@ -26,11 +26,11 @@ function legacy() {
 describe('v9 territory schema and sequential migration', () => {
   it('adds only the Waterfront baseline to a rich v8 save, preserving every prior field exactly', () => {
     const old = legacy(), raw = JSON.stringify(old);
-    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(11);
-    expect(result).toEqual({ ok: true, envelope: { ...old, version: 11,
-      state: { ...old.state, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] } } } });
+    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(12);
+    expect(result).toEqual({ ok: true, envelope: { ...old, version: 12,
+      state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] } } } });
     if (!result.ok) throw Error('fixture');
-    const { crew: _crew, city, ...previous } = result.envelope.state;
+    const { events: _events, crew: _crew, city, ...previous } = result.envelope.state;
     expect(previous).toEqual(old.state); expect(city.ownedTerritoryIds).not.toContain(N.id);
     expect(result.envelope.savedAt).toBe(old.savedAt); expect(JSON.stringify(old)).toBe(raw);
     expect(validateSaveCode(encodeSaveText(raw))).toEqual(result);
@@ -46,16 +46,16 @@ describe('v9 territory schema and sequential migration', () => {
       ...(version >= 7 ? { permanentProgression: { empirePoints: 17, rebirthCount: 4,
         ...(version >= 8 ? { skills: s.permanentProgression.skills } : {}) } } : {}) };
     const result = validateSaveCode(encodeSaveText(JSON.stringify({ ...old, version, state })));
-    expect(result).toMatchObject({ ok: true, envelope: { version: 11, savedAt: old.savedAt,
+    expect(result).toMatchObject({ ok: true, envelope: { version: 12, savedAt: old.savedAt,
       state: { city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] }, economy: s.economy,
         businesses: { owned: { [B.id]: { level: version === 1 ? 1 : 48 } }, productionRemainderMilliCents: 975 } } } });
   });
   it.each([{ ids: [W.id] }, { ids: [W.id, N.id] }])('roundtrips authoritative city %# and all previous state through CE1', ({ ids }) => {
-    const state = { ...legacy().state, crew: createInitialGameState().crew, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ids } };
+    const state = { ...legacy().state, events: createInitialGameState().events, crew: createInitialGameState().crew, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ids } };
     const serialized = serializeSave(state, 42), exported = exportSaveCode(state, 42);
     if (!serialized.ok || !exported.ok) throw Error('fixture');
     expect(exported.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(exported.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 11, savedAt: 42, state } });
+    expect(validateSaveCode(exported.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 12, savedAt: 42, state } });
     expect(parseSave(serialized.serialized)).toEqual(validateSaveCode(exported.code));
     expect(serialized.serialized).not.toMatch(/controlledCount|purchaseCost|SOLARA|requirements|displayName/);
   });
@@ -65,7 +65,7 @@ describe('v9 territory schema and sequential migration', () => {
     { ownedTerritoryIds: [W.id, null] }, { ownedTerritoryIds: [W.id], extra: true }])('rejects malformed current city %# without repair', city => {
     const state = { ...createInitialGameState(), city: withValidHeat(city) };
     expect(validateSaveState(state)).toBeNull();
-    expect(parseSave(JSON.stringify({ format: 'crime-empire-save', version: 11, savedAt: 1, state }))).toEqual({ ok: false, error: 'invalid-state' });
+    expect(parseSave(JSON.stringify({ format: 'crime-empire-save', version: 12, savedAt: 1, state }))).toEqual({ ok: false, error: 'invalid-state' });
   });
   it('rejects prototypes, getters, holes and non-JSON own properties without executing getters', () => {
     const base = createInitialGameState();
@@ -85,15 +85,15 @@ describe('v9 territory schema and sequential migration', () => {
   it('rejects smuggled city in v8 and unsupported future versions', () => {
     const old = legacy();
     expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, city: createInitialGameState().city } }))).toEqual({ ok: false, error: 'invalid-state' });
-    expect(parseSave(JSON.stringify({ ...old, version: 12 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(JSON.stringify({ ...old, version: 13 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
   it('migration retains savedAt for one normal offline catch-up without granting territory', () => {
     const old = legacy(); let raw = JSON.stringify(old); const now = old.savedAt + 25000;
     const saves = createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; } }), () => now);
-    const state = { ...old.state, crew: createInitialGameState().crew, city: createInitialGameState().city };
+    const state = { ...old.state, events: createInitialGameState().events, crew: createInitialGameState().crew, city: createInitialGameState().city };
     const expected = simulateGameElapsed(state, 25000).state;
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected });
-    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: now, state: expected } });
+    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: now, state: expected } });
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { incomeEarned: '0', xpEarned: 0 } });
   });
 });

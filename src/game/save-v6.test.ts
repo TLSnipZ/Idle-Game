@@ -19,8 +19,8 @@ function current() {
 describe('v6 vehicle saves',()=>{
   it('migrates realistic v5 preserving every previous field and savedAt through local/CE1 validation',()=>{
     const old=legacy(); const serialized=JSON.stringify(old);
-    const expected={ok:true,envelope:{...old,version:11,state:{...old.state, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
-    expect(CURRENT_SAVE_VERSION).toBe(11); expect(parseSave(serialized)).toEqual(expected);
+    const expected={ok:true,envelope:{...old,version:12,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
+    expect(CURRENT_SAVE_VERSION).toBe(12); expect(parseSave(serialized)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(serialized))).toEqual(expected); expect(JSON.stringify(old)).toBe(serialized);
   });
   it('roundtrips exact v6 ownership and all progress through the same envelope',()=>{
@@ -28,7 +28,7 @@ describe('v6 vehicle saves',()=>{
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(encoded.serialized));
-    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version:11,savedAt:42,state}});
+    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version:12,savedAt:42,state}});
     expect(encoded.serialized).not.toMatch(/artwork|Vortex|vehicle-placeholder|ownedVehicleCount/);
   });
   it.each([null,{}, {ownedVehicleIds:null}, {ownedVehicleIds:['vehicle:unknown']},

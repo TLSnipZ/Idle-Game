@@ -1,3 +1,5 @@
+import { resolveEventChoice } from '../game/resolve-event-choice';
+import { describeEventResolution } from './event-presentation';
 import { recruitCrewMember, assignCrewMember, unassignCrewSlot } from '../game/crew-commands';
 import { describeCrewCommand } from './crew-presentation';
 import { layLow } from '../game/lay-low';
@@ -128,11 +130,19 @@ export function useGame() {
     });
   }
 
+  function chooseEvent(eventId: unknown, choiceId: unknown) {
+    runtime.execute(state => {
+      const result = resolveEventChoice(state, eventId, choiceId);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeEventResolution(result) }));
+      return result;
+    });
+  }
+
   function rebirth() {
     const result = runtime.rebirth();
     if (result.ok) setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
     return result;
   }
 
-  return { recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

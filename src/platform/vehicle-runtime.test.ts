@@ -10,6 +10,7 @@ import { UPGRADE_CATALOG } from '../features/upgrades';
 import { moneyFromMinorUnits, MAX_MONEY_DIGITS } from '../features/economy';
 import { purchaseVehicle } from '../game/purchase-vehicle';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { reconcileOffline, OFFLINE_CAP_MS } from '../game/offline-progress';
 import { parseSave, serializeSave } from '../game/save-schema';
 import { exportSaveCode, validateSaveCode } from '../game/save-code';
@@ -31,7 +32,7 @@ function fixture(state=initial(), savedAt=1000) {
       expect(parseSave(raw)).toMatchObject({ok:true,envelope:{state:view.result.state}});
   },createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{
     if(fail) throw Error('quota'); raw=value; writes++;
-  }}),()=>wall),{now:()=>now,schedule:callback=>{tick=callback;timers++;return()=>{timers--;};}},
+  }}),()=>wall),{random: { next: () => 0.99 }, now: () =>now,schedule:callback=>{tick=callback;timers++;return()=>{timers--;};}},
   callback=>{autosave=callback;timers++;return()=>{timers--;};});
   return {make,raw:()=>raw,writes:()=>writes,timers:()=>timers,tick:()=>tick(),autosave:()=>autosave(),
     at:(value:number)=>{now=value;},wall:(value:number)=>{wall=value;},fail:()=>{fail=true;}};
@@ -40,34 +41,34 @@ describe('vehicle runtime and durable progression',()=>{
   it('reconciles old bonuses before purchase and uses new bonus only afterward without affecting dispatcher',()=>{
     const state=initial(); const f=fixture(state); const game=f.make(); game.start(); game.dismissOffline();
     f.at(10000); f.wall(11000); game.execute(current=>purchaseVehicle(current,V.id));
-    const expected=purchaseVehicle(simulateGameElapsed(state,10000).state,V.id).state;
+    const expected=purchaseVehicle(onlineElapsed(state,10000).state,V.id).state;
     expect(game.getSnapshot().result.state).toEqual(expected);
     expect(game.getSnapshot().automationEvent).toMatchObject({completedJobs:1,income:'3600',xpEarned:5});
     expect(expected.progression.xp).toBe(3605); expect(expected.automation.starterJobElapsedMs).toBe(5000);
     expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
-    f.at(15000); f.tick(); expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(expected,5000).state);
+    f.at(15000); f.tick(); expect(game.getSnapshot().result.state).toEqual(onlineElapsed(expected,5000).state);
     game.stop(); expect(f.timers()).toBe(0);
   });
   it('drops only runtime sub-ms at the vehicle boundary, preserving earned fractions',()=>{
     const f=fixture(); const game=f.make();game.start();game.dismissOffline();
     f.at(10.75);game.execute(state=>purchaseVehicle(state,V.id));const bought=game.getSnapshot().result.state;
-    expect(bought.businesses).toEqual(simulateGameElapsed(initial(),10).state.businesses);
+    expect(bought.businesses).toEqual(onlineElapsed(initial(),10).state.businesses);
     f.at(11);f.tick();expect(game.getSnapshot().result.state).toBe(bought);
-    f.at(11.75);f.tick();expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(bought,1).state);game.stop();
+    f.at(11.75);f.tick();expect(game.getSnapshot().result.state).toEqual(onlineElapsed(bought,1).state);game.stop();
   });
   it('failed acquisition retains reconciled income and continues with old modifiers',()=>{
     const state={...initial(),progression:{xp:0}};const f=fixture(state);const game=f.make();game.start();game.dismissOffline();
     f.at(1000);game.execute(current=>purchaseVehicle(current,V.id));
     expect(game.getSnapshot().result).toMatchObject({ok:false,error:'prerequisite-not-met'});
-    expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(state,1000).state);
-    f.at(2000);f.tick();expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed(state,2000).state);game.stop();
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(state,1000).state);
+    f.at(2000);f.tick();expect(game.getSnapshot().result.state).toEqual(onlineElapsed(state,2000).state);game.stop();
   });
   it('exports current state, autosaves conservatively, reloads and remounts without duplicate loops',()=>{
     const f=fixture(initial(true)); const game=f.make();game.start();game.dismissOffline();const writes=f.writes();
     f.at(250);f.wall(1250);f.tick();expect(f.writes()).toBe(writes);
     f.at(5000);f.wall(6000);const exported=game.exportCode();if(!exported.ok)throw Error('export');
-    const expected=simulateGameElapsed(initial(true),5000).state;
-    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version:11,savedAt:6000,state:expected}});
+    const expected=onlineElapsed(initial(true),5000).state;
+    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version:12,savedAt:6000,state:expected}});
     f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
     game.stop();game.start();game.start();expect(f.timers()).toBe(2);game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
@@ -118,18 +119,18 @@ describe('vehicle runtime and durable progression',()=>{
 
 
 it('v5 local migration consumes its saved timestamp without losing offline time',()=>{
-  const state=initial();const {crew:_crew,city:_city,permanentProgression:_permanent,garage:_garage,...legacy}=state;
+  const state=initial();const { events: _events, crew: _crew,city:_city,permanentProgression:_permanent,garage:_garage,...legacy}=state;
   let raw=JSON.stringify({format:'crime-empire-save',version:5,savedAt:1000,state:legacy});
   const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>26000);
   const expected=simulateGameElapsed(state,25000).state;
   expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version:11,savedAt:26000,state:expected}});
+  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version:12,savedAt:26000,state:expected}});
   expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
 });
 
 it('preserves partition equivalence across a vehicle save/reload boundary',()=>{
-  const state=initial(true);const first=simulateGameElapsed(state,91).state;
+  const state=initial(true);const first=onlineElapsed(state,91).state;
   const encoded=serializeSave(first,1000);if(!encoded.ok)throw Error('fixture');
   const loaded=parseSave(encoded.serialized);if(!loaded.ok)throw Error('fixture');
-  expect(reconcileOffline(loaded.envelope.state,1000,5565).state).toEqual(simulateGameElapsed(state,4656).state);
+  expect(reconcileOffline(loaded.envelope.state,1000,5565).state).toEqual({...simulateGameElapsed(state,4656).state,events:first.events});
 });

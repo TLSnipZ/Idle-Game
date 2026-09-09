@@ -1,3 +1,5 @@
+import { createInitialEventState } from '../features/events';
+import type { EventState } from '../features/events';
 import { createInitialCrewState } from '../features/crew';
 import type { CrewState } from '../features/crew';
 import { createInitialCityState } from '../features/territories';
@@ -15,6 +17,7 @@ import { createInitialEconomyState } from '../features/economy';
 import type { EconomyState } from '../features/economy';
 
 export interface GameState {
+  readonly events: EventState;
   readonly crew: CrewState;
   readonly city: CityState;
   readonly permanentProgression: PermanentProgressionState;
@@ -27,5 +30,5 @@ export interface GameState {
 }
 
 export function createInitialGameState(): GameState {
-  return { crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
+  return { events: createInitialEventState(), crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
 }

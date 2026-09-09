@@ -16,8 +16,8 @@ const legacy = () => ({ format: 'crime-empire-save', version: 4, savedAt: 123456
 describe('v5 progression saves', () => {
   it('migrates realistic v4 without altering any prior state or its timestamp', () => {
     const old = legacy(); const text = JSON.stringify(old);
-    const expected = { ok: true, envelope: { ...old, version: 11, state: { ...old.state, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 } } } };
-    expect(CURRENT_SAVE_VERSION).toBe(11);
+    const expected = { ok: true, envelope: { ...old, version: 12, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 } } } };
+    expect(CURRENT_SAVE_VERSION).toBe(12);
     expect(parseSave(text)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(expected);
     expect(JSON.stringify(old)).toBe(text);
@@ -29,7 +29,7 @@ describe('v5 progression saves', () => {
     const code = exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 11, savedAt: 42, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 12, savedAt: 42, state } });
     expect(serialized.serialized).not.toMatch(/levelEvent|xpIntoLevel|currentLevel|progressRatio/);
   });
   it.each([-1,.5,NaN,Infinity,MAX_XP+1,'10',null,undefined])('rejects malformed XP %#', xp => {

@@ -8,7 +8,8 @@ import { STARTER_BUSINESS } from '../features/businesses';
 import { createInitialGameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
 import { purchaseBusiness } from '../game/purchase-business';
-import { simulateGameElapsed as simulateElapsed } from '../game/simulate-game-elapsed';
+import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { serializeSave } from '../game/save-schema';
 import { createLocalSave } from './local-save';
 import { AUTOSAVE_CADENCE_MS, createPersistentGame } from './persistent-game';
@@ -18,7 +19,7 @@ function portable(state = owned()) { return encodeSaveText(encoded(state)); }
 function owned() {
   let state = createInitialGameState();
   for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
-  return simulateElapsed(purchaseBusiness(state, STARTER_BUSINESS.id).state, 13).state;
+  return simulateGameElapsed(purchaseBusiness(state, STARTER_BUSINESS.id).state, 13).state;
 }
 function encoded(state = owned()) {
   const result = serializeSave(state, 1); if (!result.ok) throw Error('fixture');
@@ -40,7 +41,7 @@ function fixture(initial: string | null = null) {
     return () => clearInterval(id);
   };
   const make = () => createPersistentGame(publish, createLocalSave(() => storage, () => wall), {
-    now: () => now, schedule: callback => schedule(callback, RUNTIME_CADENCE_MS),
+    random: { next: () => 0.99 }, now: () => now, schedule: callback => schedule(callback, RUNTIME_CADENCE_MS),
   }, callback => schedule(callback, AUTOSAVE_CADENCE_MS));
   return { storage, publish, make, raw: () => raw,
     at: (value: number) => { now = value; }, wall: (value: number) => { wall = value; },
@@ -66,7 +67,7 @@ describe('persistent runtime lifecycle', () => {
     expect(game.getSnapshot().result.state).toEqual(owned());
     expect(game.getSnapshot().persistence.kind).toBe('loaded');
     f.advance(1000);
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned(), 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(owned(), 1000).state);
   });
   it('autosaves at five seconds, not on each production callback', () => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
@@ -74,13 +75,13 @@ describe('persistent runtime lifecycle', () => {
     expect(f.storage.setItem).not.toHaveBeenCalled();
     f.advance(1);
     expect(f.storage.setItem).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(f.raw() ?? '').state).toEqual(simulateElapsed(owned(), AUTOSAVE_CADENCE_MS).state);
+    expect(JSON.parse(f.raw() ?? '').state).toEqual(onlineElapsed(owned(), AUTOSAVE_CADENCE_MS).state);
   });
   it('saves only the fully applied command after pre-command production', () => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(1100.4); game.execute(performStarterJob);
     expect(f.storage.setItem).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(f.raw() ?? '').state).toEqual(performStarterJob(simulateElapsed(owned(), 1000).state).state);
+    expect(JSON.parse(f.raw() ?? '').state).toEqual(performStarterJob(onlineElapsed(owned(), 1000).state).state);
     expect(game.getSnapshot().persistence.kind).toBe('saved');
   });
   it('purchase saves both cash and ownership atomically; failure does not save', () => {
@@ -166,7 +167,7 @@ describe('portable runtime transactions', () => {
     const result = game.exportCode();
     if (!result.ok) throw Error('export');
     const decoded = validateSaveCode(result.code);
-    expect(decoded.ok && decoded.envelope).toEqual({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION, savedAt: 777, state: simulateElapsed(owned(), 1000).state });
+    expect(decoded.ok && decoded.envelope).toEqual({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION, savedAt: 777, state: onlineElapsed(owned(), 1000).state });
     expect(f.raw()).toBe(encoded());
     expect(f.storage.setItem).not.toHaveBeenCalled();
     const snapshot = game.getSnapshot().result.state;
@@ -184,7 +185,7 @@ describe('portable runtime transactions', () => {
     f.at(10_000.2); game.exportCode();
     expect(game.getSnapshot().result.state).toEqual(candidate);
     f.at(11_000); game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(candidate, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(candidate, 1000).state);
     expect(vi.getTimerCount()).toBe(2);
     f.advance(AUTOSAVE_CADENCE_MS);
     expect(f.storage.setItem).toHaveBeenCalledTimes(2);
@@ -199,7 +200,7 @@ describe('portable runtime transactions', () => {
     expect(f.storage.setItem).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(2);
     game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(original, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(original, 1000).state);
   });
   it('write failure leaves live state, prior valid save and clock bookkeeping intact', () => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
@@ -210,7 +211,7 @@ describe('portable runtime transactions', () => {
     expect(game.getSnapshot().result.state).toBe(original);
     expect(f.raw()).toBe(encoded());
     game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(original, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(original, 1000).state);
   });
   it('rejects invalid timing before writing and keeps runtime usable', () => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear(); f.at(NaN);
@@ -218,7 +219,7 @@ describe('portable runtime transactions', () => {
     expect(f.storage.setItem).not.toHaveBeenCalled();
     expect(game.getSnapshot().runtimeError).toBeNull();
     f.at(1100); game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(owned(), 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(owned(), 1000).state);
   });
   it('confirmed replacement can recover a corrupt stored save and starts one autosave loop', () => {
     const f = fixture('{'); const game = f.make(); game.start(); f.storage.setItem.mockClear();
@@ -264,22 +265,22 @@ describe('level command persistence and time boundaries', () => {
   it('reconciles old level first, saves the upgrade, and uses new level only after the boundary', () => {
     const initial = funded(); const f = fixture(encoded(initial)); const game = f.make(); game.start();
     f.at(10100.8); game.execute(state => upgradeBusiness(state, STARTER_BUSINESS.id));
-    const upgraded = upgradeBusiness(simulateElapsed(initial, 10000).state, STARTER_BUSINESS.id).state;
+    const upgraded = upgradeBusiness(onlineElapsed(initial, 10000).state, STARTER_BUSINESS.id).state;
     expect(game.getSnapshot().result.state).toEqual(upgraded);
     expect(upgraded.businesses.productionRemainderMilliCents).toBe(initial.businesses.productionRemainderMilliCents);
     expect(JSON.parse(f.raw() ?? '').state).toEqual(upgraded);
     f.at(10101.2); game.exportCode();
     expect(game.getSnapshot().result.state).toEqual(upgraded);
     f.at(10101.8); game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(upgraded, 1).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(upgraded, 1).state);
   });
   it('failed upgrade retains accrued old-level income and does not change the rate', () => {
     const initial = owned(); const f = fixture(encoded(initial)); const game = f.make(); game.start();
     f.at(1100); game.execute(state => upgradeBusiness(state, STARTER_BUSINESS.id));
     expect(game.getSnapshot().result).toMatchObject({ ok: false, error: 'insufficient-funds' });
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(initial, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 1000).state);
     f.at(2100); game.exportCode();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed(initial, 2000).state);
+    expect(game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 2000).state);
   });
   it('levels survive autosave, reload, export and import with no historical import income', () => {
     const f = fixture(encoded(funded(7))); const game = f.make(); game.start();
@@ -301,7 +302,7 @@ describe('level command persistence and time boundaries', () => {
     } };
     const f = fixture(JSON.stringify(legacy)); f.wall(1001);
     const game = f.make(); game.start();
-    expect(game.getSnapshot().result.state).toEqual(simulateElapsed({ ...owned(), city: createInitialGameState().city, progression: { xp: 0 } }, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed({ ...owned(), city: createInitialGameState().city, progression: { xp: 0 } }, 1000).state);
     expect(JSON.parse(f.raw() ?? '')).toMatchObject({ version: CURRENT_SAVE_VERSION, savedAt: 1001 });
     game.stop(); const second = f.make(); second.start();
     expect(second.getSnapshot().offline?.incomeEarned).toBe('0');

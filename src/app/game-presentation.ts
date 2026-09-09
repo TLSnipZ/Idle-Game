@@ -28,6 +28,8 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'no-pending-event': return 'No active event.';
+    case 'wrong-event': case 'unknown-choice': return 'That event choice is unavailable.';
     case 'unknown-crew-member': case 'already-recruited': case 'unknown-slot': case 'not-recruited':
     case 'incompatible-slot': case 'already-assigned': case 'already-empty': return describeCrewCommand(result, 'recruit');
     case 'already-cold': return 'Already cold. Nothing was spent.';

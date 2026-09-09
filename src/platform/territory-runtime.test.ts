@@ -5,6 +5,7 @@ import { rebirthState } from '../game/test-fixtures/rebirth-state';
 import { ROOT, FAST, LEARN, NEVER } from '../game/test-fixtures/skill-state';
 import { acquireTerritory } from '../game/acquire-territory';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { performStarterJob } from '../game/perform-starter-job';
 import { createInitialGameState } from '../game/game-state';
 import { NEON_MILE as N, WATERFRONT as W } from '../features/territories';
@@ -17,7 +18,7 @@ describe('territory runtime and persistence boundaries', () => {
   it('reconciles completed Dispatcher jobs at old reward, then saves acquisition, then uses new reward', () => {
     const initial = territoryState(), f = rebirthRuntime(initial);
     f.at(25000); f.wall(26000); f.game.execute(s => acquireTerritory(s, N.id));
-    const reconciled = simulateGameElapsed(initial, 25000); if (!reconciled.ok) throw Error('fixture');
+    const reconciled = onlineElapsed(initial, 25000); if (!reconciled.ok) throw Error('fixture');
     expect(reconciled.automation.income).toBe('5000');
     const acquired = acquireTerritory(reconciled.state, N.id).state;
     expect(f.game.getSnapshot().result.state).toEqual(acquired);
@@ -25,7 +26,7 @@ describe('territory runtime and persistence boundaries', () => {
     expect(acquired.automation.starterJobElapsedMs).toBe(5000);
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { savedAt: 26000, state: acquired } });
     f.at(30000); f.wall(31000); f.tick();
-    expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(acquired, 5000).state);
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(acquired, 5000).state);
     expect(f.game.getSnapshot().automationEvent).toMatchObject({ completedJobs: 1, income: '2750' });
     const current = f.game.getSnapshot().result.state; f.game.execute(performStarterJob);
     expect(f.game.getSnapshot().result.state).toEqual(performStarterJob(current).state); f.game.stop();
@@ -34,15 +35,15 @@ describe('territory runtime and persistence boundaries', () => {
     const initial = territoryState(), f = rebirthRuntime(initial);
     f.at(.4); f.game.execute(s => acquireTerritory(s, N.id)); const acquired = f.game.getSnapshot().result.state;
     f.at(1); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(acquired);
-    f.at(1.5); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(acquired, 1).state); f.game.stop();
+    f.at(1.5); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(acquired, 1).state); f.game.stop();
   });
   it('failed acquisition preserves the reconciled state and durable save, and the scheduler remains usable', () => {
     const initial = territoryState(false, 11), f = rebirthRuntime(initial), raw = f.raw();
     f.at(25000); f.game.execute(s => acquireTerritory(s, N.id));
     expect(f.game.getSnapshot().result).toMatchObject({ ok: false, error: 'requirements-not-met' });
-    expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(initial, 25000).state);
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 25000).state);
     expect(f.raw()).toBe(raw); f.at(30000); f.tick();
-    expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(initial, 30000).state); f.game.stop();
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(initial, 30000).state); f.game.stop();
   });
   it('command save, export, autosave, reload and Strict Mode-style restart retain ownership', () => {
     const f = rebirthRuntime(territoryState()); f.game.execute(s => acquireTerritory(s, N.id));
@@ -50,7 +51,7 @@ describe('territory runtime and persistence boundaries', () => {
     f.at(250); f.tick(); expect(f.events.filter(e => e.type === 'write')).toHaveLength(writes);
     f.at(5000); f.wall(6000); f.autosave();
     const state = f.game.getSnapshot().result.state, exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 11, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 12, state } });
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state } });
     f.game.stop(); f.game.start(); f.game.start(); expect(f.timers()).toBe(2); f.game.stop();
     const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(state);
@@ -87,7 +88,7 @@ describe('territory runtime and persistence boundaries', () => {
     const f = rebirthRuntime(state), raw = f.raw(); if (failed) f.fail();
     f.at(3000); f.wall(4000); const result = f.game.rebirth(); expect(result.ok).toBe(!failed);
     if (failed) {
-      expect(f.raw()).toBe(raw); expect(f.game.getSnapshot().result.state).toEqual(simulateGameElapsed(state, 3000).state);
+      expect(f.raw()).toBe(raw); expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(state, 3000).state);
       expect(f.events.some(e => e.state.city.ownedTerritoryIds.length === 1)).toBe(false);
     } else {
       const reset = f.game.getSnapshot().result.state;
@@ -109,7 +110,7 @@ describe('territory runtime and persistence boundaries', () => {
     const events: string[] = [];
     const make = () => createPersistentGame(view => { if (view.persistence.kind === 'loaded') events.push('publish'); },
       createLocalSave(() => ({ getItem: () => raw, setItem: (_key: string, value: string) => { raw = value; events.push('write'); } }), () => now),
-      { now: () => 0, schedule: () => () => {} }, () => () => {});
+      { random: { next: () => 0.99 }, now: () => 0, schedule: () => () => {} }, () => () => {});
     const game = make(); game.start(); const expected = simulateGameElapsed(state, cap).state;
     expect(events.slice(0, 2)).toEqual(['write', 'publish']); expect(game.getSnapshot().result.state).toEqual(expected);
     expect(game.getSnapshot().offline).toMatchObject({ capMs: cap, rewardedElapsedMs: cap });
@@ -120,7 +121,7 @@ describe('territory runtime and persistence boundaries', () => {
     const state = territoryState(true), encoded = serializeSave(state, 1000); if (!encoded.ok) throw Error('fixture');
     let timers = 0; const raw = encoded.serialized;
     const game = createPersistentGame(() => {}, createLocalSave(() => ({ getItem: () => raw, setItem: () => { throw Error('quota'); } }), () => 31000),
-      { now: () => 0, schedule: () => { timers++; return () => {}; } }, () => { timers++; return () => {}; });
+      { random: { next: () => 0.99 }, now: () => 0, schedule: () => { timers++; return () => {}; } }, () => { timers++; return () => {}; });
     game.start(); expect(timers).toBe(0); expect(game.getSnapshot().result.state).toEqual(state);
     expect(game.getSnapshot().persistence).toMatchObject({ kind: 'offline-error', error: 'storage-write' });
     expect(raw).toBe(encoded.serialized); game.stop();

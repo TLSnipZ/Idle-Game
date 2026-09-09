@@ -537,4 +537,37 @@ only on the next positive elapsed call (1ms leaves 5,001ms). Global saved remain
 remains below 60,000ms, even under Mara. Heat zero banks nothing. Shared starting-tier
 batch rules and Dispatcher floor(jobs/5) Heat per batch remain unchanged. No Crew
 changes XP or the Never Sleeps-only 8/10/12h cap. Crew does not change base balance
-while unassigned. All final balancing and Random Events remain deferred.
+while unassigned. Final balancing remains deferred; Phase 7D events follow below.
+
+
+## Phase 7D — provisional Random Events balance
+
+All values are **provisional**. The online opportunity interval is **600,000ms
+(10 minutes)** with **35%** chance (`roll < 0.35`) when eligible content exists.
+Uniform selection uses configured Hot Tip → Shakedown → Warehouse order. At most
+one attempt occurs per reconciliation, even for multiple completed windows; keep
+only the modulo remainder. No eligible content consumes zero RNG. There is no
+weighted rarity, pity timer, queue, per-event cooldown, history or event chain.
+
+| Event / stable ID | Spawn eligibility | Choice / stable ID | Fixed outcome |
+| --- | --- | --- | --- |
+| Hot Tip / `event:hot-tip` | Player Level 5 | TAKE THE TIP / `choice:take-tip` | +$1,500 cash; +5 Heat |
+| Hot Tip | Player Level 5 | PLAY IT SAFE / `choice:play-safe` | −5 Heat, minimum 0 |
+| Shakedown / `event:shakedown` | Heat ≥20 | PAY THEM OFF / `choice:pay-off` | Spend $1,000; −10 Heat |
+| Shakedown | Heat ≥20 | REFUSE / `choice:refuse` | +10 Heat |
+| Warehouse Opportunity / `event:warehouse-opportunity` | Dockside owned AND Player Level 10 | INVEST / `choice:invest` | Require/spend $2,500, add $4,000; +5 Heat (net +$1,500) |
+| Warehouse Opportunity | Dockside owned AND Player Level 10 | PASS / `choice:pass` | No effect |
+
+Paid choices require current reconciled cash; Warehouse is a spend-then-credit
+atomic transaction, not a net-only credit. Free alternatives are always available.
+All three events award **0 XP and 0 EP**. Fixed Money ignores job bonuses, Heat cash
+penalties, territory/Crew/permanent-skill modifiers. Mara affects natural cooling
+only. Event Heat changes clamp to 0–100; reduction to zero clears cooling progress,
+otherwise the numerical remainder is preserved. Existing Heat tier penalties,
+gain sources outside events and 60s/45s cooling cadence remain unchanged.
+
+Pending freezes only the event timer, not ordinary gameplay. Successful resolution
+clears the event and requires a fresh ten-minute opportunity; failed resolution
+retains it. Spawn conditions are not retention conditions. No event progression or
+RNG occurs offline, regardless of the 8/10/12h economy cap. Rebirth discards pending
+and progress without reward. No hidden random outcomes or police/bust system exists.

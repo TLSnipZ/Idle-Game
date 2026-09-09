@@ -5,7 +5,7 @@ import { createInitialGameState } from '../game/game-state';
 import type { GameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
 import { purchaseBusiness } from '../game/purchase-business';
-import { simulateGameElapsed as simulateElapsed } from '../game/simulate-game-elapsed';
+import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { browserTiming, createGameRuntime, RUNTIME_CADENCE_MS } from './game-runtime';
 
 function funded(): GameState {
@@ -21,7 +21,7 @@ function fixture(state = owned(), initialTime = 0) {
   const callbacks = new Set<() => void>();
   const publish = vi.fn();
   const runtime = createGameRuntime(state, publish, {
-    now: () => now,
+    random: { next: () => 0.99 }, now: () => now,
     schedule: callback => {
       callbacks.add(callback);
       return () => { callbacks.delete(callback); };
@@ -47,7 +47,7 @@ describe('mounted game runtime', () => {
   it('unowned businesses produce nothing', () => {
     const f = fixture(createInitialGameState());
     f.runtime.start(); f.at(1000); f.tick();
-    expect(f.state()).toEqual(createInitialGameState());
+    expect(f.state()).toEqual(onlineElapsed(createInitialGameState(), 1000).state);
   });
   it('owned businesses earn from elapsed runtime', () => {
     const f = fixture();
@@ -58,12 +58,12 @@ describe('mounted game runtime', () => {
     const f = fixture(); f.runtime.start();
     f.at(1000);
     for (let i = 0; i < 100; i++) f.tick();
-    expect(f.state()).toEqual(simulateElapsed(owned(), 1000).state);
+    expect(f.state()).toEqual(onlineElapsed(owned(), 1000).state);
   });
   it('a delayed callback catches up across a long same-session delay', () => {
     const f = fixture(); f.runtime.start();
     f.at(8 * 60 * 60 * 1000); f.tick();
-    expect(f.state()).toEqual(simulateElapsed(owned(), 28_800_000).state);
+    expect(f.state()).toEqual(onlineElapsed(owned(), 28_800_000).state);
     expect(f.publish).toHaveBeenCalledTimes(1);
   });
   it('arbitrary callbacks equal one combined elapsed interval', () => {
@@ -76,35 +76,35 @@ describe('mounted game runtime', () => {
   it('retains 0.4 + 0.4 + 0.4 milliseconds as 1 ms plus 0.2 ms', () => {
     const f = fixture(); f.runtime.start();
     for (const t of [0.4, 0.8, 1.2]) { f.at(t); f.tick(); }
-    expect(f.state()).toEqual(simulateElapsed(owned(), 1).state);
+    expect(f.state()).toEqual(onlineElapsed(owned(), 1).state);
     f.at(2); f.tick();
-    expect(f.state()).toEqual(simulateElapsed(owned(), 2).state);
+    expect(f.state()).toEqual(onlineElapsed(owned(), 2).state);
   });
   it('fractional split intervals retain all whole milliseconds', () => {
     const f = fixture(); f.runtime.start();
     for (let i = 1; i <= 10000; i++) { f.at(i * 0.4); f.tick(); }
-    expect(f.state()).toEqual(simulateElapsed(owned(), 4000).state);
+    expect(f.state()).toEqual(onlineElapsed(owned(), 4000).state);
   });
   it('reconciles before purchase, without retroactive business income', () => {
     const f = fixture(funded()); f.runtime.start(); f.at(1000);
     f.runtime.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     expect(f.state().economy.cash).toBe('0');
     f.at(1500); f.tick();
-    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 500).state);
+    expect(f.state()).toEqual(onlineElapsed({ ...owned(), events: { ...owned().events, opportunityElapsedMs: 1000 }, city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 500).state);
   });
   it('does not transfer fractional unowned time into a newly purchased business', () => {
     const f = fixture(funded()); f.runtime.start(); f.at(1000.75);
     f.runtime.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     f.at(1014); f.tick(); // 13.25 ms owned: only 13 whole ms are eligible.
-    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 13).state);
+    expect(f.state()).toEqual(onlineElapsed({ ...owned(), events: { ...owned().events, opportunityElapsedMs: 1000 }, city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 13).state);
     f.at(1014.75); f.tick();
-    expect(f.state()).toEqual(simulateElapsed({ ...owned(), city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 14).state);
+    expect(f.state()).toEqual(onlineElapsed({ ...owned(), events: { ...owned().events, opportunityElapsedMs: 1000 }, city: { ...owned().city, heatDecayElapsedMs: 1000 } }, 14).state);
   });
   it('starter jobs retain fractional producing time at their boundary', () => {
     const f = fixture(); f.runtime.start(); f.at(0.75);
     f.runtime.execute(performStarterJob);
     f.at(1); f.tick();
-    expect(f.state()).toEqual(performStarterJob(simulateElapsed(owned(), 1).state).state);
+    expect(f.state()).toEqual(performStarterJob(onlineElapsed(owned(), 1).state).state);
   });
   it('commands see pre-command production and preserve it through a job', () => {
     const f = fixture(); f.runtime.start(); f.at(1000);
