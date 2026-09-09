@@ -2305,3 +2305,14 @@ outer batching, Event RNG boundaries, 4,096-segment safety, and durable offline 
 import / Rebirth replacement remain architectural contracts. Phase 9E adds release
 regressions and documentation only; no production implementation changes were needed.
 See BASE_GAME_RELEASE.md for the verification matrix and pending live verification.
+
+
+### POST 1B presentation composition
+
+Existing domain-specific React surfaces now expose stronger feature/support
+hierarchy. `sections.css` composes those surfaces using the approved tokens; it
+does not provide gameplay authority. Starter XP uses the existing XP evaluator;
+Heat cooling attribution uses the existing Crew selector. No formulas are copied
+into React. Rebirth/import interaction state remains owned by the stable shell,
+and confirmation focus/live-region contracts are unchanged. Optional future art
+regions are presentation wrappers only, never GameState fields or saved paths.

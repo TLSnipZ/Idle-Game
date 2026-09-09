@@ -90,6 +90,22 @@ describe('five-section presentation navigation', () => {
     };
     for (const text of surfaces[section.id]) expect(html).toContain(text);
   });
+  it('starter work exposes exact payout, XP and Heat together before the existing action', () => {
+    const h = harness(); h.select(SECTION.operations.id);
+    const html = h.render();
+    expect(html).toContain('<dt>Payout</dt><dd>$25.00</dd>');
+    expect(html).toContain('<dt>XP</dt><dd>+10</dd>');
+    expect(html).toContain('<dt>Heat</dt><dd>+1</dd>');
+    expect(html.indexOf('action-outcomes')).toBeLessThan(html.indexOf('delivery-button'));
+  });
+  it('Rebirth confirmation presents Cancel before the destructive action', () => {
+    const h = harness(view(autoUpgraderState())); h.select(SECTION.empire.id); h.rebirthControls.request();
+    const html = h.render();
+    expect(html.indexOf('aria-label="Cancel Rebirth"')).toBeLessThan(html.indexOf('>Confirm Rebirth</button>'));
+    expect(html).toContain('You keep'); expect(html).toContain('You lose');
+    expect(html).toContain('+4 Empire Points');
+    expect(html).not.toMatch(/Reset Progress|New Game/);
+  });
   it('Overview summarizes current state without management controls and shortcuts only navigate', () => {
     const s = autoUpgraderState(), before = JSON.stringify(s), navigate = vi.fn();
     const component = OverviewSection({ state: s, paused: false, onNavigate: navigate });

@@ -113,6 +113,12 @@ describe('mounted navigation and one live runtime', () => {
   it('pending Event survives navigation and normal runtime; global indicator returns to the same choices', async () => {
     const s = autoUpgraderState(), state: GameState = { ...s, events: { pendingEventId: 'event:shakedown', opportunityElapsedMs: 123456 } };
     const f = await mount(state);
+    const before = f.game().getSnapshot().result.state, reads = f.reads(), writes = f.writes();
+    await click('VIEW EVENT');
+    expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('CITY');
+    expect(f.game().getSnapshot().result.state).toBe(before);
+    expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
+    expect(f.random.next).not.toHaveBeenCalled();
     for (const section of PRIMARY_SECTIONS) {
       await navigate(section.label); await f.advance(1000);
       expect(container.querySelector('.global-indicators')?.textContent).toContain('CITY EVENT ACTIVE · Shakedown');

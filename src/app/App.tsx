@@ -14,6 +14,7 @@ import { GlobalStatus } from './GlobalStatus';
 import { GlobalFeedback } from './GlobalFeedback';
 import { useActionFocus } from './use-action-focus';
 import './App.css';
+import './sections.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
 export function App() { return <GameShell game={useGame()} />; }

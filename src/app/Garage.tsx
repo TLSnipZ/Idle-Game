@@ -12,16 +12,17 @@ export function Garage({ state, paused, onPurchase }: {
   return <section className="garage" aria-labelledby="garage-heading">
     <div className="panel-heading"><h2 id="garage-heading">Garage</h2>
       <span>Owned vehicles: {collection.ownedVehicleCount} / {collection.totalConfiguredVehicles}</span></div>
-    <div className="upgrade-catalog">{VEHICLE_CATALOG.map(vehicle => {
+    <div className="garage-catalog">{VEHICLE_CATALOG.map(vehicle => {
       const view = selectVehicle(state, vehicle.id);
       if (!view) return null;
       const heading = `${vehicle.id}-heading`;
       const requirements = `${vehicle.id}-requirements`;
       return <article key={vehicle.id} className={`panel vehicle-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
-        <p className="eyebrow">Performance collection · Permanent ownership</p>
+        <header className="showroom-stage"><p className="eyebrow">Performance collection · Permanent ownership</p>
         <div className="panel-heading"><h3 id={heading}>{vehicle.name}</h3>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? 'OWNED' : 'NOT OWNED'}</span></div>
-        <p className="eyebrow">{vehicle.category}</p><p>{vehicle.description}</p>
+        <p className="eyebrow">{vehicle.category}</p></header><div className="vehicle-specification"><p>{vehicle.description}</p>
+        <p className="ownership-badge">PERMANENT VEHICLE · Kept through Rebirth</p>
         <p className="production">{formatModifier(vehicle.modifier)} global business production{view.owned ? paused ? ' · Session paused' : ' · Active' : ''}</p>
         {!view.owned && <>
           <p>Price: <strong>{formatCash(vehicle.purchaseCost)}</strong></p>
@@ -30,7 +31,7 @@ export function Garage({ state, paused, onPurchase }: {
           <button className="action-button purchase-button" disabled={paused || !view.canPurchase} aria-describedby={requirements}
             aria-label={`Buy ${vehicle.name}`} onClick={() => onPurchase(vehicle.id)}>{paused ? 'Session paused' : 'Collect vehicle'}</button>
         </>}
-      </article>;
+      </div></article>;
     })}</div>
   </section>;
 }

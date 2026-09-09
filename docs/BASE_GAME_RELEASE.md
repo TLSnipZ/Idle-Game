@@ -140,4 +140,9 @@ The user subsequently declared the Base Game foundation complete at
 `21c5858ad6a11b1ec9d1260cd580fe94d2299881`. POST 1A begins presentation-only
 Rebranding / Art Direction; it does not rewrite the historical release audit above.
 Save v15, CE1, stable IDs, balance and central runtime/persistence contracts remain
-authoritative. See ART_DIRECTION.md. POST 1A live visual verification is pending.
+authoritative. See ART_DIRECTION.md. POST 1A was subsequently manually verified live by the user.
+
+
+POST 1B continues the post-roadmap visual transformation within the frozen five
+sections. Its component composition changes preserve the Base Game Save v15/CE1,
+balance, IDs, runtime and persistence contracts; no gameplay or content is added.

@@ -28,23 +28,24 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
   return <section className="panel rebirth-panel" aria-labelledby="rebirth-heading">
     <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>Rebirth</h2>
       <span className="ownership-badge">{preview.eligible ? 'REBIRTH AVAILABLE' : 'BUILD YOUR LEGACY'}</span></div>
-    <p>Restart your temporary operation in exchange for permanent Empire Points.</p>
+    <div className="rebirth-brief"><p>Restart your temporary operation in exchange for permanent Empire Points.</p>
     <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{preview.empirePoints} EP</dd></div>
       <div><dt>Rebirths</dt><dd>{preview.rebirthCount}</dd></div></dl>
     <p>Invest unspent Empire Points in permanent skills that survive Rebirth.</p>
     <RequirementList result={preview.requirements} id="rebirth-requirements" />
-    <p className="production">Reward: {preview.reward === null ? 'Not eligible' : `+${preview.reward} Empire Points`}</p>
-    <div id="rebirth-policy" className="rebirth-policy">
-      <div><h3>You keep</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
-      <div><h3>You lose</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
+    <p className="production rebirth-reward">Reward: {preview.reward === null ? 'Not eligible' : `+${preview.reward} Empire Points`}</p>
+    </div><div id="rebirth-policy" className="rebirth-policy">
+      <div className="rebirth-keep"><h3>You keep</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
+      <div className="rebirth-lose"><h3>You lose</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{label}</li>)}</ul></div>
     </div>
     {interaction.confirming ? <div className="save-confirm" role="group" aria-labelledby="rebirth-warning" aria-describedby="rebirth-policy">
       <h3 id="rebirth-warning">Confirm your Rebirth</h3>
       <p>{preview.reward === null ? 'Requirements are no longer met.' : `Reset the listed temporary progress for +${preview.reward} Empire Points?`}</p>
       <p>The reward is recalculated from current progress when confirmed. This replaces your local save.</p>
+      <div className="confirmation-actions"><button ref={cancel} aria-label="Cancel Rebirth" className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>Cancel</button>
       <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
         onClick={() => { controls.confirm(); heading.current?.focus(); }}>Confirm Rebirth</button>
-      <button ref={cancel} aria-label="Cancel Rebirth" className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>Cancel</button>
+      </div>
     </div> : <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
       aria-describedby="rebirth-requirements rebirth-policy" onClick={controls.request}>Review Rebirth</button>}
     {unavailable && <p>Rebirth requires a running session with available local saving.</p>}

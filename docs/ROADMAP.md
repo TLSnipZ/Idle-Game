@@ -270,10 +270,18 @@ The user has declared the roadmap through **Phase 9E Base Game Foundation comple
 Earlier phase paragraphs above are historical implementation records, not the current
 post-roadmap status. The frozen baseline is `21c5858ad6a11b1ec9d1260cd580fe94d2299881`.
 
-**POST 1A Rebranding & Art Direction Foundation implementation complete; live visual
-verification pending.** Central Solara tokens and shell/card/HUD styling establish
-the visual language; [ART_DIRECTION.md](ART_DIRECTION.md) defines future category
-assets and explicit user-approved Golden References. No asset batches generated,
-font binaries added or gameplay/content expansion started. Save v15, CE1, balance,
-runtime and accessibility remain frozen. POST 1B deeper UI refinement is deferred;
-future reference creation and gameplay expansions are separately scoped.
+**POST 1A Rebranding & Art Direction Foundation is manually verified live.**
+The approved Solara palette, typography, tokens and [ART_DIRECTION.md](ART_DIRECTION.md)
+remain the visual foundation.
+
+**POST 1B Deep UI Transformation implementation complete; live visual verification
+pending.** Overview, Operations, City, Garage and Empire now use distinct feature/
+support compositions within the existing five sections. Responsive structures,
+explicit outcomes and accessible controls remain central. No Golden Reference
+assets generated, no font/image binaries added, and no content expansion started.
+Save v15, CE1, post-9C balance, runtime safeguards and accessibility remain frozen.
+
+Next visual work may begin a separately requested, controlled Golden Reference set
+with a tiny reviewed batch. Explicit user approval is required before references
+become authoritative. Later UI/art and gameplay expansion phases are not complete
+or automatically authorized by POST 1B.

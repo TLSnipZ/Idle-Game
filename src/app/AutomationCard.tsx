@@ -1,3 +1,5 @@
+import { XP_REWARDS } from '../features/progression';
+import { DISPATCHER_JOBS_PER_HEAT } from '../features/heat';
 import { RequirementList } from './RequirementList';
 import type { selectDispatcher } from '../game/automation-selectors';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
@@ -10,12 +12,15 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
   readonly onPurchase: () => void;
   readonly event: RuntimeSnapshot['automationEvent'];
 }) {
-  return <section className="panel upgrade-panel" aria-labelledby="delegation-heading">
+  return <section className="panel upgrade-panel automation-card dispatcher-card" aria-labelledby="delegation-heading">
     <div className="panel-heading"><h3 id="delegation-heading">Delegation</h3>
-      {view.unlocked && <span className="ownership-badge is-owned">{paused ? 'PAUSED' : 'ACTIVE'}</span>}
+      <span className="ownership-badge">{view.unlocked ? paused ? 'PAUSED' : 'ACTIVE' : view.eligible ? 'AVAILABLE' : 'LOCKED'}</span>
     </div>
     <h4>{view.definition.name}</h4>
     <p>{view.definition.description}</p>
+    <p className="automation-role">Automatic delivery work</p>
+    <p>XP: {XP_REWARDS.dispatcherJob} base per delivery · XP modifiers and rounding apply once per batch.</p>
+    <p>Heat: +1 per {DISPATCHER_JOBS_PER_HEAT} deliveries in one batch.</p>
     <p>Runs every {formatRemainingTime(view.intervalMs)} · {view.reward === null ? 'Reward unavailable' : `${formatCash(view.reward)} per delivery`}</p>
     {view.unlocked ? <>
       <label id="dispatcher-timing" htmlFor="dispatcher-progress">Next delivery in {formatRemainingTime(view.remainingMs)}{paused ? ' · Session paused' : ''}</label>

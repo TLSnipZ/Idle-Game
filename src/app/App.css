@@ -224,7 +224,6 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .section-heading h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); scroll-margin-top: 13rem; }
 .section-heading p { color: var(--color-muted); line-height: 1.5; }
 .section-stack { display: grid; gap: 2rem; }
-.overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .summary-card, .starter-panel { padding: clamp(1rem, 3vw, 1.5rem); overflow-wrap: anywhere; }
 .summary-card { display: flex; flex-direction: column; align-items: stretch; }
 .summary-card h2 { font-size: .9rem; letter-spacing: .06em; }
@@ -236,16 +235,15 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .automation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .automation-grid > .panel { margin: 0; }
 .section-stack > .panel { padding: clamp(1rem, 3vw, 1.5rem); }
-.section-stack .action-button:where(:not(.purchase-button):not(.delivery-button):not(.rebirth-button)):enabled, .overview-grid .action-button { color: var(--color-cool); background: var(--color-cool-tint); border-color: var(--color-cool); }
+.section-stack .action-button:where(:not(.purchase-button):not(.delivery-button):not(.rebirth-button):not(.danger-button)):enabled, .overview-command .action-button { color: var(--color-cool); background: var(--color-cool-tint); border-color: var(--color-cool); }
 .section-stack .action-button:disabled { color: var(--color-muted); background: var(--color-disabled); border-color: var(--color-border); }
 .section-stack .action-button { white-space: normal; overflow-wrap: anywhere; }
 .section-stack .panel-heading, .global-status { overflow-wrap: anywhere; }
-@media (max-width: 1000px) { .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 740px) {
   .app-header { padding: 1rem; }
   .global-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .primary-navigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .overview-grid, .automation-grid { grid-template-columns: minmax(0, 1fr); }
+  .automation-grid { grid-template-columns: minmax(0, 1fr); }
   .global-chrome-inner { padding: .5rem 1rem; }
   .section-heading h1 { scroll-margin-top: 21rem; }
 }
@@ -302,7 +300,6 @@ main { scroll-margin-block-start: 16rem; }
 .rebirth-panel, .city-events, .vehicle-card { background: var(--gradient-surface); border-radius: var(--radius-feature); box-shadow: var(--shadow-elevated); }
 .rebirth-panel { border-top: 2px solid var(--color-warm); }
 .city-events { border-top: 2px solid var(--color-accent); }
-.garage .upgrade-catalog { grid-template-columns: minmax(0, 1fr); }
 .vehicle-card { padding: clamp(1.5rem, 4vw, 3rem); border-top: 2px solid var(--color-warm); }
 .vehicle-card h3 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.5rem); margin-block: var(--space-md); letter-spacing: .04em; }
 .vehicle-card .action-button { max-width: 32rem; }
@@ -318,7 +315,7 @@ main { scroll-margin-block-start: 16rem; }
 .action-button { border-radius: var(--radius-control); }
 .purchase-button, .delivery-button { background: var(--gradient-action); color: var(--color-on-action); border-color: var(--color-action); }
 @media (hover: hover) { .purchase-button:enabled:hover, .delivery-button:enabled:hover { background: var(--color-action-hover); border-color: var(--color-accent); } }
-.action-button.rebirth-button, .section-stack .save-confirm .action-button:first-of-type:not(:disabled) { background: var(--color-danger-surface); border-color: var(--color-danger); color: var(--color-danger); }
+.action-button.rebirth-button, .action-button.danger-button { background: var(--color-danger-surface); border-color: var(--color-danger); color: var(--color-danger); }
 .action-button:disabled, .section-stack .action-button:disabled { background: var(--color-disabled); border-color: var(--color-border); color: var(--color-muted); }
 .save-confirm { background: var(--color-danger-surface); border-inline-start-color: var(--color-danger); }
 .global-feedback > div:where(:not(:empty):not(.runtime-error):not(:has(.runtime-error))) { padding: var(--space-sm) var(--space-md); border-inline-start: 2px solid var(--color-info); background: var(--color-surface); border-radius: var(--radius-control); }

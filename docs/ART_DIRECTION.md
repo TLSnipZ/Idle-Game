@@ -203,3 +203,56 @@ identity therefore have DOM/static review only here; actual browser/live visual
 approval remains pending. No GitHub Pages visual verification or WCAG certification
 is claimed. User review should cover all five sections, HOT/MANHUNT, pending Events,
 locked cards, Rebirth confirmation and Save/Import at desktop and narrow widths.
+
+## POST 1B composition refinement
+
+POST 1A was manually verified live by the user; its palette, typography, material
+language and Golden Reference governance remain authoritative. POST 1B applies
+that identity more deeply through composition, without new tokens or imagery.
+
+| Surface | Composition and hierarchy |
+| --- | --- |
+| Overview | Cash anchors a wider economy block beside Level/XP. Heat and Empire support it; pending Events become a feature strip, idle Events stay compact. Mobile reads economy, player, pressure, empire, event, Crew, Collection. Management stays in its existing section. |
+| Operations | Starter work exposes payout/XP/Heat together; Dockside is the larger production anchor. Equipment stays compact below, with a distinct Automation group. Auto-spend disclosure sits immediately before its control; paused/max states remain explicit. |
+| City | District control and Heat sit side by side on wide screens. Heat emphasizes value, tier, penalty, cooling and Lay Low in that order. Active assignments precede the Crew roster. Pending situations use two outcome-first choice surfaces; idle state stays compact. |
+| Collection | A text-complete showroom stage carries vehicle identity beside permanent effect and acquisition information. Owned vehicles remove purchase clutter. Only the actual catalog appears. |
+| Empire | Rebirth pairs readiness/reward with explicit You Keep/You Lose groups. Confirmation presents Cancel first. The foundation skill spans the tree above indented branches, whose textual prerequisites remain authoritative. Achievements form a completion gallery; statistics use a numeric record grid. Export and replacement Import have separate surfaces. |
+
+`src/app/sections.css` contains these domain compositions, grouped by section with
+responsive rules last. Shared controls, tokens, focus and reduced motion remain in
+the existing stylesheets. No generic card framework, new visual timers, image
+requests, motion effects or viewport blur layers are introduced. Use the existing
+1000px/740px breakpoints; collapse columns rather than shrinking labels. Keep
+content heights flexible, requirements/buttons wrapping and focus rings unclipped.
+
+### Optional artwork insertion points
+
+- **Vehicles:** `showroom-stage` can receive a responsive wide image (approximately
+  16:9) while keeping the model heading and permanent status in HTML. It is complete
+  with text now; never reserve a giant empty image box.
+- **Crew:** `crew-identity` can accept a portrait beside the identity block. Keep
+  role/effect/assignment readable without imagery and collapse gracefully on mobile.
+- **Territories:** `territory-story` can accept a wide district hero above its
+  description. Control, effect, acquisition Heat and requirements remain separate HTML.
+- **Events:** `event-story` can accept a wide cinematic hero. Text-safe cropping must
+  preserve the title/description and keep both choices and exact outcomes outside art.
+
+These are optional presentation regions, not saved paths or approved references.
+No assets or Golden References were generated in POST 1B. The next reference phase
+must be separately requested and use a tiny candidate batch with explicit user
+approval before promotion. Preserve POST 1A contracts and this component hierarchy.
+
+### POST 1B review limits
+
+New deterministic composition tests cover reading order, Dockside states, paused/
+max Auto-Upgrader disclosure, Heat/Mara, Crew groups, all three Event choice panels,
+Garage permanence without images, starter outcomes and Cancel-first Rebirth order.
+Existing mounted tests continue to cover actions, navigation without reconciliation,
+focus recovery, stable live regions and import/Rebirth state across section changes.
+Heat text assertions now ignore inline markup rather than requiring an unbroken
+HTML string; exact values and progress semantics remain asserted.
+
+Local browser review was attempted but returned `ERR_BLOCKED_BY_CLIENT`. Desktop,
+mobile, zoom and visual identity therefore have structural/static review only in
+this environment. Live visual verification remains pending; no GitHub Pages visual
+review or accessibility certification is claimed.

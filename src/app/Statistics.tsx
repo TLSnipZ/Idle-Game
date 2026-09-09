@@ -2,7 +2,7 @@ import { selectStatistics } from '../game/statistics-selectors';
 import type { GameState } from '../game/game-state';
 
 export function Statistics({ state }: { readonly state: GameState }) {
-  return <section className="panel statistics" aria-labelledby="statistics-heading">
+  return <section className="panel statistics empire-record" aria-labelledby="statistics-heading">
     <h2 id="statistics-heading">STATISTICS</h2>
     <p>Lifetime history · Kept through Rebirth</p>
     <dl className="statistics-grid">{selectStatistics(state).map(entry =>

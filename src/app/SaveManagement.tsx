@@ -25,7 +25,7 @@ export function SaveManagementView({ state, controls }: {
     <h3 id="save-heading">Save management</h3>
     <p>Keep a portable backup or move to another browser. Codes are not encrypted. Importing never credits time from the code.</p>
     <div className="save-grid">
-      <div>
+      <div className="export-tools"><h4>Export / Backup</h4><p>Keep a portable copy of your empire.</p>
         <button className="action-button" onClick={controls.exportCode}>Export save</button>
         {state.exported && <>
           <label htmlFor="export-code">Your exported save code</label>
@@ -33,7 +33,7 @@ export function SaveManagementView({ state, controls }: {
           <button className="action-button" onClick={() => { void controls.copyCode(); }}>Copy code</button>
         </>}
       </div>
-      <div>
+      <div className="import-tools"><h4>Import / Replace save</h4>
         <label htmlFor="import-code">Paste a save code</label>
         <p id="import-instructions">Paste the complete CE1 save code, then validate it before confirming replacement.</p>
         <textarea aria-describedby="import-instructions save-feedback" aria-invalid={state.invalidInput || undefined} id="import-code" value={state.input} rows={4} maxLength={MAX_CODE_LENGTH + 1}
@@ -41,11 +41,11 @@ export function SaveManagementView({ state, controls }: {
         <button ref={validateButton} className="action-button" onClick={() => { requested.current = true; controls.validate(); }}>Validate import</button>
         {state.confirming && <div className="save-confirm" role="group" aria-labelledby="import-warning">
           <p id="import-warning">Importing will replace your current progress and the local save stored on this browser.</p>
-          <button className="action-button" onClick={() => { controls.confirm(); validateButton.current?.focus(); }}>Confirm import</button>
+          <button className="action-button danger-button" onClick={() => { controls.confirm(); validateButton.current?.focus(); }}>Confirm import</button>
           <button ref={cancelButton} aria-label="Cancel import" className="action-button" onClick={() => { controls.cancel(); validateButton.current?.focus(); }}>Cancel</button>
         </div>}
+        <p id="save-feedback" className={state.invalidInput ? 'save-feedback-error' : undefined} role="status" aria-live="polite" aria-atomic="true">{state.invalidInput && 'ERROR · '}{state.message}</p>
       </div>
     </div>
-    <p id="save-feedback" role="status" aria-live="polite" aria-atomic="true">{state.message}</p>
   </section>;
 }

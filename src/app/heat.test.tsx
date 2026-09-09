@@ -21,7 +21,7 @@ function state(heat=0,remainder=0,cash='50000') {
 function render(s=state(),paused=false){return renderToStaticMarkup(<HeatPanel state={s} paused={paused} onLayLow={()=>{}}/>);}
 describe('Heat presentation and city interaction',()=>{
   it.each([[0,'COLD'],[20,'NOTICED'],[40,'WATCHED'],[60,'HOT'],[80,'MANHUNT'],[100,'MANHUNT']] as const)('shows exact bounded Heat and readable tier at %i', (heat,label)=>{
-    const html=render(state(heat));expect(html).toContain('HEAT');expect(html).toContain(`${heat} / 100 — ${label}`);
+    const html=render(state(heat));expect(html).toContain('HEAT');expect(html.replace(/<[^>]*>/g, '')).toContain(`${heat} / 100 — ${label}`);
     expect(html).toContain(`aria-label="Current Heat: ${heat} of 100, ${label}" max="100" value="${heat}"`);
     expect(html).toContain('XP and business production unaffected');
     expect(html).not.toMatch(/wanted-star|siren|police encounter/);
@@ -54,7 +54,7 @@ describe('Heat presentation and city interaction',()=>{
     const f=rebirthRuntime(state(75,42000,'1000000'));let feedback='';
     f.game.execute(s=>{const result=layLow(s);feedback=describeLayLow(result);return result;});
     expect(feedback).toContain('-$500.00');expect(feedback).toContain('Heat now 65');
-    expect(render(f.game.getSnapshot().result.state)).toContain('65 / 100 — HOT');f.game.stop();
+    expect(render(f.game.getSnapshot().result.state).replace(/<[^>]*>/g, '')).toContain('65 / 100 — HOT');f.game.stop();
     expect(describeLayLow(layLow(state()))).toContain('Already cold');
     expect(describeLayLow(layLow(state(20,0,'49900')))).toContain('Not enough cash');
   });
@@ -71,7 +71,7 @@ describe('Heat presentation and city interaction',()=>{
     const base=territoryState(true),hot={...base,city:{...base.city,heat:100}};
     const owned=renderToStaticMarkup(<City state={hot} paused={false} onAcquire={()=>{}} onLayLow={()=>{}}/>);
     expect(owned).toContain('Territories controlled: 2 / 2');expect(owned).not.toContain('Take control');
-    expect(owned).not.toContain('Acquisition generates');expect(owned).toContain('100 / 100 — MANHUNT');
+    expect(owned).not.toContain('Acquisition generates');expect(owned.replace(/<[^>]*>/g, '')).toContain('100 / 100 — MANHUNT');
   });
   it('explicitly lists Heat as temporary in the shared Rebirth confirmation policy',()=>{
     expect(REBIRTH_POLICY.city.action).toBe('reset');expect(REBIRTH_POLICY.city.labels).toContain('Heat / current police attention');

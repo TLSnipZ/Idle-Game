@@ -15,10 +15,10 @@ export function Achievements({ state, announcement }: {
     </div>
     <div className="achievement-grid">{view.cards.map(card =>
       <article className={`achievement-card ${card.unlocked ? 'is-unlocked' : ''}`} key={card.id} aria-labelledby={`${card.id}-name`}>
-        <h3 id={`${card.id}-name`}>{card.name}</h3>
+        <div className="panel-heading"><h3 id={`${card.id}-name`}>{card.name}</h3>
+        <strong className="ownership-badge">{card.unlocked ? 'UNLOCKED' : 'LOCKED'}</strong></div>
         <p>{card.description}</p>
-        <strong>{card.unlocked ? 'UNLOCKED' : 'LOCKED'}</strong>
-        <p>{card.progress}</p>
+        <p className="achievement-progress">{card.progress}</p>
       </article>)}</div>
   </section>;
 }

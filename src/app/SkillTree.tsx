@@ -15,10 +15,10 @@ export function SkillTree({ state, paused, onPurchase }: {
       const view = selectSkill(state, skill.id);
       if (!view) return null;
       const heading = `${skill.id}-heading`, requirements = `${skill.id}-requirements`;
-      return <article key={skill.id} className="panel skill-node" aria-labelledby={heading}>
+      return <article key={skill.id} className={`panel skill-node ${skill.requirements.length === 0 ? 'skill-foundation' : 'skill-branch'}`} aria-labelledby={heading}>
         <div className="panel-heading"><h3 id={heading}>{skill.name}</h3>
-          <span className="ownership-badge">{view.maxed ? 'MAXED' : !view.requirements.met ? 'LOCKED' : 'AVAILABLE'}</span></div>
-        <p>Rank {view.rank} / {view.maxRank}{view.rank > 0 ? ' · Permanent effect active' : ''}</p>
+          <span className="ownership-badge">{view.maxed ? 'MAXED · MAX RANK' : !view.requirements.met ? 'LOCKED' : 'AVAILABLE'}</span></div>
+        <p className="skill-rank">Rank {view.rank} / {view.maxRank}{view.rank > 0 ? ' · Permanent effect active' : ''}</p>
         <p>{skill.description}</p>
         <p>Current: {describeSkillEffect(view.currentEffect)}</p>
         {view.nextEffect && <p>Next rank: {describeSkillEffect(view.nextEffect)}</p>}
@@ -26,7 +26,7 @@ export function SkillTree({ state, paused, onPurchase }: {
         {!view.maxed && <>
           <p>Next rank: <strong>{view.nextCost} EP</strong></p>
           <p>{!view.requirements.met ? 'Prerequisites not met.' : view.insufficientEp ? 'Not enough Empire Points.' : 'Ready to invest.'}</p>
-          <button className="action-button" disabled={paused || !view.canPurchase} aria-describedby={requirements}
+          <button className="action-button purchase-button" disabled={paused || !view.canPurchase} aria-describedby={requirements}
             aria-label={`Purchase next rank of ${skill.name}`} onClick={() => onPurchase(skill.id)}>
             {paused ? 'Session paused' : 'Purchase rank'}</button>
         </>}

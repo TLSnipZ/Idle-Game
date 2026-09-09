@@ -17,19 +17,21 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
     <div className="panel-heading"><h2 id="crew-heading">CREW</h2>
       <span>Recruited: {crew.recruitedCrewCount} / {crew.totalConfiguredCrew} · Active: {crew.activeAssignmentCount} / {crew.totalSlots}</span></div>
     <p>Recruit specialists and put them where they matter. Operations is a choice: better delivery cash or faster cooling.</p>
+    <h3 className="subsection-label">Active assignments</h3>
     <div className="crew-slots">{crew.slots.map(slot => <article className="panel crew-slot" key={slot.id} aria-labelledby={`crew-slot-${slot.id}`}>
-      <h3 id={`crew-slot-${slot.id}`}>{slot.name.toUpperCase()}</h3>
-      <p>Current: {slot.occupant?.name ?? 'Empty'}</p>
-      <p>{slot.occupant ? describeCrewEffect(slot.occupant.effect) : 'No active specialist'}</p>
+      <h4 id={`crew-slot-${slot.id}`}>{slot.name.toUpperCase()}</h4>
+      <p className="slot-occupant">Current: {slot.occupant?.name ?? 'Empty'}</p>
+      <p>{slot.occupant ? describeCrewEffect(slot.occupant.effect) : 'No active specialist · No specialist assigned.'}</p>
       {slot.occupant && <button className="action-button" disabled={paused} aria-label={`Unassign ${slot.name}`} onClick={() => onUnassign(slot.id)}>Unassign</button>}
     </article>)}</div>
+    <h3 className="subsection-label">Roster</h3>
     <div className="crew-catalog">{CREW_CATALOG.map(member => {
       const view = crewPresentation(state, member.id);
       if (!view) return null;
       const requirementsId = `${member.id}-requirements`;
       return <article className="panel crew-card" key={member.id} aria-labelledby={`${member.id}-heading`}>
-        <div className="panel-heading"><h3 id={`${member.id}-heading`}>{member.name}</h3><span className="ownership-badge">{view.status}</span></div>
-        <p>{member.description}</p><p>{view.effect} · Only while assigned</p><p>{view.availability}</p>
+        <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{member.name}</h4><span className="ownership-badge">{view.status}</span></div>
+        <p className="eyebrow">{view.compatibleSlots.map(slot => slot.name).join(' / ')}</p><p>{member.description}</p></div><p className="specialist-effect">{view.effect} · Only while assigned</p><p>{view.availability}</p>
         {!view.recruited ? <>
           <p>Recruitment: <strong>{formatCash(member.recruitmentCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirementsId} />

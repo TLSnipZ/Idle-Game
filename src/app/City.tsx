@@ -15,18 +15,18 @@ export function City({ state, paused, onAcquire, onLayLow }: {
     <div className="panel-heading"><h2 id="city-heading">{CITY_NAME}</h2>
       <span>Territories controlled: {city.ownedTerritoryCount} / {city.totalConfiguredTerritories}</span></div>
     <p>Build influence block by block.</p>
-    <HeatPanel state={state} paused={paused} onLayLow={onLayLow} />
+    <div className="district-pressure-layout"><div className="district-zone"><h3>Districts</h3>
     <div className="territory-catalog">{TERRITORY_CATALOG.map(territory => {
       const view = territoryPresentation(state, territory.id);
       if (!view) return null;
       const heading = `${territory.id}-heading`, requirements = `${territory.id}-requirements`;
       return <article key={territory.id} className={`panel territory-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
-        <p className="eyebrow">{territory.starting ? 'The starting foothold' : 'The nightlife strip'}</p>
-        <div className="panel-heading"><h3 id={heading}>{territory.name}</h3>
+        <p className="eyebrow">{territory.starting ? 'Starting district' : 'Nightlife district'}</p>
+        <div className="panel-heading"><h4 id={heading}>{territory.name}</h4>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.status}</span></div>
-        <p>{territory.description}</p><p className="territory-effect">{view.effect}</p>
+        <div className="territory-story"><p>{territory.description}</p></div><p className="territory-effect">{view.effect}</p>
         {view.owned ? <p>{view.availability}</p> : <>
-          <p>Acquisition generates +{territory.acquisitionHeat} Heat.</p>
+          <p className="acquisition-warning">Acquisition generates +{territory.acquisitionHeat} Heat.</p>
           <p>Price: <strong>{formatCash(territory.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
           <p>{view.availability}</p>
@@ -35,6 +35,8 @@ export function City({ state, paused, onAcquire, onLayLow }: {
             onClick={() => onAcquire(territory.id)}>{paused ? 'Session paused' : 'Take control'}</button>
         </>}
       </article>;
-    })}</div>
+    })}</div></div>
+    <HeatPanel state={state} paused={paused} onLayLow={onLayLow} />
+    </div>
   </section>;
 }

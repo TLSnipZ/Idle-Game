@@ -26,11 +26,11 @@ export function BusinessCard({ progress, onUpgrade, owned, canPurchase, paused, 
       <div className="business-content">
         <div className="panel-heading"><span className="eyebrow">Your first business</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{owned ? '✓ ' : ''}{view.status}</span></div>
         <h3 id="business-name">{STARTER_BUSINESS.name}</h3>
-        {progress && <p>Level {progress.level}</p>}
+        {progress && <p className="business-level">Level {progress.level}</p>}
         <p className="business-description">{STARTER_BUSINESS.description}</p>
         <div className="business-terms">
-          <div><span className="metric-label">{owned ? 'Acquisition price' : 'Purchase price'}</span><strong>{formatCash(STARTER_BUSINESS.purchaseCost)}</strong></div>
-          <div className={view.live ? 'production is-live' : 'production'}>
+          {!owned && <div><span className="metric-label">Purchase price</span><strong>{formatCash(STARTER_BUSINESS.purchaseCost)}</strong><p>No requirements. Production begins after purchase.</p></div>}
+          <div className={view.live ? 'production is-live production-readout' : 'production production-readout'}>
             <span className="metric-label"><span className="status-dot" aria-hidden="true" />{view.productionLabel}</span>
             <strong>{view.live ? '+' : ''}{formatProduction(progress?.production ?? STARTER_BUSINESS.baseProductionCentsPerSecond)} <small>/ sec</small></strong>
             {paused && <span className="rate-note">Effective rate · currently inactive</span>}
@@ -38,7 +38,7 @@ export function BusinessCard({ progress, onUpgrade, owned, canPurchase, paused, 
         </div>
         {progress && <div className="business-terms">
           <div><span className="metric-label">Next level</span><strong>{progress.nextProduction ? `${formatProduction(progress.nextProduction)} / sec` : 'MAX LEVEL'}</strong></div>
-          {progress.upgradeCost && <div><span className="metric-label">Upgrade price</span><strong>{formatCash(progress.upgradeCost)}</strong></div>}
+          {progress.upgradeCost && <div><span className="metric-label">Next upgrade price</span><strong>{formatCash(progress.upgradeCost)}</strong></div>}
         </div>}
         {progress && progress.modifiers.length > 0 && <div className="purchase-note"><p>Base at Level {progress.level}: {formatCash(progress.baseProduction)}/sec</p><ModifierBreakdown modifiers={progress.modifiers} /><p>Effective: {formatProduction(progress.production)}/sec</p></div>}
         <button className="action-button purchase-button" disabled={progress ? paused || !progress.canUpgrade : view.disabled} onClick={progress ? onUpgrade : onPurchase} aria-label={progress ? `Upgrade ${STARTER_BUSINESS.name}${progress.upgradeCost === null ? ", maximum level reached" : ` to Level ${progress.level + 1}`}` : `Buy ${STARTER_BUSINESS.name}`} aria-describedby="purchase-note">
