@@ -1,3 +1,4 @@
+import { collectCrewModifiers } from '../features/crew';
 import { collectHeatModifiers } from '../features/heat';
 import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
@@ -26,7 +27,7 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
     seen.add(id);
     return vehicle.modifier;
   });
-  return [...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
+  return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
   const business = findBusiness(id);

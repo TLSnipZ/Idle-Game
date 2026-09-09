@@ -1,3 +1,4 @@
+import type { CrewCommandResult } from '../game/crew-commands';
 import type { LayLowResult } from '../game/lay-low';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
 import type { PurchaseSkillResult } from '../game/purchase-skill-rank';
@@ -17,7 +18,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
@@ -116,9 +117,10 @@ export function createGameRuntime(
     if (!reconcile()) return;
     const previous = snapshot.result.state;
     const result = command(previous);
-    // Ownership/level/equipment/delegation/vehicle/skill/territory changes start a new rate boundary. Runtime sub-ms
+    // Ownership/level/equipment/delegation/vehicle/skill/territory/assignment changes start a new rate boundary. Runtime sub-ms
     // duration is dropped; earned authoritative milli-cents are never reset.
-    if (result.ok && (result.state.businesses.owned !== previous.businesses.owned
+    if (result.ok && (result.state.crew.assignments !== previous.crew.assignments
+        || result.state.businesses.owned !== previous.businesses.owned
         || result.state.city.ownedTerritoryIds !== previous.city.ownedTerritoryIds
         || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds
         || result.state.permanentProgression.skills !== previous.permanentProgression.skills

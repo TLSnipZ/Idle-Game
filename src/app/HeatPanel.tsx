@@ -11,6 +11,7 @@ export function HeatPanel({ state, paused, onLayLow }: {
       <span>{view.heat} / {view.maximum} — {view.tier.label}</span></div>
     <progress aria-label="Current Heat" max={view.maximum} value={view.heat} />
     <p>{view.penalty} · XP and business production unaffected.</p>
+    <p>{view.cooling}</p>
     {view.countdown !== null && <p>{view.countdown}</p>}
     <p>Manual delivery: +{MANUAL_JOB_HEAT} Heat. Dispatcher: +1 per {DISPATCHER_JOBS_PER_HEAT} deliveries in one batch.</p>
     <p>Lay low · Reduce Heat by {view.reduction} · Cost: {formatCash(view.cost)}</p>

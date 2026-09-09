@@ -1,3 +1,4 @@
+import { CREW_CATALOG } from '../features/crew';
 import { findTerritory, requireCityState, TERRITORY_CATALOG } from '../features/territories';
 import { findSkill, getSkillRank } from '../features/skills';
 import { VEHICLE_CATALOG } from '../features/vehicles';
@@ -67,6 +68,7 @@ export function evaluateRequirements(state: GameState, requirements: readonly Re
 /** Announcement only, in explicit catalog order; affordability is not unlock eligibility. */
 export function newlyEligibleContent(before: GameState, after: GameState): readonly string[] {
   const content = [
+    ...CREW_CATALOG.map(definition => ({ definition, owned: after.crew.recruitedIds.includes(definition.id) })),
     { definition: STARTER_BUSINESS, owned: Object.hasOwn(after.businesses.owned, STARTER_BUSINESS.id) },
     ...UPGRADE_CATALOG.map(definition => ({ definition, owned: after.upgrades.purchasedIds.includes(definition.id) })),
     { definition: DELIVERY_DISPATCHER, owned: after.automation.unlockedIds.includes(DELIVERY_DISPATCHER.id) },

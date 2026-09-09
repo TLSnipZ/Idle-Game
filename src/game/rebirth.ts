@@ -14,6 +14,7 @@ export const REBIRTH_REQUIREMENTS: readonly Requirement[] = Object.freeze([
 const REBIRTH_LEVELS_PER_POINT = 10n;
 /** Exhaustive slice policy: new GameState slices require an explicit retention decision. */
 export const REBIRTH_POLICY = {
+  crew: { action: 'reset', labels: ['Recruited Crew and active assignments'] },
   city: { action: 'reset', labels: ['Territories beyond the starting Waterfront foothold', 'Heat / current police attention'] },
   economy: { action: 'reset', labels: ['Cash'] },
   businesses: { action: 'reset', labels: ['Businesses and business levels', 'Temporary production progress (both fractional remainders)'] },

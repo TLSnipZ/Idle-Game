@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 7B: deterministic Solara City Heat.**
+idle/tycoon browser game. **Phase 7C: Solara City Crew assignments.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -79,7 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B live verification remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -145,6 +145,6 @@ to gain **+10% manual/Dispatcher cash**, including offline Dispatcher jobs. XP a
 business production are unaffected. Territories beyond Waterfront reset on Rebirth;
 vehicles and permanent skills remain. Older saves gain Waterfront only. Manual deliveries, Dispatcher batches and Neon Mile
 acquisition build **Heat**. HOT reduces delivery cash by 10%; MANHUNT by 25%.
-Heat cools by one per credited minute. **Lay Low** costs $500 and removes up to 10
+Heat normally cools by one per credited minute. **Lay Low** costs $500 and removes up to 10
 Heat. Heat resets on Rebirth; XP and business production are unaffected. Older
-saves begin with zero Heat. Crew, Random Events and a full city map remain deferred.
+saves begin with zero Heat. Recruit Rico, Mara and Jax in **Crew**, then explicitly assign them to Operations or Logistics. Only assigned specialists improve delivery cash, cooling or production; Operations chooses Rico or Mara. Recruitment and assignments reset on Rebirth. Random Events, Crew progression and a full city map remain deferred.

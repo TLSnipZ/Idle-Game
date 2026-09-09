@@ -179,3 +179,10 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .heat-panel progress { width: 100%; accent-color: var(--color-cool); }
 .heat-hot progress { accent-color: #eab567; }
 .heat-manhunt progress { accent-color: #e98282; }
+
+.crew { min-width: 0; grid-column: 1 / -1; }
+.crew-slots, .crew-catalog { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.crew-catalog { margin-top: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.crew-slot, .crew-card { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); overflow-wrap: anywhere; }
+.crew-card .action-button, .crew-slot .action-button { width: 100%; white-space: normal; }
+@media (max-width: 740px) { .crew-slots, .crew-catalog { grid-template-columns: minmax(0, 1fr); } }

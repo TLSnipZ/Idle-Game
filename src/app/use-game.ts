@@ -1,3 +1,5 @@
+import { recruitCrewMember, assignCrewMember, unassignCrewSlot } from '../game/crew-commands';
+import { describeCrewCommand } from './crew-presentation';
 import { layLow } from '../game/lay-low';
 import { describeLayLow } from './heat-presentation';
 import { acquireTerritory } from '../game/acquire-territory';
@@ -104,11 +106,33 @@ export function useGame() {
     });
   }
 
+  function recruitCrew(id: unknown) {
+    runtime.execute(state => {
+      const result = recruitCrewMember(state, id);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeCrewCommand(result, 'recruit', id) }));
+      return result;
+    });
+  }
+  function assignCrew(slot: unknown, id: unknown) {
+    runtime.execute(state => {
+      const result = assignCrewMember(state, slot, id);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeCrewCommand(result, 'assign', id, slot) }));
+      return result;
+    });
+  }
+  function unassignCrew(slot: unknown) {
+    runtime.execute(state => {
+      const result = unassignCrewSlot(state, slot);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: describeCrewCommand(result, 'unassign', undefined, slot) }));
+      return result;
+    });
+  }
+
   function rebirth() {
     const result = runtime.rebirth();
     if (result.ok) setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
     return result;
   }
 
-  return { coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

@@ -503,4 +503,38 @@ Cooling never banks at zero. Lay Low preserves partial cooling while still posit
 and clears it at zero. All offline Heat uses the existing shared 8/10/12h credited
 window; discarded time neither heats nor cools. Rebirth resets Heat/progress and
 Neon Mile; permanent Fast Talker rank 1 then pays $27.50 as before.
-All values are provisional. No police events, RNG or Crew balance is implemented.
+All values are provisional. Phase 7B introduced no police events, RNG or Crew balance.
+
+## Phase 7C — provisional Crew balance
+
+Exactly three recruits and two operational slots; all values are provisional.
+
+| Stable ID / Name | Recruitment | Acquisition requirements (AND) | Slot | Effect only while assigned |
+| --- | --- | --- | --- | --- |
+| `crew:rico-vale` / Rico Vale | $20,000 (2,000,000 cents) | Player Level 8 | `operations` | +10% starter-job / Dispatcher Money |
+| `crew:mara-knox` / Mara Knox | $30,000 (3,000,000 cents) | Player Level 10; control Neon Mile | `operations` | Cooling interval 60,000 → 45,000ms per −1 Heat |
+| `crew:jax-mercer` / Jax Mercer | $40,000 (4,000,000 cents) | Player Level 12; Dockside Level 15 | `logistics` | +15% global business production |
+
+Operations deliberately trades Rico's cash against Mara's faster cooling; Jax can
+work independently in Logistics. No passive bench effects, auto-assignment, upkeep,
+recruitment XP/EP/Heat, skill requirements or Crew progression. Assignment,
+replacement and unassignment cost nothing and do not immediately change Heat.
+Recruitment gates apply only to acquisition. Crew resets on Rebirth with no refund.
+Existing prices and requirements remain unchanged; Crew is entirely optional.
+
+Rico full job stack: `($25 + $5) × 1.20 × 1.10 × 1.10 × 1.10 = $47.916`.
+At HOT multiply once more by 0.90: **$43.1244**. Exact rational evaluation precedes
+the unchanged final per-job cent floor: **$47.91 / $43.12**. Dispatcher multiplies
+the same per-job payout; XP and Heat gains are unchanged. No percentage addition.
+Jax canonical production: `$0.75 × 1.15 × 1.10 × 1.10 × 1.15 = $1.20016875/s`
+with Vortex, Streetwise rank 2 and Silent Partner rank 1. Temporary upgrades stack
+through the same central evaluator. Neither production rate nor earned fractions
+round early. These are valid retained/imported-rank examples, not waived purchase gates.
+
+Mara preserves cooling progress numerically when assigned/replaced/unassigned.
+40,000ms then 5,000ms cools once at 45s; an existing 50,000ms is legal and cools
+only on the next positive elapsed call (1ms leaves 5,001ms). Global saved remainder
+remains below 60,000ms, even under Mara. Heat zero banks nothing. Shared starting-tier
+batch rules and Dispatcher floor(jobs/5) Heat per batch remain unchanged. No Crew
+changes XP or the Never Sleeps-only 8/10/12h cap. Crew does not change base balance
+while unassigned. All final balancing and Random Events remain deferred.

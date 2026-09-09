@@ -27,9 +27,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 6A — Rebirth foundation (complete; user verified live) | Rebirth, EP/count, permanent garage, v7 migration | Explicit retention matrix, atomic reset, prerequisite/cycle validation |
 | 6B — Permanent skill foundation (complete; user verified live) | One Empire Foundations tree, five skills, EP spending, v8 migration | Exact effects/XP flooring, permanent retention, shared derived cap |
 | 7A — Territory foundation (complete; user verified live) | Solara City, Waterfront/Neon Mile, temporary ownership, v9 migration | Atomic acquisition, central job modifier, Rebirth baseline and save/runtime/offline tests |
-| 7B — Deterministic Heat (implementation complete; live pending) | Integer Heat, exact gain/decay, job cash penalties, Lay Low, v10 migration | Atomic start-tier batching, cooling remainder, shared offline cap and Rebirth reset |
-| 7C — Crew (deferred / next) | Separately scoped Crew foundation | Preserve shared simulation, Heat and permanent/temporary boundaries |
-| Later Phase 7 — Random Events (deferred) | Separately scoped city systems | No implementation or placeholder state in Phase 7B |
+| 7B — Deterministic Heat (complete; user verified live) | Integer Heat, exact gain/decay, job cash penalties, Lay Low, v10 migration | Atomic start-tier batching, cooling remainder, shared offline cap and Rebirth reset |
+| 7C — Crew (implementation complete; live pending) | Three recruits, two assignment slots, exact active effects, v11 migration | Atomic recruitment/assignment, old-effect reconciliation, Mara remainder, shared offline and Rebirth reset |
+| Later Phase 7 — Random Events (deferred / next) | Separately scoped city systems | Preserve shared deterministic boundaries; no implementation or placeholder state in Phase 7C |
 | 8 — Long-term progression | Achievements, statistics expansion and late-game automation | One-time rewards, consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
@@ -122,13 +122,28 @@ Random Events, collection expansion and additional permanent trees remain deferr
 Phase 7 as a whole is not complete. No full city redesign or final district art exists.
 
 
-Phase 7B implementation is complete; live verification is pending. Heat is bounded
+Phase 7B implementation is complete and was manually verified live by the user. Heat is bounded
 0–100 with five tiers, three gain sources, exact per-minute decay, one Lay Low action
 and HOT/MANHUNT job-cash penalties through the central evaluator. Shared elapsed
 batches use starting Heat for rewards, then Dispatcher Heat, then cooling. No
 cross-batch Heat counter exists. v9→v10 migration starts Heat at zero and preserves
 all previous progression. CE1, import timing, durable offline/Rebirth replacement,
 permanent skills/Garage and the shared 8/10/12h cap remain intact. Heat resets with
-Waterfront-only territory ownership on Rebirth. Phase 7C Crew is next/deferred;
+Waterfront-only territory ownership on Rebirth. Phase 7C Crew follows below;
 Random Events, collections and other later work remain deferred. Phase 7 as a whole
 is not complete. No RNG, policing events or additional content was implemented.
+
+
+The user manually verified Phase 7B Heat gain/tiers, HOT/MANHUNT cash penalties,
+decay, Lay Low, Neon Mile Heat, XP/production isolation, offline Heat, Rebirth reset
+and persistence/export/import in the functioning live build.
+
+Phase 7C implementation is complete; **live verification is pending**. Three Crew
+members (Rico Vale, Mara Knox, Jax Mercer) can be recruited and explicitly assigned
+to Operations/Logistics. Bench ownership has no effect. Rico/Jax use central Money
+modifiers; Mara derives 45s cooling without rescaling the saved remainder. All
+assignment changes reconcile old effects first. Crew resets on Rebirth while
+permanent systems remain intact. v10→v11 adds only empty recruitment/assignments;
+CE1 and the shared offline/persistence contracts remain. Random Events is the next
+city-system slice, deferred pending a separate task. Phase 7 overall is not complete.
+No Crew progression, upkeep, random traits, portraits or automatic assignment exists.

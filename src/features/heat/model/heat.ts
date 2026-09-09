@@ -37,14 +37,15 @@ export function dispatcherHeatGain(completedJobs: number): number {
   return Number(BigInt(completedJobs) / BigInt(DISPATCHER_JOBS_PER_HEAT));
 }
 /** Constant-time cooling, including huge safe elapsed inputs. Zero never banks time. */
-export function decayHeat<T extends HeatState>(state: T, elapsedMs: number): T {
+export function decayHeat<T extends HeatState>(state: T, elapsedMs: number, intervalMs: number = HEAT_DECAY_INTERVAL_MS): T {
   requireHeatState(state);
   if (!isElapsedMs(elapsedMs)) throw new RangeError('Invalid Heat elapsed');
+  if (!Number.isSafeInteger(intervalMs) || intervalMs < 1 || intervalMs > HEAT_DECAY_INTERVAL_MS) throw new RangeError('Invalid Heat decay interval');
   if (state.heat === 0 || elapsedMs === 0) return state;
   const total = BigInt(state.heatDecayElapsedMs) + BigInt(elapsedMs);
-  const intervals = total / BigInt(HEAT_DECAY_INTERVAL_MS);
+  const intervals = total / BigInt(intervalMs);
   const heat = intervals >= BigInt(state.heat) ? 0 : state.heat - Number(intervals);
-  return { ...state, heat, heatDecayElapsedMs: heat === 0 ? 0 : Number(total % BigInt(HEAT_DECAY_INTERVAL_MS)) };
+  return { ...state, heat, heatDecayElapsedMs: heat === 0 ? 0 : Number(total % BigInt(intervalMs)) };
 }
 export function collectHeatModifiers(state: HeatState): readonly Modifier[] {
   requireHeatState(state);

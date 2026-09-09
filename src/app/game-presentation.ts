@@ -1,3 +1,4 @@
+import { describeCrewCommand } from './crew-presentation';
 import { findVehicle } from '../features/vehicles';
 import { evaluateXpReward } from '../game/xp-reward';
 import { DELIVERY_DISPATCHER } from '../features/automation';
@@ -27,6 +28,8 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'unknown-crew-member': case 'already-recruited': case 'unknown-slot': case 'not-recruited':
+    case 'incompatible-slot': case 'already-assigned': case 'already-empty': return describeCrewCommand(result, 'recruit');
     case 'already-cold': return 'Already cold. Nothing was spent.';
     case 'unknown-territory': return 'This territory is unavailable.';
     case 'unknown-skill': return 'This permanent skill is unavailable.';

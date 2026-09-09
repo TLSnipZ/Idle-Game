@@ -6,7 +6,6 @@ import { STARTER_BUSINESS } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
 import { formatCash } from '../features/economy/ui';
 import { createInitialGameState } from '../game/game-state';
-import type { RuntimeSnapshot } from '../platform/game-runtime';
 import { businessPresentation, describeAction } from './game-presentation';
 import { BusinessCard } from './BusinessCard';
 
@@ -79,15 +78,15 @@ describe('action feedback', () => {
     expect(message).toContain(STARTER_BUSINESS.name);
     expect(message).toContain('Live production has started');
   });
-  const failures: ReadonlyArray<readonly [Extract<RuntimeSnapshot['result'], { ok: false }>['error'], string]> = [
+  const failures = [
     ['insufficient-funds', 'Not enough cash'],
     ['already-owned', 'already yours'],
     ['unknown-business', 'unavailable'],
     ['overflow', 'Cash limit reached'],
     ['invalid-amount', 'No transaction was made'],
-  ];
+  ] as const;
   it.each(failures)('explains %s without false success feedback', (error, text) => {
-    const message = describeAction('purchase', { ok: false, state, error, requirements: { met: false, requirements: [] } });
+    const message = describeAction('purchase', { ok: false, state, error });
     expect(message).toContain(text);
     expect(message).not.toContain('has started');
   });

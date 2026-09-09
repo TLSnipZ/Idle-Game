@@ -1,3 +1,4 @@
+import { CrewPanel } from './CrewPanel';
 import { CITY_NAME } from '../features/territories';
 import { City } from './City';
 import { SkillTree } from './SkillTree';
@@ -26,7 +27,7 @@ import { useGame } from './use-game';
 import './App.css';
 
 export function App() {
-  const { coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
+  const { recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent, buyAutomation, automationEvent, buyUpgrade, upgradeOwnedBusiness, offline, dismissOffline, saveActions, persistence, snapshot, runtimeError, feedback, runStarterJob, buyBusiness } = useGame();
   const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const reward = evaluateJobReward(snapshot.state);
   const paused = runtimeError !== null;
@@ -90,6 +91,7 @@ export function App() {
         <section aria-labelledby="upgrades-heading"><h2 id="upgrades-heading">Upgrades</h2><div className="upgrade-catalog">{UPGRADE_CATALOG.map(upgrade => <UpgradeCard key={upgrade.id} view={selectUpgrade(snapshot.state, upgrade.id)} paused={paused} onPurchase={() => buyUpgrade(upgrade.id)} />)}</div></section>
         <AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} />
         <City state={snapshot.state} paused={paused} onAcquire={takeTerritory} onLayLow={coolDown} />
+        <CrewPanel state={snapshot.state} paused={paused} onRecruit={recruitCrew} onAssign={assignCrew} onUnassign={unassignCrew} />
         <Garage state={snapshot.state} paused={paused} onPurchase={buyVehicle} />
         <RebirthPanel state={snapshot.state} unavailable={paused || persistence.kind === 'blocked'} onRebirth={rebirth} />
         <SkillTree state={snapshot.state} paused={paused} onPurchase={buySkill} />

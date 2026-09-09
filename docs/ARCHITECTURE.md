@@ -1496,7 +1496,7 @@ Phase 7A is complete and was manually verified live by the user. Phase 7B follow
 ## Phase 7B — deterministic Heat
 
 Phase 7A was manually verified live by the user. Phase 7B implementation adds
-Heat to the temporary city slice; live verification remains pending.
+Heat to the temporary city slice; the user has now manually verified Phase 7B live.
 
 `city = { ownedTerritoryIds, heat, heatDecayElapsedMs }`. Heat is an integer 0–100,
 separate from Money/XP. Cooling progress is an integer 0–59,999 milliseconds. At
@@ -1606,5 +1606,95 @@ The Solara City Heat panel consumes pure selectors for tier, penalty, affordabil
 cooling countdown and Lay Low. Native progress semantics, visible tier text, focus
 styles and restrained colors retain accessibility without flashing or new UI timers.
 Neon Mile discloses +10 acquisition Heat before purchase. No wanted stars, police
-encounters, RNG, loss/confiscation, Crew, random events or new content exists.
-Phase 7C remains deferred.
+encounters, RNG, loss/confiscation, Crew or random events were part of Phase 7B.
+Phase 7C follows below.
+
+## Phase 7C — Crew assignment foundation
+
+Phase 7B was manually verified live by the user. Phase 7C implementation is complete;
+its live verification is pending. `features/crew` owns exactly three original
+specialists, stable CrewMemberIds, fixed config and structural validation. Display
+names are replaceable independently of save identity. Retiring an ID or changing
+slot compatibility needs an explicit migration decision, never silent deletion.
+
+`GameState.crew = { recruitedIds, assignments: { operations, logistics } }`.
+The unique ID array records recruitment; each slot holds one compatible recruited
+ID or null. A member can occupy at most one slot, independently of future slot
+compatibility. Fresh runs contain no recruits and two empty slots. No display names,
+costs, derived effects, counts or timestamps are stored. Strict validation rejects
+unknown/duplicate IDs, unowned/incompatible assignments, duplicate occupants,
+unknown slot keys, malformed shapes, accessors and non-JSON properties. It does not
+re-evaluate acquisition requirements. Valid grandfathered recruits/assignments
+remain active after load/import regardless of current level/territory gates.
+
+`recruitCrewMember(state, id)` validates, checks identity/duplicate ownership, uses
+central `evaluateRequirements` and canonical `spendCash`, then atomically adds
+recruitment with the exact payment. It never assigns, activates an effect, awards
+XP/EP or adds Heat. Failures retain the full original state; unmet requirements
+carry the same structured breakdown as other content. `assignCrewMember(state,
+slot, id)` checks slot, identity, recruitment, existing assignment and configured
+compatibility, then replaces only the requested slot atomically. Replaced members
+remain recruited. `unassignCrewSlot(state, slot)` clears only that slot. Both cost
+nothing and preserve Heat, cooling progress, Money, XP and EP. Assigning someone
+already active fails `already-assigned`; empty unassignment fails `already-empty`.
+Invalid authoritative state follows the existing fail-loud programming-error policy.
+
+Only **assignments** feed `activeCrewMembers` / `collectCrewModifiers`; recruitment
+alone gives no bench bonus. Rico and Jax supply configured modifiers to the existing
+central collector/evaluator. Flat-first, stable-ID-ordered rational multiplication
+and final per-job whole-cent flooring are unchanged. Breakdown source IDs resolve
+to the specialist names. Rico and Mara share Operations, so their effects cannot
+coexist; Jax independently occupies Logistics. No separate Crew multiplier exists.
+
+Mara supplies derived runtime configuration instead of a Money stat.
+`getHeatDecayIntervalMs(state)` returns 60,000ms normally or 45,000ms with her
+assigned. The sole `decayHeat` implementation accepts that interval; integer
+BigInt quotient/remainder handles arbitrarily large accepted elapsed batches with
+no tick loop. Assignment changes preserve the numerical cooling remainder and
+never cool immediately or proportionally rescale progress. Zero elapsed is an
+identity; next **positive** elapsed processes any now-complete interval. Thus
+40,000ms plus 5,000ms under Mara cools once; 50,000ms plus 1ms cools once and retains
+5,001ms. Persisted validation deliberately stays **0 <= remainder < 60,000** even
+under Mara. At Heat zero the remainder must still be zero, with no banked cooling.
+The Heat selector uses the same derived interval; an overdue remainder displays
+zero seconds until the next positive reconciliation, never a negative countdown.
+
+All three commands use existing `execute`: reconcile with OLD assignments, apply
+one immutable command, then normal successful-command persistence. Recruitment
+retains runtime fractional time because it activates nothing. Assignment changes
+use the existing conservative rate-boundary policy: discard less than 1ms of
+runtime-only duration, never earned production fractions, whole-ms Dispatcher
+progress or Heat remainder. Failure keeps legitimate pre-command reconciliation.
+Normal write failure leaves the valid new state live with a warning and the previous
+durable save intact; future ordinary autosave may save it. No new scheduler/storage
+key is added. Offline, import and Rebirth retain write-before-publication.
+
+Shared elapsed ordering remains business production, Dispatcher Money/XP using
+STARTING modifiers/Heat, batch Heat gain, then cooling using the interval-start
+assignment. Crew does not alter Heat gains, tiers, XP, Dispatcher interval or caps.
+Never Sleeps alone derives the shared 8/10/12h credited duration. Offline uses the
+same assigned effects and exact simulation; discarded time affects nothing. Heat
+and heat-dependent job income retain the intentional Phase 7B batch semantics;
+continuous business production retains exact split-interval fractions.
+
+Rebirth policy explicitly resets **Crew recruitment and assignments** to fresh
+empty state after the final reconciliation with old Crew active. No costs are
+refunded. All prior temporary fields still reset, including Waterfront-only city,
+Heat/remainder zero. Garage, unspent EP plus reward, count and skill ranks survive.
+Rico/Jax bonuses disappear; default cooling returns to 60s. No cached effects remain.
+
+Save **v11** sequentially migrates v1 through v10. v10→v11 only adds empty Crew;
+cash, XP, business levels, upgrades, automation progress, both production fractions,
+garage, EP/count/skills, territories, Heat/remainder and savedAt are preserved exactly.
+Earlier migration steps still emit their historical shapes. CE1 transport is
+unchanged. Import preserves explicit recruits/assignments without payment,
+recruitment feedback, requirement checks or historical simulation; it rebases timing
+and durably writes before replacement. Export reconciles first as before.
+
+The adjacent Solara City Crew panel has three text-first cards and two named slots,
+central requirements/affordability, inactive/active states, replacement labels and
+unassignment controls. Pure selectors supply all eligibility, compatibility and
+active effects. Counts and feedback are presentation-only. Responsive grids,
+semantic buttons and existing focus/reduced-motion styles are retained. Rebirth's
+keep/lose summary includes Crew. No automatic assignment, portraits, levels, XP,
+rarity, wages, traits or Random Events exist. The next city-system slice is deferred.

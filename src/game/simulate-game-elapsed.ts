@@ -1,3 +1,4 @@
+import { getHeatDecayIntervalMs } from './heat-decay-interval';
 import { decayHeat } from '../features/heat';
 import { isElapsedMs } from '../features/economy';
 import { requireXp } from '../features/progression';
@@ -20,6 +21,6 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   if (!automation.ok) return { ...automation, state };
   const income = subtractMoney(business.state.economy.cash, state.economy.cash);
   if (!income.ok) throw new Error('Production must not reduce cash');
-  const city = decayHeat(automation.state.city, elapsedMs);
+  const city = decayHeat(automation.state.city, elapsedMs, getHeatDecayIntervalMs(state));
   return { ...automation, state: city === automation.state.city ? automation.state : { ...automation.state, city }, businessIncome: income.value };
 }
