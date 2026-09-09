@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 8C: Late-Game Automation Foundation.**
+idle/tycoon browser game. **Phase 9A: UX & Information Architecture.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -32,7 +32,7 @@ Corrupt/newer saves are preserved with a warning and saving disabled for that
 session unless you explicitly confirm importing a replacement. Storage failures are
 shown in-game. No cloud saves exist.
 
-Use **Save management → Export save** to generate a `CE1-` backup code. Copy it
+Use **Empire → Save & Transfer → Export save** to generate a `CE1-` backup code. Copy it
 with the button or select the text manually if clipboard access is unavailable.
 To restore, paste a code, validate it, then confirm replacing current progress and
 the local save. Cancel keeps your progress. Codes are not encrypted or secret.
@@ -79,7 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C live verification remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C and all of Phase 8 were manually verified live by the user. Phase 9A live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -173,3 +173,10 @@ and controlled Neon Mile. It starts **disabled**: explicitly enable automatic
 spending to attempt one paid Dockside level upgrade every 30 seconds, online and
 offline. Disabled progress pauses. Each successful purchase uses the same price,
 XP and lifetime upgrade counter as a manual upgrade. It resets on Rebirth.
+
+
+Navigate with **Overview, Operations, City, Collection and Empire**. Overview is a
+live summary; Operations manages earning and automation, City manages districts/Heat/
+Crew/Events, Collection holds the Garage, and Empire holds permanent progression and
+save transfer. Cash, Level, Heat and EP remain global. Switching sections never pauses
+the game or changes your save.

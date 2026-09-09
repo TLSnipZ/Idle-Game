@@ -1983,10 +1983,9 @@ exception, observational isolation and final-state Heat semantics.
 
 ## Phase 8C — Business Auto-Upgrader foundation
 
-Phase 8B was manually verified live by the user. Phase 8C implementation is complete;
-**live verification is pending**. Phase 8 implementation is complete for the current
-roadmap block, subject to this final live verification. Phase 9 and broader automation
-expansion remain deferred.
+Phase 8B and Phase 8C were manually verified live by the user. The current Phase 8
+roadmap block is complete and fully verified live. Phase 9A follows below; broader
+automation expansion remains deferred.
 
 Exactly one new automation joins Delivery Dispatcher in `features/automation`:
 `automation:business-auto-upgrader`, displayed as **Business Auto-Upgrader**. The
@@ -2122,3 +2121,75 @@ price/level/progress, and reuses native progress controls and responsive styles.
 No target selector, reserve, budget, second new automation, cloud feature or Phase 9
 polish is included. Future work must preserve opt-in spending, exact chronological
 funding, outer Dispatcher/Heat/Event contracts and durable atomic publication.
+
+
+## Phase 9A — presentation information architecture
+
+Exactly five primary sections are defined in `src/app/navigation.ts`, in a fixed
+order: OVERVIEW, OPERATIONS, CITY, COLLECTION, EMPIRE. `SectionId` and the small
+presentation catalog are the shared identity source. Every load defaults to
+Overview. Selection lives in `GameShell` React state only: no router, hash storage,
+GameState field, localStorage key, migration or navigation-dependent requirement.
+
+`App` mounts `useGame` exactly once above `GameShell`. Only the active section's
+management tree renders. Section selection only updates React state and keyboard
+focus/scroll position; it never calls a command, reconcile, RNG, save or bootstrap.
+The original 250ms runtime and autosave remain active regardless of visible content.
+Production, Dispatcher, Heat, Crew, Events, achievements/statistics and Auto-Upgrader
+use the exact Phase 8C domain and platform implementation, unchanged by this phase.
+
+- Overview summarizes cash, derived player XP/level, current total effective business
+  production, Heat/tier, territories, recruited/active Crew, EP/Rebirth readiness,
+  events and Garage count. Shortcuts navigate without executing gameplay actions.
+- Operations contains the starter job, business purchase/level upgrades and modifier
+  breakdown, normal upgrades, then both automation cards with their existing controls.
+- City contains Solara City/territories, Heat/Lay Low, Crew assignments/recruitment and
+  City Events with both choices. Pending events do not block any other section.
+- Collection contains the existing Garage/Vortex S9 only.
+- Empire contains Rebirth/EP, Empire Foundations, Achievements, Statistics, then
+  Save & Transfer with the original export/validation/confirm/cancel flows.
+
+Global status derives Cash/Level/Heat/EP from existing selectors. Event and spending
+indicators route to City or Operations only. The Auto-Upgrader indicator distinguishes
+an enabled but paused session from running automatic spending. It is not a second toggle.
+The current palette, system fonts and existing decorative artwork remain unchanged.
+The compact top navigation uses five columns on desktop and wraps to three on mobile;
+all five native buttons remain available, with `aria-current`, visible focus and
+44px minimum targets. Short viewports use non-sticky status to leave content accessible.
+Overview and automation use responsive grids; long Money/requirements wrap rather than
+introducing horizontal scrolling. No section-specific scheduler exists.
+
+`dashboardPresentation` composes existing selectors. Total production sums the exact
+central evaluated rational rates and formats them using `formatProduction`; it never
+caches an authoritative rate. Money continues using `formatCash`. Short Heat/automation
+countdowns remain ceiling seconds, Event opportunities remain MM:SS, and offline
+absence remains the existing duration formatter. These contextual formats and exact
+millisecond semantics are retained; no economy values were reformatted into new units.
+
+Command, achievement, level/unlock, event-spawn and Dispatcher feedback live outside
+the active section. Offline welcome/upgrade spending summaries and persistence/failure
+messages are global too. Announcement identities remain the existing sequence IDs;
+navigation does not create another announcement or persisted notification history.
+The detailed Achievements and Events cards no longer receive the global announcement
+prop, preventing duplicate render-time announcements when visiting them.
+
+Small extracted `useSaveManagement` and `useRebirthControls` hooks reuse the existing
+pure controllers. `GameShell` retains these above the conditional views, preserving
+import draft, exported text, validated code and confirmation state across section
+changes. A pending-confirmation shortcut returns to Empire. Only the existing explicit
+confirmation can call a destructive command. Success/cancel/errors remain in the
+Empire views and are also shown globally when Empire is inactive. Import preserves
+the current UI section and replaces only the authoritative game state as before.
+
+**Save remains v15; CE1 remains unchanged.** All six achievements, eight statistics,
+prices, requirements, timings, ownership and persistence contracts are unchanged.
+No Phase 9B/9C or final Rebranding work is included. Future Rebranding may replace
+styling/assets while preserving this information architecture and action mapping.
+See `docs/UX_CHECKLIST.md` for feature coverage and visual-review limitations.
+
+A development-only Happy DOM environment exercises real mounted React navigation
+with the existing injected runtime clocks and storage. It verifies no extra runtime
+construction, time reads, writes or RNG from navigation, and retained import/Rebirth
+controllers through actual unmount/remount of the section views. This is a test
+harness only; no new runtime dependency, router or browser automation framework is
+shipped. DOM tests do not substitute for the pending real-browser visual review.

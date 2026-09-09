@@ -4,9 +4,13 @@ import type { SaveActions, SaveManagementState } from './save-management';
 import { MAX_CODE_LENGTH } from '../game/save-code';
 
 export function SaveManagement({ actions }: { readonly actions: SaveActions }) {
+  const { state, controls } = useSaveManagement(actions);
+  return <SaveManagementView state={state} controls={controls} />;
+}
+export function useSaveManagement(actions: SaveActions) {
   const [state, setState] = useState(INITIAL_SAVE_MANAGEMENT);
   const [controls] = useState(() => createSaveManagement(actions, setState));
-  return <SaveManagementView state={state} controls={controls} />;
+  return { state, controls };
 }
 
 export function SaveManagementView({ state, controls }: {

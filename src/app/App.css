@@ -205,3 +205,52 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .statistics-entry dd { margin: .5rem 0 0; }
 .statistics-entry strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
 .statistics-entry p { margin-bottom: 0; }
+
+/* Phase 9A: presentation hierarchy; existing palette and artwork stay intact. */
+.foundation { width: min(100%, 90rem); margin: 0 auto; padding: 1.5rem clamp(1rem, 3vw, 3rem) 2rem; }
+.global-chrome { position: sticky; top: 0; z-index: 5; background: #101722; border-block: 1px solid var(--color-border); }
+.global-chrome-inner { max-width: 90rem; margin: auto; padding: .65rem clamp(1rem, 3vw, 3rem); }
+.global-status { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: .5rem 1rem; margin: 0 0 .65rem; }
+.global-status div { min-width: 0; }
+.global-status dt { color: var(--color-muted); font-size: .75rem; }
+.global-status dd { margin: .2rem 0 0; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.primary-navigation { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .4rem; }
+.primary-navigation button, .global-indicators button { min-width: 0; min-height: 44px; padding: .6rem; border: 1px solid var(--color-border); border-radius: .5rem; color: var(--color-text); background: transparent; font: inherit; font-size: .85rem; font-weight: 650; cursor: pointer; overflow-wrap: anywhere; }
+.primary-navigation button[aria-current="page"] { background: #81e6dc18; border-color: var(--color-cool); color: var(--color-cool); box-shadow: inset 0 -3px var(--color-cool); }
+.primary-navigation button:focus-visible, .global-indicators button:focus-visible { outline: 2px solid var(--color-cool); outline-offset: 2px; }
+.global-indicators { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; align-items: center; }
+.global-indicators button { font-size: .75rem; color: var(--color-cool); }
+.global-feedback { margin-bottom: 1rem; font-size: .85rem; overflow-wrap: anywhere; }
+.global-feedback > div:empty, .global-feedback > div:has(> span:empty) { display: none; }
+.global-feedback > div:not(:empty) { margin-bottom: .4rem; }
+.persistence-note { color: var(--color-muted); font-size: .75rem; margin: .4rem 0; }
+.section-heading { margin: 1.5rem 0; }
+.section-heading h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); scroll-margin-top: 13rem; }
+.section-heading p { color: var(--color-muted); line-height: 1.5; }
+.section-stack { display: grid; gap: 2rem; }
+.overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.summary-card, .starter-panel { padding: clamp(1rem, 3vw, 1.5rem); overflow-wrap: anywhere; }
+.summary-card { display: flex; flex-direction: column; align-items: stretch; }
+.summary-card h2 { font-size: .9rem; letter-spacing: .06em; }
+.summary-card p { line-height: 1.5; }
+.summary-value { font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.section-shortcut { color: var(--color-cool); background: #81e6dc0a; border-color: #81e6dc50; margin-top: auto; }
+.starter-panel .delivery-block { border: 0; padding-top: .5rem; }
+.starter-panel .reward { flex-shrink: 1; white-space: normal; overflow-wrap: anywhere; }
+.automation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.automation-grid > .panel { margin: 0; }
+.section-stack > .panel { padding: clamp(1rem, 3vw, 1.5rem); }
+.section-stack .action-button:not(.purchase-button):not(.delivery-button):not(.rebirth-button), .overview-grid .action-button { color: var(--color-cool); background: #81e6dc0a; border-color: #81e6dc50; }
+.section-stack .action-button:disabled { color: #adb7c6; background: #ffffff05; border-color: #ffffff1a; }
+.section-stack .action-button { white-space: normal; overflow-wrap: anywhere; }
+.section-stack .panel-heading, .global-status { overflow-wrap: anywhere; }
+@media (max-width: 1000px) { .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 740px) {
+  .app-header { padding: 1rem; }
+  .global-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .primary-navigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .overview-grid, .automation-grid { grid-template-columns: minmax(0, 1fr); }
+  .global-chrome-inner { padding: .5rem 1rem; }
+  .section-heading h1 { scroll-margin-top: 21rem; }
+}
+@media (max-height: 600px) { .global-chrome { position: static; } .section-heading h1 { scroll-margin-top: 1rem; } }

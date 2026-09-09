@@ -9,9 +9,13 @@ import type { RebirthControlsState } from './rebirth-controls';
 export function RebirthPanel({ state, unavailable, onRebirth }: {
   readonly state: GameState; readonly unavailable: boolean; readonly onRebirth: () => RebirthTransactionResult;
 }) {
+  const { interaction, controls } = useRebirthControls(onRebirth);
+  return <RebirthPanelView preview={selectRebirth(state)} unavailable={unavailable} interaction={interaction} controls={controls} />;
+}
+export function useRebirthControls(onRebirth: () => RebirthTransactionResult) {
   const [interaction, setInteraction] = useState(INITIAL_REBIRTH_CONTROLS);
   const [controls] = useState(() => createRebirthControls(onRebirth, setInteraction));
-  return <RebirthPanelView preview={selectRebirth(state)} unavailable={unavailable} interaction={interaction} controls={controls} />;
+  return { interaction, controls };
 }
 export function RebirthPanelView({ preview, unavailable, interaction, controls }: {
   readonly preview: ReturnType<typeof selectRebirth>; readonly unavailable: boolean;

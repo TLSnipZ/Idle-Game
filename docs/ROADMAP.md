@@ -32,8 +32,11 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 7D — Random Events (complete; user verified live) | Three events, two choices each, injected RNG, online-only opportunities, v12 migration | Atomic choices, one pending event, offline exclusion, Rebirth reset and deterministic tests |
 | 8A — Achievement Foundation (complete; user verified live) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
 | 8B — Lifetime Statistics Foundation (complete; user verified live) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
-| 8C — Late-Game Automation Foundation (implementation complete; live pending) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
-| 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
+| 8C — Late-Game Automation Foundation (complete; user verified live) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
+| 9A — UX & Information Architecture (implementation complete; live pending) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
+| 9B — Accessibility & Interaction Polish (next / deferred) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
+| 9C — Balance review (deferred) | Deliberate economy review | Explicitly scoped values and regression evidence |
+| Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
 ## Current status
 
@@ -197,16 +200,25 @@ The user manually verified all eight statistics, repeated actions across Rebirth
 Peak Heat permanence, offline Dispatcher counts and CE1 preservation in the live
 Phase 8B build. Statistics remain observational.
 
-Phase 8C Late-Game Automation Foundation implementation is complete; **live
-verification is pending**. One Business Auto-Upgrader costs $250,000, requires
+Phase 8C Late-Game Automation Foundation implementation is complete and **manually
+verified live by the user**. One Business Auto-Upgrader costs $250,000, requires
 Level 20 / Dockside Level 25 / Neon Mile, starts disabled and attempts a paid
 Dockside upgrade every 30 seconds when enabled. Production/spending respects purchase
 boundaries, while Dispatcher XP/Heat and Event RNG retain outer-batch semantics.
 Manual upgrade rules, individual XP flooring and statistics are reused. Shared
 offline operation, durable publication, Rebirth reset and v14→v15 migration are tested.
-CE1 is unchanged. No generic auto-buyer, reserve, new content or Phase 9 work exists.
+CE1 is unchanged. No generic auto-buyer, reserve or Phase 9 work was added in 8C.
 
-The currently planned **Phase 8 implementation block is complete; final live
-verification remains pending until the user verifies Phase 8C**. Phase 9 is not
-complete or started. Broader automation expansion remains separately scoped and
+The currently planned **Phase 8 block is complete and fully manually verified live**: Achievements, Statistics and Business Auto-Upgrader. Phase 9A follows below; Phase 9 as a whole remains incomplete. Broader automation expansion remains separately scoped and
 deferred, alongside collection expansion and other future work.
+
+
+Phase 9A UX & Information Architecture implementation is complete; **live verification
+is pending**. OVERVIEW, OPERATIONS, CITY, COLLECTION and EMPIRE organize every existing
+feature. Cash/Level/Heat/EP and pending Event/active spending indicators remain global.
+Navigation is local React state; one central runtime continues independently. Import
+and Rebirth controllers retain their interaction state above the active section.
+Save v15, CE1, balance, all content catalogs and timing remain unchanged.
+[The feature review checklist](UX_CHECKLIST.md) maps the previous page to the sections.
+Phase 9B Accessibility & Interaction Polish is next/deferred; Phase 9C balance review
+and post-roadmap Rebranding have not begun. No new artwork, palette or fonts were added.
