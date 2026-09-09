@@ -17,6 +17,15 @@ Phase 9B accessibility remain preserved contracts.
   **manually reviewed live by the user; canonical KX-R visually approved**. One vehicle only; Save v16 / CE1.
 - POST 2D: **Interaction & Progression Polish implemented; live verification pending**.
   In-section focus/scroll stability, global HUD XP, Rebirth Ready and compact KX-R layout.
+- POST 3A: **Business Expansion I design and deterministic analysis complete**;
+  [BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md) is the proposed POST 3B contract.
+  Current production remains Dockside only, Save v16 / CE1; no live changes.
+- POST 3B: **Business Expansion I Implementation — planned, not started**.
+  Implement the three proposed packages, shared Business cards/production and one
+  selected Auto-Upgrader target; recommended v17 migration preserves existing state.
+- POST 3C: **Operations Long-Section Navigation / UX — planned** immediately after
+  POST 3B deployment and live verification. Then Reset Progress, Next Objective /
+  Guidance, Active Vehicle / Tier 1 Garage and Heat / Police 2.0, subject to live defects.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately
@@ -120,3 +129,26 @@ Baseline comparison confirms both KX-R assets, save/schema/export, XP/Rebirth
 rules and all domain/platform code are unchanged. No dependency changes.
 Authenticated GitHub shell credentials were unavailable; no push was attempted.
 The original unrelated GAME_DESIGN.md edit remains untouched outside this task.
+
+## POST 3A verification and handoff
+
+Business Expansion I design and evidence are complete in BUSINESS_EXPANSION.md.
+Fresh npm ci, typecheck, tests, build and git diff --check passed: **1,908 tests
+in 92 files**, including eight isolated analysis cases. Current controls reuse
+the prior balance policy; proposed runs use real commands/rational production
+with test-only lookup data. Active, idle, optimized, investment/vehicle/Nights
+sensitivities and an actual second-run reset are documented with their limits.
+
+All previously tracked non-documentation files match POST 2D byte-for-byte.
+Production still has one Business; Save v16/CE1 and all historical migrations,
+runtime safeguards, balance, assets and dependencies remain unchanged. Built
+browser JavaScript excludes the proposed IDs and analysis catalog. No visual
+change or new deployed verification is claimed. The unrelated GAME_DESIGN.md
+edit is preserved outside this task checkout. GitHub shell credentials are
+unavailable; retain the single local design commit without a push.
+
+POST 3B needs explicit implementation authorization: use the exact proposed
+packages, preserve pooled fractions and historical validators, and introduce
+one selected automation target with the recommended v17 migration. Monitor XP
+pacing and higher Dockside/EP accumulation under enabled offline automation.
+POST 3C Operations navigation follows successful deployed/live 3B verification.

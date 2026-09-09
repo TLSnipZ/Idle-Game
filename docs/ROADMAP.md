@@ -305,3 +305,14 @@ navigation and compact desktop Garage. Save v16, CE1, canonical assets and all
 balance/runtime contracts are unchanged. POST_ROADMAP.md owns the current backlog;
 HUD XP is resolved, while broader Guidance, Reset Progress and Garage expansion
 remain future separate scopes. No automatic next phase.
+
+## POST 3A design handoff
+
+Business Expansion I design/analysis is complete; production still contains only
+Dockside Detail, Save v16 / CE1. [BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md)
+records concrete **proposed** Neon Laundry, Afterdark Customs and Solara Nights
+packages, deterministic control/proposed pacing, risks and the POST 3B contract.
+POST 3B implementation is next, including one selected Auto-Upgrader target and
+the recommended v17 migration. Neither is implemented here. After deployed/live
+3B verification, prioritize POST 3C Operations Long-Section Navigation / UX.
+POST_ROADMAP.md retains Reset, Guidance, Garage and other deferred priorities.

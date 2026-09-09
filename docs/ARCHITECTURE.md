@@ -2413,3 +2413,19 @@ is ephemeral, not Save state. Review Rebirth only changes local section/target
 request, then focuses and instantly scrolls to `rebirth-heading`; it neither opens
 confirmation nor calls the runtime, clock, RNG or storage. The existing panel's
 Review/Cancel/Confirm flow still owns actual Rebirth.
+
+## POST 3A planning boundary — no runtime change
+
+[BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md) owns the proposed POST 3B economy
+and migration contract. Current Business ownership is already a sparse keyed map;
+extend it rather than replace it. Preserve per-ID scoped modifier evaluation and
+the shared milli-cent/sub-milli-cent remainder when aggregating production.
+
+Save remains v16 / CE1. A future v17 is recommended for the selected Auto-Upgrader
+target, defaulting to Dockside while preserving ownership, enablement, elapsed
+progress, fractions and unrelated state. Freeze historical Business-ID and
+automation-shape validation before widening the current catalog. New Businesses
+start unowned; no historical simulation. One owned target, existing 30s cadence,
+reconcile-before-target-change and atomic publication remain the future contract.
+The isolated analysis test's catalog injection is not historical-save validation
+or production implementation. No new content/schema/UI is shipped in POST 3A.
