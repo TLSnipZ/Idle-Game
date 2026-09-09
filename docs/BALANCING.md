@@ -250,3 +250,10 @@ repeat post-Rebirth actions, never assignments; every successful event choice co
 including PASS, never spawn/discard. Rebirth increments both counts atomically.
 Peak Heat is the maximum final authoritative Heat observed, not a reconstructed
 within-batch maximum. No balance evaluator reads achievements or statistics.
+
+
+## Base Game freeze
+
+Phase 9E retains every post-9C value above unchanged. Future expansion balance work
+must be explicitly scoped; this release audit grants no refunds, compensation or
+retrospective recalculation of stored progression.

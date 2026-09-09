@@ -69,6 +69,27 @@ describe('v15 automation migration and strict validation',()=>{
       ...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{}),...(version>=11?{crew:s.crew}:{}),...(version>=12?{events:s.events}:{})};
     const result=validateSaveCode(encodeSaveText(JSON.stringify(envelope(state,version))));expect(result).toMatchObject({ok:true,envelope:{version:15,savedAt:123456789,state:{economy:s.economy,
       automation:{unlockedIds:version>=4?[D.id]:[],starterJobElapsedMs:version>=4?7000:0,enabledIds:[],businessAutoUpgradeElapsedMs:0}}}});
+    // Release matrix: verify every historical slice, not just version/cash/automation.
+    if (!result.ok) throw Error(result.error);
+    const fresh = createInitialGameState();
+    expect(result.envelope.state).toEqual({
+      ...fresh, economy: s.economy,
+      businesses: { owned: version === 1 ? { 'business:dockside-detail': { level: 1 } } : s.businesses.owned,
+        productionRemainderMilliCents: 975,
+        productionRemainderSubMilliCents: version >= 3 ? s.businesses.productionRemainderSubMilliCents : fresh.businesses.productionRemainderSubMilliCents },
+      upgrades: version >= 3 ? s.upgrades : fresh.upgrades,
+      automation: { ...fresh.automation, unlockedIds: version >= 4 ? [D.id] : [], starterJobElapsedMs: version >= 4 ? 7000 : 0 },
+      progression: version >= 5 ? s.progression : fresh.progression,
+      garage: version >= 6 ? s.garage : fresh.garage,
+      permanentProgression: { empirePoints: version >= 7 ? 17 : 0, rebirthCount: version >= 7 ? 4 : 0,
+        skills: version >= 8 ? s.permanentProgression.skills : {},
+        unlockedAchievementIds: version >= 13 ? s.permanentProgression.unlockedAchievementIds : [],
+        statistics: version >= 14 ? s.permanentProgression.statistics : { ...fresh.permanentProgression.statistics, rebirthsCompleted: version >= 7 ? 4 : 0 } },
+      city: version >= 10 ? s.city : version === 9 ? { ...fresh.city, ownedTerritoryIds: s.city.ownedTerritoryIds } : fresh.city,
+      crew: version >= 11 ? s.crew : fresh.crew,
+      events: version >= 12 ? s.events : fresh.events,
+    });
+    expect(validateSaveState(result.envelope.state)).toEqual(result.envelope.state);
   });
   it('rejects v14 claiming future ownership or fields instead of silently granting it',()=>{
     const s=autoUpgraderState();expect(parseSave(JSON.stringify(envelope(s,14)))).toEqual({ok:false,error:'invalid-state'});

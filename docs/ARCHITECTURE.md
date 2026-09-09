@@ -2292,3 +2292,16 @@ is not a reason to suppress it. Only the active primary presentation tree render
 central runtime, confirmation controllers and stable polite feedback remain mounted.
 No blanket memoization, new timers, worker, cache, dependency or accessibility setting
 was introduced. See RUNTIME_HARDENING.md for the audit/test coverage and limitations.
+
+
+## Phase 9E — Base Game freeze contract
+
+Save v15 is the frozen current Base Game schema; CE1 remains its transport. Future
+authoritative-state additions require explicit sequential migrations, preservation
+of stored progress, and compatible stable content IDs. Future migrations are allowed,
+not implicit. Navigation, focus, runtime caches and release metadata stay outside
+GameState. Central command reconciliation, exact production fractions, Dispatcher
+outer batching, Event RNG boundaries, 4,096-segment safety, and durable offline /
+import / Rebirth replacement remain architectural contracts. Phase 9E adds release
+regressions and documentation only; no production implementation changes were needed.
+See BASE_GAME_RELEASE.md for the verification matrix and pending live verification.

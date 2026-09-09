@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 9C: Balance & Progression Pass.**
+idle/tycoon browser game. **Phase 9E: Base Game release candidate; live verification pending.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -79,7 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C and all of Phase 8 were manually verified live by the user. Phase 9A was manually verified live by the user. Phase 9B was manually verified live by the user. Phase 9C live verification remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B was manually verified live by the user. Phase 8C and all of Phase 8 were manually verified live by the user. Phase 9A was manually verified live by the user. Phase 9B was manually verified live by the user. Phases 9C and 9D were manually verified live by the user. Phase 9E live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -123,11 +123,9 @@ it or force-push this standalone foundation.
 
 ## Foundation verification
 
-Passed: `npm ci --no-audit --no-fund`, `npm run build` (including
-`tsc --noEmit`), and `git diff --cached --check`. Built JS/CSS references were
-checked for existing files and relative resolution beneath a repository path.
-Browser visual/interaction testing was not run; no behavioral test suite exists
-yet because Phase 0 has no gameplay behavior.
+The current release audit, automated verification matrix and browser-review limits
+are recorded in [BASE_GAME_RELEASE.md](docs/BASE_GAME_RELEASE.md). Save v15 and
+CE1 remain compatible; the Base Game freeze adds no content or balance changes.
 
 
 Rebirth becomes available at Player Level 20 and Dockside Level 25. Review the

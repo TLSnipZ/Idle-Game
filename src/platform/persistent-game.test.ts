@@ -190,7 +190,10 @@ describe('portable runtime transactions', () => {
     f.advance(AUTOSAVE_CADENCE_MS);
     expect(f.storage.setItem).toHaveBeenCalledTimes(2);
   });
-  it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION + 1, savedAt: 0, state: owned() }))])('failed validation preserves both state and save %#', code => {
+  it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION + 1, savedAt: 0, state: owned() })),
+    ...[{ economy: { cash: 123 } }, { progression: { xp: -1 } }, { garage: { ownedVehicleIds: ['vehicle:unknown'] } }]
+      .map(invalid => encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 15, savedAt: 0, state: { ...owned(), ...invalid } }))),
+  ])('failed validation preserves both state and save %#', code => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     const original = game.getSnapshot().result.state;
     f.at(1100);

@@ -36,8 +36,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 9A — UX & Information Architecture (complete; user verified live) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
 | 9B — Accessibility & Interaction Polish (complete; user verified live) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
 | 9C — Balance & Progression Pass (complete; user verified live) | Deterministic progression audit; three acquisition adjustments | Reproducible models, unchanged v15/CE1 and runtime contracts |
-| 9D — Performance & Runtime Hardening (implementation complete; live pending) | Runtime/performance review | Preserve post-9C balance, deterministic batching and durable persistence |
-| 9E — Release Candidate / Base Game Freeze (next / deferred) | Regression verification and release readiness | Preserve balance, v15/CE1, runtime and accessibility contracts |
+| 9D — Performance & Runtime Hardening (complete; user verified live) | Runtime/performance review | Preserve post-9C balance, deterministic batching and durable persistence |
+| 9E — Release Candidate / Base Game Freeze (implementation complete; live pending) | Regression verification and release readiness | Preserve balance, v15/CE1, runtime and accessibility contracts |
 | Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
 ## Current status
@@ -241,7 +241,7 @@ keep their exact state; v15/CE1, rewards, production, Heat, batching, Events,
 automation chronology, achievements/statistics, offline durability and 9A/9B UI
 contracts remain unchanged. No new content or system was added.
 
-**Phase 9D Performance & Runtime Hardening is implemented; live verification is pending**, with explicit
+**Phase 9D Performance & Runtime Hardening is complete and manually verified live by the user**, with explicit
 preservation of post-9C balance, Dispatcher XP/Heat batching, Mara remainder,
 outer Event RNG/online-only opportunities, Auto-Upgrader chronology, offline
 write-before-publication, import timing, achievement/statistics semantics and
@@ -256,8 +256,9 @@ protect existing behavior. Max-level collapse, disabled/unowned unsplit simulati
 250ms refresh and five-second autosave were reviewed and retained. No balance,
 schema, content, render architecture or dependency change was needed.
 
-**Phase 9E Release Candidate / Base Game Freeze is next/deferred.** Preserve post-9C
-balance, all 9D safeguards, v15/CE1, deterministic Event RNG, offline durability,
-atomic import/Rebirth, Phase 9A navigation and Phase 9B accessibility. Prioritize
-regression verification and release readiness, not new features. Phase 9 remains
-incomplete; Rebranding has not started.
+**Phase 9E Release Candidate / Base Game Freeze implementation is complete; live
+verification is pending.** [BASE_GAME_RELEASE.md](BASE_GAME_RELEASE.md) records the
+release matrix, migration preservation, legal progression/Rebirth regressions and
+review limits. No production bug fix, balance change, schema change or new content
+was needed. Phase 9 / Base Game is not yet marked live verified: that requires the
+user's deployed Phase 9E confirmation. Post-roadmap Rebranding remains not started.
