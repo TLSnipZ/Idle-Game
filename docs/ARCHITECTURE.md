@@ -2193,3 +2193,51 @@ construction, time reads, writes or RNG from navigation, and retained import/Reb
 controllers through actual unmount/remount of the section views. This is a test
 harness only; no new runtime dependency, router or browser automation framework is
 shipped. DOM tests do not substitute for the pending real-browser visual review.
+
+
+## Phase 9B — accessibility and interaction polish
+
+Phase 9A was manually verified live by the user. Phase 9B is implemented; live and
+assistive-technology verification remain pending. These changes are presentation-only:
+**save v15, CE1, GameState, runtime, requirements and all gameplay formulas are unchanged**.
+
+The five native navigation buttons retain their order/default, `aria-current="page"`,
+and an underline as well as color/border for the current section. One main and one
+active h1 remain; business, automation and save subsection headings now reflect their
+nesting. Skip to main content explicitly focuses the existing `main` anchor target.
+Section changes deliberately focus the section heading; runtime updates never do so.
+No custom tab/arrow-key widget or saved focus state is introduced.
+
+A small `useActionFocus` hook observes activation of a currently focused button only.
+If that action removes/disables the button, it focuses the surviving enclosing card
+heading, unless another control already received focus. Event resolution, Crew actions
+and completed purchases therefore have a predictable destination. It does not respond
+to unrelated runtime changes or add commands, clock reads, storage or RNG calls.
+Rebirth and import remain **inline groups**, not modal dialogs. Rebirth retains its
+cancel-first entry and heading return; explicit import validation now focuses Cancel
+when confirmation opens, and confirm/cancel return to Validate import. Navigation
+retains the existing controllers and never executes confirmation.
+
+Stable global polite regions retain discrete command, achievement, level, event and
+storage-error feedback. Routine Dispatcher output remains visible on demand but is
+no longer announced every cycle, either globally or on the automation card. Successful
+autosave status is also ordinary text. Cash and progress/countdown displays remain
+outside live regions. Import feedback is associated with its visibly labeled input;
+the existing validation result also supplies ephemeral `aria-invalid` state. No parser
+or transaction changes were made. Exported codes remain read-only/selectable.
+
+Native progress elements expose Heat/tier (0–100), within-level XP (MAX LEVEL rather
+than Level 101), and named Dispatcher/Auto-Upgrader progress with associated countdown
+text. Enable/disable remains a native action button with a changing action name and
+an associated explicit enabled/disabled description, not an ARIA switch or pressed
+button with a changing label. Event choices form a named group with event context,
+visible deterministic outcomes and native disabled affordability semantics.
+
+Shared 3px focus-visible outlines, existing >=44px controls, spaced confirmation
+buttons and wrapping badges/metrics support keyboard and touch use. Narrow screens
+use non-sticky global chrome to avoid obscuring enlarged content. The centralized
+reduced-motion media query removes nonessential animation/transitions and smooth
+scroll behavior, without accessing gameplay timers. Existing palette tokens remain:
+representative text and focus contrast pairs passed a numerical spot-check, so no
+rebrand or token adjustment was needed. See `ACCESSIBILITY_REVIEW.md` for evidence
+and the limits of DOM/style checks versus real-browser/assistive-technology review.

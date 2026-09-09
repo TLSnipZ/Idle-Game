@@ -22,7 +22,7 @@ function render(s=state(),paused=false){return renderToStaticMarkup(<HeatPanel s
 describe('Heat presentation and city interaction',()=>{
   it.each([[0,'COLD'],[20,'NOTICED'],[40,'WATCHED'],[60,'HOT'],[80,'MANHUNT'],[100,'MANHUNT']] as const)('shows exact bounded Heat and readable tier at %i', (heat,label)=>{
     const html=render(state(heat));expect(html).toContain('HEAT');expect(html).toContain(`${heat} / 100 — ${label}`);
-    expect(html).toContain(`aria-label="Current Heat" max="100" value="${heat}"`);
+    expect(html).toContain(`aria-label="Current Heat: ${heat} of 100, ${label}" max="100" value="${heat}"`);
     expect(html).toContain('XP and business production unaffected');
     expect(html).not.toMatch(/wanted-star|siren|police encounter/);
   });

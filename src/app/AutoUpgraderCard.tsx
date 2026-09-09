@@ -10,19 +10,20 @@ export function AutoUpgraderCard({ view, paused, onPurchase, onToggle }: {
   readonly onToggle: (enabled: boolean) => void;
 }) {
   return <section className="panel upgrade-panel" aria-labelledby="auto-upgrader-heading">
-    <div className="panel-heading"><h2 id="auto-upgrader-heading">BUSINESS AUTO-UPGRADER</h2>
+    <div className="panel-heading"><h3 id="auto-upgrader-heading">BUSINESS AUTO-UPGRADER</h3>
       {view.owned && <span className="ownership-badge is-owned">{paused ? 'PAUSED' : view.enabled ? 'ACTIVE' : 'DISABLED'}</span>}
     </div>
     <p>{view.definition.description}</p>
     <p id="auto-upgrader-spending">Automatically spends cash on Dockside upgrades when affordable.</p>
     {view.owned ? <>
+      <p id="auto-upgrader-state">Automatic spending: {view.enabled ? 'enabled' : 'disabled'}{paused ? ' · Session paused' : ''}.</p>
       <p>{view.level === null ? 'Dockside not owned — no upgrades available.' : `Dockside Level ${view.level}`}</p>
       {view.maxed ? <p>MAX LEVEL</p> : view.nextCost !== null && <p>Next upgrade: <strong>{formatCash(view.nextCost)}</strong>
         {!view.canAffordNextUpgrade && ' · More cash needed'}</p>}
-      <label htmlFor="auto-upgrader-progress">Next attempt in {formatRemainingTime(view.remainingMs)}{!view.enabled || paused ? ' · Progress paused' : ''}</label>
-      <progress id="auto-upgrader-progress" max={view.definition.intervalMs} value={view.progressMs} />
+      <label id="auto-upgrader-timing" htmlFor="auto-upgrader-progress">Next attempt in {formatRemainingTime(view.remainingMs)}{!view.enabled || paused ? ' · Progress paused' : ''}</label>
+      <progress aria-label="Business Auto-Upgrader attempt progress" aria-describedby="auto-upgrader-timing auto-upgrader-state" id="auto-upgrader-progress" max={view.definition.intervalMs} value={view.progressMs} />
       <button className="action-button purchase-button" disabled={paused || !view.canToggle}
-        aria-label={`${view.enabled ? 'Disable' : 'Enable'} Business Auto-Upgrader`} aria-describedby="auto-upgrader-spending"
+        aria-label={`${view.enabled ? 'Disable' : 'Enable'} Business Auto-Upgrader`} aria-describedby="auto-upgrader-spending auto-upgrader-state"
         onClick={() => onToggle(!view.enabled)}>{view.enabled ? 'DISABLE' : 'ENABLE'}</button>
     </> : <>
       <p>Price: <strong>{formatCash(view.definition.purchaseCost)}</strong></p>

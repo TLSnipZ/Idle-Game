@@ -25,7 +25,7 @@ export function BusinessCard({ progress, onUpgrade, owned, canPurchase, paused, 
       </div>
       <div className="business-content">
         <div className="panel-heading"><span className="eyebrow">Your first business</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{owned ? '✓ ' : ''}{view.status}</span></div>
-        <h2 id="business-name">{STARTER_BUSINESS.name}</h2>
+        <h3 id="business-name">{STARTER_BUSINESS.name}</h3>
         {progress && <p>Level {progress.level}</p>}
         <p className="business-description">{STARTER_BUSINESS.description}</p>
         <div className="business-terms">
@@ -41,7 +41,7 @@ export function BusinessCard({ progress, onUpgrade, owned, canPurchase, paused, 
           {progress.upgradeCost && <div><span className="metric-label">Upgrade price</span><strong>{formatCash(progress.upgradeCost)}</strong></div>}
         </div>}
         {progress && progress.modifiers.length > 0 && <div className="purchase-note"><p>Base at Level {progress.level}: {formatCash(progress.baseProduction)}/sec</p><ModifierBreakdown modifiers={progress.modifiers} /><p>Effective: {formatProduction(progress.production)}/sec</p></div>}
-        <button className="action-button purchase-button" disabled={progress ? paused || !progress.canUpgrade : view.disabled} onClick={progress ? onUpgrade : onPurchase} aria-describedby="purchase-note">
+        <button className="action-button purchase-button" disabled={progress ? paused || !progress.canUpgrade : view.disabled} onClick={progress ? onUpgrade : onPurchase} aria-label={progress ? `Upgrade ${STARTER_BUSINESS.name}${progress.upgradeCost === null ? ", maximum level reached" : ` to Level ${progress.level + 1}`}` : `Buy ${STARTER_BUSINESS.name}`} aria-describedby="purchase-note">
           <span>{progress ? paused ? 'Session paused' : progress.upgradeCost === null ? 'MAX LEVEL' : `Upgrade to Level ${progress.level + 1}` : view.buttonLabel}</span><span aria-hidden="true">{owned ? '✓' : '↗'}</span>
         </button>
         <p id="purchase-note" className="purchase-note">{progress && !paused && progress.upgradeCost && !progress.canUpgrade ? 'More cash needed for the next level.' : view.note}</p>

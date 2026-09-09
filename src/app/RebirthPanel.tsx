@@ -44,7 +44,7 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
       <p>The reward is recalculated from current progress when confirmed. This replaces your local save.</p>
       <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
         onClick={() => { controls.confirm(); heading.current?.focus(); }}>Confirm Rebirth</button>
-      <button ref={cancel} className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>Cancel</button>
+      <button ref={cancel} aria-label="Cancel Rebirth" className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>Cancel</button>
     </div> : <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
       aria-describedby="rebirth-requirements rebirth-policy" onClick={controls.request}>Review Rebirth</button>}
     {unavailable && <p>Rebirth requires a running session with available local saving.</p>}

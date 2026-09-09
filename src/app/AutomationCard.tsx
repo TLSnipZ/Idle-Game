@@ -11,17 +11,17 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
   readonly event: RuntimeSnapshot['automationEvent'];
 }) {
   return <section className="panel upgrade-panel" aria-labelledby="delegation-heading">
-    <div className="panel-heading"><h2 id="delegation-heading">Delegation</h2>
+    <div className="panel-heading"><h3 id="delegation-heading">Delegation</h3>
       {view.unlocked && <span className="ownership-badge is-owned">{paused ? 'PAUSED' : 'ACTIVE'}</span>}
     </div>
-    <h3>{view.definition.name}</h3>
+    <h4>{view.definition.name}</h4>
     <p>{view.definition.description}</p>
     <p>Runs every {formatRemainingTime(view.intervalMs)} · {view.reward === null ? 'Reward unavailable' : `${formatCash(view.reward)} per delivery`}</p>
     {view.unlocked ? <>
-      <label htmlFor="dispatcher-progress">Next delivery in {formatRemainingTime(view.remainingMs)}{paused ? ' · Session paused' : ''}</label>
-      <progress id="dispatcher-progress" max={view.intervalMs} value={view.progressMs} />
+      <label id="dispatcher-timing" htmlFor="dispatcher-progress">Next delivery in {formatRemainingTime(view.remainingMs)}{paused ? ' · Session paused' : ''}</label>
+      <progress aria-label="Delivery Dispatcher progress" aria-describedby="dispatcher-timing" id="dispatcher-progress" max={view.intervalMs} value={view.progressMs} />
       <p>Manual deliveries remain available and do not reset this progress.</p>
-      <p role="status" aria-live="polite" aria-atomic="true"><span key={event?.sequence}>{event ? `Last dispatch: ${describeAutomatedJobs(event)}` : 'Your dispatcher is ready for the next run.'}</span></p>
+      <p><span>{event ? `Last dispatch: ${describeAutomatedJobs(event)}` : 'Your dispatcher is ready for the next run.'}</span></p>
     </> : <>
       <p>Price: <strong>{formatCash(view.definition.purchaseCost)}</strong></p>
       <RequirementList result={view.requirements} id="dispatcher-requirement" />

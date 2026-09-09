@@ -12,6 +12,7 @@ import { SectionContent } from './SectionContent';
 import { dashboardPresentation } from './dashboard-presentation';
 import { GlobalStatus } from './GlobalStatus';
 import { GlobalFeedback } from './GlobalFeedback';
+import { useActionFocus } from './use-action-focus';
 import './App.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
@@ -22,6 +23,8 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const save = useSaveManagement(game.saveActions);
   const rebirth = useRebirthControls(game.rebirth);
   const heading = useRef<HTMLHeadingElement>(null);
+  const main = useRef<HTMLElement>(null);
+  const captureAction = useActionFocus();
   const previous = useRef(active);
   useEffect(() => {
     if (previous.current !== active) {
@@ -33,14 +36,14 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const section = PRIMARY_SECTIONS.find(section => section.id === active) ?? SECTION.overview;
   const paused = game.runtimeError !== null;
   return <div className="app-shell">
-    <a className="skip-link" href="#main">Skip to content</a>
+    <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>Skip to main content</a>
     <header className="app-header"><span className="wordmark"><span className="brand-mark" aria-hidden="true">CE</span> Crime Empire</span><span className="edition">{CITY_NAME}</span></header>
     <GlobalStatus view={dashboardPresentation(game.snapshot.state)} active={active} onNavigate={setActive} paused={paused} />
-    <main id="main" className="foundation" tabIndex={-1}>
+    <main ref={main} id="main" className="foundation" tabIndex={-1}>
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />
       {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => setActive(SECTION.empire.id)}>Return to Empire · Confirmation awaiting your choice</button>}
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />
-      <div id="section-content" aria-labelledby="section-heading">
+      <div onClickCapture={captureAction} id="section-content" aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{section.label}</h1><p>{section.description}</p></div>
         <SectionContent active={active} game={game} onNavigate={setActive} save={save} rebirth={rebirth} />
       </div>

@@ -49,7 +49,7 @@ describe('delegation presentation', () => {
     const event = { sequence: 1, xpEarned: 15, completedJobs: 3, income: moneyFromMinorUnits('10800') };
     const state = purchaseAutomation(eligible(), D.id).state;
     const html = renderToStaticMarkup(<AutomationCard view={selectDispatcher(state)} paused={false} onPurchase={() => {}} event={event} />);
-    expect(html).toContain('3 automated deliveries · +$108.00'); expect(html).toContain('role="status"'); expect(html).toContain('aria-live="polite"');
+    expect(html).toContain('3 automated deliveries · +$108.00'); expect(html).not.toContain('role="status"'); expect(html).not.toContain('aria-live="polite"');
     expect(describeAutomatedJobs({ completedJobs: 1, xpEarned: 5, income: moneyFromMinorUnits('2500') })).toBe('1 automated delivery · +$25.00 · +5 XP');
     expect(describeAction('automation', purchaseAutomation(eligible(), D.id))).toContain('hired');
   });

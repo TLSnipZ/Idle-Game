@@ -9,7 +9,7 @@ export function HeatPanel({ state, paused, onLayLow }: {
   return <article className={`panel heat-panel heat-${view.tier.id}`} aria-labelledby="heat-heading">
     <div className="panel-heading"><h3 id="heat-heading">HEAT</h3>
       <span>{view.heat} / {view.maximum} — {view.tier.label}</span></div>
-    <progress aria-label="Current Heat" max={view.maximum} value={view.heat} />
+    <progress aria-label={`Current Heat: ${view.heat} of ${view.maximum}, ${view.tier.label}`} max={view.maximum} value={view.heat} />
     <p>{view.penalty} · XP and business production unaffected.</p>
     <p>{view.cooling}</p>
     {view.countdown !== null && <p>{view.countdown}</p>}

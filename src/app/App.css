@@ -61,7 +61,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .business-content .eyebrow { color: var(--color-muted); font-size: .72rem; }
 .ownership-badge { font-size: .75rem; padding: .2rem .55rem; }
 .ownership-badge.is-owned { color: var(--color-cool); border-color: #81e6dc50; background: #81e6dc0a; }
-.business-card h2 { margin: .7rem 0 .4rem; font-size: 1.65rem; font-weight: 600; letter-spacing: -.035em; }
+.business-card h3 { margin: .7rem 0 .4rem; font-size: 1.65rem; font-weight: 600; letter-spacing: -.035em; }
 .business-description { color: var(--color-muted); font-size: .8rem; margin: 0; max-width: 43ch; }
 .business-terms { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; margin: 1.35rem 0; padding: 1rem 0; border-top: 1px solid #ffffff12; border-bottom: 1px solid #ffffff12; }
 .metric-label { display: flex; align-items: center; gap: .4rem; font-size: .75rem; color: var(--color-muted); margin-bottom: .3rem; }
@@ -92,10 +92,6 @@ h1 em { color: var(--color-cool); font-style: normal; }
   .action-button { flex-wrap: wrap; }
   .business-terms { gap: .5rem; }
   .business-terms strong { font-size: 1.05rem; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .action-button, .business-card { transition: none; }
-  .action-button:enabled:hover, .action-button:enabled:active { transform: none; }
 }
 
 .save-panel { margin-top: 1.5rem; padding: clamp(1rem, 3vw, 2rem); }
@@ -254,3 +250,25 @@ h1 em { color: var(--color-cool); font-style: normal; }
   .section-heading h1 { scroll-margin-top: 21rem; }
 }
 @media (max-height: 600px) { .global-chrome { position: static; } .section-heading h1 { scroll-margin-top: 1rem; } }
+
+/* Phase 9B: focus, readable wrapping and practical touch spacing. */
+.primary-navigation button[aria-current="page"] { text-decoration: underline; text-underline-offset: .3em; }
+.primary-navigation button:focus-visible, .global-indicators button:focus-visible,
+.action-button:focus-visible, .save-panel textarea:focus-visible { outline: 3px solid var(--color-cool); outline-offset: 3px; }
+.skip-link { position: fixed; min-height: 44px; }
+.save-confirm .action-button + .action-button, .crew-card .action-button + .action-button { margin-top: .75rem; }
+.save-confirm { border-inline-start: 3px solid var(--color-accent); }
+.panel-heading { flex-wrap: wrap; }
+.ownership-badge { max-width: 100%; flex-shrink: 1; overflow-wrap: anywhere; }
+.panel, .section-stack > *, .save-grid > *, .business-terms > * { min-width: 0; }
+.save-panel h3 { font-size: 1.25rem; }
+.business-terms strong, .permanent-totals dd, .statistics-entry strong { overflow-wrap: anywhere; }
+@media (max-width: 740px) {
+  /* Leave room for zoomed/wrapped text; content must not sit behind a tall header. */
+  .global-chrome { position: static; }
+  button, a, textarea, input, select { scroll-margin-block: 1rem; }
+  .business-terms { grid-template-columns: minmax(0, 1fr); }
+}
+
+main { scroll-margin-block-start: 16rem; }
+@media (max-width: 740px) { main { scroll-margin-block-start: 1rem; } }

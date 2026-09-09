@@ -188,4 +188,73 @@ describe('mounted navigation and one live runtime', () => {
     expect(container.querySelector('.global-feedback')?.textContent).toContain('Dockside Operator');
     expect(f.random.next).not.toHaveBeenCalled(); expect(f.writes()).toBe(1);
   });
+  it('skip link focuses the single main without reading clocks, writing saves or consuming RNG', async () => {
+    const f = await mount(autoUpgraderState()), before = f.game().getSnapshot().result.state;
+    const reads = f.reads(), writes = f.writes();
+    const skip = container.querySelector<HTMLAnchorElement>('.skip-link');
+    expect(skip?.textContent).toBe('Skip to main content'); expect(skip?.getAttribute('href')).toBe('#main');
+    await act(() => { skip?.focus(); skip?.click(); });
+    expect(document.activeElement?.tagName).toBe('MAIN'); expect(container.querySelectorAll('main')).toHaveLength(1);
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
+    expect(f.random.next).not.toHaveBeenCalled();
+  });
+  it('focused controls survive Cash, Heat, Dispatcher, Auto-Upgrader and event-spawn updates', async () => {
+    const s = autoUpgraderState();
+    const f = await mount({ ...s, city: { ...s.city, heat: 70 },
+      automation: { ...s.automation, unlockedIds: [...s.automation.unlockedIds, DELIVERY_DISPATCHER.id] },
+      events: { opportunityElapsedMs: 599000, pendingEventId: null } });
+    await navigate('EMPIRE'); const input = container.querySelector<HTMLTextAreaElement>('#import-code'); input?.focus();
+    f.random.next.mockReturnValueOnce(.1).mockReturnValueOnce(0); await f.advance(60000);
+    expect(document.activeElement).toBe(input); expect(f.game().getSnapshot().result.state.events.pendingEventId).not.toBeNull();
+    expect(f.game().getSnapshot().result.state.permanentProgression.statistics.businessLevelsPurchased).toBe(2);
+    expect(container.querySelector('.global-status')?.closest('[aria-live], [role="status"]')).toBeNull();
+    expect(container.querySelector('.global-feedback')?.textContent).toContain('Last dispatch:');
+    const dispatch = [...container.querySelectorAll('.global-feedback span')].find(e => e.textContent?.startsWith('Last dispatch:'));
+    expect(dispatch?.closest('[aria-live], [role="status"]')).toBeNull();
+  });
+  it('focused event resolution hands focus to its surviving heading, without extra actions', async () => {
+    const s = autoUpgraderState(); const f = await mount({ ...s, events: { pendingEventId: 'event:hot-tip', opportunityElapsedMs: 0 } });
+    await navigate('CITY'); button('PLAY IT SAFE').focus(); await click('PLAY IT SAFE');
+    expect(document.activeElement?.id).toBe('city-events-heading');
+    expect(f.game().getSnapshot().result.state.events.pendingEventId).toBeNull();
+    expect(f.game().getSnapshot().result.state.permanentProgression.statistics.eventsResolved).toBe(1);
+    expect(f.random.next).not.toHaveBeenCalled();
+  });
+  it('Crew assignment and unassignment keep a usable focus destination and announce outcomes', async () => {
+    const s = autoUpgraderState(); const f = await mount({ ...s, crew: { recruitedIds: ['crew:mara-knox'], assignments: { operations: null, logistics: null } } });
+    await navigate('CITY'); button('Assign Mara Knox to Operations').focus(); await click('Assign Mara Knox to Operations');
+    expect(document.activeElement?.id).toBe('crew:mara-knox-heading');
+    expect(container.querySelector('.global-feedback [role="status"]')?.textContent).toContain('Mara Knox');
+    button('Unassign Operations').focus(); await click('Unassign Operations');
+    expect(document.activeElement?.id).toBe('crew-slot-operations');
+    expect(f.game().getSnapshot().result.state.crew.assignments.operations).toBeNull();
+  });
+  it('import errors are associated with the input, and inline confirmation focuses safe cancellation', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('EMPIRE');
+    await fillImport('bad code'); await click('Validate import');
+    const input = container.querySelector<HTMLTextAreaElement>('#import-code');
+    expect(input?.getAttribute('aria-invalid')).toBe('true');
+    expect(input?.getAttribute('aria-describedby')).toContain('save-feedback');
+    expect(container.querySelector('#save-feedback')?.getAttribute('role')).toBe('status');
+    const code = exportSaveCode(createInitialGameState(),0); if (!code.ok) throw Error('code');
+    await fillImport(code.code); expect(input?.hasAttribute('aria-invalid')).toBe(false);
+    const before = f.game().getSnapshot().result.state; await click('Validate import');
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Cancel import');
+    expect(container.querySelector('.save-confirm')?.getAttribute('role')).toBe('group');
+    expect(container.querySelector('[aria-modal]')).toBeNull();
+    await click('Cancel import'); expect(document.activeElement?.textContent).toBe('Validate import');
+    expect(f.game().getSnapshot().result.state).toBe(before);
+  });
+  it('each section retains one h1 and non-skipping heading levels', async () => {
+    await mount(autoUpgraderState());
+    for (const section of PRIMARY_SECTIONS) {
+      await navigate(section.label); expect(container.querySelectorAll('h1')).toHaveLength(1);
+      expect(container.querySelector('h1')?.textContent).toBe(section.label);
+      let previous = 1;
+      for (const el of container.querySelectorAll('#section-content h1, #section-content h2, #section-content h3, #section-content h4')) {
+        const level = Number(el.tagName.slice(1)); expect(level).toBeLessThanOrEqual(previous+1); previous=level;
+      }
+    }
+  });
+
 });

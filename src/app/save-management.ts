@@ -11,6 +11,7 @@ export interface SaveManagementState {
   readonly exported: string;
   readonly input: string;
   readonly confirming: boolean;
+  readonly invalidInput?: boolean;
   readonly message: string;
 }
 export const INITIAL_SAVE_MANAGEMENT: SaveManagementState = {
@@ -45,7 +46,7 @@ export function createSaveManagement(
   };
   function edit(input: string) {
     revision++; pending = null;
-    update({ input, confirming: false, message: '' });
+    update({ input, confirming: false, invalidInput: false, message: '' });
   }
   function exportCode() {
     revision++;
@@ -64,7 +65,7 @@ export function createSaveManagement(
     revision++;
     const result = validateSaveCode(state.input);
     pending = result.ok ? state.input : null;
-    update({ confirming: result.ok, message: result.ok ? 'Valid save. Confirm below to replace current progress.' : failure(result.error) });
+    update({ confirming: result.ok, invalidInput: !result.ok, message: result.ok ? 'Valid save. Confirm below to replace current progress.' : failure(result.error) });
   }
   function cancel() {
     revision++; pending = null;

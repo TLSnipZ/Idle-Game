@@ -57,3 +57,11 @@ therefore **pending**, as are live GitHub Pages checks. CSS uses wrapping/minmax
 grids and semantic controls; no pixel-perfect screenshot assertion substitutes for
 that pending visual review. Phase 9B should retain this feature mapping and all
 runtime/confirmation boundaries while carrying out its separate accessibility pass.
+
+
+### Subsequent user verification
+
+The user manually verified Phase 9A live, including desktop/mobile navigation,
+global status/indicators, ongoing runtime and retained Rebirth/import interaction.
+The limitations above record the original implementation review. Phase 9B's separate
+checks and remaining browser/assistive-technology work are in `ACCESSIBILITY_REVIEW.md`.

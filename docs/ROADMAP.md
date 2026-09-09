@@ -33,9 +33,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 8A — Achievement Foundation (complete; user verified live) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
 | 8B — Lifetime Statistics Foundation (complete; user verified live) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
 | 8C — Late-Game Automation Foundation (complete; user verified live) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
-| 9A — UX & Information Architecture (implementation complete; live pending) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
-| 9B — Accessibility & Interaction Polish (next / deferred) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
-| 9C — Balance review (deferred) | Deliberate economy review | Explicitly scoped values and regression evidence |
+| 9A — UX & Information Architecture (complete; user verified live) | Five primary sections, global status/feedback and compact Overview | Every feature reachable; presentation-only navigation; v15 unchanged |
+| 9B — Accessibility & Interaction Polish (implementation complete; live pending) | Separately scoped systematic accessibility review | Preserve navigation, confirmations and runtime ownership |
+| 9C — Balance & Progression Pass (next / deferred) | Deliberate economy review | Explicitly scoped values and regression evidence |
 | Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
 ## Current status
@@ -213,12 +213,17 @@ The currently planned **Phase 8 block is complete and fully manually verified li
 deferred, alongside collection expansion and other future work.
 
 
-Phase 9A UX & Information Architecture implementation is complete; **live verification
-is pending**. OVERVIEW, OPERATIONS, CITY, COLLECTION and EMPIRE organize every existing
+Phase 9A UX & Information Architecture is complete and **manually verified live by the user**. OVERVIEW, OPERATIONS, CITY, COLLECTION and EMPIRE organize every existing
 feature. Cash/Level/Heat/EP and pending Event/active spending indicators remain global.
 Navigation is local React state; one central runtime continues independently. Import
 and Rebirth controllers retain their interaction state above the active section.
 Save v15, CE1, balance, all content catalogs and timing remain unchanged.
 [The feature review checklist](UX_CHECKLIST.md) maps the previous page to the sections.
-Phase 9B Accessibility & Interaction Polish is next/deferred; Phase 9C balance review
-and post-roadmap Rebranding have not begun. No new artwork, palette or fonts were added.
+Phase 9B Accessibility & Interaction Polish is implemented, with live verification pending. Phase 9C Balance & Progression Pass is next/deferred; post-roadmap Rebranding has not begun. No new artwork, palette or fonts were added.
+
+
+Phase 9B adds native control context, skip/focus behavior, quieter live feedback,
+progress descriptions, inline import confirmation focus and centralized reduced motion.
+DOM interaction and style checks preserve all Phase 9A navigation/runtime contracts.
+Real-browser zoom, keyboard traversal and screen-reader review remain pending; this is
+not a certification claim. Phase 9 remains incomplete. No balance, save or content change.
