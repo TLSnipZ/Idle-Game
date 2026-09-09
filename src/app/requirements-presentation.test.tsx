@@ -34,7 +34,7 @@ describe('requirements presentation',()=>{
     expect(describeAction('equipment',purchaseUpgrade(rich(),F.id))).toContain('Player Level 5');
   });
   it('owned content displays purchased/active rather than locked despite unmet gates',()=>{
-    const state={...rich(),upgrades:{purchasedIds:[F.id,S.id]},automation:{unlockedIds:[D.id],starterJobElapsedMs:123}};
+    const state={...rich(),upgrades:{purchasedIds:[F.id,S.id]},automation:{enabledIds:[],businessAutoUpgradeElapsedMs:0,unlockedIds:[D.id],starterJobElapsedMs:123}};
     const html=renderToStaticMarkup(<UpgradeCard view={selectUpgrade(state,F.id)} paused={false} onPurchase={()=>{}} />);
     expect(html).toContain('PURCHASED'); expect(html).not.toContain('LOCKED'); expect(html).not.toContain('<button');
     const dispatcher=renderToStaticMarkup(<AutomationCard view={selectDispatcher(state)} event={undefined} paused={false} onPurchase={()=>{}} />);

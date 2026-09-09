@@ -17,7 +17,7 @@ function owned(xp = 0) {
   const state = createInitialGameState();
   return { ...state, progression: { xp }, economy: { cash: moneyFromMinorUnits('100000000') },
     businesses: { ...state.businesses, owned: { [B.id]: { level: 1 } } },
-    automation: { unlockedIds: [D.id], starterJobElapsedMs: 0 } };
+    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } };
 }
 describe('exact XP and derived levels', () => {
   it.each([[1,0],[2,100],[3,400],[4,900],[5,1600],[10,8100],[25,57600],[50,240100],[100,980100]])('level %i begins at %i XP', (level, xp) => {
@@ -80,7 +80,7 @@ describe('three atomic XP sources', () => {
     const fresh = { ...createInitialGameState(), economy: state.economy };
     expect(purchaseBusiness(fresh,B.id).state.progression.xp).toBe(0);
     expect(purchaseUpgrade(state,PRESSURE_WASHER.id).state.progression.xp).toBe(0);
-    const locked = { ...state, automation: { unlockedIds: [], starterJobElapsedMs: 0 } };
+    const locked = { ...state, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 } };
     expect(purchaseAutomation(locked,D.id).state.progression.xp).toBe(0);
   });
   it('failed level commands award no XP', () => {
@@ -106,7 +106,7 @@ describe('three atomic XP sources', () => {
     expect(simulateGameElapsed(state,10000)).toMatchObject({ ok: false, state });
   });
   it('offline cycles share the cap and retain prior progress; business-only income earns no XP', () => {
-    const state = { ...owned(), automation: { unlockedIds: [D.id], starterJobElapsedMs: 5000 },
+    const state = { ...owned(), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 },
       upgrades: { purchasedIds: [EXPRESS_TIPS.id, STREET_CONNECTIONS.id] } };
     const result = reconcileOffline(state,0,25000);
     expect(result.ok && result.progress).toMatchObject({ xpEarned: 15, automation: { completedJobs: 3, income: '10800' } });
@@ -114,7 +114,7 @@ describe('three atomic XP sources', () => {
     const capped = reconcileOffline(owned(),0,12*3600000);
     expect(capped.ok && capped.progress).toMatchObject({ rewardedElapsedMs: OFFLINE_CAP_MS, xpEarned: 14400, levelIncrease: { fromLevel: 1, toLevel: 13 } });
     expect(capped.state.automation.starterJobElapsedMs).toBe(0);
-    const locked = { ...owned(), automation: { unlockedIds: [], starterJobElapsedMs: 0 } };
+    const locked = { ...owned(), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 } };
     const business = reconcileOffline(locked,0,10000);
     expect(business.ok && business.progress.xpEarned).toBe(0);
     expect(reconcileOffline(state,10000,0).state.progression.xp).toBe(0);

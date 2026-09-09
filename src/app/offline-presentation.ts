@@ -9,5 +9,5 @@ export function formatOfflineDuration(elapsedMs: number): string {
   return `${seconds}s`;
 }
 export function showOfflineReward(progress: OfflineProgress | null): progress is OfflineProgress {
-  return progress !== null && progress.incomeEarned !== '0';
+  return progress !== null && (progress.incomeEarned !== '0' || (progress.autoUpgrader?.levelsPurchased ?? 0) > 0);
 }

@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from './test-fixtures/save-text';
 import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENT_CATALOG, isAchievementIds } from '../features/achievements';
@@ -14,11 +15,11 @@ const envelope=(state:unknown,version=CURRENT_SAVE_VERSION)=>({format:'crime-emp
 describe('v13 permanent achievement saves',()=>{
   it('v12 migration adds empty IDs only, despite all six conditions being satisfied',()=>{
     const s=rich(),{statistics:_statistics,unlockedAchievementIds:_ids,...permanentProgression}=s.permanentProgression, old={...s,permanentProgression};
-    const raw=JSON.stringify(envelope(old,12)); const result=parseSave(raw);
-    expect(CURRENT_SAVE_VERSION).toBe(14); expect(result).toEqual({ok:true,envelope:envelope(s)});
+    const raw=stringifySaveFixture(envelope(old,12)); const result=parseSave(raw);
+    expect(CURRENT_SAVE_VERSION).toBe(15); expect(result).toEqual({ok:true,envelope:envelope(s)});
     if(!result.ok)throw Error('fixture'); const {statistics:_statistics2,unlockedAchievementIds,...previous}=result.envelope.state.permanentProgression;
     expect(unlockedAchievementIds).toEqual([]); expect({...result.envelope.state,permanentProgression:previous}).toEqual(old);
-    expect(validateSaveCode(encodeSaveText(raw))).toEqual(result); expect(JSON.stringify(envelope(old,12))).toBe(raw);
+    expect(validateSaveCode(encodeSaveText(raw))).toEqual(result); expect(stringifySaveFixture(envelope(old,12))).toBe(raw);
   });
   it.each([[],...ACHIEVEMENT_CATALOG.map(a=>[a.id]),ACHIEVEMENT_CATALOG.map(a=>a.id)].map(unlockedAchievementIds=>({unlockedAchievementIds})))('roundtrips historical completion %# independent of current conditions',({unlockedAchievementIds})=>{
     for(const base of [createInitialGameState(),rich()]) {
@@ -30,7 +31,7 @@ describe('v13 permanent achievement saves',()=>{
   });
   it.each([undefined,null,{},'achievement:first-steps',[0],[null],['achievement:unknown'],['achievement:first-steps','achievement:first-steps']])('rejects malformed achievement collection %#',unlockedAchievementIds=>{
     const s=rich(),bad={...s,permanentProgression:{...s.permanentProgression,unlockedAchievementIds}};
-    expect(validateSaveState(bad)).toBeNull(); expect(parseSave(JSON.stringify(envelope(bad)))).toEqual({ok:false,error:'invalid-state'});
+    expect(validateSaveState(bad)).toBeNull(); expect(parseSave(stringifySaveFixture(envelope(bad)))).toEqual({ok:false,error:'invalid-state'});
   });
   it('rejects sparse, custom and accessor arrays without invoking getters',()=>{
     for(const ids of [Array(1),Object.assign([],{extra:true}),Object.defineProperty([],0,{get(){throw Error('getter');},enumerable:true})]) expect(isAchievementIds(ids)).toBe(false);
@@ -39,6 +40,6 @@ describe('v13 permanent achievement saves',()=>{
     const s=rich(),state={economy:s.economy,businesses:version===1?{ownedIds:['business:dockside-detail'],productionRemainderMilliCents:975}:{owned:s.businesses.owned,productionRemainderMilliCents:975,...(version>=3?{productionRemainderSubMilliCents:s.businesses.productionRemainderSubMilliCents}:{})},
       ...(version>=3?{upgrades:s.upgrades}:{}),...(version>=4?{automation:s.automation}:{}),...(version>=5?{progression:s.progression}:{}),...(version>=6?{garage:s.garage}:{}),
       ...(version>=7?{permanentProgression:{empirePoints:17,rebirthCount:4,...(version>=8?{skills:s.permanentProgression.skills}:{})}}:{}),...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{}),...(version>=11?{crew:s.crew}:{}),...(version>=12?{events:s.events}:{})};
-    const r=validateSaveCode(encodeSaveText(JSON.stringify(envelope(state,version)))); expect(r).toMatchObject({ok:true,envelope:{version:14,savedAt:123456789,state:{permanentProgression:{unlockedAchievementIds:[]},economy:s.economy}}});
+    const r=validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state,version)))); expect(r).toMatchObject({ok:true,envelope:{version:15,savedAt:123456789,state:{permanentProgression:{unlockedAchievementIds:[]},economy:s.economy}}});
   });
 });

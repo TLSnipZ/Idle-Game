@@ -23,7 +23,7 @@ export const REBIRTH_POLICY = {
   economy: { action: 'reset', labels: ['Cash'] },
   businesses: { action: 'reset', labels: ['Businesses and business levels', 'Temporary production progress (both fractional remainders)'] },
   upgrades: { action: 'reset', labels: ['Normal upgrades'] },
-  automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress'] },
+  automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress', 'Business Auto-Upgrader ownership, enabled state and progress'] },
   progression: { action: 'reset', labels: ['Player XP / Level (returns to Level 1)'] },
   garage: { action: 'retain', labels: ['Vehicles'] },
   permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills', 'Achievements', 'Lifetime Statistics'] },

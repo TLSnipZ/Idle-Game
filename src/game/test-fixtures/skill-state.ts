@@ -14,6 +14,6 @@ export function skillState(skills: SkillRanks = {}, ep = 30): GameState {
   const fresh = createInitialGameState();
   return { ...fresh, economy: { cash: moneyFromMinorUnits('100000000') },
     businesses: { ...fresh.businesses, owned: { [STARTER_BUSINESS.id]: { level: 1 } } },
-    automation: { unlockedIds: [DELIVERY_DISPATCHER.id], starterJobElapsedMs: 0 },
+    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [DELIVERY_DISPATCHER.id], starterJobElapsedMs: 0 },
     permanentProgression: { statistics: createInitialStatistics(1), unlockedAchievementIds: [], empirePoints: ep, rebirthCount: 1, skills } };
 }

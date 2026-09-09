@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from './test-fixtures/save-text';
 import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { DELIVERY_DISPATCHER as D } from '../features/automation';
@@ -12,16 +13,16 @@ const old = () => ({ format: 'crime-empire-save', version: 3, savedAt: 123456789
       productionRemainderSubMilliCents: { numerator: '1', denominator: '3' } },
     upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } } });
 function current() {
-  const loaded = parseSave(JSON.stringify(old())); if (!loaded.ok) throw Error('fixture');
-  return { ...loaded.envelope.state, automation: { unlockedIds: [D.id], starterJobElapsedMs: 4321 } };
+  const loaded = parseSave(stringifySaveFixture(old())); if (!loaded.ok) throw Error('fixture');
+  return { ...loaded.envelope.state, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 4321 } };
 }
 describe('v4 delegation saves', () => {
   it('migrates realistic v3 with all upgrades preserving every previous field and timestamp', () => {
-    const original = old(); const text = JSON.stringify(original); const result = parseSave(text);
-    expect(CURRENT_SAVE_VERSION).toBe(14);
+    const original = old(); const text = stringifySaveFixture(original); const result = parseSave(text);
+    expect(CURRENT_SAVE_VERSION).toBe(15);
     expect(result).toEqual({ ok: true, envelope: { ...original, version: CURRENT_SAVE_VERSION,
-      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 } } } });
-    expect(JSON.stringify(original)).toBe(text);
+      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 } } } });
+    expect(stringifySaveFixture(original)).toBe(text);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(result);
   });
   it('roundtrips v4 progress/ownership with fresh metadata and unchanged CE1 transport', () => {
@@ -35,11 +36,11 @@ describe('v4 delegation saves', () => {
     const state = current(); expect(validateSaveState({ ...state, automation: { ...state.automation, starterJobElapsedMs } })).toBeNull();
   });
   it.each([['automation:unknown'], [D.id, D.id], [null], null, 'ids'])('rejects malformed IDs %#', unlockedIds => {
-    expect(validateSaveState({ ...current(), automation: { unlockedIds, starterJobElapsedMs: 0 } })).toBeNull();
+    expect(validateSaveState({ ...current(), automation: { ...current().automation, unlockedIds, starterJobElapsedMs: 0 } })).toBeNull();
   });
   it('rejects locked progress/missing/extra data but allows grandfathered ownership', () => {
     const state = current();
-    for (const automation of [{ unlockedIds: [], starterJobElapsedMs: 1 }, {}, { unlockedIds: [] }, { ...state.automation, count: 1 }])
+    for (const automation of [{ ...state.automation, unlockedIds: [], starterJobElapsedMs: 1 }, {}, { unlockedIds: [] }, { ...state.automation, count: 1 }])
       expect(validateSaveState({ ...state, automation })).toBeNull();
     expect(validateSaveState({ ...state, upgrades: { purchasedIds: [] }, businesses: { ...state.businesses, owned: {} } })).not.toBeNull();
     const { automation: _automation, ...missing } = state; expect(validateSaveState(missing)).toBeNull();
@@ -51,9 +52,9 @@ describe('v4 delegation saves', () => {
     expect(validateSaveState({ ...state, automation: Object.create(state.automation) })).toBeNull();
   });
   it('does not reinterpret malformed v3 or accept a future schema', () => {
-    expect(parseSave(JSON.stringify({ ...old(), state: current() }))).toEqual({ ok: false, error: 'invalid-state' });
+    expect(parseSave(stringifySaveFixture({ ...old(), state: current() }))).toEqual({ ok: false, error: 'invalid-state' });
     const previous = old();
-    expect(parseSave(JSON.stringify({ ...previous, state: { ...previous.state, economy: { cash: '01' } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...previous, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(stringifySaveFixture({ ...previous, state: { ...previous.state, economy: { cash: '01' } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...previous, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

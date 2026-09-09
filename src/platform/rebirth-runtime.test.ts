@@ -30,7 +30,7 @@ describe('durable Rebirth transaction', () => {
     expect(f.events.map(e=>e.type)).toEqual(['publish','write','publish']);
     expect(f.events[1]?.state).toEqual(after);expect(f.events[2]?.state).toEqual(after);
     expect(f.game.getSnapshot().result.state).toEqual(after);
-    expect(after.automation).toEqual({unlockedIds:[],starterJobElapsedMs:0});
+    expect(after.automation).toEqual({ enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
     expect(after.businesses.productionRemainderMilliCents).toBe(0);
     expect(after.businesses.productionRemainderSubMilliCents).toEqual(rational(0n));
     expect(f.game.getSnapshot().automationEvent).toBeUndefined();expect(f.game.getSnapshot().levelEvent).toBeUndefined();
@@ -89,7 +89,7 @@ describe('durable Rebirth transaction', () => {
     const f=rebirthRuntime();expect(f.game.rebirth().ok).toBe(true);const state=onlineElapsed(f.game.getSnapshot().result.state,5000).state;
     f.at(5000);f.wall(6000);f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state}});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 14,state}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 15,state}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);
     expect(f.game.getSnapshot().result.state).toEqual(state);f.game.stop();expect(f.timers()).toBe(0);
   });

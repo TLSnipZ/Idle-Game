@@ -71,7 +71,7 @@ describe('six permanent observational achievements', () => {
     for (const operations of [null,'crew:rico-vale','crew:mara-knox'] as const) expect(getEligibleAchievementIds(crewState({operations,logistics:'crew:jax-mercer'}))).toContain('achievement:crew-chief');
   });
   it.each([0,1,2])('offline cap rank %i observes only the final Heat and preserves all credited subsystem results', rank => {
-    const s = { ...milestone(3,59), automation: { unlockedIds: [D.id], starterJobElapsedMs: 0 }, permanentProgression: { ...fresh().permanentProgression, skills: rank ? { 'skill:never-sleeps': rank } : {} } };
+    const s = { ...milestone(3,59), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 }, permanentProgression: { ...fresh().permanentProgression, skills: rank ? { 'skill:never-sleeps': rank } : {} } };
     const short = reconcileOffline(s,0,50000); expect(short.ok).toBe(true); expect(short.state.city.heat).toBe(60); expect(short.state.permanentProgression.unlockedAchievementIds).toContain('achievement:running-hot');
     const long = reconcileOffline(s,0,120000); expect(long.state.city.heat).toBe(59); expect(long.state.permanentProgression.unlockedAchievementIds).not.toContain('achievement:running-hot');
     const capped = reconcileOffline(s,0,20*3600000), online = simulateGameElapsed(s,getOfflineCapMs(s)); expect(capped.state).toEqual(online.state);

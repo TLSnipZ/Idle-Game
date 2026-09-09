@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from './test-fixtures/save-text';
 import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { parseSave, serializeSave, validateSaveState, CURRENT_SAVE_VERSION } from './save-schema';
@@ -9,19 +10,19 @@ const id = 'business:dockside-detail';
 const legacy = () => ({ format: 'crime-empire-save', version: 2, savedAt: 123456789,
   state: { economy: { cash: '900719925474099312345' }, businesses: { owned: { [id]: { level: 7 } }, productionRemainderMilliCents: 975 } } });
 function current() {
-  const result = parseSave(JSON.stringify(legacy()));
+  const result = parseSave(stringifySaveFixture(legacy()));
   if (!result.ok) throw Error('fixture');
   return { ...result.envelope.state, upgrades: { purchasedIds: [PRESSURE_WASHER.id] },
     businesses: { ...result.envelope.state.businesses, productionRemainderSubMilliCents: rational(1n, 3n) } };
 }
 describe('v3 upgrade and precision schema', () => {
   it('migrates realistic v2 saves preserving level, cash, milli-cents and savedAt', () => {
-    const old = legacy(); const before = JSON.stringify(old);
+    const old = legacy(); const before = stringifySaveFixture(old);
     const result = parseSave(before);
     expect(result).toEqual({ ok: true, envelope: { ...old, version: CURRENT_SAVE_VERSION, state: {
-      ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
+      ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, businesses: { ...old.state.businesses, productionRemainderSubMilliCents: ZERO_RATIONAL },
     } } });
-    expect(JSON.stringify(old)).toBe(before);
+    expect(stringifySaveFixture(old)).toBe(before);
     expect(validateSaveCode(encodeSaveText(before))).toEqual(result);
   });
   it('round trips purchased equipment and both fractional components through storage and CE1', () => {
@@ -59,13 +60,13 @@ describe('v3 upgrade and precision schema', () => {
   });
   it.each([0, 101, 1.5, '7'])('rejects invalid v2 levels during migration %#', level => {
     const old = legacy();
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, businesses: { ...old.state.businesses, owned: { [id]: { level } } } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, businesses: { ...old.state.businesses, owned: { [id]: { level } } } } })).ok).toBe(false);
   });
   it('rejects corrupt v2 cash, remainder, extras and future versions', () => {
     const old = legacy();
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, economy: { cash: '01' } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, businesses: { ...old.state.businesses, productionRemainderMilliCents: 1000 } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, economy: { cash: '01' } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, businesses: { ...old.state.businesses, productionRemainderMilliCents: 1000 } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

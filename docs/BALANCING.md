@@ -615,3 +615,31 @@ A hidden Dispatcher peak removed by same-batch cooling is not reconstructed.
 Peak Heat remains after cooling and Rebirth; it grants no benefit and does not
 change Running Hot's current-Heat condition. No existing prices, rewards, caps,
 requirements, achievement thresholds or gameplay formulas change.
+
+
+## Phase 8C — provisional Business Auto-Upgrader
+
+| Property | Provisional value |
+| --- | --- |
+| Stable ID | `automation:business-auto-upgrader` |
+| Purchase cost | $250,000 |
+| Requirements | Player Level 20, owned Dockside Detail Level 25, Neon Mile controlled |
+| Target | Dockside Detail only |
+| Initial setting | Disabled; explicit enable required |
+| Cadence | One attempt per 30 seconds while enabled |
+| Disabled progress | Paused at its exact stored milliseconds |
+| Successful attempt | Buy exactly one level at the current manual upgrade price |
+| Upgrade price | $150 × current Level²; Level 25/26/27 cost $93,750 / $101,400 / $109,350 |
+| XP | Same 25 base XP per level as manual upgrades; floor each modified award separately |
+| Statistic | +1 businessLevelsPurchased per successful upgrade |
+| Heat | No Heat from purchasing/toggling/upgrading |
+| Max/insufficient funds | Consume attempt, no purchase; stays enabled |
+| Offline | Works if enabled, using the shared 8/10/12h credited cap |
+| Rebirth | Ownership, enabled state and progress reset; no refund |
+
+Production before a purchase uses the old level; subsequent production uses the new
+level. Completed Dispatcher earnings can fund purchases only once earned. Dispatcher
+reward/XP/Heat still uses one outer batch; internal purchase boundaries do not add
+Event rolls. Learn the Streets rank 1 yields 27 XP per upgrade: three cost-paying
+upgrades award 81 XP, not 82. There is no reserve/budget or ongoing fee, no auto business
+purchase, and no new achievement/statistic. All other prices and modifiers are unchanged.

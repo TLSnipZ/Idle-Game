@@ -12,7 +12,8 @@ export function OfflineReturn({ progress, onDismiss }: {
     <div role="status" aria-live="polite">
       <h2 id="offline-heading">Welcome back</h2>
       <p>While you were away</p>
-      <p className="offline-income">+{formatCash(progress.incomeEarned)}</p>
+      <p className="offline-income">+{formatCash(progress.incomeEarned)}{progress.autoUpgrader?.levelsPurchased ? ' earned before automatic spending' : ''}</p>
+      {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>Business Auto-Upgrader: Dockside +{progress.autoUpgrader?.levelsPurchased} levels · Spent {formatCash(progress.autoUpgrader.spent)}</p>}
       {progress.automation && progress.businessIncome !== undefined && <>
         <p>Business income: {formatCash(progress.businessIncome)}</p>
         <p>Dispatcher: {progress.automation.completedJobs} deliveries · {formatCash(progress.automation.income)}</p>

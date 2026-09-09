@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from './test-fixtures/save-text';
 import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { CURRENT_SAVE_VERSION, parseSave, serializeSave, validateSaveState } from './save-schema';
@@ -13,24 +14,24 @@ const legacy = () => ({ format: 'crime-empire-save', version: 4, savedAt: 123456
     businesses: { owned: { [B.id]: { level: 7 } }, productionRemainderMilliCents: 975,
       productionRemainderSubMilliCents: { numerator: '1', denominator: '3' } },
     upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) },
-    automation: { unlockedIds: [D.id], starterJobElapsedMs: 4321 } } });
+    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 4321 } } });
 describe('v5 progression saves', () => {
   it('migrates realistic v4 without altering any prior state or its timestamp', () => {
-    const old = legacy(); const text = JSON.stringify(old);
-    const expected = { ok: true, envelope: { ...old, version: 14, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 } } } };
-    expect(CURRENT_SAVE_VERSION).toBe(14);
+    const old = legacy(); const text = stringifySaveFixture(old);
+    const expected = { ok: true, envelope: { ...old, version: 15, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 } } } };
+    expect(CURRENT_SAVE_VERSION).toBe(15);
     expect(parseSave(text)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(expected);
-    expect(JSON.stringify(old)).toBe(text);
+    expect(stringifySaveFixture(old)).toBe(text);
   });
   it.each([0,99,100,1850,980100,MAX_XP])('roundtrips exact XP %i through storage and CE1', xp => {
-    const migrated = parseSave(JSON.stringify(legacy())); if (!migrated.ok) throw Error('fixture');
+    const migrated = parseSave(stringifySaveFixture(legacy())); if (!migrated.ok) throw Error('fixture');
     const state = { ...migrated.envelope.state, progression: { xp } };
     const serialized = serializeSave(state,42); if (!serialized.ok) throw Error('fixture');
     const code = exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 14, savedAt: 42, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 15, savedAt: 42, state } });
     expect(serialized.serialized).not.toMatch(/levelEvent|xpIntoLevel|currentLevel|progressRatio/);
   });
   it.each([-1,.5,NaN,Infinity,MAX_XP+1,'10',null,undefined])('rejects malformed XP %#', xp => {
@@ -47,8 +48,8 @@ describe('v5 progression saves', () => {
   });
   it('rejects malformed v4, incompatible shapes and future versions', () => {
     const old = legacy();
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, automation: { ...old.state.automation, starterJobElapsedMs: -1 } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, state: { ...old.state, progression: { xp: 123 } } })).ok).toBe(false);
-    expect(parseSave(JSON.stringify({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, automation: { ...old.state.automation, starterJobElapsedMs: -1 } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, state: { ...old.state, progression: { xp: 123 } } })).ok).toBe(false);
+    expect(parseSave(stringifySaveFixture({ ...old, version: CURRENT_SAVE_VERSION + 1 }))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

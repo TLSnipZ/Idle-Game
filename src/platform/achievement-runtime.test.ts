@@ -44,13 +44,13 @@ describe('central achievement command and elapsed boundaries', () => {
     }
   });
   it('Dispatcher unlocks from the complete batch without a click', () => {
-    const s = fresh(), f = runtime({ ...s, progression: { xp: 95 }, city: { ...s.city, heat: 59 }, automation: { unlockedIds: [D.id], starterJobElapsedMs: 0 } });
+    const s = fresh(), f = runtime({ ...s, progression: { xp: 95 }, city: { ...s.city, heat: 59 }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } });
     f.at(50000); f.game.reconcile();
     expect(owns(f.game.getSnapshot().result.state)).toEqual(['achievement:first-steps','achievement:running-hot']);
     expect(f.game.getSnapshot().result.state.progression.xp).toBe(120);
   });
   it('keeps both reconciliation and command unlocks in one grouped announcement', () => {
-    const s = fresh(), f = runtime({ ...s, progression: { xp: 95 }, city: { ...s.city, heat: 59 }, automation: { unlockedIds: [D.id], starterJobElapsedMs: 0 } });
+    const s = fresh(), f = runtime({ ...s, progression: { xp: 95 }, city: { ...s.city, heat: 59 }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } });
     f.at(10000); f.game.execute(performStarterJob);
     expect(f.game.getSnapshot().achievementEvent?.ids).toEqual(['achievement:first-steps','achievement:running-hot']);
   });
@@ -83,7 +83,7 @@ describe('central achievement command and elapsed boundaries', () => {
 });
 describe('durable achievements, bootstrap, import and Rebirth', () => {
   it.each([false,true])('offline award is written before publication, storage failure=%s', fail => {
-    const s = fresh(), input = { ...s, progression: { xp: 95 }, automation: { unlockedIds: [D.id], starterJobElapsedMs: 0 } }, encoded = serializeSave(input,0);
+    const s = fresh(), input = { ...s, progression: { xp: 95 }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } }, encoded = serializeSave(input,0);
     if (!encoded.ok) throw Error('fixture'); let raw = encoded.serialized; const original = raw; const order: string[] = [];
     const game = createPersistentGame(v => { order.push('publish'); if (fail) expect(owns(v.result.state)).toEqual([]); else expect(owns(v.result.state)).toEqual(['achievement:first-steps']); }, createLocalSave(() => ({ getItem: () => raw, setItem: (_k,v) => { if (fail) throw Error('quota'); const saved = parseSave(v); if (!saved.ok) throw Error('fixture'); expect(owns(saved.envelope.state)).toEqual(['achievement:first-steps']); order.push('write'); raw = v; } }), () => 10000), { now: () => 0, schedule: () => () => {} }, () => () => {});
     game.start(); expect(order[0]).toBe(fail ? 'publish' : 'write');
@@ -105,7 +105,7 @@ describe('durable achievements, bootstrap, import and Rebirth', () => {
     f.game.stop(); const reload=f.make(); reload.start(); expect(owns(reload.getSnapshot().result.state)).toEqual(owns(writes[0]!.state)); reload.stop();
   });
   it('pre-Rebirth reconciliation unlock and First Rebirth are announced together', () => {
-    const s = rebirthState(), f=rebirthRuntime({...s, city:{...s.city,heat:59}, automation:{unlockedIds:[D.id],starterJobElapsedMs:0}});
+    const s = rebirthState(), f=rebirthRuntime({...s, city:{...s.city,heat:59}, automation:{enabledIds:[],businessAutoUpgradeElapsedMs:0,unlockedIds:[D.id],starterJobElapsedMs:0}});
     f.at(50000); expect(f.game.rebirth().ok).toBe(true);
     expect(f.game.getSnapshot().achievementEvent?.ids).toEqual(['achievement:running-hot','achievement:first-rebirth']); f.game.stop();
   });

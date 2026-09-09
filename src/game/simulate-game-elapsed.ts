@@ -1,3 +1,6 @@
+import { BUSINESS_AUTO_UPGRADER } from '../features/automation';
+import { simulateAutoUpgrader } from './simulate-auto-upgrader';
+import type { UpgradeBusinessResult } from './upgrade-business';
 import { countStatistic, observePeakHeat } from './statistics';
 import type { StatisticsError } from '../features/statistics';
 import { unlockEligibleAchievements } from './achievements';
@@ -13,11 +16,13 @@ import type { AutomationSimulationResult } from './simulate-automation';
 import type { GameState } from './game-state';
 
 export type GameSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: StatisticsError }
+  | Extract<UpgradeBusinessResult, { ok: false }>
   | Extract<AutomationSimulationResult, { ok: false }>
-  | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money });
+  | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money; readonly autoUpgrader?: { readonly levelsPurchased: number; readonly spent: Money } });
 /** One transaction: production, start-tier job rewards/XP, batch Heat gain, then cooling. */
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
+  if (elapsedMs > 0 && state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) return simulateAutoUpgrader(state, elapsedMs);
   const business = simulateElapsed(state, elapsedMs);
   if (!business.ok) return business;
   requireXp(state.progression.xp);

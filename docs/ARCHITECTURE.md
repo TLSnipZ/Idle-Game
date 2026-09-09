@@ -1898,7 +1898,7 @@ the same ephemeral announcement shape; no notification history is saved.
 ## Phase 8B — permanent Lifetime Statistics Foundation
 
 Phase 8A was manually verified live by the user. Phase 8B implementation is
-complete; **live verification is pending**. Statistics are local, observational
+complete and **manually verified live by the user**. Statistics are local, observational
 history and grant no rewards. No formula, requirement, event chance or achievement
 condition reads statistics. The six Phase 8A achievements remain unchanged.
 
@@ -1979,3 +1979,146 @@ ordered, accessible entries; formatting lives in pure presentation selectors.
 No charts, analytics, rewards, new achievements, challenges or Phase 8C automation
 were added. Phase 8C must preserve these counter units, atomic boundaries, migration
 exception, observational isolation and final-state Heat semantics.
+
+
+## Phase 8C — Business Auto-Upgrader foundation
+
+Phase 8B was manually verified live by the user. Phase 8C implementation is complete;
+**live verification is pending**. Phase 8 implementation is complete for the current
+roadmap block, subject to this final live verification. Phase 9 and broader automation
+expansion remain deferred.
+
+Exactly one new automation joins Delivery Dispatcher in `features/automation`:
+`automation:business-auto-upgrader`, displayed as **Business Auto-Upgrader**. The
+Dispatcher keeps its original identity, cost, ten-second cycle and always-active
+ownership semantics. Both share the automation catalog and purchase architecture.
+The new automation targets only Dockside Detail. Acquisition uses central AND
+requirements: Player Level 20, owned Dockside at Level 25, and Neon Mile controlled;
+`spendCash` charges exactly $250,000. There is no Crew, achievement or statistics gate.
+
+```ts
+automation: {
+  unlockedIds: AutomationId[];
+  starterJobElapsedMs: number;
+  enabledIds: AutomationId[];
+  businessAutoUpgradeElapsedMs: number;
+}
+```
+
+Only the owned Auto-Upgrader may occur in `enabledIds`. Dispatcher never needs an
+enabled entry and cannot be toggled. Arrays contain unique known IDs. Current
+validation rejects missing/extra fields, malformed IDs, getters/sparse collections,
+unowned enablement and unowned progress. Auto-Upgrader progress is an exact safe
+integer in `[0, 30000)`; it must be zero before ownership. Purchase initializes
+progress to zero and leaves it disabled. Ownership/enablement never changes merely
+because acquisition requirements later fail in a structurally valid imported save.
+
+`setAutomationEnabled` is a pure, free immutable command with structured unknown,
+non-toggleable, unowned and invalid-boolean failures. Repeating the current setting
+succeeds as an identity-preserving no-op. A disabled automation pauses its exact
+progress, never resets it. Enabling resumes that progress. All purchases and toggles
+use the normal runtime command boundary: reconcile with the old configuration,
+then apply the command, then save normally. No past time receives a newly enabled
+purchase, and disabling first processes any due purchases. The explicit enable
+button and visible automatic-spending disclosure are the player's opt-in.
+
+### Chronological production and spending
+
+`simulateGameElapsed` keeps the unchanged Phase 8B path when Auto-Upgrader is
+unowned/disabled, or elapsed is zero. With enabled positive elapsed,
+`simulateAutoUpgrader` divides **business production and spendable earnings** at
+30-second attempt boundaries. Each segment calls the existing exact
+`simulateElapsed`; earned business fractions survive through both remainder fields.
+At each completed boundary `attemptBusinessAutoUpgrade` calls the same
+`upgradeBusiness` command used manually. Its exact current quadratic price,
+Money spending, single level increment, effective XP and checked
+`businessLevelsPurchased` update remain the one authoritative path.
+
+One boundary attempts one level. Success, insufficient funds and max level all
+consume the attempt. Insufficient funds does not disable the automation; later
+production/Dispatcher earnings may fund a later boundary. Current Level 100 consumes
+attempts without spending. A valid imported owner without Dockside similarly
+consumes no-op attempts and never automatically buys a business. Invalid state,
+XP/Money overflow or statistics overflow fails the entire **outer** candidate,
+including earlier successful local purchases. No partial publication occurs.
+
+Each successful upgrade floors its own effective XP award. Learn the Streets rank
+1 gives 27 XP per purchase: three upgrades give 81, not a combined 82. The existing
+six achievements are evaluated centrally against the completed outer candidate;
+upgrade-dependent XP/level milestones are monotonic within this candidate and are
+therefore all retained. No additional Heat source, achievement or statistic exists.
+Only `businessLevelsPurchased` counts automatic purchases; Dispatcher statistics
+continue to count deliveries separately.
+
+At most 1,440 boundaries occur in the shared maximum twelve-hour offline window.
+Each segment uses batched math, never loops per delivery/millisecond/second. When
+Dockside is maxed or absent, all remaining no-purchase boundaries collapse into
+one segment plus exact modulo progress. Unaffordable attempts with a producing
+business are processed at their actual boundaries because later earnings can
+make a purchase possible. There is no speculative analytic purchase solver.
+
+### Dispatcher, Heat and Event outer-batch contracts
+
+Auto-Upgrader changes no Dispatcher modifiers. `planDispatcher` therefore keeps
+interval-start reward/skill/Heat evaluation and one outer completed-job count.
+At each purchase boundary, only the earnings for jobs completed **up to that
+boundary** become spendable. Future jobs cannot fund an earlier purchase.
+Cumulative prefix Money/XP differences distribute these earnings chronologically;
+Dispatcher XP still equals the floor of the **whole outer batch**, rather than
+summing independently floored segments. Prefix planning and normal Dispatcher
+simulation share the same reward/cycle calculation. Separate upgrade XP awards
+are added without changing that Dispatcher floor. No per-job loop is introduced.
+
+Heat remains one outer transaction: starting Heat, `floor(totalJobs / 5)` gain,
+then decay across the full elapsed duration using the starting Crew assignment.
+Mara still derives 45s, otherwise 60s; purchase boundaries do not invent Heat
+batches or cooling observations. Final peakHeat and Running Hot keep final-state
+observation, not internal/transient peaks. Rico and Jax use the unchanged central
+modifier evaluator; Jax's rate increases naturally with bought business levels.
+Business levels and current player XP do not modify Dispatcher/Heat formulas.
+This is why only production/spendable income needs internal segmentation.
+
+`simulateOnlineElapsed` advances City Events once **after** the completed economic
+candidate, with the original total online elapsed and final-state eligibility.
+There is still at most one spawn attempt per outer reconciliation, no matter how
+many auto-upgrade boundaries it contained. Pending events freeze only event cadence;
+normal purchases continue around them. Offline consumes no event progress or RNG.
+Arbitrarily splitting outer calls still retains the existing Phase 7 Heat/XP
+batching distinctions; internal purchase boundaries add none of their own.
+
+### Offline, reset and save compatibility
+
+Owned/enabled Auto-Upgrader uses the same Never Sleeps 8h/10h/12h credited duration
+and the exact online economic simulation. Discarded absence contributes no attempt,
+income or progress. The complete candidate (cash, levels, XP, counters, achievements,
+Dispatcher, Heat and progress) is durably written before publication. Overflow or
+storage failure preserves the old save and existing bootstrap pause behavior.
+One-time consumption and future-clock handling remain unchanged.
+
+Offline metadata optionally carries `{ levelsPurchased, spent }`, never saved in
+GameState. Welcome-back income remains **gross earned income** (business plus
+Dispatcher), since automated spending may reduce existing cash. The card explicitly
+shows gross income before spending and Dockside +N levels / spent Money when
+purchases occurred. It does not misreport net cash reduction as negative production.
+
+Rebirth first reconciles active automation. Due upgrades earn legitimate XP,
+statistics and achievements before reset. The fresh constructor then clears both
+ownership IDs, `enabledIds`, and both progress fields. There is no purchase-price
+refund. Vehicles, EP/count, skills, achievements and lifetime statistics retain
+their existing policy. The reset summary explicitly lists Auto-Upgrader loss.
+
+Save schema **v15** sequentially migrates v1→…→v14→v15. Only the final v14 step
+adds empty enabled IDs and zero Auto-Upgrader progress. Every pre-existing field,
+Dispatcher ownership/progress and `savedAt` is preserved exactly. Earlier steps
+still emit the actual historical two-field automation shape. Migration never
+purchases, enables, upgrades or simulates. **CE1- remains unchanged**. Ordinary
+save/reload/import/export preserve explicit ownership, enablement and remainder.
+Import writes before replacement and rebases timing without historical upgrades or
+requirement checks. Imported 20,000ms progress requires 10,000ms future elapsed for
+the next attempt, even if its exported timestamp is a week old.
+
+The new card sits next to Delegation, uses pure selectors for requirements/current
+price/level/progress, and reuses native progress controls and responsive styles.
+No target selector, reserve, budget, second new automation, cloud feature or Phase 9
+polish is included. Future work must preserve opt-in spending, exact chronological
+funding, outer Dispatcher/Heat/Event contracts and durable atomic publication.

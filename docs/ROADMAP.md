@@ -31,8 +31,8 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 7C — Crew (complete; user verified live) | Three recruits, two assignment slots, exact active effects, v11 migration | Atomic recruitment/assignment, old-effect reconciliation, Mara remainder, shared offline and Rebirth reset |
 | 7D — Random Events (complete; user verified live) | Three events, two choices each, injected RNG, online-only opportunities, v12 migration | Atomic choices, one pending event, offline exclusion, Rebirth reset and deterministic tests |
 | 8A — Achievement Foundation (complete; user verified live) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
-| 8B — Lifetime Statistics Foundation (implementation complete; live pending) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
-| 8C — Late-game automation (next / deferred) | Separately scoped automation | Consistent commands, no runaway scheduling |
+| 8B — Lifetime Statistics Foundation (complete; user verified live) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
+| 8C — Late-Game Automation Foundation (implementation complete; live pending) | One opt-in Dockside Auto-Upgrader, 30s purchases, v15 migration | Chronological production/spending, outer batching, atomic offline/reset and CE1 tests |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
 ## Current status
@@ -182,12 +182,31 @@ Phase 8B implementation follows below. No lifetime or peak-Heat statistics were
 added in Phase 8A. Phase 8 as a whole is not complete.
 
 
-Phase 8B Lifetime Statistics Foundation implementation is complete; **live
-verification is pending**. Eight permanent observations record manual/Dispatcher
+Phase 8B Lifetime Statistics Foundation implementation is complete and **manually
+verified live by the user**. Eight permanent observations record manual/Dispatcher
 jobs, paid business upgrades, territory acquisitions, Crew recruits, event choices,
 Rebirths and final-state peak Heat. Checked counter overflow fails atomically;
 shared offline simulation and Rebirth preserve history. v13→v14 adds zero history
 except the exact existing Rebirth count; CE1 remains compatible. Statistics confer
 no rewards or gameplay effects, and the six achievements remain unchanged.
-**Phase 8C late-game automation is next/deferred**. No challenges, new achievements,
-analytics or automation were added; Phase 8 overall remains incomplete.
+No challenges, new achievements, analytics or automation were added in Phase 8B.
+Phase 8C follows below.
+
+
+The user manually verified all eight statistics, repeated actions across Rebirth,
+Peak Heat permanence, offline Dispatcher counts and CE1 preservation in the live
+Phase 8B build. Statistics remain observational.
+
+Phase 8C Late-Game Automation Foundation implementation is complete; **live
+verification is pending**. One Business Auto-Upgrader costs $250,000, requires
+Level 20 / Dockside Level 25 / Neon Mile, starts disabled and attempts a paid
+Dockside upgrade every 30 seconds when enabled. Production/spending respects purchase
+boundaries, while Dispatcher XP/Heat and Event RNG retain outer-batch semantics.
+Manual upgrade rules, individual XP flooring and statistics are reused. Shared
+offline operation, durable publication, Rebirth reset and v14→v15 migration are tested.
+CE1 is unchanged. No generic auto-buyer, reserve, new content or Phase 9 work exists.
+
+The currently planned **Phase 8 implementation block is complete; final live
+verification remains pending until the user verifies Phase 8C**. Phase 9 is not
+complete or started. Broader automation expansion remains separately scoped and
+deferred, alongside collection expansion and other future work.

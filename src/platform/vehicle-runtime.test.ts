@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from '../game/test-fixtures/save-text';
 import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { createPersistentGame } from './persistent-game';
@@ -22,7 +23,7 @@ function initial(owned=false): GameState {
     economy:{cash:moneyFromMinorUnits('10000000')},
     businesses:{...state.businesses,owned:{[B.id]:{level:10}},productionRemainderMilliCents:975,
       productionRemainderSubMilliCents:rational(1n,3n)},
-    upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)},automation:{unlockedIds:[D.id],starterJobElapsedMs:5000}};
+    upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)},automation:{enabledIds:[],businessAutoUpgradeElapsedMs:0,unlockedIds:[D.id],starterJobElapsedMs:5000}};
 }
 function fixture(state=initial(), savedAt=1000) {
   const encoded=serializeSave(state,savedAt); if(!encoded.ok) throw Error('fixture');
@@ -69,7 +70,7 @@ describe('vehicle runtime and durable progression',()=>{
     f.at(250);f.wall(1250);f.tick();expect(f.writes()).toBe(writes);
     f.at(5000);f.wall(6000);const exported=game.exportCode();if(!exported.ok)throw Error('export');
     const expected=onlineElapsed(initial(true),5000).state;
-    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 14,savedAt:6000,state:expected}});
+    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 15,savedAt:6000,state:expected}});
     f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
     game.stop();game.start();game.start();expect(f.timers()).toBe(2);game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
@@ -121,11 +122,11 @@ describe('vehicle runtime and durable progression',()=>{
 
 it('v5 local migration consumes its saved timestamp without losing offline time',()=>{
   const state=initial();const { events: _events, crew: _crew,city:_city,permanentProgression:_permanent,garage:_garage,...legacy}=state;
-  let raw=JSON.stringify({format:'crime-empire-save',version:5,savedAt:1000,state:legacy});
+  let raw=stringifySaveFixture({format:'crime-empire-save',version:5,savedAt:1000,state:legacy});
   const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>26000);
   const expected=simulateGameElapsed(state,25000).state;
   expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 14,savedAt:26000,state:expected}});
+  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 15,savedAt:26000,state:expected}});
   expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
 });
 

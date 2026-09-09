@@ -20,7 +20,7 @@ const stats = (s: GameState) => s.permanentProgression.statistics;
 function active(): GameState {
   const s = rebirthState();
   return { ...s, city: { ...s.city, heat: 59, heatDecayElapsedMs: 0 },
-    automation: { unlockedIds: [D.id], starterJobElapsedMs: 9000 },
+    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 9000 },
     events: { pendingEventId: 'event:hot-tip', opportunityElapsedMs: 200000 } };
 }
 describe('statistics at runtime and durable boundaries', () => {

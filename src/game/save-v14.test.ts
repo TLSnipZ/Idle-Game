@@ -1,3 +1,4 @@
+import { stringifySaveFixture } from './test-fixtures/save-text';
 import { describe, expect, it } from 'vitest';
 import { createInitialStatistics, isStatisticsState, CUMULATIVE_STATISTICS } from '../features/statistics';
 import { createInitialGameState } from './game-state';
@@ -19,14 +20,14 @@ function rich() {
 describe('v14 lifetime statistics and CE1', () => {
   it('v13 migration preserves every old field and initializes only exact Rebirth history', () => {
     const s = rich(), { statistics: _statistics, ...permanentProgression } = s.permanentProgression;
-    const old = { ...s, permanentProgression }, raw = JSON.stringify(envelope(old, 13));
-    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(14); expect(result.ok).toBe(true);
+    const old = { ...s, permanentProgression }, raw = stringifySaveFixture(envelope(old, 13));
+    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(15); expect(result.ok).toBe(true);
     if (!result.ok) throw Error('fixture');
     const { statistics, ...previous } = result.envelope.state.permanentProgression;
     expect(statistics).toEqual({ manualJobsCompleted: 0, automatedJobsCompleted: 0, businessLevelsPurchased: 0,
       territoriesAcquired: 0, crewMembersRecruited: 0, eventsResolved: 0, rebirthsCompleted: 4, peakHeat: 0 });
     expect({ ...result.envelope.state, permanentProgression: previous }).toEqual(old);
-    expect(result.envelope.savedAt).toBe(123456789); expect(JSON.stringify(envelope(old, 13))).toBe(raw);
+    expect(result.envelope.savedAt).toBe(123456789); expect(stringifySaveFixture(envelope(old, 13))).toBe(raw);
     expect(validateSaveCode(encodeSaveText(raw))).toEqual(result);
     const next = performRebirth(result.envelope.state); expect(next.ok).toBe(true);
     expect(next.state.permanentProgression.statistics.rebirthsCompleted).toBe(5); expect(next.state.permanentProgression.rebirthCount).toBe(5);
@@ -36,13 +37,13 @@ describe('v14 lifetime statistics and CE1', () => {
     for (const value of [undefined, -1, 0.1, Number.MAX_SAFE_INTEGER + 1, '1', null, true, NaN, Infinity]) {
       const bad = { ...s, permanentProgression: { ...s.permanentProgression, statistics: { ...createInitialStatistics(), [key]: value } } };
       expect(validateSaveState(bad)).toBeNull();
-      expect(parseSave(JSON.stringify(envelope(bad)))).toEqual({ ok: false, error: 'invalid-state' });
+      expect(parseSave(stringifySaveFixture(envelope(bad)))).toEqual({ ok: false, error: 'invalid-state' });
     }
     const { [key]: _value, ...missing } = createInitialStatistics(); expect(isStatisticsState(missing)).toBe(false);
   });
   it.each([undefined, -1, 101, 0.5, '60', null, true, NaN, Infinity])('rejects malformed peakHeat %#', peakHeat => {
     const s = rich(), bad = { ...s, permanentProgression: { ...s.permanentProgression, statistics: { ...createInitialStatistics(), peakHeat } } };
-    expect(validateSaveState(bad)).toBeNull(); expect(parseSave(JSON.stringify(envelope(bad))).ok).toBe(false);
+    expect(validateSaveState(bad)).toBeNull(); expect(parseSave(stringifySaveFixture(envelope(bad))).ok).toBe(false);
   });
   it.each([0, 1, 60, 100])('accepts peak %i even if current Heat is different', peakHeat => {
     const s = rich(); expect(validateSaveState({ ...s, permanentProgression: { ...s.permanentProgression, statistics: { ...createInitialStatistics(), peakHeat } } })).not.toBeNull();
@@ -74,8 +75,8 @@ describe('v14 lifetime statistics and CE1', () => {
       ...(version >= 7 ? { permanentProgression: { empirePoints: 17, rebirthCount: 4, ...(version >= 8 ? { skills: s.permanentProgression.skills } : {}), ...(version >= 13 ? { unlockedAchievementIds: s.permanentProgression.unlockedAchievementIds } : {}) } } : {}),
       ...(version >= 9 ? { city: version === 9 ? { ownedTerritoryIds: s.city.ownedTerritoryIds } : s.city } : {}),
       ...(version >= 11 ? { crew: s.crew } : {}), ...(version >= 12 ? { events: s.events } : {}) };
-    const r = validateSaveCode(encodeSaveText(JSON.stringify(envelope(state, version))));
-    expect(r).toMatchObject({ ok: true, envelope: { version: 14, savedAt: 123456789, state: {
+    const r = validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state, version))));
+    expect(r).toMatchObject({ ok: true, envelope: { version: 15, savedAt: 123456789, state: {
       economy: s.economy, permanentProgression: { statistics: createInitialStatistics(version >= 7 ? 4 : 0) } } } });
   });
   it('v14 empty state roundtrip adds no fields, history, or timestamps', () => {

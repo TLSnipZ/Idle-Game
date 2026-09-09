@@ -11,6 +11,6 @@ export function territoryState(owned = false, playerLevel = 12, businessLevel = 
   return { ...fresh, economy: { cash: moneyFromMinorUnits('10000000') },
     progression: { xp: getXpThresholdForLevel(playerLevel) },
     businesses: { ...fresh.businesses, owned: { [STARTER_BUSINESS.id]: { level: businessLevel } } },
-    automation: { unlockedIds: [DELIVERY_DISPATCHER.id], starterJobElapsedMs: 0 },
+    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [DELIVERY_DISPATCHER.id], starterJobElapsedMs: 0 },
     city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: owned ? [WATERFRONT.id, NEON_MILE.id] : [WATERFRONT.id] } };
 }

@@ -1,7 +1,7 @@
 import { describeCrewCommand } from './crew-presentation';
 import { findVehicle } from '../features/vehicles';
 import { evaluateXpReward } from '../game/xp-reward';
-import { DELIVERY_DISPATCHER } from '../features/automation';
+import { BUSINESS_AUTO_UPGRADER, DELIVERY_DISPATCHER } from '../features/automation';
 import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
 import { findUpgrade } from '../features/upgrades';
@@ -14,6 +14,7 @@ import type { PersistenceStatus } from '../platform/persistent-game';
 export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown): string {
   if (result.ok) {
     if (action === 'vehicle') return `${findVehicle(contentId)?.name ?? 'Vehicle'} added to your garage. Production bonus is active.`;
+    if (action === 'automation' && contentId === BUSINESS_AUTO_UPGRADER.id) return 'Business Auto-Upgrader purchased. Disabled until you enable automatic spending.';
     if (action === 'automation') return `${DELIVERY_DISPATCHER.name} hired. Automated deliveries are active.`;
     if (action === 'equipment') {
       const upgrade = findUpgrade(contentId);
@@ -43,7 +44,10 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'unknown-vehicle': return 'This vehicle is unavailable. No purchase was made.';
     case 'unknown-business': return 'This business is unavailable. No purchase was made.';
     case 'unknown-automation': return 'This delegation is unavailable.';
-    case 'already-unlocked': return 'This dispatcher is already hired.';
+    case 'already-unlocked': return 'This automation is already owned.';
+    case 'not-toggleable': return 'This automation cannot be toggled.';
+    case 'automation-not-owned': return 'Purchase this automation first.';
+    case 'invalid-enabled': return 'The automation setting is invalid.';
     case 'unknown-upgrade': return 'This upgrade is unavailable.';
     case 'already-purchased': return 'This upgrade is already purchased.';
     case 'requirements-not-met':

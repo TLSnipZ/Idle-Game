@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 14;
+export const CURRENT_SAVE_VERSION = 15;
 // UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
@@ -88,7 +88,13 @@ function validateState(value: unknown, version: number): GameState | null {
       purchasedIds.push(upgrade.id);
     }
   }
-  const automation = version >= 4 ? value.automation : createInitialAutomationState();
+  let automation: unknown = version >= 4 ? value.automation : createInitialAutomationState();
+  if (version >= 4 && version < 15) {
+    if (!record(automation) || !keys(automation, ['unlockedIds', 'starterJobElapsedMs'])
+      || !Array.isArray(automation.unlockedIds)
+      || automation.unlockedIds.some(id => id !== 'automation:delivery-dispatcher')) return null;
+    automation = { ...automation, enabledIds: [], businessAutoUpgradeElapsedMs: 0 };
+  }
   if (!isAutomationState(automation)) return null;
   const progression = version >= 5 ? value.progression : { xp: 0 };
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
@@ -120,7 +126,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { unlockedIds: [...automation.unlockedIds], starterJobElapsedMs: automation.starterJobElapsedMs }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -199,6 +205,15 @@ function migrateV12ToV13(value: unknown): unknown {
 /** Schema-only addition: Rebirth count is the sole existing exact historical counter. */
 function migrateV13ToV14(value: unknown): GameState | null { return validateState(value, 13); }
 
+function migrateV14ToV15(value: unknown): GameState | null { return validateState(value, 14); }
+
+/** Emit historical automation shape between sequential legacy migrations. */
+function legacyAutomation(value: unknown): unknown {
+  if (!record(value) || !record(value.automation)) return value;
+  const { enabledIds: _enabled, businessAutoUpgradeElapsedMs: _elapsed, ...automation } = value.automation;
+  return { ...value, automation };
+}
+
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
   if (!record(value) || !keys(value, ['format', 'version', 'savedAt', 'state'])) {
@@ -210,19 +225,20 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version > CURRENT_SAVE_VERSION) return { ok: false, error: 'unsupported-version' };
   if (!isSaveTimestamp(value.savedAt)) return { ok: false, error: 'invalid-timestamp' };
   let migrated: unknown = value.state;
-  if (value.version === 1) migrated = migrateV1ToV2(migrated);
-  if (value.version <= 2) migrated = migrateV2ToV3(migrated);
-  if (value.version <= 3) migrated = migrateV3ToV4(migrated);
-  if (value.version <= 4) migrated = migrateV4ToV5(migrated);
-  if (value.version <= 5) migrated = migrateV5ToV6(migrated);
-  if (value.version <= 6) migrated = migrateV6ToV7(migrated);
-  if (value.version <= 7) migrated = migrateV7ToV8(migrated);
-  if (value.version <= 8) migrated = migrateV8ToV9(migrated);
-  if (value.version <= 9) migrated = migrateV9ToV10(migrated);
-  if (value.version <= 10) migrated = migrateV10ToV11(migrated);
-  if (value.version <= 11) migrated = migrateV11ToV12(migrated);
-  if (value.version <= 12) migrated = migrateV12ToV13(migrated);
-  if (value.version <= 13) migrated = migrateV13ToV14(migrated);
+  if (value.version === 1) migrated = legacyAutomation(migrateV1ToV2(migrated));
+  if (value.version <= 2) migrated = legacyAutomation(migrateV2ToV3(migrated));
+  if (value.version <= 3) migrated = legacyAutomation(migrateV3ToV4(migrated));
+  if (value.version <= 4) migrated = legacyAutomation(migrateV4ToV5(migrated));
+  if (value.version <= 5) migrated = legacyAutomation(migrateV5ToV6(migrated));
+  if (value.version <= 6) migrated = legacyAutomation(migrateV6ToV7(migrated));
+  if (value.version <= 7) migrated = legacyAutomation(migrateV7ToV8(migrated));
+  if (value.version <= 8) migrated = legacyAutomation(migrateV8ToV9(migrated));
+  if (value.version <= 9) migrated = legacyAutomation(migrateV9ToV10(migrated));
+  if (value.version <= 10) migrated = legacyAutomation(migrateV10ToV11(migrated));
+  if (value.version <= 11) migrated = legacyAutomation(migrateV11ToV12(migrated));
+  if (value.version <= 12) migrated = legacyAutomation(migrateV12ToV13(migrated));
+  if (value.version <= 13) migrated = legacyAutomation(migrateV13ToV14(migrated));
+  if (value.version <= 14) migrated = migrateV14ToV15(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

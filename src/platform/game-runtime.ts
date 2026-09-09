@@ -1,3 +1,4 @@
+import type { ToggleAutomationResult } from '../game/set-automation-enabled';
 import { unlockEligibleAchievements } from '../game/achievements';
 import type { AchievementId } from '../features/achievements';
 import { browserRandom } from './random-source';
@@ -23,7 +24,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state';
 
@@ -143,6 +144,7 @@ export function createGameRuntime(
         || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds
         || result.state.permanentProgression.skills !== previous.permanentProgression.skills
         || result.state.upgrades !== previous.upgrades
+        || result.state.automation.enabledIds !== previous.automation.enabledIds
         || result.state.automation.unlockedIds !== previous.automation.unlockedIds)) remainderMs = 0;
     snapshot = { ...snapshot, ...(result.ok ? { ...levelEventFor(result.state), ...achievementEventFor(result.state, beforeAchievements) } : {}), result };
     publish(snapshot);
