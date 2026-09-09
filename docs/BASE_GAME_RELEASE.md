@@ -132,3 +132,12 @@ Phase 9D runtime safeguards, deterministic Event RNG, exact remainders, offline
 durability, atomic import/Rebirth, permanent history, Phase 9A navigation and Phase
 9B accessibility. Authoritative-state additions need explicit sequential migrations.
 No post-roadmap work or Rebranding is started by this release audit.
+
+
+## Post-roadmap visual foundation
+
+The user subsequently declared the Base Game foundation complete at
+`21c5858ad6a11b1ec9d1260cd580fe94d2299881`. POST 1A begins presentation-only
+Rebranding / Art Direction; it does not rewrite the historical release audit above.
+Save v15, CE1, stable IDs, balance and central runtime/persistence contracts remain
+authoritative. See ART_DIRECTION.md. POST 1A live visual verification is pending.

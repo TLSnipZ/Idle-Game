@@ -12,10 +12,10 @@ export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
   const paused = runtimeError !== null;
   const storageError = persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error';
   return <aside className="global-feedback" aria-label="Session feedback">
-    <div role="status" aria-live="polite" aria-atomic="true"><span key={feedback.sequence}>{feedback.message}</span></div>
-    <div role="status" aria-live="polite" aria-atomic="true">{achievementEvent && <span key={achievementEvent.sequence}>{achievementAnnouncement(achievementEvent.ids)}</span>}</div>
+    <div className={`feedback-command feedback-${feedback.tone ?? 'info'}`} role="status" aria-live="polite" aria-atomic="true"><span key={feedback.sequence}>{feedback.message}</span></div>
+    <div className="feedback-achievement" role="status" aria-live="polite" aria-atomic="true">{achievementEvent && <span key={achievementEvent.sequence}>{achievementAnnouncement(achievementEvent.ids)}</span>}</div>
     <div role="status" aria-live="polite" aria-atomic="true">{levelEvent && !paused && <span key={levelEvent.sequence}>{describeLevelIncrease(levelEvent)}{levelEvent.unlocks?.length ? ` · New unlock available: ${levelEvent.unlocks.join(', ')}` : ''}</span>}</div>
-    <div role="status" aria-live="polite" aria-atomic="true">{cityEvent && cityEvent.id === game.snapshot.state.events.pendingEventId && <span key={cityEvent.sequence}>{describeEventSpawn(cityEvent.id)}</span>}</div>
+    <div className="feedback-event" role="status" aria-live="polite" aria-atomic="true">{cityEvent && cityEvent.id === game.snapshot.state.events.pendingEventId && <span key={cityEvent.sequence}>{describeEventSpawn(cityEvent.id)}</span>}</div>
     <div>{automationEvent && !paused && <span>Last dispatch: {describeAutomatedJobs(automationEvent)}</span>}</div>
     {transferMessage && <p role="status">{transferMessage}</p>}
     {rebirthMessage && <p role="status">{rebirthMessage}</p>}

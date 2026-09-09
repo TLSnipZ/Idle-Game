@@ -1,13 +1,13 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 280px; background: var(--color-background); color: var(--color-text); font-family: var(--font-body); font-size: 1rem; line-height: 1.6; }
 a { color: var(--color-cool); }
-:focus-visible { outline: 2px solid var(--color-cool); outline-offset: 5px; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 5px; }
 ::selection { background: var(--color-accent); color: var(--color-background); }
 
 /* Presentation-only accessibility: no runtime preference or saved state. */
 button, a, textarea, input, select { scroll-margin-block: 18rem 2rem; }
 button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 3px solid var(--color-cool); outline-offset: 3px;
+  outline: 3px solid var(--color-focus); outline-offset: 3px;
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

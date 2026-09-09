@@ -16,7 +16,7 @@ export function HeatPanel({ state, paused, onLayLow }: {
     <p>Manual delivery: +{MANUAL_JOB_HEAT} Heat. Dispatcher: +1 per {DISPATCHER_JOBS_PER_HEAT} deliveries in one batch.</p>
     <p>Lay low · Reduce Heat by {view.reduction} · Cost: {formatCash(view.cost)}</p>
     <p>{view.availability}</p>
-    <button className="action-button purchase-button" aria-label="Lay low to reduce Heat"
+    <button className="action-button secondary-button" aria-label="Lay low to reduce Heat"
       disabled={paused || !view.canLayLow} onClick={onLayLow}>{paused ? 'Session paused' : 'LAY LOW'}</button>
   </article>;
 }

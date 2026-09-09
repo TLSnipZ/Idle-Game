@@ -9,10 +9,10 @@ export function GlobalStatus({ view, active, onNavigate, paused }: {
   return <div className="global-chrome">
     <div className="global-chrome-inner">
       <dl className="global-status" aria-label="Current player status">
-        <div><dt>Cash</dt><dd>{view.cash}</dd></div>
-        <div><dt>Player Level</dt><dd>{view.player.currentLevel}</dd></div>
-        <div><dt>Heat</dt><dd>{view.heat.heat} · {view.heat.tier.label}</dd></div>
-        <div><dt>Empire Points</dt><dd>{view.empire.empirePoints} EP</dd></div>
+        <div className="hud-cash"><dt>Cash</dt><dd>{view.cash}</dd></div>
+        <div className="hud-level"><dt>Player Level</dt><dd>{view.player.currentLevel}</dd></div>
+        <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>Heat</dt><dd>{view.heat.heat} · {view.heat.tier.label}</dd></div>
+        <div className="hud-empire"><dt>Empire Points</dt><dd>{view.empire.empirePoints} EP</dd></div>
       </dl>
       <Navigation active={active} onNavigate={onNavigate} />
       {(view.event.pending || view.autoActive || paused) && <div className="global-indicators">

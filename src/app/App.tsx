@@ -37,18 +37,18 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const paused = game.runtimeError !== null;
   return <div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>Skip to main content</a>
-    <header className="app-header"><span className="wordmark"><span className="brand-mark" aria-hidden="true">CE</span> Crime Empire</span><span className="edition">{CITY_NAME}</span></header>
+    <header className="app-header"><span className="wordmark">{CITY_NAME}</span><span className="edition">Own the night</span></header>
     <GlobalStatus view={dashboardPresentation(game.snapshot.state)} active={active} onNavigate={setActive} paused={paused} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />
       {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => setActive(SECTION.empire.id)}>Return to Empire · Confirmation awaiting your choice</button>}
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />
-      <div onClickCapture={captureAction} id="section-content" aria-labelledby="section-heading">
+      <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{section.label}</h1><p>{section.description}</p></div>
         <SectionContent active={active} game={game} onNavigate={setActive} save={save} rebirth={rebirth} />
       </div>
       <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(getOfflineCapMs(game.snapshot.state))}.</p>
     </main>
-    <footer className="app-footer"><span>Crime Empire <span aria-hidden="true">/</span> Working title</span><span>Start small. Own the night.</span></footer>
+    <footer className="app-footer"><span>{CITY_NAME} <span aria-hidden="true">/</span> Crime empire</span><span>Start small. Own the night.</span></footer>
   </div>;
 }

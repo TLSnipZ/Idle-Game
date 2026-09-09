@@ -4,7 +4,6 @@ import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
 import { formatCash } from '../features/economy/ui';
 import { formatModifier } from './stat-format';
 import { RequirementList } from './RequirementList';
-import { vehicleArtwork } from './vehicle-artwork';
 
 export function Garage({ state, paused, onPurchase }: {
   readonly state: GameState; readonly paused: boolean; readonly onPurchase: (id: string) => void;
@@ -18,9 +17,8 @@ export function Garage({ state, paused, onPurchase }: {
       if (!view) return null;
       const heading = `${vehicle.id}-heading`;
       const requirements = `${vehicle.id}-requirements`;
-      const art = vehicleArtwork(vehicle.id);
       return <article key={vehicle.id} className={`panel vehicle-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
-        {art && <div className={art.className} aria-hidden="true"><span>PERFORMANCE COLLECTION</span><small>{art.label}</small></div>}
+        <p className="eyebrow">Performance collection · Permanent ownership</p>
         <div className="panel-heading"><h3 id={heading}>{vehicle.name}</h3>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? 'OWNED' : 'NOT OWNED'}</span></div>
         <p className="eyebrow">{vehicle.category}</p><p>{vehicle.description}</p>

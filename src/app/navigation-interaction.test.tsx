@@ -147,13 +147,21 @@ describe('mounted navigation and one live runtime', () => {
     expect(container.querySelector('.global-indicators')?.textContent ?? '').not.toContain('AUTO-UPGRADER ACTIVE');
   });
   it('manual command and achievement feedback remain after leaving Operations', async () => {
-    const s = createInitialGameState(); await mount({ ...s, progression: { xp: 90 }, city: { ...s.city, heat: 59 } });
+    const s = createInitialGameState(); const f = await mount({ ...s, progression: { xp: 90 }, city: { ...s.city, heat: 59 } });
     await navigate('OPERATIONS'); const delivery = container.querySelector('.delivery-button');
     if (!(delivery instanceof HTMLButtonElement)) throw Error('delivery');
     await act(() => delivery.click()); await navigate('COLLECTION');
     expect(container.querySelector('.global-feedback')?.textContent).toContain('First Steps');
     expect(container.querySelector('.global-feedback')?.textContent).toContain('Running Hot');
     expect(container.querySelector('.global-status')?.textContent).toContain('60 · HOT');
+    expect(container.querySelector('.hud-heat')?.classList.contains('heat-hot')).toBe(true);
+    expect(container.querySelector('#section-content')?.getAttribute('data-section')).toBe('collection');
+    expect(content()).toContain('Permanent ownership');
+    const feedback = container.querySelector('.feedback-success');
+    expect(feedback?.getAttribute('aria-live')).toBe('polite');
+    expect(container.querySelector('.feedback-achievement')?.textContent).toContain('First Steps');
+    await f.advance(250);
+    expect(container.querySelector('.feedback-success')).toBe(feedback);
   });
   it('Rebirth confirmation and cancel survive remounting the Empire view; only explicit confirm resets', async () => {
     const f = await mount(autoUpgraderState()); await navigate('EMPIRE');

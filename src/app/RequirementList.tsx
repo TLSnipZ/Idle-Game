@@ -5,7 +5,7 @@ export function RequirementList({ result, id }: { readonly result: RequirementRe
   return <div id={id} className="requirements">
     {result.requirements.length === 0 ? <p>No requirements.</p> : <>
       <p>Requirements</p>
-      <ul>{result.requirements.map((detail, index) => <li key={index}>
+      <ul>{result.requirements.map((detail, index) => <li key={index} className={detail.met ? 'requirement-met' : 'requirement-unmet'}>
         {detail.met ? 'Met' : 'Not met'} — {detail.description}
       </li>)}</ul>
     </>}

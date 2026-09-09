@@ -1,7 +1,8 @@
-# Crime Empire
+# Solara City
 
-Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 9E: Base Game release candidate; live verification pending.**
+A modern coastal crime, luxury and street-culture idle/tycoon browser game.
+The Base Game foundation is complete. **POST 1A visual foundation implemented; live visual review pending.**
+See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
