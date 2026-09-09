@@ -275,9 +275,12 @@ The approved Solara palette, typography, tokens and [ART_DIRECTION.md](ART_DIREC
 remain the visual foundation.
 
 **POST 1B Deep UI Transformation is manually verified live by the user.**
-**POST 1C Live UX Polish & Number Formatting implementation is complete; live
-verification is pending.** No assets, Golden References or content expansion started.
+**POST 1C Live UX Polish & Number Formatting is manually verified live by the user.**
+**POST 2A Vehicle Catalog Design Pass implementation is complete; live-game changes
+are none.** [VEHICLE_CATALOG.md](VEHICLE_CATALOG.md) documents proposed vehicles,
+pricing evidence and future ownership/tuning/migration contracts. KX-R is not live.
 
-[POST_ROADMAP.md](POST_ROADMAP.md) is the current post-roadmap priority/status source:
-POST 1C → POST 2A Vortex S9 Golden Reference → POST 2B Crew/Territory/Event references
-→ controlled asset batches. Future work is neither started nor automatically authorized.
+[POST_ROADMAP.md](POST_ROADMAP.md) remains the current priority/status source.
+Next: **POST 2B — Kairo KX-R Golden Reference**, a separately approved small candidate
+phase. Candidate A's prior approval concerns Art Style only, not its sedan model.
+No canonical vehicle artwork, Garage expansion or Tuning has been implemented.

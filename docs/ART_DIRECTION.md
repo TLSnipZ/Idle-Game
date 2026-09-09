@@ -290,5 +290,37 @@ Empty slots have one absence message and static assignment guidance. Normal card
 explain consequences, not fractional remainders or batch-rounding internals.
 
 No gameplay, assets, fonts, dependencies or guidance engine are introduced. Preserve
-these conventions in POST 2A along with approved reference governance. See
+these conventions in subsequent Garage/asset work along with approved reference governance. See
 [POST_ROADMAP.md](POST_ROADMAP.md) for current status and deferred priorities.
+
+
+## POST 2A — Vehicle Art Style and canonical models
+
+[VEHICLE_CATALOG.md](VEHICLE_CATALOG.md) is the future Garage planning authority.
+The user approved earlier external **Candidate A for Vehicle Art-Style Direction
+only**: premium realistic game-render quality, front 3/4 low natural automotive
+camera, vehicle-dominant responsive framing, Solara coastal-night showroom,
+wet/polished floor, grounded contact shadow, restrained reflections and navy /
+turquoise / magenta / warm lighting. Its depicted sedan is **not** an approved
+production model. No image is integrated or promoted by this documentation pass.
+
+An **Art-Style Reference** defines shared camera, rendering, lighting, environment
+and composition. A **Vehicle Model Reference** defines one canonical fictional
+body, proportions, lamps, grille, surfaces, aero, wheels and badges. No Golden
+Vehicle Model Reference exists yet. Kairo Motors / Kairo KX-R is the confirmed
+future first-car concept; Vortex stays live pending explicit implementation.
+
+Future models may strongly evoke real automotive eras/archetypes, but must alter
+identifying lamps, intakes, bumpers, rear graphics, surfaces, aero and branding.
+Do not commission exact real cars with logos removed. Real-model references stay
+in developer notes; player names and badges are fictional. The KX-R keeps compact
+1990s performance-hatch DNA with its own canonical details. The next phase is
+**POST 2B — Kairo KX-R Golden Reference**, a small user-reviewed candidate set.
+
+Future tuning uses each approved base Model Reference to create controlled reviewed
+variants while retaining identity and the shared Art Style. Favor curated feasible
+image combinations; do not promise arbitrary in-browser generation, a 3D configurator
+or thousands of full renders. Keep files independent of saved vehicle/build IDs.
+Inspect this document, the applicable explicitly approved assets and catalog model
+notes before any generation. Missing approved image sources must be recovered or
+requested, never replaced silently. User approval precedes reference promotion.
