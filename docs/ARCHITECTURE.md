@@ -1839,7 +1839,7 @@ Crew-specific options, extra content or Phase 8 systems are implemented.
 ## Phase 8A — permanent Achievement Foundation
 
 Phase 7D and the complete Phase 7 city-system foundation were manually verified
-live by the user. Phase 8A implementation is complete; **live verification is pending**.
+live by the user. Phase 8A implementation is complete and **manually verified live by the user**.
 
 Exactly six stable `AchievementId`s live in the explicit ordered achievement catalog.
 Config owns names, descriptions and typed current-state conditions. The only saved
@@ -1893,3 +1893,89 @@ and permanent completion after unlocking. Grouped runtime announcements include
 all new names in configured order, including a command that unlocks milestones
 both during reconciliation and afterward. Bootstrap and successful Rebirth use
 the same ephemeral announcement shape; no notification history is saved.
+
+
+## Phase 8B — permanent Lifetime Statistics Foundation
+
+Phase 8A was manually verified live by the user. Phase 8B implementation is
+complete; **live verification is pending**. Statistics are local, observational
+history and grant no rewards. No formula, requirement, event chance or achievement
+condition reads statistics. The six Phase 8A achievements remain unchanged.
+
+`permanentProgression.statistics: StatisticsState` contains exactly eight explicit
+numeric fields. Fresh games start all eight at zero. No display strings, derived
+values, timestamps, lifetime cash, telemetry or backend state are stored.
+
+| Field | Successful transition counted |
+| --- | --- |
+| `manualJobsCompleted` | +1 per manual starter job; never Dispatcher jobs |
+| `automatedJobsCompleted` | +completed Dispatcher cycles, online or credited offline, once per full batch |
+| `businessLevelsPurchased` | +1 per paid level upgrade; initial Level-1 purchase excluded |
+| `territoriesAcquired` | +1 per Neon Mile acquisition, including repeat acquisitions after Rebirth; Waterfront excluded |
+| `crewMembersRecruited` | +1 per recruitment, including repeats after Rebirth; assignment/replacement/unassignment excluded |
+| `eventsResolved` | +1 per successful choice, including PASS; spawn, failed choices and pending discard excluded |
+| `rebirthsCompleted` | +1 per successful Rebirth, atomically with the existing `rebirthCount` |
+| `peakHeat` | Maximum final Heat observed at successful Heat-changing command or positive elapsed-batch boundaries |
+
+The statistics feature owns immutable `incrementStatistic` and `recordPeakHeat`
+helpers. Cumulative counters are non-negative safe integers. Checked addition
+compares remaining safe-integer capacity before adding; overflow returns structured
+`statistics-overflow`, never a clamped/imprecise result. Invalid authoritative
+inputs fail loudly. Peak Heat is an integer in 0–100 and never decreases.
+`game/statistics.ts` composes these helpers with complete local command candidates;
+a failed counter update returns the full original transaction input. No partial
+Money, XP, Heat, ownership, event resolution, achievement or counter is published.
+
+Commands retain their existing runtime reconciliation boundary. Completed elapsed
+work before a failed command remains authoritative; only the failed command's
+candidate is discarded. Successful commands carry their counters in the same
+normal meaningful-command save, then the existing central achievement evaluation
+runs before publication. No second statistics write or UI-owned update exists.
+
+The shared `simulateGameElapsed` transaction keeps interval-start modifiers/Heat,
+business production, Dispatcher Money/XP, batch Heat gain, then Heat decay. Only
+after that full result does it count completed Dispatcher cycles and observe final
+Heat, followed by achievement evaluation. There is no per-cycle loop or additional
+scheduler. Internal gain/decay slices never observe peak Heat: starting at 55,
+rising internally to 65 and cooling to final 45 observes **45**, not 65. Existing
+higher historical peaks remain. Running Hot still evaluates current final Heat,
+not `peakHeat`; neither system reconstructs unseen transient peaks.
+
+Zero elapsed is not a statistics observation. Loading, validation, migration,
+rendering and import alone do not increment counters or infer a peak from current
+Heat. Positive legitimate online/offline reconciliation may record its final Heat.
+Offline uses the same completed-cycle result and the same Never Sleeps-only
+8/10/12h duration for every subsystem. Its candidate includes statistics and
+achievements before durable write/publication. Overflow or storage failure
+preserves the previous durable save and existing paused-bootstrap behavior.
+No manual-job/event-resolution counts arise offline; City Events remain frozen.
+
+Rebirth reconciles with the current run first, retaining legitimate final elapsed
+statistics, then constructs the fresh temporary run with permanent history carried
+forward. Both Rebirth counters update atomically; overflow in either rejects the
+whole reset and EP award. It never infers a new peak merely from resetting Heat.
+The durable write includes all retained history before replacement.
+
+| Rebirth policy | State |
+| --- | --- |
+| Keep | Garage/vehicles, unspent EP, Rebirth count, permanent skills, achievements, all lifetime statistics |
+| Reset | Cash, businesses/levels/fractions, normal upgrades, Dispatcher/progress, XP, Crew, City Events/progress, Heat/remainder; territories return to Waterfront only |
+
+Save schema **v14** retains sequential v1→…→v13→v14 migration. v13→v14 adds only
+statistics and preserves every old field and `savedAt`. Seven fields start zero,
+including `peakHeat`, regardless of current progression. The **sole history
+initialization exception** is `rebirthsCompleted = existing rebirthCount`, since
+that is already an exact historical count. No other history is inferred. Current
+validation requires exactly the eight fields, checked numeric ranges and plain
+JSON-compatible structure. It intentionally does not require the two Rebirth
+counts to equal; valid imported values remain authoritative, and future Rebirths
+increment both independently by one.
+
+**CE1- remains unchanged** and preserves all statistics exactly, with the existing
+write-before-replacement and timestamp rebase. Import performs no historical
+simulation, count increment or peak inference. Future successful gameplay resumes
+from imported values. Statistics UI is a separate compact section with eight
+ordered, accessible entries; formatting lives in pure presentation selectors.
+No charts, analytics, rewards, new achievements, challenges or Phase 8C automation
+were added. Phase 8C must preserve these counter units, atomic boundaries, migration
+exception, observational isolation and final-state Heat semantics.

@@ -1,3 +1,5 @@
+import { countStatistic, observePeakHeat } from './statistics';
+import type { StatisticsError } from '../features/statistics';
 import { gainHeat } from '../features/heat';
 import { findTerritory } from '../features/territories';
 import { spendCash } from '../features/economy';
@@ -8,7 +10,7 @@ import type { GameState } from './game-state';
 import { validateSaveState } from './save-schema';
 
 export type AcquireTerritoryResult = { readonly ok: true; readonly state: GameState }
-  | { readonly ok: false; readonly state: GameState; readonly error: EconomyError | 'unknown-territory' | 'already-owned' }
+  | { readonly ok: false; readonly state: GameState; readonly error: StatisticsError | EconomyError | 'unknown-territory' | 'already-owned' }
   | { readonly ok: false; readonly state: GameState; readonly error: 'requirements-not-met'; readonly requirements: RequirementResult };
 
 export function acquireTerritory(state: GameState, id: unknown): AcquireTerritoryResult {
@@ -20,6 +22,6 @@ export function acquireTerritory(state: GameState, id: unknown): AcquireTerritor
   if (!requirements.met) return { ok: false, state, error: 'requirements-not-met', requirements };
   const payment = spendCash(state.economy, territory.purchaseCost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
-  return { ok: true, state: { ...state, economy: payment.state,
-    city: { ...gainHeat(state.city, territory.acquisitionHeat), ownedTerritoryIds: [...state.city.ownedTerritoryIds, territory.id] } } };
+  return countStatistic(state, observePeakHeat({ ...state, economy: payment.state,
+    city: { ...gainHeat(state.city, territory.acquisitionHeat), ownedTerritoryIds: [...state.city.ownedTerritoryIds, territory.id] } }), 'territoriesAcquired');
 }

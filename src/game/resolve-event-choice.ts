@@ -1,3 +1,5 @@
+import { countStatistic, observePeakHeat } from './statistics';
+import type { StatisticsError } from '../features/statistics';
 import { findEvent, createInitialEventState } from '../features/events';
 import type { EventChoice } from '../features/events';
 import { spendCash, earnCash } from '../features/economy';
@@ -9,7 +11,7 @@ import type { GameState } from './game-state';
 export type EventResolutionResult =
   | { readonly ok: true; readonly state: GameState; readonly choice: EventChoice }
   | { readonly ok: false; readonly state: GameState;
-      readonly error: EconomyError | 'no-pending-event' | 'wrong-event' | 'unknown-choice' };
+      readonly error: StatisticsError | EconomyError | 'no-pending-event' | 'wrong-event' | 'unknown-choice' };
 
 /** Resolve exactly the current identity, never an arbitrary catalog reward. No RNG. */
 export function resolveEventChoice(
@@ -29,8 +31,7 @@ export function resolveEventChoice(
   const city = choice.heatChange >= 0
     ? gainHeat(state.city, choice.heatChange)
     : reduceHeat(state.city, -choice.heatChange);
-  return {
-    ok: true, choice,
-    state: { ...state, economy: credit.state, city, events: createInitialEventState() },
-  };
+  const counted = countStatistic(state, { ...state, economy: credit.state, city, events: createInitialEventState() }, 'eventsResolved');
+  if (!counted.ok) return counted;
+  return { ok: true, choice, state: observePeakHeat(counted.state) };
 }

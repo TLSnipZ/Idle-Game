@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../../features/statistics';
 import { createInitialGameState } from '../game-state';
 import type { GameState } from '../game-state';
 import type { SkillRanks } from '../../features/skills';
@@ -14,5 +15,5 @@ export function skillState(skills: SkillRanks = {}, ep = 30): GameState {
   return { ...fresh, economy: { cash: moneyFromMinorUnits('100000000') },
     businesses: { ...fresh.businesses, owned: { [STARTER_BUSINESS.id]: { level: 1 } } },
     automation: { unlockedIds: [DELIVERY_DISPATCHER.id], starterJobElapsedMs: 0 },
-    permanentProgression: { unlockedAchievementIds: [], empirePoints: ep, rebirthCount: 1, skills } };
+    permanentProgression: { statistics: createInitialStatistics(1), unlockedAchievementIds: [], empirePoints: ep, rebirthCount: 1, skills } };
 }

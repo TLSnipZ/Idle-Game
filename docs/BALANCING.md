@@ -594,3 +594,24 @@ passes 60 Heat internally but finishes below 60 does not unlock Running Hot sole
 from that peak. There are no lifetime statistics or achievement rewards in 8A.
 Migration adds empty ownership; normal bootstrap can recognize currently satisfied
 milestones. Import preserves recorded completion without historical inference.
+
+
+## Phase 8B — observational lifetime statistics
+
+Statistics do not change balance and grant no reward. The eight fields are:
+manual jobs completed, automated jobs completed, business levels purchased,
+territories acquired, Crew members recruited, events resolved, Rebirths completed,
+and peak Heat. Jobs count successful manual actions and completed Dispatcher
+cycles separately. Business upgrades exclude initial purchase. Territory takeovers
+exclude baseline Waterfront and include reacquisition after Rebirth. Crew counts
+recruitment actions across runs, never assignment changes. Every successful event
+choice counts, including PASS; spawn or Rebirth discard does not.
+
+Rebirth preserves history and increments both its existing count and statistics
+count by one atomically. v13 migration initializes only the statistics Rebirth
+count from existing `rebirthCount`; all other fields start zero. Peak Heat records
+the maximum **final authoritative** Heat observed after an action/elapsed batch.
+A hidden Dispatcher peak removed by same-batch cooling is not reconstructed.
+Peak Heat remains after cooling and Rebirth; it grants no benefit and does not
+change Running Hot's current-Heat condition. No existing prices, rewards, caps,
+requirements, achievement thresholds or gameplay formulas change.

@@ -1,3 +1,4 @@
+import { observePeakHeat } from './statistics';
 import { LAY_LOW_COST, LAY_LOW_REDUCTION, reduceHeat } from '../features/heat';
 import { spendCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
@@ -10,5 +11,5 @@ export function layLow(state: GameState): LayLowResult {
   if (state.city.heat === 0) return { ok: false, state, error: 'already-cold' };
   const payment = spendCash(state.economy, LAY_LOW_COST);
   if (!payment.ok) return { ok: false, state, error: payment.error };
-  return { ok: true, state: { ...state, economy: payment.state, city: reduceHeat(state.city, LAY_LOW_REDUCTION) } };
+  return { ok: true, state: observePeakHeat({ ...state, economy: payment.state, city: reduceHeat(state.city, LAY_LOW_REDUCTION) }) };
 }

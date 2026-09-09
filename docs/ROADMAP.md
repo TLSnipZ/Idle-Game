@@ -30,9 +30,9 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 7B — Deterministic Heat (complete; user verified live) | Integer Heat, exact gain/decay, job cash penalties, Lay Low, v10 migration | Atomic start-tier batching, cooling remainder, shared offline cap and Rebirth reset |
 | 7C — Crew (complete; user verified live) | Three recruits, two assignment slots, exact active effects, v11 migration | Atomic recruitment/assignment, old-effect reconciliation, Mara remainder, shared offline and Rebirth reset |
 | 7D — Random Events (complete; user verified live) | Three events, two choices each, injected RNG, online-only opportunities, v12 migration | Atomic choices, one pending event, offline exclusion, Rebirth reset and deterministic tests |
-| 8A — Achievement Foundation (implementation complete; live pending) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
-| 8B — Statistics (next / deferred) | Separately scoped statistics expansion | Preserve achievement IDs, permanent completion and existing transaction boundaries |
-| Future — Late-game automation (deferred) | Separately scoped automation | Consistent commands, no runaway scheduling |
+| 8A — Achievement Foundation (complete; user verified live) | Six permanent observational milestones, central evaluation, v13 migration | Idempotent unlocks, runtime/offline durability, Rebirth retention; no rewards |
+| 8B — Lifetime Statistics Foundation (implementation complete; live pending) | Eight permanent observational fields, checked updates, v14 migration | Atomic counters, final-state peak Heat, offline durability and Rebirth retention |
+| 8C — Late-game automation (next / deferred) | Separately scoped automation | Consistent commands, no runaway scheduling |
 | 9 — Polish and release | Art, accessibility, responsive UI, balance and Pages deployment | Asset provenance, full progression checks, supported save migrations |
 
 ## Current status
@@ -174,9 +174,20 @@ Phase 7 city-system foundation — Territories, Heat, Crew and Random Events —
 now implemented and manually verified live. Earlier phase-local deferral notes
 above record history rather than the current implementation status.
 
-Phase 8A Achievement Foundation implementation is complete; **live verification
-is pending**. Exactly six achievements permanently recognize current-state
+Phase 8A Achievement Foundation implementation is complete and **manually verified
+live by the user**. Exactly six achievements permanently recognize current-state
 milestones with no gameplay rewards. Central command/runtime/offline evaluation,
 pre-/post-Rebirth ordering, v12→v13 migration and CE1 compatibility are covered.
-Phase 8B Statistics is next/deferred. Late-game automation remains deferred;
-Phase 8 as a whole is not complete. No lifetime or peak-Heat statistics were added.
+Phase 8B implementation follows below. No lifetime or peak-Heat statistics were
+added in Phase 8A. Phase 8 as a whole is not complete.
+
+
+Phase 8B Lifetime Statistics Foundation implementation is complete; **live
+verification is pending**. Eight permanent observations record manual/Dispatcher
+jobs, paid business upgrades, territory acquisitions, Crew recruits, event choices,
+Rebirths and final-state peak Heat. Checked counter overflow fails atomically;
+shared offline simulation and Rebirth preserve history. v13→v14 adds zero history
+except the exact existing Rebirth count; CE1 remains compatible. Statistics confer
+no rewards or gameplay effects, and the six achievements remain unchanged.
+**Phase 8C late-game automation is next/deferred**. No challenges, new achievements,
+analytics or automation were added; Phase 8 overall remains incomplete.

@@ -22,6 +22,7 @@ export function crewPresentation(state: GameState, id: unknown) {
 export function describeCrewCommand(result: CrewCommandResult, action: 'recruit' | 'assign' | 'unassign', id?: unknown, slotId?: unknown): string {
   if (!result.ok) {
     switch (result.error) {
+      case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
       case 'requirements-not-met': return `Recruitment locked: ${result.requirements.requirements.filter(r => !r.met).map(r => r.description).join('; ')}.`;
       case 'insufficient-funds': return 'Not enough cash to recruit. Nothing was spent.';
       case 'already-recruited': return 'This specialist is already recruited.';

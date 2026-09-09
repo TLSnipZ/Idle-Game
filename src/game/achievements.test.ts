@@ -79,7 +79,7 @@ describe('six permanent observational achievements', () => {
   it('captures every pre-Rebirth milestone, then First Rebirth, in the single reset candidate', () => {
     const base = allMilestones(), s = { ...base, permanentProgression: { ...base.permanentProgression, rebirthCount: 0, empirePoints: 7 } };
     const result = performRebirth(s); expect(result.ok).toBe(true);
-    expect(result.state).toEqual({ ...fresh(), garage: s.garage, permanentProgression: { ...s.permanentProgression, empirePoints: 11, rebirthCount: 1, unlockedAchievementIds: ids } });
+    expect(result.state).toEqual({ ...fresh(), garage: s.garage, permanentProgression: { ...s.permanentProgression, statistics: { ...s.permanentProgression.statistics, rebirthsCompleted: 1 }, empirePoints: 11, rebirthCount: 1, unlockedAchievementIds: ids } });
     const again = performRebirth({ ...s, permanentProgression: result.state.permanentProgression });
     expect(again.state.permanentProgression.unlockedAchievementIds).toEqual(ids);
     expect(again.state.permanentProgression.empirePoints).toBe(15);

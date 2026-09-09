@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { parseSave, CURRENT_SAVE_VERSION, validateSaveState } from './save-schema';
 import { encodeSaveText, validateSaveCode } from './save-code';
@@ -9,7 +10,7 @@ describe('v1 migration through v2 ownership', () => {
     const old = legacy(); const text = JSON.stringify(old);
     const result = parseSave(text);
     expect(result).toEqual({ ok: true, envelope: { ...old, version: CURRENT_SAVE_VERSION, state: {
-      events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, economy: old.state.economy, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [id]: { level: 1 } }, productionRemainderMilliCents: 975 },
+      events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, economy: old.state.economy, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: { [id]: { level: 1 } }, productionRemainderMilliCents: 975 },
     } } });
     expect(JSON.stringify(old)).toBe(text);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(result);

@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { parseSave, serializeSave, CURRENT_SAVE_VERSION, validateSaveState } from './save-schema';
 import { encodeSaveText, validateSaveCode, exportSaveCode } from './save-code';
@@ -19,8 +20,8 @@ function current() {
 describe('v6 vehicle saves',()=>{
   it('migrates realistic v5 preserving every previous field and savedAt through local/CE1 validation',()=>{
     const old=legacy(); const serialized=JSON.stringify(old);
-    const expected={ok:true,envelope:{...old,version: 13,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
-    expect(CURRENT_SAVE_VERSION).toBe(13); expect(parseSave(serialized)).toEqual(expected);
+    const expected={ok:true,envelope:{...old,version: 14,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ statistics: createInitialStatistics(0), unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
+    expect(CURRENT_SAVE_VERSION).toBe(14); expect(parseSave(serialized)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(serialized))).toEqual(expected); expect(JSON.stringify(old)).toBe(serialized);
   });
   it('roundtrips exact v6 ownership and all progress through the same envelope',()=>{
@@ -28,7 +29,7 @@ describe('v6 vehicle saves',()=>{
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(encoded.serialized));
-    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version: 13,savedAt:42,state}});
+    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version: 14,savedAt:42,state}});
     expect(encoded.serialized).not.toMatch(/artwork|Vortex|vehicle-placeholder|ownedVehicleCount/);
   });
   it.each([null,{}, {ownedVehicleIds:null}, {ownedVehicleIds:['vehicle:unknown']},

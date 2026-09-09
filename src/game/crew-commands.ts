@@ -1,3 +1,5 @@
+import { countStatistic } from './statistics';
+import type { StatisticsError } from '../features/statistics';
 import { CREW_SLOTS, findCrewMember, findCrewSlot } from '../features/crew';
 import { spendCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
@@ -6,7 +8,7 @@ import type { RequirementResult } from './requirement';
 import { evaluateRequirements } from './requirements';
 import { validateSaveState } from './save-schema';
 
-export type CrewCommandError = EconomyError | 'unknown-crew-member' | 'already-recruited'
+export type CrewCommandError = StatisticsError | EconomyError | 'unknown-crew-member' | 'already-recruited'
   | 'unknown-slot' | 'not-recruited' | 'incompatible-slot' | 'already-assigned' | 'already-empty';
 export type CrewCommandResult = { readonly ok: true; readonly state: GameState }
   | { readonly ok: false; readonly state: GameState; readonly error: CrewCommandError }
@@ -23,8 +25,8 @@ export function recruitCrewMember(state: GameState, id: unknown): CrewCommandRes
   if (!requirements.met) return { ok: false, state, error: 'requirements-not-met', requirements };
   const payment = spendCash(state.economy, member.recruitmentCost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
-  return { ok: true, state: { ...state, economy: payment.state,
-    crew: { ...state.crew, recruitedIds: [...state.crew.recruitedIds, member.id] } } };
+  return countStatistic(state, { ...state, economy: payment.state,
+    crew: { ...state.crew, recruitedIds: [...state.crew.recruitedIds, member.id] } }, 'crewMembersRecruited');
 }
 /** Explicit replacement of the target slot; never moves someone from another slot. */
 export function assignCrewMember(state: GameState, slotId: unknown, id: unknown): CrewCommandResult {

@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { createInitialGameState } from './game-state';
 import { performStarterJob } from './perform-starter-job';
@@ -7,7 +8,7 @@ import { STARTER_JOB, MAX_MONEY_DIGITS, moneyFromMinorUnits } from '../features/
 describe('game state and starter delivery', () => {
   it('creates only the implemented authoritative slices', () => {
     const state = createInitialGameState();
-    expect(state).toEqual({ events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, economy: { cash: '0' }, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {}, productionRemainderMilliCents: 0 } });
+    expect(state).toEqual({ events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 }, upgrades: { purchasedIds: [] }, economy: { cash: '0' }, businesses: { productionRemainderSubMilliCents: { numerator: '0', denominator: '1' }, owned: {}, productionRemainderMilliCents: 0 } });
     expect(selectCash(state)).toBe('0');
     expect(createInitialGameState().economy).not.toBe(state.economy);
   });

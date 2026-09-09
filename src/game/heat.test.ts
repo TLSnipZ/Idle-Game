@@ -102,7 +102,7 @@ describe('cooling and deliberate reduction', () => {
   it.each([[75,42000,65,42000],[6,42000,0,0],[10,30000,0,0],[20,30000,10,30000]])('Lay Low at %i preserves or clears cooling correctly', (heat,remainder,next,rest) => {
     const s = frozen(funded(heat,remainder)); const result = layLow(s);
     expect(result.ok).toBe(true); expect(result.state.economy.cash).toBe('950000');
-    expect(result.state).toEqual({ ...s, economy: { cash: '950000' }, city: { ...s.city, heat: next, heatDecayElapsedMs: rest } });
+    expect(result.state).toEqual({ ...s, permanentProgression: {...s.permanentProgression,statistics:{...s.permanentProgression.statistics,peakHeat:next}}, economy: { cash: '950000' }, city: { ...s.city, heat: next, heatDecayElapsedMs: rest } });
   });
   it('spends exact funds down to zero without rewards', () => {
     const s = funded(6,42000,'50000'); expect(layLow(s)).toMatchObject({ ok: true, state: { economy: { cash: '0' }, city: { heat: 0, heatDecayElapsedMs: 0 }, progression: s.progression, permanentProgression: s.permanentProgression } });
@@ -135,7 +135,7 @@ describe('atomic Heat sources and exact job penalties', () => {
   it.each([[0,10],[95,100]])('Neon acquisition at %i Heat clamps to %i atomically', (heat,next) => {
     const s = frozen(heated(heat,heat ? 42000 : 0,territoryState())); const r = acquireTerritory(s,NEON_MILE.id);
     expect(r.ok).toBe(true); expect(r.state.city.heat).toBe(next); expect(r.state.city.heatDecayElapsedMs).toBe(s.city.heatDecayElapsedMs);
-    expect(r.state.economy.cash).toBe('0'); expect(r.state.progression).toBe(s.progression); expect(r.state.permanentProgression).toBe(s.permanentProgression);
+    expect(r.state.economy.cash).toBe('0'); expect(r.state.progression).toBe(s.progression); expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,territoriesAcquired:1,peakHeat:next}});
     expect(acquireTerritory(r.state,NEON_MILE.id).state).toBe(r.state);
   });
   it('failed acquisition never adds Heat or spends', () => {
@@ -192,7 +192,7 @@ describe('offline and fresh/Rebirth contracts', () => {
       const r = reconcileOffline(s,1000,1000+duration);
       expect(r.ok && r.progress).toMatchObject({ rewardedElapsedMs: Math.min(cap,duration), actualElapsedMs: duration, capped: duration >= cap, capMs: cap });
       expect(r.state).toEqual(simulateGameElapsed(s,Math.min(cap,duration)).state);
-      expect(r.state.permanentProgression).toEqual({...s.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover']});
+      expect(r.state.permanentProgression).toEqual({...s.permanentProgression, statistics:{...s.permanentProgression.statistics,automatedJobsCompleted:Math.floor((s.automation.starterJobElapsedMs+Math.min(cap,duration))/10000)}, unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover']});
     }
   });
   it('Rebirth clears territory/Heat/remainder and every temporary field, retaining permanent state', () => {

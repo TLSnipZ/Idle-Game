@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { EVENT_CATALOG, EVENT_OPPORTUNITY_MS, EVENT_SPAWN_CHANCE, advanceEventOpportunity, eventChanceSucceeds, selectEventId } from '../features/events';
 import { createInitialGameState } from './game-state';
@@ -97,8 +98,8 @@ describe('atomic current-event choice resolution',()=>{
   ] as const)('%s / %s exact fixed transaction', (id,choice,cash,heat,afterCash,afterHeat,remainder)=>{
     const s=eventState(id,cash,heat),before=structuredClone(s);Object.freeze(s);Object.freeze(s.events);
     const r=resolveEventChoice(s,id,choice);expect(r.ok).toBe(true);expect(s).toEqual(before);
-    expect(r.state).toEqual({...s,economy:{cash:afterCash},city:{...s.city,heat:afterHeat,heatDecayElapsedMs:remainder},events:{pendingEventId:null,opportunityElapsedMs:0}});
-    expect(r.state.progression).toBe(s.progression);expect(r.state.permanentProgression).toBe(s.permanentProgression);
+    expect(r.state).toEqual({...s,permanentProgression:{...s.permanentProgression,statistics:{...s.permanentProgression.statistics,eventsResolved:1,peakHeat:afterHeat}},economy:{cash:afterCash},city:{...s.city,heat:afterHeat,heatDecayElapsedMs:remainder},events:{pendingEventId:null,opportunityElapsedMs:0}});
+    expect(r.state.progression).toBe(s.progression);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,eventsResolved:1,peakHeat:afterHeat}});
   });
   it.each([[SHAKE,'choice:pay-off','99999'],[WAREHOUSE,'choice:invest','249999']] as const)('unaffordable %s preserves entire state and pending timer',(id,choice,cash)=>{
     const s=eventState(id,cash),before=structuredClone(s);expect(resolveEventChoice(s,id,choice)).toEqual({ok:false,error:'insufficient-funds',state:s});expect(s).toEqual(before);
@@ -114,8 +115,8 @@ describe('atomic current-event choice resolution',()=>{
   it.each([0,60,90,100])('all stat sources and Heat %i leave event Money/XP unchanged',heat=>{
     const b=rebirthState(),crew=crewState({operations:'crew:rico-vale',logistics:'crew:jax-mercer'});
     for(const id of [TIP,WAREHOUSE] as const){const s={...b,...eventState(id,'1000000',heat),upgrades:b.upgrades,garage:b.garage,crew:crew.crew,
-      city:{...crew.city,heat,heatDecayElapsedMs:heat?30000:0},permanentProgression:{ unlockedAchievementIds: [],empirePoints:10,rebirthCount:2,skills:{'skill:fast-talker':2,'skill:learn-the-streets':2,'skill:streetwise-investment':3,'skill:silent-partner':2,'skill:never-sleeps':2}}};
-      const r=resolveEventChoice(s,id,id===TIP?'choice:take-tip':'choice:invest');expect(r.ok).toBe(true);expect(r.state.economy.cash).toBe('1150000');expect(r.state.progression).toBe(s.progression);expect(r.state.permanentProgression).toBe(s.permanentProgression);}
+      city:{...crew.city,heat,heatDecayElapsedMs:heat?30000:0},permanentProgression:{ statistics: createInitialStatistics(2), unlockedAchievementIds: [],empirePoints:10,rebirthCount:2,skills:{'skill:fast-talker':2,'skill:learn-the-streets':2,'skill:streetwise-investment':3,'skill:silent-partner':2,'skill:never-sleeps':2}}};
+      const r=resolveEventChoice(s,id,id===TIP?'choice:take-tip':'choice:invest');expect(r.ok).toBe(true);expect(r.state.economy.cash).toBe('1150000');expect(r.state.progression).toBe(s.progression);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,eventsResolved:1,peakHeat:Math.min(100,heat + 5)}});}
   });
   it('current cash changes availability without resnapshotting or eligibility rechecks',()=>{
     const s=eventState(SHAKE,'200000',0);expect(selectCityEvents(s).choices[0]?.canChoose).toBe(true);
@@ -125,6 +126,6 @@ describe('atomic current-event choice resolution',()=>{
   it.each([null,TIP,SHAKE,WAREHOUSE] as const)('Rebirth discards %s and timer without resolving/refunding',pendingEventId=>{
     const s={...rebirthState(),events:{opportunityElapsedMs:123456,pendingEventId}},r=performRebirth(s);expect(r.ok).toBe(true);
     expect(r.state.events).toEqual(createInitialGameState().events);expect(r.state.economy.cash).toBe('0');expect(r.state.garage).toEqual(s.garage);
-    expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:4,rebirthCount:1,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth']});
+    expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,rebirthsCompleted:1},empirePoints:4,rebirthCount:1,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth']});
   });
 });

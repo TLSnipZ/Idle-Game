@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { EMPIRE_FOUNDATIONS, SKILL_CATALOG, isSkillRanks } from '../features/skills';
 import { purchaseSkillRank } from './purchase-skill-rank';
@@ -88,10 +89,10 @@ describe('one permanent tree and its acquisition rules', () => {
     expect(state.permanentProgression.empirePoints).toBe(3); // 19 EP invested.
     const ranks = state.permanentProgression.skills;
     const first = performRebirth(state); expect(first.ok).toBe(true);
-    expect(first.state.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'], skills: ranks, empirePoints: 7, rebirthCount: 2 });
+    expect(first.state.permanentProgression).toEqual({ statistics: createInitialStatistics(2), unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'], skills: ranks, empirePoints: 7, rebirthCount: 2 });
     expect(first.state.garage).toEqual(state.garage);
     expect({ ...first.state, garage: createInitialGameState().garage, permanentProgression: createInitialGameState().permanentProgression }).toEqual(createInitialGameState());
     const second = performRebirth({ ...rebirthState(37, 48), permanentProgression: first.state.permanentProgression });
-    expect(second.state.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:first-rebirth'], skills: ranks, empirePoints: 14, rebirthCount: 3 });
+    expect(second.state.permanentProgression).toEqual({ statistics: createInitialStatistics(3), unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:first-rebirth'], skills: ranks, empirePoints: 14, rebirthCount: 3 });
   });
 });

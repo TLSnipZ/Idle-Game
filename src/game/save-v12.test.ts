@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it, vi } from 'vitest';
 import { CURRENT_SAVE_VERSION, parseSave, serializeSave, validateSaveState } from './save-schema';
 import { encodeSaveText, exportSaveCode, validateSaveCode } from './save-code';
@@ -10,13 +11,13 @@ import { selectCityEvents, eligibleEvents } from './event-selectors';
 function rich() {
   const s=rebirthState(37,48),c=crewState({operations:'crew:mara-knox',logistics:'crew:jax-mercer'});
   return {...s,crew:c.crew,city:{...c.city,heat:70,heatDecayElapsedMs:50000},
-    permanentProgression:{ unlockedAchievementIds: [],empirePoints:17,rebirthCount:4,skills:{'skill:streetwise-investment':3,'skill:fast-talker':2,'skill:learn-the-streets':1,'skill:silent-partner':2,'skill:never-sleeps':2}}};
+    permanentProgression:{ statistics: createInitialStatistics(4), unlockedAchievementIds: [],empirePoints:17,rebirthCount:4,skills:{'skill:streetwise-investment':3,'skill:fast-talker':2,'skill:learn-the-streets':1,'skill:silent-partner':2,'skill:never-sleeps':2}}};
 }
 function envelope(state:unknown,version=CURRENT_SAVE_VERSION) {return {format:'crime-empire-save',version,savedAt:123456789,state};}
 describe('v12 event persistence boundary',()=>{
   it('v11 migration adds only empty events, preserving every prior field and original timestamp',()=>{
     const {events:_events,...old}=rich(),raw=JSON.stringify(envelope(withoutAchievements(old),11));
-    const parsed=parseSave(raw);expect(CURRENT_SAVE_VERSION).toBe(13);
+    const parsed=parseSave(raw);expect(CURRENT_SAVE_VERSION).toBe(14);
     expect(parsed).toEqual({ok:true,envelope:envelope({...old,events:createInitialGameState().events})});
     if(!parsed.ok)throw Error('fixture');const {events,...previous}=parsed.envelope.state;
     expect(previous).toEqual(old);expect(events).toEqual({opportunityElapsedMs:0,pendingEventId:null});
@@ -30,7 +31,7 @@ describe('v12 event persistence boundary',()=>{
       ...(version>=6?{garage:s.garage}:{}),...(version>=7?{permanentProgression:{empirePoints:17,rebirthCount:4,...(version>=8?{skills:s.permanentProgression.skills}:{})}}:{}),
       ...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{}),...(version>=11?{crew:s.crew}:{})};
     const code=encodeSaveText(JSON.stringify(envelope(state,version)));expect(code.startsWith('CE1-')).toBe(true);
-    const r=validateSaveCode(code);expect(r).toMatchObject({ok:true,envelope:{version: 13,savedAt:123456789,state:{economy:s.economy,events:createInitialGameState().events}}});
+    const r=validateSaveCode(code);expect(r).toMatchObject({ok:true,envelope:{version: 14,savedAt:123456789,state:{economy:s.economy,events:createInitialGameState().events}}});
     if(!r.ok)throw Error('fixture');if(version===11)expect(r.envelope.state.crew).toEqual(s.crew);
   });
   it.each([null,TIP,SHAKE,WAREHOUSE] as const)('roundtrips %s without eligibility checks or extra state',pendingEventId=>{
@@ -57,7 +58,7 @@ describe('v12 event persistence boundary',()=>{
   it('rejects accessors, hidden keys and prototypes without executing getters',()=>{
     const e=createInitialGameState().events;
     for(const bad of [{...e,get pendingEventId(){throw Error('getter');}},{...e,[Symbol('x')]:1},Object.create(e),Object.defineProperty({...e},'pendingEventId',{enumerable:false})])expect(isEventState(bad)).toBe(false);
-    expect(parseSave(JSON.stringify(envelope(rich(),14)))).toEqual({ok:false,error:'unsupported-version'});
+    expect(parseSave(JSON.stringify(envelope(rich(),15)))).toEqual({ok:false,error:'unsupported-version'});
     expect(parseSave(JSON.stringify(envelope(rich(),11)))).toEqual({ok:false,error:'invalid-state'});
   });
   it('selectors, validation, migration and CE1 never require or consume RNG',()=>{
@@ -71,7 +72,7 @@ describe('v12 event persistence boundary',()=>{
   });
 });
 
-function withoutAchievements<T extends { permanentProgression: { unlockedAchievementIds: readonly unknown[] } }>(state: T) {
-  const { unlockedAchievementIds: _ids, ...permanentProgression } = state.permanentProgression;
+function withoutAchievements<T extends { permanentProgression: { statistics: unknown; unlockedAchievementIds: readonly unknown[] } }>(state: T) {
+  const { statistics: _statistics, unlockedAchievementIds: _ids, ...permanentProgression } = state.permanentProgression;
   return { ...state, permanentProgression };
 }

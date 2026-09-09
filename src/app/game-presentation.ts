@@ -28,6 +28,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
   }
   switch (result.error) {
+    case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
     case 'no-pending-event': return 'No active event.';
     case 'wrong-event': case 'unknown-choice': return 'That event choice is unavailable.';
     case 'unknown-crew-member': case 'already-recruited': case 'unknown-slot': case 'not-recruited':

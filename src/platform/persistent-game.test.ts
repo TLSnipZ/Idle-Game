@@ -302,12 +302,12 @@ describe('level command persistence and time boundaries', () => {
     } };
     const f = fixture(JSON.stringify(legacy)); f.wall(1001);
     const game = f.make(); game.start();
-    expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed({ ...owned(), city: createInitialGameState().city, progression: { xp: 0 } }, 1000).state);
+    expect(game.getSnapshot().result.state).toEqual(simulateGameElapsed({ ...owned(), permanentProgression:createInitialGameState().permanentProgression, city: createInitialGameState().city, progression: { xp: 0 } }, 1000).state);
     expect(JSON.parse(f.raw() ?? '')).toMatchObject({ version: CURRENT_SAVE_VERSION, savedAt: 1001 });
     game.stop(); const second = f.make(); second.start();
     expect(second.getSnapshot().offline?.incomeEarned).toBe('0');
     const historical = encodeSaveText(JSON.stringify(legacy));
     expect(second.importCode(historical).ok).toBe(true);
-    expect(second.getSnapshot().result.state).toEqual({ ...owned(), city: createInitialGameState().city, progression: { xp: 0 } });
+    expect(second.getSnapshot().result.state).toEqual({ ...owned(), permanentProgression:createInitialGameState().permanentProgression, city: createInitialGameState().city, progression: { xp: 0 } });
   });
 });

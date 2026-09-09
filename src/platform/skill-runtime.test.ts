@@ -50,9 +50,9 @@ describe('skill command boundaries and persistence', () => {
     const f = rebirthRuntime(skillState({ [ROOT]: 1 }));
     f.game.execute(s => purchaseSkillRank(s, FAST)); const state = f.game.getSnapshot().result.state;
     expect(state.permanentProgression.empirePoints).toBe(29);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 13, state } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 14, state } });
     const exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 13, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 14, state } });
     f.autosave(); f.game.stop(); const reload = f.make(); reload.start(); reload.start();
     expect(reload.getSnapshot().result.state).toEqual(state); expect(f.timers()).toBe(2); reload.stop(); expect(f.timers()).toBe(0);
   });
@@ -85,7 +85,7 @@ describe('skill command boundaries and persistence', () => {
   });
 });
 describe('derived-cap durable offline bootstrap', () => {
-  it.each([1, 2])('rank %i consumes one interval once and never changes permanent progression', rank => {
+  it.each([1, 2])('rank %i consumes one interval once and preserves skills and EP while recording automated jobs', rank => {
     const state = skillState({ [ROOT]: 3, [FAST]: 1, [LEARN]: 1, [NEVER]: rank });
     const initial = serializeSave(state, 1000); if (!initial.ok) throw Error('fixture'); let raw = initial.serialized;
     const now = 1000 + 14 * 3600000;
@@ -94,7 +94,7 @@ describe('derived-cap durable offline bootstrap', () => {
     expect(result).toMatchObject({ kind: 'loaded', state: expected });
     expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { savedAt: now, state: expected } });
     expect(save.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { xpEarned: 0, incomeEarned: '0' } });
-    expect(expected.permanentProgression).toEqual({...state.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:first-rebirth']});
+    expect(expected.permanentProgression).toEqual({...state.permanentProgression, statistics:{...state.permanentProgression.statistics,automatedJobsCompleted:(8+2*rank)*360}, unlockedAchievementIds: ['achievement:first-steps','achievement:first-rebirth']});
   });
   it('failed offline write or XP simulation never publishes candidate or overwrites original', () => {
     for (const overflow of [false, true]) {

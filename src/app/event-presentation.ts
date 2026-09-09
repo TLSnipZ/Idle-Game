@@ -21,6 +21,7 @@ export function eventPresentation(state: GameState) {
 export function describeEventResolution(result: EventResolutionResult): string {
   if (!result.ok) {
     switch (result.error) {
+      case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
       case 'no-pending-event': return 'No active event.';
       case 'wrong-event': case 'unknown-choice': return 'That event choice is unavailable.';
       case 'insufficient-funds': return 'Not enough cash for this choice. Event remains active.';

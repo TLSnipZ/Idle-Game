@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { City } from './City';
@@ -70,7 +71,7 @@ describe('Solara City presentation and interaction', () => {
     expect(describeTerritoryAcquisition(acquireTerritory(broke, 'unknown'), 'unknown')).toContain('unavailable');
   });
   it('names Neon Mile in the shared breakdown and reports actual Money/XP', () => {
-    const state = { ...territoryState(true), permanentProgression: { unlockedAchievementIds: [], empirePoints: 0, rebirthCount: 0, skills: { [FAST]: 1 } } };
+    const state = { ...territoryState(true), permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], empirePoints: 0, rebirthCount: 0, skills: { [FAST]: 1 } } };
     const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
     const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
     expect(html).toContain('Neon Mile: +10%'); expect(html).toContain('Fast Talker: +10%');

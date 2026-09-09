@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { CREW_CATALOG, CREW_SLOTS, RICO_VALE as R, MARA_KNOX as M, JAX_MERCER as J, createInitialCrewState, collectCrewModifiers, isCrewState } from '../features/crew';
 import { STARTER_BUSINESS as B } from '../features/businesses';
@@ -72,8 +73,8 @@ describe('Crew catalog and acquisition', () => {
     const copy = JSON.stringify(s), r = recruitCrewMember(s, member.id);
     expect(r.ok).toBe(true); expect(r.state.economy.cash).toBe((BigInt(s.economy.cash) - BigInt(member.recruitmentCost)).toString());
     expect(r.state.crew.recruitedIds).toEqual([member.id]); expect(r.state.crew.assignments).toBe(s.crew.assignments);
-    expect({ ...r.state, economy: s.economy, crew: s.crew }).toEqual(s);
-    expect(collectCrewModifiers(r.state.crew)).toEqual([]); expect(getHeatDecayIntervalMs(r.state)).toBe(60000);
+    expect({ ...r.state, economy: s.economy, crew: s.crew, permanentProgression: { ...r.state.permanentProgression, statistics: s.permanentProgression.statistics } }).toEqual(s);
+    expect(r.state.permanentProgression.statistics.crewMembersRecruited).toBe(1); expect(collectCrewModifiers(r.state.crew)).toEqual([]); expect(getHeatDecayIntervalMs(r.state)).toBe(60000);
     expect(JSON.stringify(s)).toBe(copy);
     expect(recruitCrewMember(r.state, member.id)).toEqual({ ok: false, state: r.state, error: 'already-recruited' });
   });
@@ -225,12 +226,12 @@ describe('Crew offline and Rebirth contracts', () => {
   });
   it('Rebirth explicitly resets Crew/all temporary slices, retains permanents and never refunds; repeated rebuild works', () => {
     const base=rebirthState();const s=frozen({...base,crew:crewState({operations:R.id,logistics:J.id}).crew,
-      city:heat(crewState(),90,50000).city, permanentProgression:{ unlockedAchievementIds: [],empirePoints:3,rebirthCount:2,skills:{[FAST]:1,[ROOT]:2,[SILENT]:1,[LEARN]:1,[NEVER]:1}}});
+      city:heat(crewState(),90,50000).city, permanentProgression:{ statistics: createInitialStatistics(2), unlockedAchievementIds: [],empirePoints:3,rebirthCount:2,skills:{[FAST]:1,[ROOT]:2,[SILENT]:1,[LEARN]:1,[NEVER]:1}}});
     const r=performRebirth(s);expect(r).toMatchObject({ok:true,reward:4});
     const fresh=createInitialGameState();expect(r.state.crew).toEqual(fresh.crew);expect(r.state.city).toEqual(fresh.city);
     for(const key of ['economy','businesses','upgrades','automation','progression'] as const)expect(r.state[key]).toEqual(fresh[key]);
-    expect(r.state.garage).toEqual(s.garage);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,empirePoints:7,rebirthCount:3,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
-    expect(evaluateJobReward(r.state)).toMatchObject({reward:'2750'});expect(getHeatDecayIntervalMs(r.state)).toBe(60000);expect(collectCrewModifiers(r.state.crew)).toEqual([]);
+    expect(r.state.garage).toEqual(s.garage);expect(r.state.permanentProgression).toEqual({...s.permanentProgression,statistics: {...s.permanentProgression.statistics,rebirthsCompleted:3},empirePoints:7,rebirthCount:3,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
+    expect(evaluateJobReward(r.state)).toMatchObject({reward:'2750'});expect(getHeatDecayIntervalMs(r.state)).toBe(60000);expect(r.state.permanentProgression.statistics.crewMembersRecruited).toBe(0); expect(collectCrewModifiers(r.state.crew)).toEqual([]);
     const rebuilt=purchaseBusiness({...r.state,economy:{cash:B.purchaseCost}},B.id).state;
     expect(evaluateBusinessProduction(rebuilt,B.id,1)).toMatchObject({effective:rational(8349n,80n)});
     const second=performRebirth({...s,permanentProgression:r.state.permanentProgression});expect(second.state.permanentProgression.empirePoints).toBe(11);expect(second.state.crew).toEqual(fresh.crew);

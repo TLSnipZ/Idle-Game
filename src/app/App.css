@@ -196,3 +196,12 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; }
 .achievement-card { min-width: 0; overflow-wrap: anywhere; padding: 1rem; border: 1px solid var(--color-border); border-radius: 0.75rem; }
 .achievement-card.is-unlocked { border-color: var(--color-accent); }
+
+/* Lifetime observations share the compact permanent-progression presentation. */
+.statistics { min-width: 0; }
+.statistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; }
+.statistics-entry { min-width: 0; padding: 1rem; border: 1px solid var(--color-border); border-radius: 12px; overflow-wrap: anywhere; }
+.statistics-entry dt { font-weight: 700; }
+.statistics-entry dd { margin: .5rem 0 0; }
+.statistics-entry strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.statistics-entry p { margin-bottom: 0; }

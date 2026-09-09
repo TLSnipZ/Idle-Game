@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { DELIVERY_DISPATCHER as D } from '../features/automation';
 import { UPGRADE_CATALOG } from '../features/upgrades';
@@ -17,9 +18,9 @@ function current() {
 describe('v4 delegation saves', () => {
   it('migrates realistic v3 with all upgrades preserving every previous field and timestamp', () => {
     const original = old(); const text = JSON.stringify(original); const result = parseSave(text);
-    expect(CURRENT_SAVE_VERSION).toBe(13);
+    expect(CURRENT_SAVE_VERSION).toBe(14);
     expect(result).toEqual({ ok: true, envelope: { ...original, version: CURRENT_SAVE_VERSION,
-      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 } } } });
+      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { unlockedIds: [], starterJobElapsedMs: 0 } } } });
     expect(JSON.stringify(original)).toBe(text);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(result);
   });

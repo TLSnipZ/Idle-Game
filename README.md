@@ -1,7 +1,7 @@
 # Crime Empire
 
 Working title for a modern Miami/Florida-inspired crime, luxury and street-culture
-idle/tycoon browser game. **Phase 8A: Achievement Foundation.**
+idle/tycoon browser game. **Phase 8B: Lifetime Statistics Foundation.**
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
@@ -79,7 +79,7 @@ The user manually verified the live Phase 4C deployment: dispatcher purchase,
 automation, welcome-back breakdown and export/import work. The user also verified
 Phase 5A manual/dispatcher/business-level XP, reload, offline XP, export/import
 and the player progress UI. The user verified Phase 5B level gates, requirement UI,
-grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A live verification remains pending.
+grandfathered ownership and fresh-save progression live. Phase 5C and Phase 6A were also manually verified live by the user. Phase 6B was manually verified live by the user; Phase 7A was manually verified live by the user; Phase 7B was manually verified live by the user; Phase 7C was manually verified live by the user; Phase 7D and the complete Phase 7 city-system foundation were manually verified live by the user. Phase 8A was manually verified live by the user. Phase 8B live verification remains pending.
 
 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) deploys
 on pushes to `main` and supports **Actions → Deploy to GitHub Pages → Run workflow**
@@ -160,3 +160,9 @@ spawn offline, and reset on Rebirth. Older saves gain an empty event state.
 **Achievements** recognize six visible milestones without changing rewards or
 production. Completion is permanent through Rebirth, reload and CE1 backups.
 Locked cards show current progress; unlocked cards stay completed after rebuilding.
+
+
+**Statistics** show eight lifetime observations: manual and automated jobs, paid
+business upgrades, territory takeovers, Crew recruits, event resolutions, Rebirths
+and peak Heat. They survive Rebirth and CE1 backups and provide no gameplay bonuses.
+Older saves retain their exact Rebirth history; other new counters start at zero.

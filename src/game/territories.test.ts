@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { CITY_NAME, WATERFRONT as W, NEON_MILE as N, TERRITORY_CATALOG, isCityState, collectTerritoryModifiers } from '../features/territories';
 import { STARTER_BUSINESS as B } from '../features/businesses';
@@ -45,7 +46,7 @@ describe('Solara City catalog and acquisition', () => {
     const state = createInitialGameState();
     expect(state.city).toEqual({ heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id] }); expect(state.city).not.toBe(createInitialGameState().city);
     expect(state.economy.cash).toBe('0'); expect(state.progression.xp).toBe(0);
-    expect(state.permanentProgression).toEqual({ unlockedAchievementIds: [], empirePoints: 0, rebirthCount: 0, skills: {} });
+    expect(state.permanentProgression).toEqual({ statistics: createInitialStatistics(0), unlockedAchievementIds: [], empirePoints: 0, rebirthCount: 0, skills: {} });
     expect(selectCity(state)).toEqual({ ownedTerritoryCount: 1, totalConfiguredTerritories: 2 });
     expect(collectTerritoryModifiers(state.city)).toEqual([]);
   });
@@ -72,7 +73,7 @@ describe('Solara City catalog and acquisition', () => {
     const before = JSON.stringify(state), result = acquireTerritory(state, N.id);
     expect(result.ok).toBe(true); expect(result.state.economy.cash).toBe('0');
     expect(result.state.city.ownedTerritoryIds).toEqual([W.id, N.id]);
-    expect(result.state).toEqual({ ...state, economy: { cash: '0' }, city: { heat: 10, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });
+    expect(result.state).toEqual({ ...state, permanentProgression:{...state.permanentProgression,statistics:{...state.permanentProgression.statistics,territoriesAcquired:1,peakHeat:10}}, economy: { cash: '0' }, city: { heat: 10, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });
     expect(JSON.stringify(state)).toBe(before); expect(selectCity(result.state).ownedTerritoryCount).toBe(2);
     expect(acquireTerritory(result.state, N.id)).toEqual({ ok: false, state: result.state, error: 'already-owned' });
   });
@@ -167,12 +168,12 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     if (!without.ok) throw Error('fixture');
     expect(result.progress.businessIncome).toEqual(without.progress.businessIncome);
     expect(result.progress.xpEarned).toEqual(without.progress.xpEarned);
-    expect(result.state.permanentProgression).toEqual({...state.permanentProgression, unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover']});
+    expect(result.state.permanentProgression).toEqual({...state.permanentProgression, statistics:{...state.permanentProgression.statistics,automatedJobsCompleted:cap/10000}, unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover']});
   });
   it('Rebirth resets the full temporary matrix, retains permanent slices and allows paid reacquisition', () => {
     const base = rebirthState();
     const state = freeze({ ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
-      permanentProgression: { unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 2, skills: { [ROOT]: 1, [FAST]: 1 } } });
+      permanentProgression: { statistics: createInitialStatistics(2), unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 2, skills: { [ROOT]: 1, [FAST]: 1 } } });
     const result = performRebirth(state); if (!result.ok) throw Error('fixture');
     expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
     expect(result.state.city).toEqual(createInitialGameState().city);
@@ -181,7 +182,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(result.state.businesses.productionRemainderSubMilliCents).toEqual({ numerator: '0', denominator: '1' });
     expect(result.state.upgrades.purchasedIds).toEqual([]); expect(result.state.automation).toEqual({ unlockedIds: [], starterJobElapsedMs: 0 });
     expect(result.state.progression.xp).toBe(0); expect(result.state.garage).toEqual(state.garage);
-    expect(result.state.permanentProgression).toEqual({ unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover','achievement:first-rebirth'], empirePoints: 7, rebirthCount: 3, skills: state.permanentProgression.skills });
+    expect(result.state.permanentProgression).toEqual({ statistics: createInitialStatistics(3), unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover','achievement:first-rebirth'], empirePoints: 7, rebirthCount: 3, skills: state.permanentProgression.skills });
     expect(evaluateJobReward(result.state)).toMatchObject({ reward: '2750' });
     expect(acquireTerritory(result.state, N.id)).toMatchObject({ ok: false, error: 'requirements-not-met' });
     const rebuilt = { ...result.state, economy: territoryState().economy, businesses: territoryState().businesses, progression: territoryState().progression };

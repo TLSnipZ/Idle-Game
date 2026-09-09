@@ -25,6 +25,7 @@ export function describeTerritoryAcquisition(result: AcquireTerritoryResult, id:
   if (result.ok && territory) return `${territory.name} controlled. -${formatCash(territory.purchaseCost)} · ${describeTerritoryEffect(territory)} · +${territory.acquisitionHeat} Heat (maximum ${MAX_HEAT}).`;
   if (result.ok) return 'Territory controlled.';
   switch (result.error) {
+    case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
     case 'requirements-not-met': return 'Requirements not met: ' + result.requirements.requirements
       .filter(detail => !detail.met).map(detail => detail.description).join('; ') + '.';
     case 'insufficient-funds': return 'Not enough cash to take control. No acquisition was made.';

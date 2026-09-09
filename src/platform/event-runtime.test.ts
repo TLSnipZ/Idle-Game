@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it, vi } from 'vitest';
 import { eventState, fakeRandom, TIP, SHAKE, WAREHOUSE } from '../game/test-fixtures/event-state';
@@ -27,7 +28,7 @@ import { recruitCrewMember, assignCrewMember, unassignCrewSlot } from '../game/c
 import { getHeatDecayIntervalMs } from '../game/heat-decay-interval';
 function active():GameState {
   const s=rebirthState(),c=crewState({operations:'crew:rico-vale',logistics:'crew:jax-mercer'});
-  return {...s,crew:c.crew,city:{...c.city,heat:79,heatDecayElapsedMs:30000},permanentProgression:{ unlockedAchievementIds: [],empirePoints:20,rebirthCount:3,skills:{}},
+  return {...s,crew:c.crew,city:{...c.city,heat:79,heatDecayElapsedMs:30000},permanentProgression:{ statistics: createInitialStatistics(3), unlockedAchievementIds: [],empirePoints:20,rebirthCount:3,skills:{}},
     events:{pendingEventId:TIP,opportunityElapsedMs:200000}};
 }
 describe('online event command boundaries',()=>{
@@ -93,7 +94,7 @@ describe('online event command boundaries',()=>{
     const current=f.game.getSnapshot().result.state;
     if(fail){expect(current.events.pendingEventId).toBe(TIP);expect(f.raw()).toBe(raw);}else{
       expect(current.events).toEqual(createInitialGameState().events);expect(current.economy.cash).toBe('0');expect(current.city).toEqual(createInitialGameState().city);expect(current.crew).toEqual(createInitialGameState().crew);
-      expect(current.garage).toEqual(s.garage);expect(current.permanentProgression).toEqual({...s.permanentProgression,empirePoints:24,rebirthCount:4,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
+      expect(current.garage).toEqual(s.garage);expect(current.permanentProgression).toEqual({...s.permanentProgression,statistics:{...s.permanentProgression.statistics,rebirthsCompleted:4,peakHeat:79},empirePoints:24,rebirthCount:4,unlockedAchievementIds:['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:running-hot', 'achievement:crew-chief', 'achievement:first-rebirth']});
       const write=f.events.findIndex(e=>e.type==='write');const reset=f.events.findIndex(e=>e.type==='publish'&&e.state.events.pendingEventId===null);expect(write).toBeLessThan(reset);
     }f.game.stop();
   });

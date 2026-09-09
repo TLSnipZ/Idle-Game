@@ -1,3 +1,4 @@
+import { Statistics } from './Statistics';
 import { Achievements } from './Achievements';
 import { CityEvents } from './CityEvents';
 import { CrewPanel } from './CrewPanel';
@@ -99,6 +100,7 @@ export function App() {
         <RebirthPanel state={snapshot.state} unavailable={paused || persistence.kind === 'blocked'} onRebirth={rebirth} />
         <SkillTree state={snapshot.state} paused={paused} onPurchase={buySkill} />
         <Achievements state={snapshot.state} announcement={achievementEvent} />
+        <Statistics state={snapshot.state} />
         <SaveManagement actions={saveActions} />
         <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(getOfflineCapMs(snapshot.state))}.</p>
       </main>

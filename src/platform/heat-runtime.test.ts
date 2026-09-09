@@ -59,7 +59,7 @@ describe('shared Heat runtime and durable boundaries', () => {
     f.at(5000);f.wall(6000);f.autosave();const saved=f.game.getSnapshot().result.state;
     expect(saved.city).toMatchObject({heat:70,heatDecayElapsedMs:50000});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 13,savedAt:6000,state:saved}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 14,savedAt:6000,state:saved}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);expect(f.game.getSnapshot().result.state).toEqual(saved);f.game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(saved);reload.stop();
   });

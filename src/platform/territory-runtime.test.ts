@@ -1,3 +1,4 @@
+import { createInitialStatistics } from '../features/statistics';
 import { unlockEligibleAchievements } from '../game/achievements';
 import { describe, expect, it } from 'vitest';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
@@ -52,7 +53,7 @@ describe('territory runtime and persistence boundaries', () => {
     f.at(250); f.tick(); expect(f.events.filter(e => e.type === 'write')).toHaveLength(writes);
     f.at(5000); f.wall(6000); f.autosave();
     const state = f.game.getSnapshot().result.state, exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 13, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 14, state } });
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state } });
     f.game.stop(); f.game.start(); f.game.start(); expect(f.timers()).toBe(2); f.game.stop();
     const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(state);
@@ -68,7 +69,7 @@ describe('territory runtime and persistence boundaries', () => {
   it('import preserves grandfathered ownership without historical rewards or acquisition feedback', () => {
     const base = createInitialGameState();
     const candidate = { ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
-      permanentProgression: { unlockedAchievementIds: [], empirePoints: 4, rebirthCount: 2, skills: { [FAST]: 1 } } };
+      permanentProgression: { statistics: createInitialStatistics(2), unlockedAchievementIds: [], empirePoints: 4, rebirthCount: 2, skills: { [FAST]: 1 } } };
     const exported = exportSaveCode(candidate, 0); if (!exported.ok) throw Error('fixture');
     const f = rebirthRuntime(territoryState()); f.at(90000); f.wall(100000);
     expect(f.game.importCode(exported.code)).toEqual({ ok: true });
@@ -85,7 +86,7 @@ describe('territory runtime and persistence boundaries', () => {
   });
   it.each([false, true])('Rebirth resets city only after durable success (failed write=%s)', failed => {
     const state = { ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
-      permanentProgression: { unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 1, skills: { [ROOT]: 1, [FAST]: 1 } } };
+      permanentProgression: { statistics: createInitialStatistics(1), unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 1, skills: { [ROOT]: 1, [FAST]: 1 } } };
     const f = rebirthRuntime(state), raw = f.raw(); if (failed) f.fail();
     f.at(3000); f.wall(4000); const result = f.game.rebirth(); expect(result.ok).toBe(!failed);
     if (failed) {

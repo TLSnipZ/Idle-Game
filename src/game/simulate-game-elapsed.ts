@@ -1,3 +1,5 @@
+import { countStatistic, observePeakHeat } from './statistics';
+import type { StatisticsError } from '../features/statistics';
 import { unlockEligibleAchievements } from './achievements';
 import { getHeatDecayIntervalMs } from './heat-decay-interval';
 import { decayHeat } from '../features/heat';
@@ -10,7 +12,8 @@ import type { Money } from '../features/economy';
 import type { AutomationSimulationResult } from './simulate-automation';
 import type { GameState } from './game-state';
 
-export type GameSimulationResult = Extract<AutomationSimulationResult, { ok: false }>
+export type GameSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: StatisticsError }
+  | Extract<AutomationSimulationResult, { ok: false }>
   | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money });
 /** One transaction: production, start-tier job rewards/XP, batch Heat gain, then cooling. */
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
@@ -24,5 +27,9 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   if (!income.ok) throw new Error('Production must not reduce cash');
   const city = decayHeat(automation.state.city, elapsedMs, getHeatDecayIntervalMs(state));
   const candidate = city === automation.state.city ? automation.state : { ...automation.state, city };
-  return { ...automation, state: elapsedMs > 0 ? unlockEligibleAchievements(candidate).state : candidate, businessIncome: income.value };
+  const counted = countStatistic(state, candidate, 'automatedJobsCompleted', automation.automation.completedJobs);
+  if (!counted.ok) return counted;
+  // Zero elapsed (including future-clock bootstrap) is not a historical observation.
+  const observed = elapsedMs > 0 ? observePeakHeat(counted.state) : counted.state;
+  return { ...automation, state: elapsedMs > 0 ? unlockEligibleAchievements(observed).state : observed, businessIncome: income.value };
 }

@@ -5,6 +5,7 @@ export const INITIAL_REBIRTH_CONTROLS: RebirthControlsState = { confirming: fals
 export function describeRebirth(result: RebirthTransactionResult): string {
   if (result.ok) return `REBIRTH COMPLETE · +${result.reward} Empire Points. Your operation begins again at Level 1.`;
   switch (result.error) {
+    case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
     case 'requirements-not-met': return 'Rebirth unavailable: ' + result.requirements.requirements.filter(detail => !detail.met).map(detail => detail.description).join('; ') + '. Nothing was reset.';
     case 'overflow': return 'Permanent progression limit reached. Nothing was reset.';
     case 'persistence-failure': return 'Rebirth could not be saved. Nothing was reset and no Empire Points were granted. Your previous save is preserved; check storage access or reload if another tab changed it.';

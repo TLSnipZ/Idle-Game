@@ -1,8 +1,11 @@
+import { createInitialStatistics } from '../../statistics';
+import type { StatisticsState } from '../../statistics';
 import type { AchievementId } from '../../achievements';
 import { requireSkillRanks } from '../../skills';
 import type { SkillRanks } from '../../skills';
 /** Permanent integer counters are separate from Money and XP. */
 export interface PermanentProgressionState {
+  readonly statistics: StatisticsState;
   readonly empirePoints: number;
   readonly rebirthCount: number;
   readonly skills: SkillRanks;
@@ -13,7 +16,7 @@ export function isPermanentValue(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 && value <= MAX_PERMANENT_VALUE;
 }
 export function createInitialPermanentProgression(): PermanentProgressionState {
-  return { empirePoints: 0, rebirthCount: 0, skills: {}, unlockedAchievementIds: [] };
+  return { statistics: createInitialStatistics(), empirePoints: 0, rebirthCount: 0, skills: {}, unlockedAchievementIds: [] };
 }
 export function addRebirthReward(state: PermanentProgressionState, reward: number):
   { readonly ok: true; readonly state: PermanentProgressionState }
