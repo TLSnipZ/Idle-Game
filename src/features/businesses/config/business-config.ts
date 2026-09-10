@@ -28,7 +28,7 @@ export const BUSINESS_CATALOG: readonly BusinessDefinition[] = Object.freeze([
     description: "A performance workshop serving Solara's street scene.",
     purchaseCost: moneyFromMinorUnits('12500000'),
     requirements: Object.freeze([{ type: 'player-level', minimumLevel: 10 },
-      { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 12 }]),
+      { type: 'business-level', businessId: 'business:neon-laundry', minimumLevel: 10 }]),
     baseProductionCentsPerSecond: moneyFromMinorUnits('1500'), baseUpgradeCost: moneyFromMinorUnits('400000'),
   }),
   Object.freeze<BusinessDefinition>({
@@ -36,6 +36,7 @@ export const BUSINESS_CATALOG: readonly BusinessDefinition[] = Object.freeze([
     description: 'A premium Neon Mile nightclub with serious earning power.',
     purchaseCost: moneyFromMinorUnits('40000000'),
     requirements: Object.freeze([{ type: 'player-level', minimumLevel: 16 },
+      { type: 'business-level', businessId: 'business:afterdark-customs', minimumLevel: 8 },
       { type: 'territory-owned', territoryId: 'territory:neon-mile' }]),
     baseProductionCentsPerSecond: moneyFromMinorUnits('4000'), baseUpgradeCost: moneyFromMinorUnits('1200000'),
   }),

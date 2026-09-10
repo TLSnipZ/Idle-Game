@@ -2493,3 +2493,17 @@ owned upgrades have their own Cash/max state. Acquisition helpers are shared wit
 Automation. The shared action area uses existing 16px/8px spacing tokens, removes
 redundant purchasable helpers and hides action cues on disabled Business controls.
 Save v17 / CE1, all domain/config/platform code and gameplay remain unchanged.
+
+
+## POST 3D — acquisition gates and shared presentation
+
+Current catalog requirements use the existing generic `business-level` contract:
+Afterdark needs Laundry 10, Nights needs Afterdark 8 and Neon Mile, with Player gates
+unchanged. Acquisition-only evaluation preserves grandfathered owners and v17/CE1;
+no schema, migration, production, runtime or Rebirth changes were necessary.
+`acquisition-presentation.ts` holds the gate-first helper shared by Business,
+Automation, Territory and Crew presentation, avoiding a dependency cycle through
+command feedback. The shared `.card-action-area` supplies 16px separation / 8px
+helper spacing in Operations and City. Native disabled controls remain readable;
+Crew cash copy uses recruitment wording. App's existing local action focus recovery
+and POST 3C jump navigation remain unchanged.

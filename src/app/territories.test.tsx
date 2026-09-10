@@ -44,10 +44,10 @@ describe('Solara City presentation and interaction', () => {
   it('keeps cash shortage distinct from requirement locks', () => {
     const state = { ...territoryState(), economy: { cash: moneyFromMinorUnits('4999999') } };
     const view = territoryPresentation(state, N.id);
-    expect(view).toMatchObject({ status: 'AVAILABLE', eligible: true, affordable: false, canAcquire: false });
+    expect(view).toMatchObject({ status: 'INSUFFICIENT CASH', eligible: true, affordable: false, canAcquire: false });
     const html = render(state); expect(html).toContain('INSUFFICIENT CASH');
     expect(html).not.toContain('LOCKED'); expect(html).toContain('disabled=""');
-    expect(territoryPresentation(territoryState(), N.id)).toMatchObject({ canAcquire: true, status: 'AVAILABLE' });
+    expect(territoryPresentation(territoryState(), N.id)).toMatchObject({ canAcquire: true, status: 'PURCHASABLE' });
     expect(render(territoryState()).match(/<button[^>]*aria-label="Take control of Neon Mile"[^>]*>/)?.[0]).not.toContain('disabled');
     expect(render(territoryState(), true)).toContain('disabled=""');
   });

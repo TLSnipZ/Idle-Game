@@ -471,3 +471,21 @@ describe('POST 3C local Operations navigation', () => {
     expect(document.activeElement).toBe(acquire); expect(scroll).not.toHaveBeenCalled(); expect(window.scrollTo).not.toHaveBeenCalled();
   });
 });
+
+
+it.each(['Take control of Neon Mile', 'Recruit Rico Vale'])('%s recovers local focus without scrolling after acquisition', async label => {
+  const initial = autoUpgraderState();
+  const state = { ...initial, city: { ...initial.city, ownedTerritoryIds: ['territory:waterfront'] as const } };
+  await mount(state); await navigate('CITY');
+  const buy = button(label); buy.focus();
+  const card = buy.closest('article');
+  const heading = card?.querySelector('h4'); if (!heading) throw Error('heading');
+  const focus = vi.spyOn(heading, 'focus'); vi.mocked(window.scrollTo).mockClear();
+  await click(label);
+  expect(buy.isConnected).toBe(false);
+  expect(document.activeElement).toBe(heading);
+  expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  expect(heading.closest('article')).toBe(card);
+  expect(container.querySelector('[data-section]')?.getAttribute('data-section')).toBe('city');
+});

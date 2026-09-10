@@ -1,11 +1,13 @@
 # Solara City
 
 A modern coastal crime, luxury and street-culture idle/tycoon browser game.
-The Base Game foundation is complete. **POST 3B deployed and live. POST 3C Operations navigation and card polish implemented; live verification pending.**
+The Base Game foundation is complete. **POST 3D progression gates and shared requirement polish implemented; deployment/live verification pending.**
 See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Four live Businesses—Dockside Detail, Neon Laundry, Afterdark Customs and
-Solara Nights—produce simultaneously and level up to 100. Upgrade bonuses apply
+Solara Nights—produce simultaneously and level up to 100. Afterdark acquisition requires
+Player 10 / Laundry 10; Nights requires Player 16 / Afterdark 8 / Neon Mile. Laundry
+remains Player 5 / Dockside 7. Existing owners keep all progression. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
 Hire the **Delivery Dispatcher** for **$5,000** at Player Level 3 after acquiring Dockside: it performs
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both

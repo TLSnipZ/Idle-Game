@@ -27,14 +27,18 @@ Phase 9B accessibility remain preserved contracts.
   Non-sticky Jobs / Businesses / Automation jumps, semantic focus destinations,
   shared requirements/action spacing and progression-vs-Cash helper copy. Save v17,
   CE1, Business gates and all gameplay remain unchanged.
-- **Next: POST 3D — Business Progression Gates**, after POST 3C deployment/live review.
-  Analyze Dockside → Neon Laundry → Afterdark Customs → Solara Nights, with meaningful
-  development of the previous Business. Exact gate Levels require balance analysis;
-  no sequential gates are implemented in POST 3C.
-- **Settings & Localization Foundation** remains a prioritized future planning item;
-  no settings, language state or translation framework is included here.
-- Reset Progress, Next Objective / Guidance, Active Vehicle / Tier 1 Garage and
-  Heat / Police 2.0 remain separately scoped future work, subject to live defects.
+- POST 3D: **Business Progression Gates & Shared Requirement Polish implemented**;
+  deployment/live review pending. Laundry stays Player 5 / Dockside 7; Afterdark is
+  Player 10 / Laundry 10; Nights is Player 16 / Afterdark 8 / Neon Mile. Acquisition
+  gates only: existing owners remain valid, Save v17 / CE1 and runtime unchanged.
+  Territory/Crew share requirements/action spacing and locked versus Cash helpers.
+- **Next: Reset Progress / New Game**, after POST 3D deployment/live verification.
+- Then **Next Objective / Guidance → Settings & Localization Foundation → Business
+  Visual Identity / Artworks → Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
+  Settings planning includes a menu, English/Deutsch, centralized translation keys,
+  locale formatting, reduced-motion preference and later audio/visual options.
+  Business art starts with a Dockside Golden Reference, then Laundry, Afterdark and
+  Nights using one consistent Solara direction. No later system or artwork ships now.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately

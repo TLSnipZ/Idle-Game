@@ -1,6 +1,6 @@
 # Base Game balance
 
-Current authoritative values after **POST 3B Business Expansion I**. Non-Business Phase 9C balance is unchanged. Values remain provisional, but
+Current authoritative values after **POST 3D Business Progression Gates**. Non-Business Phase 9C balance is unchanged. Values remain provisional, but
 this document describes the implemented game only. Feature config and central domain
 helpers are the source of truth; UI uses their selectors. Phase 9C evidence and
 before/after comparisons live in [BALANCE_AUDIT.md](BALANCE_AUDIT.md).
@@ -22,14 +22,14 @@ a skill sum their own percentage before joining that evaluation.
 | --- | --- | --- | --- | --- | --- |
 | Dockside Detail / `business:dockside-detail` | $150 | None | $0.75 | $150 | 100 |
 | Neon Laundry / `business:neon-laundry` | $35,000 | Player 5, Dockside 7 | $5 | $1,000 | 100 |
-| Afterdark Customs / `business:afterdark-customs` | $125,000 | Player 10, Dockside 12 | $15 | $4,000 | 100 |
-| Solara Nights / `business:solara-nights` | $400,000 | Player 16, Neon Mile | $40 | $12,000 | 100 |
+| Afterdark Customs / `business:afterdark-customs` | $125,000 | Player 10, Neon Laundry 10 | $15 | $4,000 | 100 |
+| Solara Nights / `business:solara-nights` | $400,000 | Player 16, Afterdark Customs 8, Neon Mile | $40 | $12,000 | 100 |
 
 All use base × Level production and upgrade base × current Level² cost. Acquisition
 creates Level 1 without XP/Heat/paid-level statistics. Paid upgrades award 25 base
 XP with existing modifiers and increment `businessLevelsPurchased` once. All owned
-Businesses produce simultaneously; no ownership chain, KX-R gate or future risk
-penalty. Dockside equipment remains scoped; global modifiers apply exactly once.
+Businesses produce simultaneously; the acquisition ladder follows Dockside → Laundry
+→ Afterdark → Nights, without a KX-R gate or future risk penalty. Dockside equipment remains scoped; global modifiers apply exactly once.
 Neon Mile grants no Business production modifier. See BUSINESS_EXPANSION.md for
 preserved POST 3A deterministic pacing, ROI/share and second-run evidence.
 
@@ -285,3 +285,53 @@ within-batch maximum. No balance evaluator reads achievements or statistics.
 Phase 9E retains every post-9C value above unchanged. Future expansion balance work
 must be explicitly scoped; this release audit grants no refunds, compensation or
 retrospective recalculation of stored progression.
+
+
+## POST 3D gate decision — implemented
+
+Laundry stays Player 5 / Dockside 7. Afterdark replaces Dockside 12 with Laundry 10,
+retaining Player 10. Nights adds Afterdark 8, retaining Player 16 and Neon Mile.
+These are future-acquisition requirements only; existing owners, production and
+upgrade access remain valid, including after v17/CE1 import. Rebirth is unchanged;
+new-run reacquisition uses the new ladder. No migration or economic formula change.
+
+| Previous Business target | Level 8 upgrades | Level 10 upgrades | Level 12 upgrades |
+| --- | --- | --- | --- |
+| Laundry | $140,000 | $285,000 | $506,000 |
+| Afterdark | $560,000 | $1,140,000 | $2,024,000 |
+
+Costs sum upgrade base × L² from L=1 to target−1. Selected Laundry 10 costs $320,000
+including acquisition (nine paid upgrades, $50/sec raw); Afterdark 8 costs $685,000
+including acquisition (seven upgrades, $120/sec raw). The next Business purchase,
+Dockside and Territory investment are additional. Afterdark 10 would add $580,000
+for $30/sec more raw production; 12 would make the mandatory cost disproportionate.
+
+PART 1 used isolated candidate gates with existing authoritative transitions and
+POST 3A policies: one Job/5s online, or 40 starting Jobs then 8h offline returns;
+no event rewards; Auto-Upgrader disabled. Active/idle policies develop new Businesses
+to 10 (12 for the 12/12 comparison); greedy immediate-payback policy normally caps
+at 5, raised to satisfy each candidate prerequisite. This is not global optimization
+or a prediction of human play. All times below are elapsed h:mm, rounded.
+
+| Gates Laundry/Afterdark | Greedy Afterdark | Greedy Nights | Greedy first Rebirth eligibility |
+| --- | --- | --- | --- |
+| Prior POST 3B gates | 2:47 | 4:48 | 4:10 |
+| 8/8 | 2:59 | 5:08 | 4:42 |
+| **10/8 selected** | **3:35** | **5:32** | **5:06** |
+| 10/10 | 3:35 | 6:00 | 5:38 |
+| 12/12 | 4:26 | 7:04 | 6:45 |
+
+The active policy already develops the prerequisite: 10/8 leaves Afterdark/Nights
+at 6:36/8:06 and first Rebirth at 6:20. Idle acquisition moves from 16h/24h returns
+to 24h/32h; first Rebirth stays at the 32h return. Eight-hour sampling masks finer
+candidate differences. Player gates often clear earlier online but remain general
+progression requirements. Neon Mile remains a separate City commitment, never a
+Business production modifier.
+
+A reset-oriented greedy route omitting Afterdark stays at 4:44 under both old and
+new gates: new Businesses are optional for Rebirth (still Player 20 / Dockside 25).
+Nights may therefore be acquired after first eligibility, intentionally. The second
+10/8 greedy run, retaining KX-R and spending four EP on Streetwise Investment,
+Fast Talker and Learn the Streets, reaches Afterdark 3:09, Nights 5:00, Rebirth 4:36.
+Preserve the separate enabled offline Dockside Auto-Upgrader higher-Level/higher-EP
+behavior; neither those formulas nor that spending policy changed in POST 3D.

@@ -1,3 +1,4 @@
+import { acquisitionPresentation } from './acquisition-presentation';
 import { findCrewMember, findCrewSlot } from '../features/crew';
 import type { CrewEffect } from '../features/crew';
 import { selectCrewMember } from '../game/crew-selectors';
@@ -14,9 +15,9 @@ export function crewPresentation(state: GameState, id: unknown) {
   const view = selectCrewMember(state, id);
   if (!view) return null;
   return { ...view, effect: describeCrewEffect(view.definition.effect),
-    status: view.assignment ? 'ACTIVE' : view.recruited ? 'RECRUITED' : !view.requirements.met ? 'LOCKED' : 'AVAILABLE',
+    status: view.assignment ? 'ACTIVE' : view.recruited ? 'RECRUITED' : acquisitionPresentation(view.requirements.met, view.affordable, 'specialist', 'recruit').status,
     availability: view.assignment ? `Active in ${view.assignment.name}` : view.recruited ? 'Unassigned — effect inactive'
-      : !view.requirements.met ? '' : !view.affordable ? 'Insufficient cash' : 'Ready to recruit',
+      : acquisitionPresentation(view.requirements.met, view.affordable, 'specialist', 'recruit').note,
   };
 }
 export function describeCrewCommand(result: CrewCommandResult, action: 'recruit' | 'assign' | 'unassign', id?: unknown, slotId?: unknown): string {

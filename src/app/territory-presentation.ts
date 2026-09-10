@@ -1,3 +1,4 @@
+import { acquisitionPresentation } from './acquisition-presentation';
 import { MAX_HEAT } from '../features/heat';
 import { findTerritory } from '../features/territories';
 import type { TerritoryDefinition } from '../features/territories';
@@ -15,9 +16,8 @@ export function territoryPresentation(state: GameState, id: unknown) {
   const view = selectTerritory(state, id);
   if (!view) return null;
   return { ...view, effect: describeTerritoryEffect(view.definition),
-    status: view.owned ? 'CONTROLLED' : view.eligible ? 'AVAILABLE' : 'LOCKED',
-    availability: view.owned ? 'Under your control.' : !view.eligible ? ''
-      : view.affordable ? 'Ready to take control.' : 'INSUFFICIENT CASH',
+    status: view.owned ? 'CONTROLLED' : acquisitionPresentation(view.eligible, view.affordable, 'Territory').status,
+    availability: view.owned ? 'Under your control.' : acquisitionPresentation(view.eligible, view.affordable, 'Territory').note,
   };
 }
 export function describeTerritoryAcquisition(result: AcquireTerritoryResult, id: unknown): string {

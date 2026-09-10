@@ -1,6 +1,30 @@
 # Business Expansion I
 
-## Status & scope
+## Current POST 3D — implemented
+
+The current acquisition ladder is Dockside → Neon Laundry → Afterdark Customs →
+Solara Nights. Laundry requires Player 5 / Dockside 7; Afterdark requires Player 10 /
+Laundry 10; Nights requires Player 16 / Afterdark 8 / Neon Mile. Afterdark's old
+Dockside 12 gate is removed; Nights has no separate Laundry gate.
+
+See [BALANCING.md](BALANCING.md#post-3d-gate-decision--implemented) for 8/10/12
+candidate costs, policy timings and the 10/8 decision. Prices, production, upgrade
+curves/XP, Rebirth and automation are unchanged. Existing owners keep ownership,
+Levels, production and upgrade access even below new acquisition requirements.
+Save v17 / CE1 need no migration. After Rebirth, new acquisitions follow this ladder.
+The generic Business-ID/Level requirement model and renderer already supported it.
+
+Territory and Crew acquisition now share POST 3C requirements/action/helper spacing
+and gate-first locked versus Cash semantics. Native controls, local preventScroll
+focus recovery and Operations local navigation remain intact. Browser preview is
+blocked by ERR_BLOCKED_BY_CLIENT; visual/mobile/real-scroll acceptance is pending.
+
+Next: Reset Progress / New Game, then Guidance, Settings & Localization Foundation,
+Business Visual Identity / Artworks, Active Vehicle + Tier-1 Garage, Heat / Police 2.0.
+No later systems or artwork ship here. The records below describe POST 3A/3B history;
+their old gate proposals and next-phase statements are not current instructions.
+
+## Historical POST 3A/3B status & scope
 
 **POST 3A design complete. POST 3B IMPLEMENTED; deployment/live verification pending.**
 Recovery implementation starts directly from POST 3A commit

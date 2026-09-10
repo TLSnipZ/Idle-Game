@@ -347,3 +347,22 @@ visual approval. After deployment/live review, next is **POST 3D — Business
 Progression Gates**: analyze sequential development of the previous Business;
 exact levels are undecided. Settings & Localization Foundation is future planning.
 No POST 3D gates, Settings, Reset, Guidance, Garage/Tuning or Heat work ships here.
+
+
+## POST 3D handoff — current
+
+POST 3D Business Progression Gates & Shared Requirement Polish is implemented.
+Afterdark now needs Player 10 / Laundry 10; Nights needs Player 16 / Afterdark 8 /
+Neon Mile. Laundry remains Player 5 / Dockside 7. BALANCING.md records the 10/8
+choice and pacing risks. Existing owners are grandfathered; Save v17 / CE1 and
+runtime/Rebirth are unchanged. Territory/Crew share the acquisition spacing and
+state helpers; POST 3C navigation and local focus remain intact.
+
+Browser preview is blocked by ERR_BLOCKED_BY_CLIENT: desktop, 390px, 320px and real
+keyboard/scroll checks remain pending. Next after deployment/live verification:
+**Reset Progress / New Game** → Next Objective / Guidance → Settings & Localization
+Foundation → Business Visual Identity / Artworks → Active Vehicle + Tier-1 Garage →
+Heat / Police 2.0. Settings will consider English/Deutsch, centralized translation
+keys, locale formatting, reduced-motion preference and later audio/visual options.
+Business art starts with Dockside Golden Reference, then Laundry, Afterdark and
+Nights in one Solara direction. None of these later phases is implemented here.

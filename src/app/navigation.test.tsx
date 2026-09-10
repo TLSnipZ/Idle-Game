@@ -154,7 +154,7 @@ describe('five-section presentation navigation', () => {
     for (const text of ['Required — Player Level 12','Recruit Rico Vale','Required — Player Level 8']) expect(locked.render()).toContain(text);
     const s = autoUpgraderState(25,'0'), eligible = harness(view({ ...s, automation: fresh().automation,
       city: { ...s.city, ownedTerritoryIds: fresh().city.ownedTerritoryIds } }));
-    eligible.select(SECTION.city.id); expect(eligible.render()).toContain('Insufficient cash'); expect(eligible.render()).toContain('Met — Player Level 12');
+    eligible.select(SECTION.city.id); expect(eligible.render()).toContain('INSUFFICIENT CASH'); expect(eligible.render()).toContain('Met — Player Level 12');
     const auto = harness(view({ ...s, automation: fresh().automation })); auto.select(SECTION.operations.id);
     expect(auto.render()).toContain('INSUFFICIENT CASH'); expect(auto.render()).toContain('Met — Player Level 12');
     const owned = harness(view(autoUpgraderState(100))); owned.select(SECTION.operations.id);

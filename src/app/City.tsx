@@ -29,10 +29,12 @@ export function City({ state, paused, onAcquire, onLayLow }: {
           <p className="acquisition-warning">Acquisition generates +{territory.acquisitionHeat} Heat.</p>
           <p>Price: <strong>{formatPrice(territory.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
-          {view.availability && <p>{view.availability}</p>}
+          <div className="card-action-area">
           <button className="action-button purchase-button" disabled={paused || !view.canAcquire}
             aria-label={`Take control of ${territory.name}`} aria-describedby={requirements}
             onClick={() => onAcquire(territory.id)}>{paused ? 'Session paused' : 'Take control'}</button>
+          {view.availability && <p className="purchase-note">{view.availability}</p>}
+          </div>
         </>}
       </article>;
     })}</div></div>

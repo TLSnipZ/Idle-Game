@@ -1,3 +1,5 @@
+import { acquisitionPresentation } from './acquisition-presentation';
+export { acquisitionPresentation } from './acquisition-presentation';
 import { describeCrewCommand } from './crew-presentation';
 import { findVehicle } from '../features/vehicles';
 import { evaluateXpReward } from '../game/xp-reward';
@@ -62,12 +64,6 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
   }
 }
 
-export function acquisitionPresentation(requirementsMet: boolean, affordable: boolean, noun = 'Business') {
-  return !requirementsMet
-    ? { status: 'LOCKED', note: `Meet the requirements above to unlock this ${noun}.` }
-    : !affordable ? { status: 'INSUFFICIENT CASH', note: `Build your Cash balance to acquire this ${noun}.` }
-    : { status: 'PURCHASABLE', note: null };
-}
 
 export function businessPresentation(owned: boolean, canPurchase: boolean, paused: boolean, requirementsMet = true,
   progress?: ReturnType<typeof selectBusinessProgress>) {

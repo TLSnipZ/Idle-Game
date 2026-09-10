@@ -46,7 +46,9 @@ describe('durable portfolio boundaries', () => {
     expect(f.game.getSnapshot().result.state.businesses.owned['business:dockside-detail']?.level).toBe(26); f.game.stop();
   });
   it.each(['acquire', 'upgrade', 'target', 'toggle', 'automation'] as const)('%s save failure publishes no transaction changes', action => {
-    const s = ready(), input = action === 'automation' ? { ...s, automation: createInitialGameState().automation } : s;
+    const initial = ready();
+    const s = action === 'acquire' ? { ...initial, businesses: { ...initial.businesses, owned: { ...initial.businesses.owned, [L]: { level: 10 } } } } : initial;
+    const input = action === 'automation' ? { ...s, automation: createInitialGameState().automation } : s;
     const f = rebirthRuntime(input), before = f.game.getSnapshot().result.state, raw = f.raw(); f.fail();
     const r = f.game.execute(state => action === 'acquire' ? purchaseBusiness(state, 'business:afterdark-customs')
       : action === 'upgrade' ? upgradeBusiness(state, L) : action === 'target' ? setBusinessAutoUpgraderTarget(state, L)

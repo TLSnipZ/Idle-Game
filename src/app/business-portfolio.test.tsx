@@ -33,7 +33,9 @@ describe('shared portfolio presentation and accessible states', () => {
     expect(root.querySelectorAll('img, svg, canvas')).toHaveLength(0);
   });
   it.each(BUSINESS_CATALOG.slice(1))('$name distinguishes eligible insufficient Cash from a progression lock', d => {
-    const s = autoUpgraderState(), poor = { ...s, economy: { cash: moneyFromMinorUnits('0') } };
+    const initial = autoUpgraderState();
+    const s = { ...initial, businesses: { ...initial.businesses, owned: { ...initial.businesses.owned, ...Object.fromEntries(d.requirements.filter(r => r.type === 'business-level').map(r => [r.businessId, { level: r.minimumLevel }])) } } };
+    const poor = { ...s, economy: { cash: moneyFromMinorUnits('0') } };
     const root = render(d, poor); expect(root.textContent).toContain('INSUFFICIENT CASH'); expect(root.textContent).not.toContain('LOCKED');
     expect(render(d, s).querySelector('button')?.disabled).toBe(false);
   });

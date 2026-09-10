@@ -31,12 +31,15 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
       const requirementsId = `${member.id}-requirements`;
       return <article className="panel crew-card" key={member.id} aria-labelledby={`${member.id}-heading`}>
         <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{member.name}</h4><span className="ownership-badge">{view.status}</span></div>
-        <p className="eyebrow">{view.compatibleSlots.map(slot => slot.name).join(' / ')}</p><p>{member.description}</p></div><p className="specialist-effect">{view.effect} · Only while assigned</p>{view.availability && <p>{view.availability}</p>}
+        <p className="eyebrow">{view.compatibleSlots.map(slot => slot.name).join(' / ')}</p><p>{member.description}</p></div><p className="specialist-effect">{view.effect} · Only while assigned</p>{view.recruited && view.availability && <p>{view.availability}</p>}
         {!view.recruited ? <>
           <p>Recruitment: <strong>{formatPrice(member.recruitmentCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirementsId} />
+          <div className="card-action-area">
           <button className="action-button purchase-button" disabled={paused || !view.canRecruit} aria-label={`Recruit ${member.name}`}
             aria-describedby={requirementsId} onClick={() => onRecruit(member.id)}>Recruit</button>
+          {view.availability && <p className="purchase-note">{view.availability}</p>}
+          </div>
         </> : view.compatibleSlots.filter(slot => slot.canAssign).map(slot =>
           <button className="action-button" key={slot.id} disabled={paused}
             aria-label={`Assign ${member.name} to ${slot.name}${slot.occupant ? `, replacing ${slot.occupant.name}` : ''}`}

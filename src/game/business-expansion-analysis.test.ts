@@ -2,11 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 // Test-only catalog injection: no production entry, evaluator, command or schema is edited.
 // Mocking the config seam also reaches ownership/production's internal lookup.
+// Historical POST 3A proposal gates remain frozen even when current acquisition gates change.
 // This is an economy experiment, NOT a v16 save-compatibility test.
 vi.mock('../features/businesses/config/business-config', async importOriginal => {
   const live = await importOriginal<typeof import('../features/businesses/config/business-config')>();
   const { BUSINESS_PROPOSALS } = await import('./test-fixtures/business-expansion-proposals');
-  return { ...live, findBusiness: (id: unknown) => live.findBusiness(id) ?? BUSINESS_PROPOSALS.find(b => b.id === id) };
+  return { ...live, findBusiness: (id: unknown) => BUSINESS_PROPOSALS.find(b => b.id === id) ?? live.findBusiness(id) };
 });
 
 import { BUSINESS_PROPOSALS } from './test-fixtures/business-expansion-proposals';

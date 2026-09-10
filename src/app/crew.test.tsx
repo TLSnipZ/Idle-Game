@@ -35,8 +35,8 @@ describe('Crew presentation and actions',()=>{
   });
   it.each(CREW_CATALOG)('$name distinguishes unlocked cash shortage from requirement locks and recruitment readiness',member=>{
     const s={...crewState(),crew:createInitialCrewState(),economy:{cash:moneyFromMinorUnits('0')}};
-    expect(crewPresentation(s,member.id)).toMatchObject({status:'AVAILABLE',availability:'Insufficient cash',canRecruit:false});
-    const ready={...s,economy:{cash:member.recruitmentCost}};expect(crewPresentation(ready,member.id)).toMatchObject({canRecruit:true,availability:'Ready to recruit'});
+    expect(crewPresentation(s,member.id)).toMatchObject({status:'INSUFFICIENT CASH',availability:'Build your Cash balance to recruit this specialist.',canRecruit:false});
+    const ready={...s,economy:{cash:member.recruitmentCost}};expect(crewPresentation(ready,member.id)).toMatchObject({canRecruit:true,status:'PURCHASABLE',availability:null});
     const recruited=recruitCrewMember(ready,member.id).state;expect(crewPresentation(recruited,member.id)).toMatchObject({status:'RECRUITED',availability:'Unassigned — effect inactive',activeEffect:null});
   });
   it('offers only compatible assignment actions, no automatic effects or repeated recruitment',()=>{

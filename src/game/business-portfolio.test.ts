@@ -14,15 +14,20 @@ import { selectBusinessProgress } from './selectors';
 import { rational, addRational, ZERO_RATIONAL } from '../shared/rational';
 
 const packages = [
-  { id: 'business:neon-laundry', price: '3500000', base: '500', upgrade: '100000', player: 5, dock: 7 },
-  { id: 'business:afterdark-customs', price: '12500000', base: '1500', upgrade: '400000', player: 10, dock: 12 },
-  { id: 'business:solara-nights', price: '40000000', base: '4000', upgrade: '1200000', player: 16, dock: 0 },
+  { id: 'business:neon-laundry', price: '3500000', base: '500', upgrade: '100000', player: 5, prerequisite: D.id, level: 7 },
+  { id: 'business:afterdark-customs', price: '12500000', base: '1500', upgrade: '400000', player: 10, prerequisite: 'business:neon-laundry', level: 10 },
+  { id: 'business:solara-nights', price: '40000000', base: '4000', upgrade: '1200000', player: 16, prerequisite: 'business:afterdark-customs', level: 8 },
 ] as const;
 function ready(player = 20, dock = 25): GameState {
   const s = createInitialGameState();
   return { ...s, economy: { cash: money('100000000000') }, progression: { xp: getXpThresholdForLevel(player) },
     businesses: { ...s.businesses, owned: dock ? { [D.id]: { level: dock } } : {} },
     city: { ...s.city, ownedTerritoryIds: [...s.city.ownedTerritoryIds, 'territory:neon-mile'] } };
+}
+function eligible(p: typeof packages[number], player: number = p.player, level: number | null = p.level): GameState {
+  const s = ready(player, 0);
+  return { ...s, businesses: { ...s.businesses, owned: level === null ? {} : { [p.prerequisite]: { level } } },
+    city: p.id === 'business:solara-nights' ? s.city : createInitialGameState().city };
 }
 function definition(id: string) { const d = BUSINESS_CATALOG.find(b => b.id === id); if (!d) throw Error(id); return d; }
 function elapsed(s: GameState, ms: number) { const r = simulateElapsed(s, ms); if (!r.ok) throw Error(r.error); return r.state; }
@@ -37,18 +42,18 @@ describe('approved Business portfolio authority', () => {
     it('has the exact approved package and only its approved gates', () => {
       const d = definition(p.id);
       expect(d).toMatchObject({ purchaseCost: p.price, baseProductionCentsPerSecond: p.base, baseUpgradeCost: p.upgrade });
-      expect(d.requirements).toEqual([{ type: 'player-level', minimumLevel: p.player }, p.dock
-        ? { type: 'business-level', businessId: D.id, minimumLevel: p.dock }
-        : { type: 'territory-owned', territoryId: 'territory:neon-mile' }]);
+      expect(d.requirements).toEqual([{ type: 'player-level', minimumLevel: p.player },
+        { type: 'business-level', businessId: p.prerequisite, minimumLevel: p.level },
+        ...(p.id === 'business:solara-nights' ? [{ type: 'territory-owned', territoryId: 'territory:neon-mile' }] : [])]);
     });
     it('rejects either missing progression gate without mutation', () => {
-      const first = ready(p.player - 1, p.dock), valid = ready(p.player, p.dock);
-      const second = p.dock ? ready(p.player, p.dock - 1) : { ...valid, city: createInitialGameState().city };
-      for (const s of [first, second]) expect(purchaseBusiness(s, p.id)).toMatchObject({ ok: false, state: s, error: 'prerequisite-not-met' });
+      const valid = eligible(p);
+      const cases = [eligible(p, p.player - 1), eligible(p, p.player, p.level - 1), eligible(p, p.player, null)];
+      if (p.id === 'business:solara-nights') cases.push({ ...valid, city: createInitialGameState().city });
+      for (const s of cases) expect(purchaseBusiness(s, p.id)).toMatchObject({ ok: false, state: s, error: 'prerequisite-not-met' });
     });
     it('uses exact affordability; acquisition creates only Level 1 with no XP, Heat or upgrade statistic', () => {
-      let s = ready(p.player, p.dock);
-      if (p.dock) s = { ...s, city: createInitialGameState().city };
+      let s = eligible(p);
       const poor = { ...s, economy: { cash: money(String(BigInt(p.price) - 1n)) } };
       expect(purchaseBusiness(poor, p.id)).toEqual({ ok: false, state: poor, error: 'insufficient-funds' });
       s = { ...s, economy: { cash: money(p.price) } };
@@ -87,7 +92,7 @@ describe('approved Business portfolio authority', () => {
     const clock = vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('clock'); });
     try {
       expect(purchaseBusiness(s, 'business:unknown').ok).toBe(false); expect(upgradeBusiness(s, 'business:unknown').ok).toBe(false);
-      for (const p of packages) { expect(evaluateRequirements(s, definition(p.id).requirements).met).toBe(true); expect(purchaseBusiness(s, p.id).ok).toBe(true); }
+      for (const p of packages) { expect(evaluateRequirements(eligible(p), definition(p.id).requirements).met).toBe(true); expect(purchaseBusiness(eligible(p), p.id).ok).toBe(true); }
       elapsed(s, 997);
     } finally { random.mockRestore(); clock.mockRestore(); }
   });
