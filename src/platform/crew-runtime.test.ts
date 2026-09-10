@@ -31,7 +31,7 @@ describe('Crew runtime boundaries and persistence',()=>{
     const expected=recruitCrewMember(reconciled,M.id).state;
     expect(f.game.getSnapshot().result.state).toEqual(unlockEligibleAchievements(expected).state);expect(expected.crew.assignments).toEqual(s.crew.assignments);
     expect(f.events.filter(e=>e.type==='write').map(e=>e.state)).toEqual([unlockEligibleAchievements(expected).state]);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 16,savedAt:13000,state:unlockEligibleAchievements(expected).state}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 17,savedAt:13000,state:unlockEligibleAchievements(expected).state}});
   });
   it('Rico → Mara and reverse switch use old Money/decay before replacement and new effects after',()=>{
     const s=heated(R.id),f=rebirthRuntime(s);f.at(30000);
@@ -86,7 +86,7 @@ describe('Crew runtime boundaries and persistence',()=>{
     f.game.execute(state=>recruitCrewMember(state,R.id));f.game.execute(state=>assignCrewMember(state,'operations',R.id));
     f.game.execute(state=>recruitCrewMember(state,J.id));f.game.execute(state=>assignCrewMember(state,'logistics',J.id));
     f.at(4321);f.wall(5321);f.autosave();const expected=f.game.getSnapshot().result.state;
-    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 16,savedAt:5321,state:expected}});
+    const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 17,savedAt:5321,state:expected}});
     f.game.stop();const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
     reload.stop();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);expect(f.timers()).toBe(2);
     reload.execute(state=>unassignCrewSlot(state,'operations'));expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:{crew:{recruitedIds:[R.id,J.id],assignments:{operations:null,logistics:J.id}}}}});

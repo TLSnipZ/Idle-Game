@@ -34,17 +34,17 @@ describe('explicit automatic spending presentation',()=>{
   });
   it('shows exact level/cost and accessible paused/current progress without a new UI clock',()=>{
     const s=initial(),state={...s,automation:{...s.automation,businessAutoUpgradeElapsedMs:20001}},html=render(state);
-    for(const text of ['Dockside Level 25','$93,750','Next attempt in 10s','for="auto-upgrader-progress"','max="30000"','value="20001"'])expect(html).toContain(text);
+    for(const text of ['Dockside Detail Level 25','$93,750','Next attempt in 10s','for="auto-upgrader-progress"','max="30000"','value="20001"'])expect(html).toContain(text);
     expect(render(state,true)).toContain('PAUSED');expect(render(state,true)).toContain('disabled=""');
     expect(html).toContain('panel upgrade-panel');expect(html).not.toMatch(/<canvas|<svg|<select/);
   });
   it('max level still shows cadence and toggle, with no next cost or extra purchase',()=>{
-    const html=render(initial(100));expect(html).toContain('MAX LEVEL');expect(html).not.toContain('Next upgrade:');
+    const html=render(initial(100));expect(html).toContain('TARGET MAXED');expect(html).not.toContain('Next upgrade:');
     expect(html).toContain('Next attempt in 30s');expect(html).toContain('DISABLE');
   });
   it('reports no target after a structurally valid low-progression import without rechecking purchase gates',()=>{
     const s=initial(),html=render({...s,businesses:createInitialGameState().businesses,progression:{xp:0}});
-    expect(html).toContain('Dockside not owned');expect(html).not.toContain('LOCKED');expect(html).toContain('DISABLE');
+    expect(html).toContain('Dockside Detail not owned');expect(html).not.toContain('LOCKED');expect(html).toContain('DISABLE');
   });
   it('purchase/toggle feedback explains opt-in and preserves Dispatcher feedback',()=>{
     const s=initial(),base={...s,automation:createInitialGameState().automation};
@@ -57,7 +57,7 @@ describe('explicit automatic spending presentation',()=>{
   it('offline welcome shows levels and spending separately from gross income even when cash fell',()=>{
     const r=reconcileOffline(initial(25,'9262500'),0,90000);if(!r.ok)throw Error(r.error);
     const html=renderToStaticMarkup(<OfflineReturn progress={r.progress} onDismiss={()=>{}} />);
-    expect(html).toContain('Business Auto-Upgrader: Dockside +1 levels');expect(html).toContain('Spent $93,750.00');expect(html).toContain('$1,710.00 earned before automatic spending');
+    expect(html).toContain('Business Auto-Upgrader: Dockside Detail +1 levels');expect(html).toContain('Spent $93,750.00');expect(html).toContain('$1,710.00 earned before automatic spending');
     expect(html).toContain('role="status"');expect(html).toContain('Continue');
   });
   it('no upgrades means no fake auto-upgrade welcome summary; Rebirth loses this automation',()=>{

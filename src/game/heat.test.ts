@@ -204,7 +204,7 @@ describe('offline and fresh/Rebirth contracts', () => {
     expect(r.state.permanentProgression.rebirthCount).toBe(s.permanentProgression.rebirthCount+1);
     expect(r.state.economy.cash).toBe('0'); expect(r.state.progression.xp).toBe(0); expect(r.state.businesses.owned).toEqual({});
     expect(r.state.businesses.productionRemainderMilliCents).toBe(0); expect(r.state.businesses.productionRemainderSubMilliCents).toEqual(rational(0n));
-    expect(r.state.upgrades.purchasedIds).toEqual([]); expect(r.state.automation).toEqual({ enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
+    expect(r.state.upgrades.purchasedIds).toEqual([]); expect(r.state.automation).toEqual({ businessAutoUpgradeTargetId: 'business:dockside-detail', enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
     expect(performStarterJob(r.state)).toMatchObject({ ok: true, moneyEarned: '2750', xpEarned: 11 });
   });
   it('fresh progression is playable and max Heat never blocks work or revokes territory', () => {

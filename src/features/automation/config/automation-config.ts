@@ -17,10 +17,9 @@ export const DELIVERY_DISPATCHER = Object.freeze({
 export const BUSINESS_AUTO_UPGRADER = Object.freeze({
   id: 'automation:business-auto-upgrader' satisfies AutomationId,
   name: 'Business Auto-Upgrader',
-  description: 'Automatically attempts one Dockside level upgrade every 30 seconds.',
+  description: 'Attempts one upgrade every 30 seconds for the selected owned Business when affordable.',
   purchaseCost: moneyFromMinorUnits('5000000'),
   intervalMs: 30_000,
-  targetBusinessId: STARTER_BUSINESS.id,
   requirements: Object.freeze<Requirement[]>([
     { type: 'player-level', minimumLevel: 12 },
     { type: 'business-owned', businessId: STARTER_BUSINESS.id },

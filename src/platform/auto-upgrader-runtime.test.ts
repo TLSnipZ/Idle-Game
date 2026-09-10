@@ -40,7 +40,7 @@ describe('auto spending at online, offline and durable boundaries',()=>{
     const s=initial(),f=rebirthRuntime(s);f.at(30000);f.game.execute(state=>upgradeBusiness(state,B.id));
     const after=f.game.getSnapshot().result.state;expect(level(after)).toBe(27);expect(after.economy.cash).toBe('80541250');
     expect(after.permanentProgression.statistics.businessLevelsPurchased).toBe(2);
-    expect(f.events.filter(e=>e.type==='write')).toHaveLength(1);f.game.stop();
+    expect(f.events.filter(e=>e.type==='write')).toHaveLength(2);f.game.stop();
   });
   it('automatic spending before another purchase may make it unaffordable',()=>{
     const f=rebirthRuntime(initial(25,'10000000'));f.at(30000);f.game.execute(s=>purchaseVehicle(s,V.id));
@@ -64,7 +64,7 @@ describe('auto spending at online, offline and durable boundaries',()=>{
   });
   it('offline chronological affordability yields exact income/spend/XP instead of a negative income exception',()=>{
     const s=initial(25,'9262500'),r=reconcileOffline(s,1000,91000);expect(r.ok).toBe(true);if(!r.ok)throw Error(r.error);
-    expect(r.state.economy.cash).toBe('58500');expect(r.progress).toMatchObject({incomeEarned:'171000',xpEarned:25,autoUpgrader:{levelsPurchased:1,spent:'9375000'}});
+    expect(r.state.economy.cash).toBe('58500');expect(r.progress).toMatchObject({incomeEarned:'171000',xpEarned:25,autoUpgrader:{ targetId: 'business:dockside-detail', levelsPurchased:1,spent:'9375000'}});
   });
   it('disabled offline matches the unsplit baseline and preserves partial progress',()=>{
     const s=initial(),state={...s,automation:{...s.automation,enabledIds:[],businessAutoUpgradeElapsedMs:20000}};

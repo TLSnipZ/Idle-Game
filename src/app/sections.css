@@ -177,3 +177,18 @@
   #rebirth-heading { scroll-margin-block-start: 1rem; }
 }
 @media (max-height: 600px) { #rebirth-heading { scroll-margin-block-start: 1rem; } }
+
+/* Four simultaneous Businesses: stable, compact portfolio layout. */
+.operations-anchor { display: flex; flex-direction: column; }
+.operations-business { min-width: 0; width: 100%; }
+.business-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.business-grid .business-content { padding: 1rem; }
+.business-grid .business-card { min-width: 0; overflow: visible; }
+.business-grid h3 { overflow-wrap: normal; word-break: normal; }
+.business-grid .production strong { font-size: clamp(1.2rem, 3vw, 1.8rem); }
+.business-total { margin-block: .5rem 1rem; }
+.auto-target { display: grid; gap: .4rem; min-width: 0; }
+.auto-target select { width: 100%; max-width: 100%; min-width: 0; min-height: 44px; font: inherit; padding: .5rem; }
+.auto-target select:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+#auto-upgrader-timing { font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .business-grid { grid-template-columns: minmax(0, 1fr); } }

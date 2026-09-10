@@ -1,10 +1,11 @@
 # Solara City
 
 A modern coastal crime, luxury and street-culture idle/tycoon browser game.
-The Base Game foundation is complete. **POST 2C manually reviewed live; POST 2D interaction/progression polish implemented, live verification pending.**
+The Base Game foundation is complete. **POST 3B Business Expansion I implemented; deployment/live verification pending.**
 See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
-reloads. Buy Dockside Detail at level 1 and level it up to 100. Upgrade bonuses apply
+reloads. Four live Businesses—Dockside Detail, Neon Laundry, Afterdark Customs and
+Solara Nights—produce simultaneously and level up to 100. Upgrade bonuses apply
 to business production and delivery rewards through the shared modifier system.
 Hire the **Delivery Dispatcher** for **$5,000** at Player Level 3 after acquiring Dockside: it performs
 one delivery every **10 seconds** at your current reward ($25 base, $36 with both
@@ -22,9 +23,13 @@ already-owned upgrades and automation stay active, including in older saves.
 The Garage contains one canonical **Kairo KX-R**, for **$25,000** at Player Level 5
 and owned Dockside Level 5. It grants **+10% global Business Production** while
 owned, including offline and after Rebirth. Its approved artwork is repository-owned.
-Save v16 maps historical Vortex ownership to KX-R without repurchase, refund or
+Historical Save v16 maps Vortex ownership to KX-R without repurchase, refund or
 historical income. Non-owners receive no vehicle; CE1 remains unchanged. There are
 no Active Vehicle slots, additional cars or Tuning controls yet.
+Current Save **v17** adds one persisted Business Auto-Upgrader target, defaulting
+to Dockside for older saves/fresh runs/Rebirth. Owned Businesses are selectable;
+switching is free and preserves the 30s countdown and enabled state. All Business
+ownership/Levels reset on Rebirth. See [BUSINESS_EXPANSION.md](docs/BUSINESS_EXPANSION.md).
 Progress saves after successful actions and every five seconds; closing the page
 can lose unsaved actions. On return, businesses and the dispatcher receive the same base maximum **eight hours** (up to twelve with Never Sleeps)
 of offline progress from the last successful local save. A welcome card shows

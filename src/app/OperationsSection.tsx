@@ -1,5 +1,8 @@
 import type { useGame } from './use-game';
-import { STARTER_BUSINESS } from '../features/businesses';
+import { RateValue } from './RateValue';
+import { dashboardPresentation } from './dashboard-presentation';
+import { evaluateRequirements } from '../game/requirements';
+import { BUSINESS_CATALOG } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
 import { formatReward } from './number-format';
 import { selectBusinessProgress, selectOwnsBusiness, selectCanPurchaseBusiness, selectUpgrade } from '../game/selectors';
@@ -16,9 +19,8 @@ import { AutoUpgraderCard } from './AutoUpgraderCard';
 import { selectDispatcher, selectAutoUpgrader } from '../game/automation-selectors';
 import { DELIVERY_DISPATCHER, BUSINESS_AUTO_UPGRADER } from '../features/automation';
 export function OperationsSection({ game }: { readonly game: ReturnType<typeof useGame> }) {
-  const { snapshot, runtimeError, runStarterJob, upgradeOwnedBusiness, buyBusiness, buyUpgrade, buyAutomation, toggleAutomation, automationEvent } = game;
+  const { snapshot, runtimeError, runStarterJob, upgradeOwnedBusiness, buyBusiness, buyUpgrade, buyAutomation, toggleAutomation, changeAutoUpgraderTarget, automationEvent } = game;
   const paused = runtimeError !== null;
-  const owned = selectOwnsBusiness(snapshot.state, STARTER_BUSINESS.id);
   const reward = evaluateJobReward(snapshot.state);
   const xp = evaluateXpReward(snapshot.state, 'manualJob');
   return <div className="section-stack operations-layout">
@@ -37,9 +39,12 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
             </div>
       </section>
       <section className="operations-business" aria-labelledby="businesses-heading"><h2 id="businesses-heading">Businesses</h2>
-        <BusinessCard progress={selectBusinessProgress(snapshot.state, STARTER_BUSINESS.id)} owned={owned}
-          canPurchase={selectCanPurchaseBusiness(snapshot.state, STARTER_BUSINESS.id)} paused={paused}
-          onUpgrade={() => upgradeOwnedBusiness(STARTER_BUSINESS.id)} onPurchase={() => buyBusiness(STARTER_BUSINESS.id)} />
+        <p className="business-total">Total Business Production: <strong><RateValue text={dashboardPresentation(snapshot.state).production} /></strong></p>
+        <div className="business-grid">{BUSINESS_CATALOG.map(definition => <BusinessCard key={definition.id} definition={definition}
+          requirements={evaluateRequirements(snapshot.state, definition.requirements)}
+          progress={selectBusinessProgress(snapshot.state, definition.id)} owned={selectOwnsBusiness(snapshot.state, definition.id)}
+          canPurchase={selectCanPurchaseBusiness(snapshot.state, definition.id)} paused={paused}
+          onUpgrade={() => upgradeOwnedBusiness(definition.id)} onPurchase={() => buyBusiness(definition.id)} />)}</div>
       </section>
     </div>
     <section className="equipment-section" aria-labelledby="upgrades-heading"><h2 id="upgrades-heading">Upgrades</h2><div className="upgrade-catalog">
@@ -47,7 +52,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
     </div></section>
     <section aria-labelledby="automation-heading"><h2 id="automation-heading">Automation</h2><p>Delegate deliveries. Choose when to enable automatic spending.</p><div className="automation-grid">
       <AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} />
-      <AutoUpgraderCard view={selectAutoUpgrader(snapshot.state)} paused={paused} onPurchase={() => buyAutomation(BUSINESS_AUTO_UPGRADER.id)} onToggle={enabled => toggleAutomation(BUSINESS_AUTO_UPGRADER.id, enabled)} />
+      <AutoUpgraderCard view={selectAutoUpgrader(snapshot.state)} paused={paused} onPurchase={() => buyAutomation(BUSINESS_AUTO_UPGRADER.id)} onTargetChange={changeAutoUpgraderTarget} onToggle={enabled => toggleAutomation(BUSINESS_AUTO_UPGRADER.id, enabled)} />
     </div></section>
   </div>;
 }

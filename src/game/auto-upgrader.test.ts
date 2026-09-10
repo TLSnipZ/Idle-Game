@@ -36,7 +36,7 @@ function withDispatcher(s: GameState) { return { ...s, automation: { ...s.automa
 describe('Business Auto-Upgrader purchase and explicit opt-in', () => {
   it('adds exactly one configured automation with exact identity and acquisition data', () => {
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, 'automation:business-auto-upgrader']);
-    expect(A).toMatchObject({ name: 'Business Auto-Upgrader', purchaseCost: '5000000', intervalMs: 30000, targetBusinessId: B.id });
+    expect(A).toMatchObject({ name: 'Business Auto-Upgrader', purchaseCost: '5000000', intervalMs: 30000 });
     expect(A.requirements).toEqual([{ type: 'player-level', minimumLevel: 12 }, { type: 'business-owned', businessId: B.id },
       { type: 'business-level', businessId: B.id, minimumLevel: 15 }, { type: 'territory-owned', territoryId: 'territory:neon-mile' }]);
     expect(ACHIEVEMENT_CATALOG).toHaveLength(6); expect(CUMULATIVE_STATISTICS).toHaveLength(7);
@@ -91,7 +91,7 @@ describe('chronological paid upgrades and outer batching', () => {
     // $562.50 at L25 + $585 at L26 + $101.25 at L27; costs $93,750 + $101,400.
     expect(r.businessIncome).toBe('124875'); expect(r.state.economy.cash).toBe('80609875');
     expect(level(r.state)).toBe(27); expect(r.state.progression.xp).toBe(initial().progression.xp+50);
-    expect(r.autoUpgrader).toEqual({levelsPurchased:2,spent:'19515000'});
+    expect(r.autoUpgrader).toEqual({ targetId: 'business:dockside-detail', levelsPurchased:2,spent:'19515000'});
     expect(r.state.automation.businessAutoUpgradeElapsedMs).toBe(5000);
     expect(r.state.permanentProgression.statistics.businessLevelsPurchased).toBe(2);
   });

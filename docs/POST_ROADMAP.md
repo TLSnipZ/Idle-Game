@@ -1,8 +1,8 @@
 # Post-roadmap priorities
 
 This is the current post-roadmap status and priority source. ROADMAP.md retains
-historical Base Game records. Current Save v16 / CE1 includes POST 2C vehicle
-identity migration. Non-vehicle Phase 9C balance, Phase 9D runtime safeguards and
+historical Base Game records. Current Save v17 / CE1 includes POST 2C vehicle
+identity migration and POST 3B selected Business targeting. Non-vehicle Phase 9C balance, Phase 9D runtime safeguards and
 Phase 9B accessibility remain preserved contracts.
 
 ## Immediate sequence
@@ -18,11 +18,11 @@ Phase 9B accessibility remain preserved contracts.
 - POST 2D: **Interaction & Progression Polish implemented; live verification pending**.
   In-section focus/scroll stability, global HUD XP, Rebirth Ready and compact KX-R layout.
 - POST 3A: **Business Expansion I design and deterministic analysis complete**;
-  [BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md) is the proposed POST 3B contract.
-  Current production remains Dockside only, Save v16 / CE1; no live changes.
-- POST 3B: **Business Expansion I Implementation — planned, not started**.
-  Implement the three proposed packages, shared Business cards/production and one
-  selected Auto-Upgrader target; recommended v17 migration preserves existing state.
+  [BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md) retains the approved balance evidence.
+- POST 3B: **Business Expansion I implemented; deployment/live verification pending**.
+  Four Businesses, shared cards/production, selected Auto-Upgrader target and minimal
+  Save v17 migration. Recovery starts directly from the preserved POST 3A baseline;
+  the lost implementation SHA is not recreated. No non-Business rebalance.
 - POST 3C: **Operations Long-Section Navigation / UX — planned** immediately after
   POST 3B deployment and live verification. Then Reset Progress, Next Objective /
   Guidance, Active Vehicle / Tier 1 Garage and Heat / Police 2.0, subject to live defects.

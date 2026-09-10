@@ -1,3 +1,4 @@
+import type { BusinessId } from '../features/businesses';
 import { unlockEligibleAchievements } from './achievements';
 import type { AchievementId } from '../features/achievements';
 import { getOfflineCapMs } from './offline-cap';
@@ -14,7 +15,7 @@ import type { GameSimulationResult } from './simulate-game-elapsed';
 
 
 export interface OfflineProgress {
-  readonly autoUpgrader?: { readonly levelsPurchased: number; readonly spent: Money };
+  readonly autoUpgrader?: { readonly targetId: BusinessId; readonly levelsPurchased: number; readonly spent: Money };
   readonly newlyUnlockedAchievements?: readonly AchievementId[];
   readonly actualElapsedMs: number;
   readonly capMs: number;

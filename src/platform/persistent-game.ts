@@ -54,6 +54,15 @@ export function createPersistentGame(
       : { kind: 'error', error: result.error } };
     publish(view);
   }
+  function saveCandidate(candidate: GameState): boolean {
+    const written = view.persistence.kind === 'blocked'
+      ? { ok: false as const, error: 'storage-conflict' as const } : saves.save(candidate);
+    view = { ...view, persistence: written.ok ? { kind: 'saved' }
+      : written.error === 'storage-conflict' ? { kind: 'blocked', error: written.error }
+      : { kind: 'error', error: written.error } };
+    if (!written.ok) publish(view);
+    return written.ok;
+  }
   function start() {
     if (active) return;
     if (!runtime) {
@@ -68,7 +77,7 @@ export function createPersistentGame(
       runtime = createGameRuntime(view.result.state, snapshot => {
         view = { ...snapshot, persistence: view.persistence, offline: view.offline };
         publish(view);
-      }, timing, view.achievementEvent);
+      }, timing, view.achievementEvent, saveCandidate);
       publish(view);
     }
     if (view.persistence.kind === 'offline-error') return;
@@ -92,27 +101,26 @@ export function createPersistentGame(
     if (!active || !runtime) return;
     let commandInput: GameState | null = null;
     let succeeded = false;
-    let durableVehicle = false;
+    let durableCommand = false;
     const completed = runtime.execute(state => {
       const result = command(state);
       commandInput = state;
       succeeded = result.ok;
       return result;
     }, (candidate, previous) => {
-      if (candidate.garage === previous.garage) return true;
-      // Permanent vehicle acquisition publishes only after a guarded durable write.
-      durableVehicle = true;
-      const written = view.persistence.kind === 'blocked'
-        ? { ok: false as const, error: 'storage-conflict' as const } : saves.save(candidate);
-      view = { ...view, persistence: written.ok ? { kind: 'saved' }
-        : written.error === 'storage-conflict' ? { kind: 'blocked', error: written.error }
-        : { kind: 'error', error: written.error } };
-      if (!written.ok) publish(view);
-      return written.ok;
+      const guarded = candidate.garage !== previous.garage
+        || candidate.businesses.owned !== previous.businesses.owned
+        || candidate.automation.businessAutoUpgradeTargetId !== previous.automation.businessAutoUpgradeTargetId
+        || candidate.automation.enabledIds !== previous.automation.enabledIds
+        || candidate.automation.unlockedIds !== previous.automation.unlockedIds;
+      if (!guarded) return true;
+      // Business spending and automation configuration publish only after durable storage.
+      durableCommand = true;
+      return saveCandidate(candidate);
     });
     // Execute has published the completed command. Never persist reconciliation's
     // intermediate snapshot or read a possibly stale React render here.
-    if (succeeded && !durableVehicle && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
+    if (succeeded && !durableCommand && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
     return completed;
   }
   function exportCode(): ExportResult {

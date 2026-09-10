@@ -316,3 +316,16 @@ POST 3B implementation is next, including one selected Auto-Upgrader target and
 the recommended v17 migration. Neither is implemented here. After deployed/live
 3B verification, prioritize POST 3C Operations Long-Section Navigation / UX.
 POST_ROADMAP.md retains Reset, Guidance, Garage and other deferred priorities.
+
+
+## POST 3B recovery handoff
+
+POST 3A design is complete. POST 3B Business Expansion I is **implemented** from
+baseline `96ab72fffe8ced6710bca8572e573c086b0b9f8d`: four Businesses, Save v17/CE1,
+selected-target Auto-Upgrader, shared responsive Operations cards, tests and docs.
+The POST 3A handoff above records its historical one-Business design boundary.
+Deployment/live verification remains pending; browser local preview was blocked.
+**Next after live verification: POST 3C — Operations Long-Section Navigation / UX.**
+Then Reset Progress → Next Objective / Guidance → Active Vehicle / Tier 1 Garage →
+Heat / Police 2.0, subject to defects. None of those, Business artwork/depth, new
+Territories/Crew/Events/Achievements/Statistics or extra Businesses ship in POST 3B.

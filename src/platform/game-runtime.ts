@@ -26,7 +26,7 @@ export const RUNTIME_CADENCE_MS = 250;
 
 type CommandResult = ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
-  | 'invalid-clock' | 'invalid-state';
+  | 'invalid-clock' | 'invalid-state' | 'persistence-failure';
 
 export interface RuntimeSnapshot {
   readonly achievementEvent?: { readonly ids: readonly AchievementId[]; readonly sequence: number };
@@ -58,6 +58,7 @@ export function createGameRuntime(
   publish: (snapshot: RuntimeSnapshot) => void,
   timing: RuntimeTiming = browserTiming,
   initialAchievementEvent?: RuntimeSnapshot['achievementEvent'],
+  beforeAutomaticUpgradeCommit?: (candidate: GameState) => boolean,
 ) {
   let snapshot: RuntimeSnapshot = { ...(initialAchievementEvent ? { achievementEvent: initialAchievementEvent } : {}), result: { ok: true, state: initialState }, runtimeError: null };
   let baseline: number | null = null;
@@ -118,6 +119,11 @@ export function createGameRuntime(
     }
     if (!result.ok) {
       suspend(result.error);
+      return false;
+    }
+    if (result.autoUpgrader && result.autoUpgrader.levelsPurchased > 0
+      && beforeAutomaticUpgradeCommit && !beforeAutomaticUpgradeCommit(result.state)) {
+      suspend('persistence-failure');
       return false;
     }
     baseline = now;

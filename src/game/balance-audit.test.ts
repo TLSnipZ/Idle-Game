@@ -125,7 +125,7 @@ describe('Phase 9C deterministic progression routes', () => {
     const active = reconcileOffline(enabled, 0, 8 * 3600000);
     expect(paused.ok).toBe(true); expect(active.ok).toBe(true);
     if (!active.ok) throw Error(active.error);
-    expect(active.progress.autoUpgrader).toEqual({ levelsPurchased: 7, spent: '34440000' });
+    expect(active.progress.autoUpgrader).toEqual({ targetId: 'business:dockside-detail', levelsPurchased: 7, spent: '34440000' });
     expect(active.state.businesses.owned[B.id]?.level).toBe(22);
     expect(active.state.permanentProgression.statistics.businessLevelsPurchased).toBe(active.progress.autoUpgrader?.levelsPurchased);
     expect(active.state.progression.xp - s.progression.xp).toBe((active.progress.autoUpgrader?.levelsPurchased ?? 0) * 25);
@@ -137,7 +137,7 @@ describe('Phase 9C deterministic progression routes', () => {
       .toEqual([2,3,3,6,8,1,5,5]);
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, A.id]);
   });
-  it('roundtrips a rich current v16 save and CE1 code without balance compensation or field changes', () => {
+  it('roundtrips a rich current v17 save and CE1 code without balance compensation or field changes', () => {
     const s = rebirthState(37, 48);
     const rich = { ...s, automation: { ...s.automation, unlockedIds: [D.id, A.id], enabledIds: [A.id], businessAutoUpgradeElapsedMs: 23456 },
       city: { ...s.city, ownedTerritoryIds: [...s.city.ownedTerritoryIds, NEON_MILE.id], heat: 72, heatDecayElapsedMs: 42000 },
@@ -147,10 +147,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(16);
+    expect(CURRENT_SAVE_VERSION).toBe(17);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 16, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 17, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);

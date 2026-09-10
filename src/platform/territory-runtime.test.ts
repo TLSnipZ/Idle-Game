@@ -53,7 +53,7 @@ describe('territory runtime and persistence boundaries', () => {
     f.at(250); f.tick(); expect(f.events.filter(e => e.type === 'write')).toHaveLength(writes);
     f.at(5000); f.wall(6000); f.autosave();
     const state = f.game.getSnapshot().result.state, exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 16, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 17, state } });
     expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { state } });
     f.game.stop(); f.game.start(); f.game.start(); expect(f.timers()).toBe(2); f.game.stop();
     const reload = f.make(); reload.start(); expect(reload.getSnapshot().result.state).toEqual(state);

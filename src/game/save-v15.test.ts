@@ -22,7 +22,7 @@ describe('v15 automation migration and strict validation',()=>{
   it('v14 adds only unowned disabled Auto-Upgrader with zero progress, preserving every prior field',()=>{
     const s=rich(),{enabledIds:_enabled,businessAutoUpgradeElapsedMs:_progress,...automation}=s.automation;
     const old={...s,automation},raw=stringifySaveFixture(envelope(old,14)),result=parseSave(raw);
-    expect(CURRENT_SAVE_VERSION).toBe(16);expect(result).toEqual({ok:true,envelope:envelope(s)});
+    expect(CURRENT_SAVE_VERSION).toBe(17);expect(result).toEqual({ok:true,envelope:envelope(s)});
     expect(stringifySaveFixture(envelope(old,14))).toBe(raw);expect(validateSaveCode(encodeSaveText(raw))).toEqual(result);
     if(!result.ok)throw Error('fixture');const {enabledIds,businessAutoUpgradeElapsedMs,...prior}=result.envelope.state.automation;
     expect({...result.envelope.state,automation:prior}).toEqual(old);expect(enabledIds).toEqual([]);expect(businessAutoUpgradeElapsedMs).toBe(0);
@@ -68,7 +68,7 @@ describe('v15 automation migration and strict validation',()=>{
       ...(version>=7?{permanentProgression:{empirePoints:17,rebirthCount:4,...(version>=8?{skills:s.permanentProgression.skills}:{}),
         ...(version>=13?{unlockedAchievementIds:s.permanentProgression.unlockedAchievementIds}:{}),...(version>=14?{statistics:s.permanentProgression.statistics}:{})}}:{}),
       ...(version>=9?{city:version===9?{ownedTerritoryIds:s.city.ownedTerritoryIds}:s.city}:{}),...(version>=11?{crew:s.crew}:{}),...(version>=12?{events:s.events}:{})};
-    const result=validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state,version))));expect(result).toMatchObject({ok:true,envelope:{version: 16,savedAt:123456789,state:{economy:s.economy,
+    const result=validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state,version))));expect(result).toMatchObject({ok:true,envelope:{version: 17,savedAt:123456789,state:{economy:s.economy,
       automation:{unlockedIds:version>=4?[D.id]:[],starterJobElapsedMs:version>=4?7000:0,enabledIds:[],businessAutoUpgradeElapsedMs:0}}}});
     // Release matrix: verify every historical slice, not just version/cash/automation.
     if (!result.ok) throw Error(result.error);

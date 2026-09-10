@@ -2,7 +2,7 @@ import { CREW_CATALOG } from '../features/crew';
 import { findTerritory, requireCityState, TERRITORY_CATALOG } from '../features/territories';
 import { findSkill, getSkillRank } from '../features/skills';
 import { VEHICLE_CATALOG } from '../features/vehicles';
-import { findBusiness, getBusinessLevel, MAX_BUSINESS_LEVEL, STARTER_BUSINESS } from '../features/businesses';
+import { findBusiness, getBusinessLevel, MAX_BUSINESS_LEVEL, BUSINESS_CATALOG } from '../features/businesses';
 import { findUpgrade, UPGRADE_CATALOG } from '../features/upgrades';
 import { AUTOMATIONS, findAutomation } from '../features/automation';
 import { getPlayerLevel, MAX_PLAYER_LEVEL } from '../features/progression';
@@ -71,7 +71,7 @@ export function evaluateRequirements(state: GameState, requirements: readonly Re
 export function newlyEligibleContent(before: GameState, after: GameState): readonly string[] {
   const content = [
     ...CREW_CATALOG.map(definition => ({ definition, owned: after.crew.recruitedIds.includes(definition.id) })),
-    { definition: STARTER_BUSINESS, owned: Object.hasOwn(after.businesses.owned, STARTER_BUSINESS.id) },
+    ...BUSINESS_CATALOG.map(definition => ({ definition, owned: Object.hasOwn(after.businesses.owned, definition.id) })),
     ...UPGRADE_CATALOG.map(definition => ({ definition, owned: after.upgrades.purchasedIds.includes(definition.id) })),
     ...AUTOMATIONS.map(definition => ({ definition, owned: after.automation.unlockedIds.includes(definition.id) })),
     ...VEHICLE_CATALOG.map(definition => ({ definition, owned: after.garage.ownedVehicleIds.includes(definition.id) })),

@@ -1,3 +1,5 @@
+import { setBusinessAutoUpgraderTarget } from '../game/set-auto-upgrader-target';
+import { findBusiness } from '../features/businesses';
 import { setAutomationEnabled } from '../game/set-automation-enabled';
 import { describeAutomationToggle } from './automation-presentation';
 import { resolveEventChoice } from '../game/resolve-event-choice';
@@ -47,19 +49,15 @@ export function useGame() {
   }
 
   function buyBusiness(businessId: unknown) {
-    runtime.execute(state => {
-      const result = purchaseBusiness(state, businessId);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('purchase', result) }));
-      return result;
-    });
+    const result = runtime.execute(state => purchaseBusiness(state, businessId));
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result ? describeAction('purchase', result, businessId) : 'The action could not be saved. No purchase or configuration change was made.' }));
   }
 
   function upgradeOwnedBusiness(id: unknown) {
-    runtime.execute(state => {
-      const result = upgradeBusiness(state, id);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('upgrade', result) }));
-      return result;
-    });
+    const result = runtime.execute(state => upgradeBusiness(state, id));
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result ? describeAction('upgrade', result, id) : 'The action could not be saved. No purchase or configuration change was made.' }));
   }
 
   function buyUpgrade(id: unknown) {
@@ -71,19 +69,15 @@ export function useGame() {
   }
 
   function buyAutomation(id: unknown) {
-    runtime.execute(state => {
-      const result = purchaseAutomation(state, id);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('automation', result, id) }));
-      return result;
-    });
+    const result = runtime.execute(state => purchaseAutomation(state, id));
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result ? describeAction('automation', result, id) : 'The action could not be saved. No purchase or configuration change was made.' }));
   }
 
   function toggleAutomation(id: unknown, enabled: boolean) {
-    runtime.execute(state => {
-      const result = setAutomationEnabled(state, id, enabled);
-      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAutomationToggle(result, enabled) }));
-      return result;
-    });
+    const result = runtime.execute(state => setAutomationEnabled(state, id, enabled));
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result ? result.ok ? describeAutomationToggle(result, enabled) : describeAction('automation', result, id) : 'The action could not be saved. No purchase or configuration change was made.' }));
   }
 
   function buyVehicle(id: unknown) {
@@ -155,5 +149,12 @@ export function useGame() {
     return result;
   }
 
-  return { toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  function changeAutoUpgraderTarget(id: string) {
+    const result = runtime.execute(state => setBusinessAutoUpgraderTarget(state, id));
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result?.ok ? `Auto-Upgrader target set to ${findBusiness(id)?.name}.`
+        : 'Auto-Upgrader target could not be changed.' }));
+  }
+
+  return { changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

@@ -2,10 +2,10 @@
 
 ## Current implementation
 
-POST 2C: current Save **v16**, unchanged **CE1** transport, one canonical vehicle
+POST 3B: current Save **v17**, unchanged **CE1** transport, one canonical vehicle
 **Kairo KX-R** (`vehicle:kairo-kx-r`). The numbered phase sections below preserve
 historical architecture decisions; their Vortex/v15 references describe those phases.
-See the POST 2C section for the current identity/migration and acquisition boundary.
+See POST 2C for the vehicle identity boundary and POST 3B below for Business targeting.
 
 
 Through Phase 1C.2, the domain has economy and business ownership, atomic job and
@@ -2429,3 +2429,50 @@ start unowned; no historical simulation. One owned target, existing 30s cadence,
 reconcile-before-target-change and atomic publication remain the future contract.
 The isolated analysis test's catalog injection is not historical-save validation
 or production implementation. No new content/schema/UI is shipped in POST 3A.
+
+
+## POST 3B — Business portfolio and Save v17
+
+Implemented from POST 3A; live verification pending. `BUSINESS_CATALOG` contains
+Dockside, Laundry, Afterdark and Nights in stable progression order. Generic
+purchase/upgrade/selectors already existed and now resolve all four definitions.
+Acquisition creates a sparse Level-1 ownership entry, without XP/Heat/statistics.
+Paid upgrades grant the existing 25 base XP and one checked paid-level statistic.
+
+`automation.businessAutoUpgradeTargetId: BusinessId` is the sole v17 field. Pure
+v16→v17 normalization defaults it to Dockside, preserves every other value and
+savedAt, and grants no new Businesses. Historical validators remain targetless,
+accept only historical Business IDs, and continue sequentially through the v15→v16
+Vortex/KX-R mapping. Current unknown targets reject; valid but unowned targets are
+safe dormant configurations. CE1 transport and checksum/encoding are unchanged.
+
+Target commands require purchased Auto-Upgrader and an owned Business. They
+reconcile old-target time, write before publication, preserve enabled state and
+30-second progress, and do not buy a level. Simulation uses the same manual paid
+upgrade authority against that one target. No automatic acquisition/switch/queue.
+Maxed, unowned and disabled fast paths preserve exact behavior. Offline reports
+include the stable target ID, resolved to its display name in presentation.
+
+The existing per-Business modifier scopes are retained before exact aggregation:
+Dockside equipment remains Dockside-only; KX-R, Fleet, Crew and Skills retain their
+global scopes. Shared milli-cent and sub-milli-cent remainders remain mathematically
+sufficient; no independent Business timers or persisted rates are introduced.
+Shared offline caps, Dispatcher prefix batching, Heat/Mara ordering, outer Event
+RNG, sub-ms handling and 4,096-segment budget are unchanged. Actual 12h portfolio
+reconciliation is regression-tested. Oversized/overflow transitions remain atomic.
+
+The persistence guard formerly covered only vehicle purchases. It now also covers
+Business ownership/level changes and automation purchase/toggle/target changes.
+Successful elapsed automatic upgrades use the same guarded save-before-publish
+callback; failure suspends without exposing that candidate. Offline/Import/Rebirth
+retain existing complete-candidate durability. Meaningful command feedback follows
+persistence. A due automatic upgrade and following manual purchase have separate
+chronological writes, not one write after publishing both.
+
+Rebirth uses the existing fresh-state factory, clearing all Businesses and temporary
+automation, including restoring the Dockside target. Permanent KX-R/Skills/EP and
+Rebirth formulas remain unchanged, including the existing higher-EP offline
+Auto-Upgrader effect. Operations renders shared stable-ID cards, a labeled native
+owned-target select, local focus recovery and responsive 2→1 columns. No POST 3C
+navigation, artwork or speculative save fields. Browser local preview was blocked;
+real visual/mobile/keyboard/scroll acceptance remains a deployment handoff.

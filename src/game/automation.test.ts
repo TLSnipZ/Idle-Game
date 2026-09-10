@@ -27,12 +27,12 @@ describe('Delivery Dispatcher purchase', () => {
   it('pins the sole delegation identity, prerequisite, exact cost and interval', () => {
     expect(D).toMatchObject({ id: 'automation:delivery-dispatcher', name: 'Delivery Dispatcher', purchaseCost: '500000', intervalMs: 10000, requirements: [{ type: 'business-owned', businessId: STARTER_BUSINESS.id }, { type: 'player-level', minimumLevel: 3 }] });
     expect(isMoney(D.purchaseCost)).toBe(true);
-    expect(createInitialAutomationState()).toEqual({ enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
+    expect(createInitialAutomationState()).toEqual({ businessAutoUpgradeTargetId: 'business:dockside-detail', enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
   });
   it('spends exactly, starts at zero and retains original nested state immutably', () => {
     const state = owned(); Object.freeze(state); Object.freeze(state.automation); Object.freeze(state.automation.unlockedIds);
     const result = purchaseAutomation(state, D.id);
-    expect(result).toMatchObject({ ok: true, state: { economy: { cash: '0' }, automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } } });
+    expect(result).toMatchObject({ ok: true, state: { economy: { cash: '0' }, automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 0 } } });
     expect(result.state.businesses).toBe(state.businesses); expect(result.state.upgrades).toBe(state.upgrades);
     expect(state.economy.cash).toBe('500000'); expect(state.automation.unlockedIds).toEqual([]);
   });

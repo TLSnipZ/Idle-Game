@@ -6,12 +6,13 @@ import { formatProduction } from './stat-format';
 import { evaluateJobReward } from '../game/effective-stats';
 import { findUpgrade } from '../features/upgrades';
 import { selectBusinessProgress } from '../game/selectors';
-import { STARTER_BUSINESS } from '../features/businesses';
+import { findBusiness, STARTER_BUSINESS } from '../features/businesses';
 import { formatCash } from './number-format';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
 import type { PersistenceStatus } from '../platform/persistent-game';
 
 export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown): string {
+  const business = findBusiness(contentId ?? STARTER_BUSINESS.id);
   if (result.ok) {
     if (action === 'vehicle') return `${findVehicle(contentId)?.name ?? 'Vehicle'} added to your garage permanently. Kept through Rebirth.`;
     if (action === 'automation' && contentId === BUSINESS_AUTO_UPGRADER.id) return 'Business Auto-Upgrader purchased. Disabled until you enable automatic spending.';
@@ -21,12 +22,12 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       return `${upgrade?.name ?? 'Upgrade'} purchased. ${upgrade?.modifier.target.stat === 'job-reward' ? 'Delivery' : 'Production'} bonus is active.`;
     }
     if (action === 'upgrade') {
-      const progress = selectBusinessProgress(result.state, STARTER_BUSINESS.id);
-      return progress ? `${STARTER_BUSINESS.name} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)} · +${xpReward(result.state, 'businessLevel')} XP.` : 'Business upgraded.';
+      const progress = selectBusinessProgress(result.state, business?.id);
+      return progress ? `${business?.name ?? 'Business'} upgraded to Level ${progress.level}. Production increased to ${formatProduction(progress.production)} · +${xpReward(result.state, 'businessLevel')} XP.` : 'Business upgraded.';
     }
     return action === 'delivery'
       ? `Delivery completed. +${formatCash('moneyEarned' in result ? result.moneyEarned : deliveryReward(result.state))} · +${'xpEarned' in result ? result.xpEarned : xpReward(result.state, 'manualJob')} XP.`
-      : `${STARTER_BUSINESS.name} acquired. Live production has started.`;
+      : `${business?.name ?? 'Business'} acquired. Live production has started.`;
   }
   switch (result.error) {
     case 'statistics-overflow': return 'Lifetime statistics limit reached. The action was not completed.';
@@ -69,9 +70,9 @@ export function businessPresentation(owned: boolean, canPurchase: boolean, pause
     buttonLabel: paused ? 'Session paused' : owned ? 'Acquired' : canPurchase ? 'Acquire business' : 'INSUFFICIENT CASH',
     disabled: paused || owned || !canPurchase,
     note: paused ? 'Reload to restore the last available local save. Unsaved progress may be lost.'
-      : owned ? 'Your garage is earning automatically. Keep this session open.'
+      : owned ? 'This Business earns automatically, including credited offline time.'
       : canPurchase ? 'Make it yours. Production starts as soon as you acquire it.'
-      : 'Complete waterfront deliveries to fund your first business.',
+      : 'Build your Cash balance to acquire this Business.',
   };
 }
 

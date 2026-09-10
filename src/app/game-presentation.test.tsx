@@ -48,7 +48,7 @@ describe('business presentation', () => {
     expect(html.replace(/<[^>]*>/g, '')).toContain(formatProduction(STARTER_BUSINESS.baseProductionCentsPerSecond));
     expect(html).toContain('Potential production');
     expect(html).toContain('disabled=""');
-    expect(html).toContain('aria-describedby="purchase-note"');
+    expect(html).toContain('aria-describedby="business:dockside-detail-note"');
     expect(html).not.toContain('Live production');
   });
   it('renders acquired styling and live status from real ownership', () => {
@@ -61,7 +61,7 @@ describe('business presentation', () => {
   });
   it('renders a paused rate as inactive while preserving ownership', () => {
     const html = renderToStaticMarkup(<BusinessCard progress={progress} onUpgrade={() => {}} owned canPurchase={false} paused onPurchase={() => {}} />);
-    expect(html).toContain('Owned');
+    expect(html).toContain('OWNED');
     expect(html).toContain('Production paused');
     expect(html).toContain('currently inactive');
     expect(html).not.toContain('Live production');

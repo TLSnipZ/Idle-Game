@@ -21,7 +21,7 @@ function grandfathered() {
   const state = createInitialGameState();
   return { ...state, businesses: { ...state.businesses, owned: { [B.id]: { level: 1 } } },
     upgrades: { purchasedIds: [S.id,F.id] },
-    automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
+    automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
 }
 describe('acquisition-only gates preserve live saves', () => {
   it('keeps low-level owned upgrades and dispatcher active without the newly required washer', () => {
@@ -39,9 +39,9 @@ describe('acquisition-only gates preserve live saves', () => {
   });
   it('retains current schema/CE1 and exact gated ownership on roundtrip even without any business', () => {
     const state={ ...grandfathered(), businesses: createInitialGameState().businesses };
-    expect(CURRENT_SAVE_VERSION).toBe(16);
+    expect(CURRENT_SAVE_VERSION).toBe(17);
     const serialized=serializeSave(state,42); if (!serialized.ok) throw Error('fixture');
-    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 16, state } });
+    expect(parseSave(serialized.serialized)).toMatchObject({ ok: true, envelope: { version: 17, state } });
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(serialized.serialized));

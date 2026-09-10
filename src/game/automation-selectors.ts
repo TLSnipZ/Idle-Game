@@ -1,4 +1,4 @@
-import { findBusiness, getBusinessLevel, getUpgradeCost, MAX_BUSINESS_LEVEL } from '../features/businesses';
+import { BUSINESS_CATALOG, ownsBusiness, findBusiness, getBusinessLevel, getUpgradeCost, MAX_BUSINESS_LEVEL } from '../features/businesses';
 import { evaluateRequirements } from './requirements';
 import { BUSINESS_AUTO_UPGRADER, DELIVERY_DISPATCHER } from '../features/automation';
 import { canAfford } from '../features/economy';
@@ -23,11 +23,11 @@ export function selectAutoUpgrader(state: GameState) {
   const enabled = state.automation.enabledIds.includes(definition.id);
   const requirements = evaluateRequirements(state, definition.requirements);
   const affordable = canAfford(state.economy, definition.purchaseCost);
-  const level = getBusinessLevel(state.businesses, definition.targetBusinessId);
-  const target = findBusiness(definition.targetBusinessId);
+  const level = getBusinessLevel(state.businesses, state.automation.businessAutoUpgradeTargetId);
+  const target = findBusiness(state.automation.businessAutoUpgradeTargetId);
   if (!target) throw new Error('Configured automation target is missing');
   const nextCost = level === null ? null : getUpgradeCost(target, level);
-  return { definition, owned, enabled, requirements, affordable,
+  return { definition, target, targets: BUSINESS_CATALOG.filter(business => ownsBusiness(state.businesses, business.id)), owned, enabled, requirements, affordable,
     canPurchase: !owned && requirements.met && affordable, canToggle: owned,
     progressMs: state.automation.businessAutoUpgradeElapsedMs,
     remainingMs: definition.intervalMs - state.automation.businessAutoUpgradeElapsedMs,

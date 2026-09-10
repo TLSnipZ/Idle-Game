@@ -1,6 +1,6 @@
 # Base Game balance
 
-Current authoritative values after **Phase 9C**. Values remain provisional, but
+Current authoritative values after **POST 3B Business Expansion I**. Non-Business Phase 9C balance is unchanged. Values remain provisional, but
 this document describes the implemented game only. Feature config and central domain
 helpers are the source of truth; UI uses their selectors. Phase 9C evidence and
 before/after comparisons live in [BALANCE_AUDIT.md](BALANCE_AUDIT.md).
@@ -15,6 +15,32 @@ milli-cent remainder and the reduced sub-milli-cent fraction. Discrete job cash
 floors once to cents after all modifiers. Flat additions precede multiplicative
 percentage factors; distinct percentage sources multiply, not add. Ranks within
 a skill sum their own percentage before joining that evaluation.
+
+## Business Expansion I — implemented
+
+| Business / stable ID | Acquisition | Requirements | Base $/sec | Upgrade base | Max Level |
+| --- | --- | --- | --- | --- | --- |
+| Dockside Detail / `business:dockside-detail` | $150 | None | $0.75 | $150 | 100 |
+| Neon Laundry / `business:neon-laundry` | $35,000 | Player 5, Dockside 7 | $5 | $1,000 | 100 |
+| Afterdark Customs / `business:afterdark-customs` | $125,000 | Player 10, Dockside 12 | $15 | $4,000 | 100 |
+| Solara Nights / `business:solara-nights` | $400,000 | Player 16, Neon Mile | $40 | $12,000 | 100 |
+
+All use base × Level production and upgrade base × current Level² cost. Acquisition
+creates Level 1 without XP/Heat/paid-level statistics. Paid upgrades award 25 base
+XP with existing modifiers and increment `businessLevelsPurchased` once. All owned
+Businesses produce simultaneously; no ownership chain, KX-R gate or future risk
+penalty. Dockside equipment remains scoped; global modifiers apply exactly once.
+Neon Mile grants no Business production modifier. See BUSINESS_EXPANSION.md for
+preserved POST 3A deterministic pacing, ROI/share and second-run evidence.
+
+Target switching is free, requires owned automation/Business, and preserves enabled
+state and 30s progress. No automatic acquisition/retargeting. Shared offline caps,
+chronology and Rebirth formulas remain unchanged. The existing offline Dockside
+Auto-Upgrader higher-Level/higher-EP behavior is intentionally preserved.
+
+Current Save **v17**, CE1 unchanged: v16→v17 adds only the selected target, default
+Dockside. Existing progression/fractions/timestamps remain exact, new Businesses
+remain unowned. Fresh state and Rebirth reset target to Dockside; v17 import retains it.
 
 ## Opening and business progression
 
@@ -102,7 +128,7 @@ At COLD, no job upgrades / either / both pay **$25 / $30 / $36** per cycle.
 | --- | --- |
 | Purchase | **$50,000** |
 | Requirements | **Player Level 12, Dockside owned at Level 15, Neon Mile controlled** |
-| Target | Dockside Detail only |
+| Target | One explicitly selected owned Business; default Dockside |
 | Starts | **Disabled**, explicit enable required; no retroactive spending |
 | Cadence | One attempt every **30,000ms** while enabled |
 | Disabled progress | Pauses at the exact stored remainder |
@@ -112,7 +138,7 @@ At COLD, no job upgrades / either / both pay **$25 / $30 / $36** per cycle.
 | Offline | Works while enabled, within the shared credited duration |
 | Rebirth | Both automations' ownership, enabled state and progress reset; no refund |
 
-Auto-Upgrader level 25/26/27 purchases cost **$93,750 / $101,400 / $109,350**.
+Dockside Auto-Upgrader level 25/26/27 purchases cost **$93,750 / $101,400 / $109,350**.
 Production and spendable earnings respect purchase boundaries: old levels produce
 before the purchase, new levels afterward. Dispatcher reward/XP/Heat retain one
 outer batch; internal boundaries never add Event rolls. No reserve/budget exists.

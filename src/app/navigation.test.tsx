@@ -34,7 +34,7 @@ function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = 
     offline: null, feedback: { sequence: 0, message: '' }, achievementEvent: undefined, cityEvent: undefined,
     automationEvent: undefined, levelEvent: undefined, dismissOffline: vi.fn(),
     runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
-    buyAutomation: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
+    buyAutomation: vi.fn(), changeAutoUpgraderTarget: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
     recruitCrew: vi.fn(), assignCrew: vi.fn(), unassignCrew: vi.fn(), chooseEvent: vi.fn(), buySkill: vi.fn(),
     rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: { ...createPersistentGame(() => {}),
       exportCode: () => exportSaveCode(state, 1000), importCode: vi.fn(() => ({ ok: true as const })),
@@ -177,7 +177,7 @@ describe('five-section presentation navigation', () => {
   it('offline Auto-Upgrader welcome stays global before Overview, without duplicating full panels', () => {
     const offline = reconcileOffline(autoUpgraderState(),0,90000); if (!offline.ok) throw Error('fixture');
     const html = render(<GameShell game={view(offline.state, { offline: offline.progress })} />);
-    expect(html).toContain('Dockside +3 levels'); expect(html.indexOf('Dockside +3 levels')).toBeLessThan(html.indexOf('id="section-heading"'));
+    expect(html).toContain('Dockside Detail +3 levels'); expect(html.indexOf('Dockside Detail +3 levels')).toBeLessThan(html.indexOf('id="section-heading"'));
     expect(html).not.toContain('id="auto-upgrader-heading"');
   });
 });
@@ -241,11 +241,11 @@ describe('navigation around the unchanged authoritative runtime', () => {
     h.saveControls.confirm(); expect(f.game.getSnapshot().result.state).toEqual(incoming); expect(h.render()).toContain('Save imported');
     expect(h.props().active).toBe(SECTION.empire.id); f.game.stop();
   });
-  it('v16 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
+  it('v17 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
     const state = autoUpgraderState(), h = harness(view(state)); h.select(SECTION.empire.id); h.rebirthControls.request();
     const saved = serializeSave(state,1234), code = exportSaveCode(state,1234); if (!saved.ok || !code.ok) throw Error('fixture');
-    expect(CURRENT_SAVE_VERSION).toBe(16); expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 16,state}});
+    expect(CURRENT_SAVE_VERSION).toBe(17); expect(code.code.startsWith('CE1-')).toBe(true);
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 17,state}});
     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
   });
 });

@@ -1,3 +1,4 @@
+import { findBusiness } from '../features/businesses';
 import { describeLevelIncrease, formatXp } from './progression-presentation';
 import type { OfflineProgress } from '../game/offline-progress';
 import { formatCash } from './number-format';
@@ -13,7 +14,7 @@ export function OfflineReturn({ progress, onDismiss }: {
       <h2 id="offline-heading">Welcome back</h2>
       <p>While you were away</p>
       <p className="offline-income">+{formatCash(progress.incomeEarned)}{progress.autoUpgrader?.levelsPurchased ? ' earned before automatic spending' : ''}</p>
-      {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>Business Auto-Upgrader: Dockside +{progress.autoUpgrader?.levelsPurchased} levels · Spent {formatCash(progress.autoUpgrader.spent)}</p>}
+      {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>Business Auto-Upgrader: {findBusiness(progress.autoUpgrader.targetId)?.name} +{progress.autoUpgrader?.levelsPurchased} levels · Spent {formatCash(progress.autoUpgrader.spent)}</p>}
       {progress.automation && progress.businessIncome !== undefined && <>
         <p>Business income: {formatCash(progress.businessIncome)}</p>
         <p>Dispatcher: {progress.automation.completedJobs} deliveries · {formatCash(progress.automation.income)}</p>

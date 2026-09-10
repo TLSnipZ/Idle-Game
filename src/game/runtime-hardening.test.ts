@@ -75,7 +75,7 @@ describe('Phase 9D bounded runtime and frozen pre-9D outputs', () => {
           statistics: { ...state.permanentProgression.statistics, automatedJobsCompleted: 4320, businessLevelsPurchased: expected.levels },
           unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:crew-chief'] } },
       automation: { completedJobs: 4320, income: '16934400', xpEarned: 23760 }, businessIncome: expected.income,
-      autoUpgrader: { levelsPurchased: expected.levels, spent: expected.spent } });
+      autoUpgrader: { targetId: 'business:dockside-detail', levelsPurchased: expected.levels, spent: expected.spent } });
     expect(calls.mock.calls.length).toBeLessThanOrEqual(1441);
     expect(reconcileOffline(state, 1000, 43201000).state).toEqual(result.state);
   });
@@ -83,7 +83,7 @@ describe('Phase 9D bounded runtime and frozen pre-9D outputs', () => {
     const state = autoUpgraderState(100), calls = vi.spyOn(production, 'simulateElapsed');
     const result = simulate(state, Number.MAX_SAFE_INTEGER);
     expect(calls).toHaveBeenCalledTimes(1);
-    expect(result.autoUpgrader).toEqual({ levelsPurchased: 0, spent: '0' });
+    expect(result.autoUpgrader).toEqual({ targetId: 'business:dockside-detail', levelsPurchased: 0, spent: '0' });
     expect(result.state.progression).toEqual(state.progression);
     expect(result.state.permanentProgression.statistics).toEqual(state.permanentProgression.statistics);
     expect(result.state.automation).toEqual({ ...state.automation,

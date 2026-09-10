@@ -12,13 +12,13 @@ import { createInitialAutomationState, isAutomationState } from '../features/aut
 import { findUpgrade } from '../features/upgrades';
 import type { UpgradeId } from '../features/upgrades';
 import { isRational, ZERO_RATIONAL } from '../shared/rational';
-import { findBusiness, isBusinessLevel } from '../features/businesses';
+import { findBusiness, isBusinessLevel, STARTER_BUSINESS } from '../features/businesses';
 import type { BusinessId } from '../features/businesses';
 import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 16;
+export const CURRENT_SAVE_VERSION = 17;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -65,14 +65,14 @@ function validateState(value: unknown, version: number): GameState | null {
     if (!Array.isArray(businesses.ownedIds)) return null;
     for (const id of businesses.ownedIds) {
       const business = findBusiness(id);
-      if (!business || Object.hasOwn(owned, business.id)) return null;
+      if (!business || business.id !== STARTER_BUSINESS.id || Object.hasOwn(owned, business.id)) return null;
       owned[business.id] = { level: 1 };
     }
   } else {
     if (!record(businesses.owned)) return null;
     for (const id of Reflect.ownKeys(businesses.owned)) {
       const business = findBusiness(id);
-      if (!business || typeof id !== 'string') return null;
+      if (!business || (version < 17 && business.id !== STARTER_BUSINESS.id) || typeof id !== 'string') return null;
       const descriptor = Object.getOwnPropertyDescriptor(businesses.owned, id);
       if (!descriptor || !Object.hasOwn(descriptor, 'value')) return null;
       const entry: unknown = descriptor.value;
@@ -97,6 +97,10 @@ function validateState(value: unknown, version: number): GameState | null {
       || !Array.isArray(automation.unlockedIds)
       || automation.unlockedIds.some(id => id !== 'automation:delivery-dispatcher')) return null;
     automation = { ...automation, enabledIds: [], businessAutoUpgradeElapsedMs: 0 };
+  }
+  if (version >= 4 && version < 17) {
+    if (!record(automation) || !keys(automation, ['unlockedIds', 'starterJobElapsedMs', 'enabledIds', 'businessAutoUpgradeElapsedMs'])) return null;
+    automation = { ...automation, businessAutoUpgradeTargetId: STARTER_BUSINESS.id };
   }
   if (!isAutomationState(automation)) return null;
   const progression = version >= 5 ? value.progression : { xp: 0 };
@@ -223,9 +227,18 @@ function migrateV15ToV16(value: unknown): GameState | null {
 /** Emit historical automation shape between sequential legacy migrations. */
 function legacyAutomation(value: unknown): unknown {
   if (!record(value) || !record(value.automation)) return value;
-  const { enabledIds: _enabled, businessAutoUpgradeElapsedMs: _elapsed, ...automation } = value.automation;
+  const { enabledIds: _enabled, businessAutoUpgradeElapsedMs: _elapsed, businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
   return { ...value, automation };
 }
+
+/** Preserve the historical v15/v16 targetless contract between sequential steps. */
+function withoutTarget(value: GameState | null): unknown {
+  if (!value) return null;
+  const { businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
+  return { ...value, automation };
+}
+/** Schema transformation only; all elapsed progress is retained for runtime. */
+function migrateV16ToV17(value: unknown): GameState | null { return validateState(value, 16); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -251,8 +264,9 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 11) migrated = legacyAutomation(migrateV11ToV12(migrated));
   if (value.version <= 12) migrated = legacyAutomation(migrateV12ToV13(migrated));
   if (value.version <= 13) migrated = legacyAutomation(migrateV13ToV14(migrated));
-  if (value.version <= 14) migrated = migrateV14ToV15(migrated);
-  if (value.version <= 15) migrated = migrateV15ToV16(migrated);
+  if (value.version <= 14) migrated = withoutTarget(migrateV14ToV15(migrated));
+  if (value.version <= 15) migrated = withoutTarget(migrateV15ToV16(migrated));
+  if (value.version <= 16) migrated = migrateV16ToV17(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

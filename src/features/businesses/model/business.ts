@@ -8,6 +8,7 @@ export type BusinessId = `business:${string}`;
 export interface BusinessDefinition {
   readonly id: BusinessId;
   readonly name: string;
+  readonly subtitle?: string;
   readonly description: string;
   readonly purchaseCost: Money;
   readonly requirements: readonly Requirement[];

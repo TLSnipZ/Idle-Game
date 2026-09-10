@@ -210,12 +210,12 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 16,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 17,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('OVERVIEW');
-    expect(container.querySelector('.offline-return')?.textContent).toContain('Dockside +3 levels');
+    expect(container.querySelector('.offline-return')?.textContent).toContain('Dockside Detail +3 levels');
     expect(container.querySelector('.global-feedback')?.textContent).toContain('Dockside Operator');
     expect(f.random.next).not.toHaveBeenCalled(); expect(f.writes()).toBe(1);
   });
@@ -405,4 +405,37 @@ it('ordinary automation toggles preserve focus and section without extra navigat
   await click('Enable Business Auto-Upgrader');
   expect(button('Disable Business Auto-Upgrader')).toBe(toggle); expect(document.activeElement).toBe(toggle);
   expect(window.scrollTo).not.toHaveBeenCalled();
+});
+
+describe('POST 3B mounted portfolio continuity', () => {
+  it('acquires Laundry in place, then repeats upgrades on the same focused card/control', async () => {
+    await mount(autoUpgraderState()); await navigate('OPERATIONS'); vi.mocked(window.scrollTo).mockClear();
+    const buy = button('Buy Neon Laundry'); buy.focus(); const card = buy.closest('section');
+    await click('Buy Neon Laundry'); expect(button('Upgrade Neon Laundry to Level 2')).toBe(buy);
+    expect(document.activeElement).toBe(buy); expect(buy.closest('section')).toBe(card);
+    for (const level of [2, 3, 4]) { await click(`Upgrade Neon Laundry to Level ${level}`); expect(document.activeElement).toBe(buy); }
+    expect(card?.textContent).toContain('Level 4 / 100'); expect(card?.textContent).not.toContain('Requirements');
+    expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+  it('newly owned option stays unselected; free target switching keeps focus and the countdown', async () => {
+    const s = autoUpgraderState(), f = await mount({ ...s, automation: { ...s.automation, businessAutoUpgradeElapsedMs: 20000 } });
+    await navigate('OPERATIONS'); vi.mocked(window.scrollTo).mockClear(); expect(container.querySelector('#auto-upgrader-target')).toBeNull();
+    await click('Buy Neon Laundry'); const select = container.querySelector<HTMLSelectElement>('#auto-upgrader-target');
+    if (!select) throw Error('selector'); expect(select.value).toBe('business:dockside-detail'); select.focus();
+    await act(() => { select.value = 'business:neon-laundry'; select.dispatchEvent(new Event('change', { bubbles: true })); });
+    expect(container.querySelector('#auto-upgrader-target')).toBe(select); expect(document.activeElement).toBe(select);
+    expect(container.querySelector('#auto-upgrader-timing')?.textContent).toContain('10s');
+    expect(f.game().getSnapshot().result.state.automation.enabledIds).toContain('automation:business-auto-upgrader');
+    await f.advance(10000); const state = f.game().getSnapshot().result.state;
+    expect(state.businesses.owned['business:neon-laundry']?.level).toBe(2);
+    expect(state.businesses.owned['business:dockside-detail']?.level).toBe(25); expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+  it('final Laundry upgrade recovers focus locally without scrolling', async () => {
+    const s = autoUpgraderState(25, '10000000000');
+    await mount({ ...s, businesses: { ...s.businesses, owned: { ...s.businesses.owned, 'business:neon-laundry': { level: 99 } } } });
+    await navigate('OPERATIONS'); vi.mocked(window.scrollTo).mockClear(); const upgrade = button('Upgrade Neon Laundry to Level 100'); upgrade.focus();
+    const heading = upgrade.closest('section')?.querySelector('h3'); if (!(heading instanceof HTMLElement)) throw Error('heading');
+    const focus = vi.spyOn(heading, 'focus'); await click('Upgrade Neon Laundry to Level 100');
+    expect(document.activeElement).toBe(heading); expect(focus).toHaveBeenCalledWith({ preventScroll: true }); expect(window.scrollTo).not.toHaveBeenCalled();
+  });
 });

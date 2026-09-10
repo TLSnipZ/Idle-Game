@@ -47,7 +47,7 @@ describe('player progression presentation', () => {
     const initial = createInitialGameState();
     const state = { ...initial, progression: { xp: 95 },
       businesses: { ...initial.businesses, owned: { [B.id]: { level: 1 } } },
-      automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
+      automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
     const result = reconcileOffline(state,0,25000); if (!result.ok) throw Error('fixture');
     const html = renderToStaticMarkup(<OfflineReturn progress={result.progress} onDismiss={() => {}} />);
     expect(html).toContain('XP earned: +15 XP'); expect(html).toContain('LEVEL UP — Level 2');

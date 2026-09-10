@@ -17,13 +17,13 @@ import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { ACHIEVEMENT_CATALOG } from '../features/achievements';
 
 describe('Phase 9E Base Game release flow', () => {
-  it('fresh state has no inferred history and exports a valid v16 CE1 backup', () => {
+  it('fresh state has no inferred history and exports a valid v17 CE1 backup', () => {
     const state = createInitialGameState();
     expect(state.economy.cash).toBe('0');
     expect(state.city).toEqual({ ownedTerritoryIds: ['territory:waterfront'], heat: 0, heatDecayElapsedMs: 0 });
     expect(state.crew).toEqual({ recruitedIds: [], assignments: { operations: null, logistics: null } });
     expect(state.events).toEqual({ pendingEventId: null, opportunityElapsedMs: 0 });
-    expect(state.automation).toEqual({ unlockedIds: [], enabledIds: [], starterJobElapsedMs: 0, businessAutoUpgradeElapsedMs: 0 });
+    expect(state.automation).toEqual({ businessAutoUpgradeTargetId: 'business:dockside-detail', unlockedIds: [], enabledIds: [], starterJobElapsedMs: 0, businessAutoUpgradeElapsedMs: 0 });
     expect(state.permanentProgression).toEqual({ empirePoints: 0, rebirthCount: 0, skills: {}, unlockedAchievementIds: [],
       statistics: { manualJobsCompleted: 0, automatedJobsCompleted: 0, businessLevelsPurchased: 0,
         territoriesAcquired: 0, crewMembersRecruited: 0, eventsResolved: 0, rebirthsCompleted: 0, peakHeat: 0 } });
@@ -31,7 +31,7 @@ describe('Phase 9E Base Game release flow', () => {
     expect(validateSaveState(state)).toEqual(state);
     const code = exportSaveCode(state, 123);
     if (!code.ok) throw Error(code.error);
-    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 16, savedAt: 123, state } });
+    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 17, savedAt: 123, state } });
   });
 
   it('legal earnings and acquisitions reach all milestones, then reset and rebuild with permanent benefits', () => {

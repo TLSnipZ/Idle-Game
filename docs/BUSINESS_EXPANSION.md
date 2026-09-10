@@ -2,14 +2,76 @@
 
 ## Status & scope
 
-**POST 3A — DESIGN / ANALYSIS / DOCUMENTATION COMPLETE.** Baseline inspected:
-`692903f5221b733bef239c6912219c8f39c164f0` (completed POST 2D).
-**CURRENT LIVE: one Business, Dockside Detail; Save v16; CE1 unchanged.**
-**PROPOSED FOR POST 3B: Neon Laundry, Afterdark Customs, Solara Nights.**
-No new Business, UI, target state, migration, artwork or balance change ships here.
-The analysis fixtures are development-only experiments, not a runtime catalog.
-POST 2D remains the production baseline; this design does not claim a new browser
-or deployed acceptance review. Live balance remains in [BALANCING.md](BALANCING.md).
+**POST 3A design complete. POST 3B IMPLEMENTED; deployment/live verification pending.**
+Recovery implementation starts directly from POST 3A commit
+`96ab72fffe8ced6710bca8572e573c086b0b9f8d`. The lost POST 3B SHA is historical
+information, not a reproducible identity or the current implementation commit.
+
+**CURRENT IMPLEMENTED: four Businesses; Save v17; CE1 unchanged.** The approved
+three packages below now use the shared catalog, commands, exact production and
+responsive Operations cards. The Auto-Upgrader has one persisted selected target.
+No new artwork, dependencies, unique upgrades or POST 3C navigation are included.
+
+The deterministic POST 3A models and architecture audit below are retained as
+**historical design evidence**: “current/control” means the pre-expansion one-Business
+v16 baseline; “proposed” means the approved four-Business scenario now implemented.
+Those observations are not new simulations or deployment claims. Current shipped
+balance is also recorded in [BALANCING.md](BALANCING.md).
+
+### Implemented state and transaction contract
+
+- `BUSINESS_CATALOG` supplies all four definitions in stable order. Existing generic
+  `purchaseBusiness`, `upgradeBusiness`, production and selectors remain the sole
+  authorities. The sparse owned map is unchanged; absence means unowned.
+- `automation.businessAutoUpgradeTargetId` is the only new persisted field.
+  Fresh v17, pure v16→v17 migration and Rebirth default to Dockside. Current v17
+  imports preserve valid targets. Historical v1–v16 schemas remain targetless and
+  Dockside-only; the sequential v15 Vortex→v16 KX-R migration is retained.
+- A valid catalog target may be unowned in raw save validation. Such a target is
+  dormant, never auto-acquired or silently switched. Target-change commands require
+  purchased automation and an owned Business. The UI shows owned options only.
+- Free target changes reconcile under the old target first, preserve enabled state
+  and cadence progress, and purchase no immediate level. Each 30s attempt uses the
+  selected Business and the shared paid-upgrade transition. Failed/max attempts
+  are consumed; no queues, priorities or automatic switching.
+- Both shared production fractions survive ordinary commands and migration. The
+  existing per-ID modifier evaluation preserves Dockside-only equipment, then
+  exact rational rates aggregate before the pooled payout boundary. KX-R +10%
+  applies once to every contribution; Neon Mile still modifies jobs only.
+- Runtime extends the baseline vehicle durable-write guard to Business transactions,
+  automation purchase/toggle/target configuration and successful elapsed automatic
+  upgrades. Failed writes publish no purchase/configuration changes; failed elapsed
+  automatic spending pauses the session on its prior snapshot. Offline, Import and
+  Rebirth still publish one complete durable candidate. A due automatic upgrade
+  followed by a manual command has two chronological durable boundaries.
+- All owned Businesses produce online/offline. The shared 8/10/12h cap, exact
+  chronology, Dispatcher batching, Heat/Mara order, one outer Event opportunity,
+  sub-ms treatment and 4,096-segment guard are unchanged. No offline acquisition or
+  Rebirth. Existing offline Dockside growth and higher EP behavior remains intact.
+- Rebirth empties the entire Business map, including Dockside, resets automation
+  and target, and retains KX-R/EP/Skills under existing rules. Eligibility/reward
+  formulas are unchanged.
+- Operations uses stable-ID shared cards, actual individual/aggregate production,
+  exact prices, met/unmet requirements and native controls. Wide two-column layout
+  becomes one column at narrow widths. The native owned-target select preserves
+  focus/countdown; existing local `preventScroll` recovery handles disabled actions.
+
+### Recovery verification and live handoff
+
+Domain, historical migration/CE1, production fractions, targeting, offline chronology,
+Rebirth and durable transaction tests cover the recovered behavior. Mounted UI tests
+cover in-place acquisition, repeated upgrades, final-level focus and target changes.
+Cloud Browser rejected the local preview with `ERR_BLOCKED_BY_CLIENT`: desktop,
+390px, 320px, real keyboard and real scroll review are **not completed**. Structural
+and mounted DOM tests are not visual/deployment approval.
+
+After deployment verify all four cards; Laundry/Afterdark acquisition and upgrade;
+Nights P16 + Neon gate; local repeated-upgrade focus; owned-only target options;
+countdown continuity and selected-only spending; mobile overflow; and Rebirth reset.
+Only then proceed to separately scoped **POST 3C — Operations Long-Section
+Navigation / UX**. No later phase starts here.
+
+## Historical POST 3A design evidence
 
 ## Current Dockside baseline
 
@@ -106,9 +168,9 @@ semantics if eligibility later differs in a valid save.
 | Business | Status | Acquisition | Requirements | Base production/s | Production scaling | Base upgrade cost | Upgrade scaling | Max Level | Upgrade XP | Role |
 | --- | --- | ---: | --- | ---: | --- | ---: | --- | ---: | --- | --- |
 | Dockside Detail | CURRENT LIVE | $150 | None | $0.75 | base × L | $150 | base × L² | 100 | 25 base/paid Level | Entry cashflow |
-| Neon Laundry | PROPOSED FOR POST 3B | **$35,000** | **P5, owned D7** | **$5** | base × L | **$1,000** | base × L² | **100** | **25 base/paid Level** | Stable early passive cashflow |
-| Afterdark Customs | PROPOSED FOR POST 3B | **$125,000** | **P10, owned D12** | **$15** | base × L | **$4,000** | base × L² | **100** | **25 base/paid Level** | Higher-output automotive |
-| Solara Nights | PROPOSED FOR POST 3B | **$400,000** | **P16, Neon Mile owned** | **$40** | base × L | **$12,000** | base × L² | **100** | **25 base/paid Level** | Premium nightlife |
+| Neon Laundry | IMPLEMENTED IN POST 3B | **$35,000** | **P5, owned D7** | **$5** | base × L | **$1,000** | base × L² | **100** | **25 base/paid Level** | Stable early passive cashflow |
+| Afterdark Customs | IMPLEMENTED IN POST 3B | **$125,000** | **P10, owned D12** | **$15** | base × L | **$4,000** | base × L² | **100** | **25 base/paid Level** | Higher-output automotive |
+| Solara Nights | IMPLEMENTED IN POST 3B | **$400,000** | **P16, Neon Mile owned** | **$40** | base × L | **$12,000** | base × L² | **100** | **25 base/paid Level** | Premium nightlife |
 
 Proposed IDs: `business:neon-laundry`, `business:afterdark-customs`,
 `business:solara-nights`. They encode canonical identity only. Existing requirements
@@ -518,7 +580,7 @@ workshop and venue identities above, with fictional branding and restrained acce
 | Offline depth | Laundry reliability may become complementary utility; Never Sleeps keeps the shared cap progression |
 | UX / guidance | Four Businesses lengthen Operations. POST 3C navigation follows live 3B; Purchase Intelligence, Reset and Next Objective remain separate |
 
-## POST 3B IMPLEMENTATION CONTRACT
+## POST 3B IMPLEMENTATION CONTRACT — fulfilled (historical approved scope)
 
 Implement the exact three proposed packages in the final economy table with shared
 linear output/quadratic costs, maximum 100, zero acquisition XP and the existing

@@ -180,7 +180,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     expect(result.state.economy.cash).toBe('0'); expect(result.state.businesses.owned).toEqual({});
     expect(result.state.businesses.productionRemainderMilliCents).toBe(0);
     expect(result.state.businesses.productionRemainderSubMilliCents).toEqual({ numerator: '0', denominator: '1' });
-    expect(result.state.upgrades.purchasedIds).toEqual([]); expect(result.state.automation).toEqual({ enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
+    expect(result.state.upgrades.purchasedIds).toEqual([]); expect(result.state.automation).toEqual({ businessAutoUpgradeTargetId: 'business:dockside-detail', enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 });
     expect(result.state.progression.xp).toBe(0); expect(result.state.garage).toEqual(state.garage);
     expect(result.state.permanentProgression).toEqual({ statistics: createInitialStatistics(3), unlockedAchievementIds: ['achievement:first-steps','achievement:dockside-operator','achievement:neon-takeover','achievement:first-rebirth'], empirePoints: 7, rebirthCount: 3, skills: state.permanentProgression.skills });
     expect(evaluateJobReward(result.state)).toMatchObject({ reward: '2750' });

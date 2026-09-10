@@ -62,14 +62,14 @@ describe('eight permanent lifetime observations', () => {
     expect(failed.ok).toBe(false); expect(stats(failed.state)).toEqual(stats(s));
   });
   it.each([0, 1, 3, 100])('counts %i completed cycles once in online and offline batches', cycles => {
-    const s = { ...fresh(), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
+    const s = { ...fresh(), automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 5000 } };
     for (const r of [simulateGameElapsed(s, cycles * 10000), reconcileOffline(s, 1000, 1000 + cycles * 10000)]) {
       expect(r.ok).toBe(true); expect(stats(r.state).automatedJobsCompleted).toBe(cycles);
       expect(stats(r.state).manualJobsCompleted).toBe(0); expect(r.state.automation.starterJobElapsedMs).toBe(5000);
     }
   });
   it('split elapsed counts the same total cycles without double counting remainder', () => {
-    const s = { ...fresh(), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 9000 } };
+    const s = { ...fresh(), automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 9000 } };
     const split = success(simulateGameElapsed(success(simulateGameElapsed(s, 16000)), 15000));
     expect(stats(split).automatedJobsCompleted).toBe(4);
     expect(stats(simulateGameElapsed(s, 31000).state).automatedJobsCompleted).toBe(4);
@@ -137,7 +137,7 @@ describe('eight permanent lifetime observations', () => {
   });
   it('observes only final Heat, never the hidden intermediate Dispatcher maximum', () => {
     // Saved progress + 499 seconds completes 50 jobs: 55 + 10 - 8 = 57.
-    const s = { ...heat(fresh(), 55), automation: { enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 1000 } };
+    const s = { ...heat(fresh(), 55), automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 1000 } };
     const r = success(simulateGameElapsed(s, 499000));
     expect(r.city.heat).toBe(57); expect(stats(r).peakHeat).toBe(57); expect(stats(r).automatedJobsCompleted).toBe(50);
     expect(r.permanentProgression.unlockedAchievementIds).not.toContain('achievement:running-hot');

@@ -20,7 +20,7 @@ export const MAX_AUTO_UPGRADE_SEGMENTS = 4096;
 export function attemptBusinessAutoUpgrade(state: GameState):
   { readonly ok: true; readonly state: GameState; readonly outcome: 'upgraded' | 'insufficient-funds' | 'max-level' | 'not-owned' }
   | Extract<UpgradeBusinessResult, { ok: false }> {
-  const result = upgradeBusiness(state, BUSINESS_AUTO_UPGRADER.targetBusinessId);
+  const result = upgradeBusiness(state, state.automation.businessAutoUpgradeTargetId);
   if (result.ok) return { ...result, outcome: 'upgraded' };
   if (result.error === 'insufficient-funds' || result.error === 'not-owned') return { ok: true, state, outcome: result.error };
   if (result.error === 'max-level-reached') return { ok: true, state, outcome: 'max-level' };
@@ -43,7 +43,7 @@ export function simulateAutoUpgrader(state: GameState, elapsedMs: number): GameS
   let segments = 0;
   const interval = BUSINESS_AUTO_UPGRADER.intervalMs;
   while (elapsed < elapsedMs) {
-    const level = getBusinessLevel(candidate.businesses, BUSINESS_AUTO_UPGRADER.targetBusinessId);
+    const level = getBusinessLevel(candidate.businesses, state.automation.businessAutoUpgradeTargetId);
     // With no possible purchase, collapsing all remaining no-op attempts is exact.
     const noPurchases = level === null || level === MAX_BUSINESS_LEVEL;
     if (!noPurchases && segments >= MAX_AUTO_UPGRADE_SEGMENTS)
@@ -93,5 +93,5 @@ export function simulateAutoUpgrader(state: GameState, elapsedMs: number): GameS
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', totalPlan.automation.completedJobs);
   if (!counted.ok) return counted;
   return { ok: true, state: unlockEligibleAchievements(observePeakHeat(counted.state)).state,
-    automation: totalPlan.automation, businessIncome, autoUpgrader: { levelsPurchased, spent } };
+    automation: totalPlan.automation, businessIncome, autoUpgrader: { targetId: state.automation.businessAutoUpgradeTargetId, levelsPurchased, spent } };
 }

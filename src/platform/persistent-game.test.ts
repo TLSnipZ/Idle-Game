@@ -192,7 +192,7 @@ describe('portable runtime transactions', () => {
   });
   it.each(['', 'CE2-bad', 'CE1-_w', encodeSaveText('{'), encodeSaveText('{}'), encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: CURRENT_SAVE_VERSION + 1, savedAt: 0, state: owned() })),
     ...[{ economy: { cash: 123 } }, { progression: { xp: -1 } }, { garage: { ownedVehicleIds: ['vehicle:unknown'] } }]
-      .map(invalid => encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 16, savedAt: 0, state: { ...owned(), ...invalid } }))),
+      .map(invalid => encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 17, savedAt: 0, state: { ...owned(), ...invalid } }))),
   ])('failed validation preserves both state and save %#', code => {
     const f = fixture(encoded()); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     const original = game.getSnapshot().result.state;

@@ -50,9 +50,9 @@ describe('skill command boundaries and persistence', () => {
     const f = rebirthRuntime(skillState({ [ROOT]: 1 }));
     f.game.execute(s => purchaseSkillRank(s, FAST)); const state = f.game.getSnapshot().result.state;
     expect(state.permanentProgression.empirePoints).toBe(29);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 16, state } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 17, state } });
     const exported = f.game.exportCode(); if (!exported.ok) throw Error('fixture');
-    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 16, state } });
+    expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 17, state } });
     f.autosave(); f.game.stop(); const reload = f.make(); reload.start(); reload.start();
     expect(reload.getSnapshot().result.state).toEqual(state); expect(f.timers()).toBe(2); reload.stop(); expect(f.timers()).toBe(0);
   });

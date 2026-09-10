@@ -13,7 +13,7 @@ const legacy=()=>({format:'crime-empire-save',version:5,savedAt:123456789,
     businesses:{owned:{[B.id]:{level:10}},productionRemainderMilliCents:975,
       productionRemainderSubMilliCents:{numerator:'1',denominator:'3'}},
     upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)},
-    automation:{enabledIds:[],businessAutoUpgradeElapsedMs:0,unlockedIds:[D.id],starterJobElapsedMs:4321}}});
+    automation: { enabledIds:[],businessAutoUpgradeElapsedMs:0,unlockedIds:[D.id],starterJobElapsedMs:4321}}});
 function current() {
   const result=parseSave(stringifySaveFixture(legacy())); if (!result.ok) throw Error('fixture');
   return {...result.envelope.state,garage:{ownedVehicleIds:[V.id]}};
@@ -21,8 +21,8 @@ function current() {
 describe('v6 vehicle saves',()=>{
   it('migrates realistic v5 preserving every previous field and savedAt through local/CE1 validation',()=>{
     const old=legacy(); const serialized=stringifySaveFixture(old);
-    const expected={ok:true,envelope:{...old,version: 16,state:{...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ statistics: createInitialStatistics(0), unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
-    expect(CURRENT_SAVE_VERSION).toBe(16); expect(parseSave(serialized)).toEqual(expected);
+    const expected={ok:true,envelope:{...old,version: 17,state:{...old.state, automation: { ...old.state.automation, businessAutoUpgradeTargetId: B.id }, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } },city:{heat:0,heatDecayElapsedMs:0,ownedTerritoryIds:['territory:waterfront']},permanentProgression:{ statistics: createInitialStatistics(0), unlockedAchievementIds: [],skills: {}, empirePoints:0,rebirthCount:0},garage:{ownedVehicleIds:[]}}}};
+    expect(CURRENT_SAVE_VERSION).toBe(17); expect(parseSave(serialized)).toEqual(expected);
     expect(validateSaveCode(encodeSaveText(serialized))).toEqual(expected); expect(stringifySaveFixture(old)).toBe(serialized);
   });
   it('roundtrips exact v6 ownership and all progress through the same envelope',()=>{
@@ -30,7 +30,7 @@ describe('v6 vehicle saves',()=>{
     const code=exportSaveCode(state,42); if (!code.ok) throw Error('fixture');
     expect(code.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code.code)).toEqual(parseSave(encoded.serialized));
-    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version: 16,savedAt:42,state}});
+    expect(parseSave(encoded.serialized)).toMatchObject({ok:true,envelope:{version: 17,savedAt:42,state}});
     expect(encoded.serialized).not.toMatch(/artwork|Vortex|vehicle-placeholder|ownedVehicleCount/);
   });
   it.each([null,{}, {ownedVehicleIds:null}, {ownedVehicleIds:['vehicle:unknown']},
