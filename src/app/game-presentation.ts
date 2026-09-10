@@ -62,17 +62,27 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
   }
 }
 
-export function businessPresentation(owned: boolean, canPurchase: boolean, paused: boolean) {
+export function acquisitionPresentation(requirementsMet: boolean, affordable: boolean, noun = 'Business') {
+  return !requirementsMet
+    ? { status: 'LOCKED', note: `Meet the requirements above to unlock this ${noun}.` }
+    : !affordable ? { status: 'INSUFFICIENT CASH', note: `Build your Cash balance to acquire this ${noun}.` }
+    : { status: 'PURCHASABLE', note: null };
+}
+
+export function businessPresentation(owned: boolean, canPurchase: boolean, paused: boolean, requirementsMet = true,
+  progress?: ReturnType<typeof selectBusinessProgress>) {
+  const acquisition = acquisitionPresentation(requirementsMet, canPurchase);
+  const maxed = owned && progress?.upgradeCost === null;
+  const disabled = paused || (owned ? !progress?.canUpgrade : !canPurchase || !requirementsMet);
   return {
     live: owned && !paused,
-    status: owned ? 'Owned' : canPurchase ? 'Ready to acquire' : 'Not owned',
+    status: owned ? 'OWNED' : acquisition.status,
     productionLabel: paused ? 'Production paused' : owned ? 'Live production' : 'Potential production',
-    buttonLabel: paused ? 'Session paused' : owned ? 'Acquired' : canPurchase ? 'Acquire business' : 'INSUFFICIENT CASH',
-    disabled: paused || owned || !canPurchase,
+    buttonLabel: paused ? 'Session paused' : owned ? maxed ? 'MAX LEVEL' : progress ? `Upgrade to Level ${progress.level + 1}` : 'Acquired' : 'Acquire business',
+    disabled,
     note: paused ? 'Reload to restore the last available local save. Unsaved progress may be lost.'
-      : owned ? 'This Business earns automatically, including credited offline time.'
-      : canPurchase ? 'Make it yours. Production starts as soon as you acquire it.'
-      : 'Build your Cash balance to acquire this Business.',
+      : owned ? progress && !maxed && !progress.canUpgrade ? 'Insufficient Cash for the next Level.' : null
+      : acquisition.note,
   };
 }
 

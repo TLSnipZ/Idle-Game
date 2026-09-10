@@ -29,11 +29,11 @@ describe('delegation presentation', () => {
     expect(html).toContain('Runs every 10s'); expect(html).toContain('$25.00 per delivery');
     expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Required');
     expect(html).toContain('disabled'); expect(html).not.toContain('ACTIVE');
-    expect(html).toContain('aria-describedby="dispatcher-requirement"');
+    expect(html).toContain('aria-describedby="dispatcher-requirement dispatcher-helper"');
   });
   it('distinguishes unaffordable and ready states with semantic buttons', () => {
     expect(render(eligible(moneyFromMinorUnits('499999')))).toContain('INSUFFICIENT CASH');
-    const html = render(eligible()); expect(html).toContain('Ready to hire'); expect(html).toContain('<button'); expect(html).not.toContain('disabled');
+    const html = render(eligible()); expect(html).toContain('PURCHASABLE'); expect(html).toContain('<button'); expect(html).not.toContain('disabled');
     expect(render(eligible(), true)).toContain('Session paused');
   });
   it('shows active progress, modified reward and removes buying controls', () => {

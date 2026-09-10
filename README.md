@@ -1,7 +1,7 @@
 # Solara City
 
 A modern coastal crime, luxury and street-culture idle/tycoon browser game.
-The Base Game foundation is complete. **POST 3B Business Expansion I implemented; deployment/live verification pending.**
+The Base Game foundation is complete. **POST 3B deployed and live. POST 3C Operations navigation and card polish implemented; live verification pending.**
 See [ART_DIRECTION.md](docs/ART_DIRECTION.md) for tokens and future approved-asset contracts.
 Cash, player XP, business levels, five purchased upgrades, automation and exact progress survive
 reloads. Four live Businesses—Dockside Detail, Neon Laundry, Afterdark Customs and

@@ -45,7 +45,7 @@ describe('requirements presentation',()=>{
     const render=(xp:number,owned:boolean)=>renderToStaticMarkup(<AutomationCard view={selectDispatcher({...initial,progression:{xp},
       businesses:{...initial.businesses,owned:owned?{[B.id]:{level:1}}:{}}})} event={undefined} paused={false} onPurchase={()=>{}} />);
     expect(render(399,true)).toContain('Required — Player Level 3');
-    expect(render(400,true)).toContain('Ready to hire');
+    expect(render(400,true)).toContain('PURCHASABLE');
     expect(render(400,false)).toContain('Required — Own Dockside Detail');
   });
   it('announces available content alongside level feedback without persistent unlock flags',()=>{

@@ -83,7 +83,7 @@ describe('five-section presentation navigation', () => {
     const html = h.render();
     const surfaces = {
       [SECTION.overview.id]: ['ECONOMY','PLAYER','CITY PRESSURE','CREW','EMPIRE','CITY EVENT','VIEW COLLECTION'],
-      [SECTION.operations.id]: ['Starter job',STARTER_JOB.label,'Businesses','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','BUSINESS AUTO-UPGRADER'],
+      [SECTION.operations.id]: ['Jobs',STARTER_JOB.label,'Businesses','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','BUSINESS AUTO-UPGRADER'],
       [SECTION.city.id]: ['Solara City','Waterfront','Neon Mile','HEAT','LAY LOW','CREW','CITY EVENTS','No active event'],
       [SECTION.collection.id]: ['Garage','Kairo KX-R','Owned vehicles: 0 / 1'],
       [SECTION.empire.id]: ['Rebirth','Empire Points','Empire Foundations','ACHIEVEMENTS','STATISTICS','Save &amp; Transfer','Export save','Validate import'],

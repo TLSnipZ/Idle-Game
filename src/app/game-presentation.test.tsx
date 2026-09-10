@@ -17,20 +17,20 @@ describe('business presentation', () => {
     const view = businessPresentation(false, false, false);
     expect(view.live).toBe(false);
     expect(view.productionLabel).toBe('Potential production');
-    expect(view.status).toBe('Not owned');
+    expect(view.status).toBe('INSUFFICIENT CASH');
     expect(view.disabled).toBe(true);
-    expect(view.buttonLabel).toBe('INSUFFICIENT CASH');
+    expect(view.buttonLabel).toBe('Acquire business');
   });
   it('affordability enables acquisition without implying production has started', () => {
     const view = businessPresentation(false, true, false);
     expect(view.live).toBe(false);
     expect(view.disabled).toBe(false);
-    expect(view.status).toBe('Ready to acquire');
+    expect(view.status).toBe('PURCHASABLE');
   });
   it('owned businesses show live production and cannot be purchased again', () => {
     const view = businessPresentation(true, true, false);
     expect(view.live).toBe(true);
-    expect(view.status).toBe('Owned');
+    expect(view.status).toBe('OWNED');
     expect(view.disabled).toBe(true);
     expect(view.buttonLabel).toBe('Acquired');
   });
@@ -103,7 +103,7 @@ it.each([2, 4, 100])('renders owned level %s with derived rates, costs and max s
   if (progress.upgradeCost && progress.nextProduction) {
     expect(html).toContain(formatPrice(progress.upgradeCost));
     expect(html.replace(/<[^>]*>/g, '')).toContain(formatProduction(progress.nextProduction));
-    expect(html).toContain('INSUFFICIENT CASH');
+    expect(html).toContain('Insufficient Cash for the next Level.');
   } else {
     expect(html).toContain('MAX LEVEL'); expect(html).not.toContain('Upgrade to Level 101');
   }

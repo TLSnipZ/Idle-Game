@@ -1,3 +1,4 @@
+import { acquisitionPresentation } from './game-presentation';
 import { XP_REWARDS } from '../features/progression';
 import { DISPATCHER_JOBS_PER_HEAT } from '../features/heat';
 import { RequirementList } from './RequirementList';
@@ -12,9 +13,10 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
   readonly onPurchase: () => void;
   readonly event: RuntimeSnapshot['automationEvent'];
 }) {
+  const acquisition = acquisitionPresentation(view.eligible, view.canPurchase, 'automation');
   return <section className="panel upgrade-panel automation-card dispatcher-card" aria-labelledby="delegation-heading">
     <div className="panel-heading"><h3 id="delegation-heading">Delegation</h3>
-      <span className="ownership-badge">{view.unlocked ? paused ? 'PAUSED' : 'ACTIVE' : view.eligible ? 'AVAILABLE' : 'LOCKED'}</span>
+      <span className="ownership-badge">{view.unlocked ? paused ? 'PAUSED' : 'ACTIVE' : acquisition.status}</span>
     </div>
     <h4>{view.definition.name}</h4>
     <p>{view.definition.description}</p>
@@ -30,9 +32,8 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
     </> : <>
       <p>Price: <strong>{formatPrice(view.definition.purchaseCost)}</strong></p>
       <RequirementList result={view.requirements} id="dispatcher-requirement" />
-      {view.eligible && <p>{view.canPurchase ? 'Ready to hire.' : 'INSUFFICIENT CASH'}</p>}
-      <button className="action-button purchase-button" disabled={paused || !view.canPurchase}
-        aria-describedby="dispatcher-requirement" onClick={onPurchase}>{paused ? 'Session paused' : `Hire ${view.definition.name}`}</button>
+      <div className="card-action-area"><button className="action-button purchase-button" disabled={paused || !view.canPurchase}
+        aria-describedby={acquisition.note ? "dispatcher-requirement dispatcher-helper" : "dispatcher-requirement"} onClick={onPurchase}>{paused ? 'Session paused' : `Hire ${view.definition.name}`}</button>{acquisition.note && <p id="dispatcher-helper" className="purchase-note">{acquisition.note}</p>}</div>
     </>}
   </section>;
 }

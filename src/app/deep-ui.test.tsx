@@ -48,8 +48,8 @@ describe('POST 1B system compositions', () => {
     const button = panel.querySelector('button');
     if (level === null) {
       expect(panel.textContent).toContain('Purchase price');
-      expect(panel.textContent).toContain('Production begins after purchase');
-      expect(button?.getAttribute('aria-label')).toBe('Buy Dockside Detail');
+      expect(panel.textContent).toContain('Potential production');
+      expect(button?.getAttribute('aria-label')).toBe('Acquire Dockside Detail');
     } else {
       expect(panel.textContent).toContain(`Level ${level}`);
       expect(panel.textContent).not.toContain('Purchase price');

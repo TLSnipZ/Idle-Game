@@ -19,13 +19,22 @@ Phase 9B accessibility remain preserved contracts.
   In-section focus/scroll stability, global HUD XP, Rebirth Ready and compact KX-R layout.
 - POST 3A: **Business Expansion I design and deterministic analysis complete**;
   [BUSINESS_EXPANSION.md](BUSINESS_EXPANSION.md) retains the approved balance evidence.
-- POST 3B: **Business Expansion I implemented; deployment/live verification pending**.
+- POST 3B: **Business Expansion I deployed and live, confirmed by the user**.
   Four Businesses, shared cards/production, selected Auto-Upgrader target and minimal
   Save v17 migration. Recovery starts directly from the preserved POST 3A baseline;
   the lost implementation SHA is not recreated. No non-Business rebalance.
-- POST 3C: **Operations Long-Section Navigation / UX — planned** immediately after
-  POST 3B deployment and live verification. Then Reset Progress, Next Objective /
-  Guidance, Active Vehicle / Tier 1 Garage and Heat / Police 2.0, subject to live defects.
+- POST 3C: **Operations Long-Section Navigation & UX Polish implemented; live review pending**.
+  Non-sticky Jobs / Businesses / Automation jumps, semantic focus destinations,
+  shared requirements/action spacing and progression-vs-Cash helper copy. Save v17,
+  CE1, Business gates and all gameplay remain unchanged.
+- **Next: POST 3D — Business Progression Gates**, after POST 3C deployment/live review.
+  Analyze Dockside → Neon Laundry → Afterdark Customs → Solara Nights, with meaningful
+  development of the previous Business. Exact gate Levels require balance analysis;
+  no sequential gates are implemented in POST 3C.
+- **Settings & Localization Foundation** remains a prioritized future planning item;
+  no settings, language state or translation framework is included here.
+- Reset Progress, Next Objective / Guidance, Active Vehicle / Tier 1 Garage and
+  Heat / Police 2.0 remain separately scoped future work, subject to live defects.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately

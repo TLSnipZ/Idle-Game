@@ -21,19 +21,18 @@ interface BusinessCardProps {
 }
 
 export function BusinessCard({ definition = STARTER_BUSINESS, requirements, progress, onUpgrade, owned, canPurchase, paused, onPurchase }: BusinessCardProps) {
-  const view = businessPresentation(owned, canPurchase, paused);
-  const locked = !owned && requirements?.met === false;
+  const view = businessPresentation(owned, canPurchase, paused, requirements?.met ?? true, progress);
   const headingId = definition.id === STARTER_BUSINESS.id ? 'business-name' : `${definition.id}-name`;
   const noteId = `${definition.id}-note`;
   return (
     <section className={`panel business-card ${owned ? 'is-owned' : ''}`} aria-labelledby={headingId}>
       <div className="business-content">
-        <div className="panel-heading"><span className="eyebrow">{definition.subtitle ?? 'Business'}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{owned ? '✓ ' : ''}{owned ? 'OWNED' : locked ? 'LOCKED' : canPurchase ? 'PURCHASABLE' : 'INSUFFICIENT CASH'}</span></div>
+        <div className="panel-heading"><span className="eyebrow">{definition.subtitle ?? 'Business'}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
         <h3 id={headingId}>{definition.name}</h3>
         {progress && <p className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</p>}
         <p className="business-description">{definition.description}</p>
         <div className="business-terms">
-          {!owned && <div><span className="metric-label">Purchase price</span><strong>{formatPrice(definition.purchaseCost)}</strong><p>Production begins after purchase.</p></div>}
+          {!owned && <div><span className="metric-label">Purchase price</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
           <div className={view.live ? 'production is-live production-readout' : 'production production-readout'}>
             <span className="metric-label"><span className="status-dot" aria-hidden="true" />{view.productionLabel}</span>
             <strong>{view.live ? '+' : ''}<RateValue text={formatProduction(progress?.production ?? definition.baseProductionCentsPerSecond)} /></strong>
@@ -46,10 +45,14 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
           {progress.upgradeCost && <div><span className="metric-label">Next upgrade price</span><strong>{formatPrice(progress.upgradeCost)}</strong></div>}
         </div>}
         {progress && progress.modifiers.length > 0 && <div className="purchase-note"><p>Base at Level {progress.level}: <RateValue text={formatProduction(progress.baseProduction)} /></p><ModifierBreakdown modifiers={progress.modifiers} /><p>Effective: <RateValue text={formatProduction(progress.production)} /></p></div>}
-        <button className="action-button purchase-button" disabled={progress ? paused || !progress.canUpgrade : view.disabled} onClick={progress ? onUpgrade : onPurchase} aria-label={progress ? `Upgrade ${definition.name}${progress.upgradeCost === null ? ", maximum level reached" : ` to Level ${progress.level + 1}`}` : `Buy ${definition.name}`} aria-describedby={noteId}>
-          <span>{progress ? paused ? 'Session paused' : progress.upgradeCost === null ? 'MAX LEVEL' : `Upgrade to Level ${progress.level + 1}` : locked ? 'LOCKED' : view.buttonLabel}</span><span aria-hidden="true">{owned ? '✓' : '↗'}</span>
-        </button>
-        <p id={noteId} className="purchase-note">{progress && !paused && progress.upgradeCost && !progress.canUpgrade ? 'INSUFFICIENT CASH for the next level.' : view.note}</p>
+        <div className="card-action-area">
+          <button className="action-button purchase-button" disabled={view.disabled} onClick={progress ? onUpgrade : onPurchase}
+            aria-label={progress ? `Upgrade ${definition.name}${progress.upgradeCost === null ? ', maximum level reached' : ` to Level ${progress.level + 1}`}` : `Acquire ${definition.name}`}
+            aria-describedby={view.note ? noteId : undefined}>
+            <span>{view.buttonLabel}</span>{!view.disabled && <span aria-hidden="true">↗</span>}
+          </button>
+          {view.note && <p id={noteId} className="purchase-note">{view.note}</p>}
+        </div>
       </div>
     </section>
   );

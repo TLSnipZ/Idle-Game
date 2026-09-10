@@ -329,3 +329,21 @@ Deployment/live verification remains pending; browser local preview was blocked.
 Then Reset Progress → Next Objective / Guidance → Active Vehicle / Tier 1 Garage →
 Heat / Police 2.0, subject to defects. None of those, Business artwork/depth, new
 Territories/Crew/Events/Achievements/Statistics or extra Businesses ship in POST 3B.
+
+
+## POST 3C handoff
+
+POST 3B is deployed and live (user confirmation). POST 3C is implemented:
+compact non-sticky Operations navigation for Jobs, Businesses and Automation,
+semantic heading focus and instant scrolling only for explicit jumps. Business and
+Automation acquisition cards share requirements/action/helper spacing; progression
+locks take precedence over Cash helpers, with no arrow on disabled Business actions.
+Ordinary action focus remains local with the existing preventScroll recovery.
+Save v17 / CE1, balance, gates, content and runtime remain unchanged.
+
+Local Browser preview is blocked by ERR_BLOCKED_BY_CLIENT; desktop, 390px, 320px,
+real keyboard and scroll review remain pending. Automated DOM coverage is not live
+visual approval. After deployment/live review, next is **POST 3D — Business
+Progression Gates**: analyze sequential development of the previous Business;
+exact levels are undecided. Settings & Localization Foundation is future planning.
+No POST 3D gates, Settings, Reset, Guidance, Garage/Tuning or Heat work ships here.

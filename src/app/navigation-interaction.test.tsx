@@ -79,7 +79,7 @@ describe('mounted navigation and one live runtime', () => {
     const before = f.game().getSnapshot().result.state, raw = f.raw(), reads = f.reads(), writes = f.writes();
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('OVERVIEW');
     expect(container.querySelector('#business-name')).toBeNull();
-    const mapping = ['ECONOMY','Starter job','LAY LOW','Kairo KX-R','Save & Transfer'];
+    const mapping = ['ECONOMY','Jobs','LAY LOW','Kairo KX-R','Save & Transfer'];
     for (let i=0; i<PRIMARY_SECTIONS.length; i++) {
       const section = PRIMARY_SECTIONS[i]; if (!section) throw Error('section');
       await navigate(section.label); expect(content()).toContain(mapping[i]);
@@ -410,8 +410,8 @@ it('ordinary automation toggles preserve focus and section without extra navigat
 describe('POST 3B mounted portfolio continuity', () => {
   it('acquires Laundry in place, then repeats upgrades on the same focused card/control', async () => {
     await mount(autoUpgraderState()); await navigate('OPERATIONS'); vi.mocked(window.scrollTo).mockClear();
-    const buy = button('Buy Neon Laundry'); buy.focus(); const card = buy.closest('section');
-    await click('Buy Neon Laundry'); expect(button('Upgrade Neon Laundry to Level 2')).toBe(buy);
+    const buy = button('Acquire Neon Laundry'); buy.focus(); const card = buy.closest('section');
+    await click('Acquire Neon Laundry'); expect(button('Upgrade Neon Laundry to Level 2')).toBe(buy);
     expect(document.activeElement).toBe(buy); expect(buy.closest('section')).toBe(card);
     for (const level of [2, 3, 4]) { await click(`Upgrade Neon Laundry to Level ${level}`); expect(document.activeElement).toBe(buy); }
     expect(card?.textContent).toContain('Level 4 / 100'); expect(card?.textContent).not.toContain('Requirements');
@@ -419,8 +419,8 @@ describe('POST 3B mounted portfolio continuity', () => {
   });
   it('newly owned option stays unselected; free target switching keeps focus and the countdown', async () => {
     const s = autoUpgraderState(), f = await mount({ ...s, automation: { ...s.automation, businessAutoUpgradeElapsedMs: 20000 } });
-    await navigate('OPERATIONS'); vi.mocked(window.scrollTo).mockClear(); expect(container.querySelector('#auto-upgrader-target')).toBeNull();
-    await click('Buy Neon Laundry'); const select = container.querySelector<HTMLSelectElement>('#auto-upgrader-target');
+    await navigate('OPERATIONS'); await click('AUTOMATION'); vi.mocked(window.scrollTo).mockClear(); expect(container.querySelector('#auto-upgrader-target')).toBeNull();
+    await click('Acquire Neon Laundry'); const select = container.querySelector<HTMLSelectElement>('#auto-upgrader-target');
     if (!select) throw Error('selector'); expect(select.value).toBe('business:dockside-detail'); select.focus();
     await act(() => { select.value = 'business:neon-laundry'; select.dispatchEvent(new Event('change', { bubbles: true })); });
     expect(container.querySelector('#auto-upgrader-target')).toBe(select); expect(document.activeElement).toBe(select);
@@ -437,5 +437,37 @@ describe('POST 3B mounted portfolio continuity', () => {
     const heading = upgrade.closest('section')?.querySelector('h3'); if (!(heading instanceof HTMLElement)) throw Error('heading');
     const focus = vi.spyOn(heading, 'focus'); await click('Upgrade Neon Laundry to Level 100');
     expect(document.activeElement).toBe(heading); expect(focus).toHaveBeenCalledWith({ preventScroll: true }); expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('POST 3C local Operations navigation', () => {
+  it('moves focus and viewport to three semantic targets without gameplay or URL changes', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('OPERATIONS');
+    const state = f.game().getSnapshot().result.state, writes = f.writes(), reads = f.reads(), url = location.href;
+    f.random.next.mockClear(); vi.mocked(window.scrollTo).mockClear();
+    const nav = container.querySelector('nav[aria-label="Operations sections"]');
+    expect([...nav!.querySelectorAll('button')].map(b => b.textContent)).toEqual(['JOBS', 'BUSINESSES', 'AUTOMATION']);
+    expect(nav?.querySelector('[aria-current], [aria-live]')).toBeNull();
+    for (const [label, id] of [['BUSINESSES', 'businesses-heading'], ['AUTOMATION', 'automation-heading'], ['JOBS', 'starter-heading']]) {
+      const target = container.querySelector<HTMLElement>(`#${id}`)!;
+      const scroll = vi.spyOn(target, 'scrollIntoView'); const focus = vi.spyOn(target, 'focus');
+      await click(label!);
+      expect(document.activeElement).toBe(target); expect(target.tabIndex).toBe(-1);
+      expect(focus).toHaveBeenCalledWith(); expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'instant' });
+    }
+    expect(location.href).toBe(url); expect(f.game().getSnapshot().result.state).toBe(state);
+    expect(f.writes()).toBe(writes); expect(f.reads()).toBe(reads); expect(f.random.next).not.toHaveBeenCalled();
+    expect(window.scrollTo).not.toHaveBeenCalled();
+    await navigate('CITY'); await navigate('OPERATIONS');
+    expect(document.activeElement?.id).toBe('section-heading');
+  });
+  it('acquisition and repeated upgrades stay local after an explicit Business jump', async () => {
+    await mount(autoUpgraderState()); await navigate('OPERATIONS'); await click('BUSINESSES');
+    const target = container.querySelector<HTMLElement>('#businesses-heading')!;
+    const scroll = vi.spyOn(target, 'scrollIntoView'); vi.mocked(window.scrollTo).mockClear();
+    const acquire = button('Acquire Neon Laundry'); acquire.focus();
+    await click('Acquire Neon Laundry'); await click('Upgrade Neon Laundry to Level 2');
+    expect(document.activeElement).toBe(acquire); expect(scroll).not.toHaveBeenCalled(); expect(window.scrollTo).not.toHaveBeenCalled();
   });
 });

@@ -2476,3 +2476,20 @@ Auto-Upgrader effect. Operations renders shared stable-ID cards, a labeled nativ
 owned-target select, local focus recovery and responsive 2→1 columns. No POST 3C
 navigation, artwork or speculative save fields. Browser local preview was blocked;
 real visual/mobile/keyboard/scroll acceptance remains a deployment handoff.
+
+
+## POST 3C — Operations presentation only
+
+Operations owns three non-sticky native navigation buttons and heading refs:
+`starter-heading` (Jobs), `businesses-heading`, `automation-heading`. Activation
+focuses the heading (tabIndex -1) and scrolls instantly to its start. No URL/hash,
+scroll-spy, saved subsection, runtime command or new dependency. Existing primary
+entry and local action-focus recovery remain unchanged; upgrades and target changes
+never invoke these navigation refs. The four-card responsive grid remains intact.
+
+Business presentation derives badges, availability and helper intent together from
+existing selectors and requirement results. Progression lock precedes affordability;
+owned upgrades have their own Cash/max state. Acquisition helpers are shared with
+Automation. The shared action area uses existing 16px/8px spacing tokens, removes
+redundant purchasable helpers and hides action cues on disabled Business controls.
+Save v17 / CE1, all domain/config/platform code and gameplay remain unchanged.

@@ -1,3 +1,4 @@
+import { acquisitionPresentation } from './game-presentation';
 import type { selectAutoUpgrader } from '../game/automation-selectors';
 import { formatPrice } from './number-format';
 import { formatRemainingTime } from './automation-presentation';
@@ -10,9 +11,10 @@ export function AutoUpgraderCard({ view, paused, onPurchase, onToggle, onTargetC
   readonly onTargetChange?: (id: string) => void;
   readonly onToggle: (enabled: boolean) => void;
 }) {
+  const acquisition = acquisitionPresentation(view.requirements.met, view.affordable, 'automation');
   return <section className="panel upgrade-panel automation-card auto-spend-card" aria-labelledby="auto-upgrader-heading">
     <div className="panel-heading"><h3 id="auto-upgrader-heading">BUSINESS AUTO-UPGRADER</h3>
-      <span className="ownership-badge">{view.owned ? paused ? 'PAUSED' : view.enabled ? 'ACTIVE' : 'DISABLED' : view.requirements.met ? 'AVAILABLE' : 'LOCKED'}</span>
+      <span className="ownership-badge">{view.owned ? paused ? 'PAUSED' : view.enabled ? 'ACTIVE' : 'DISABLED' : acquisition.status}</span>
     </div>
     <p>{view.definition.description}</p>
     <p className="automation-role">Automatic spending · Attempt every {formatRemainingTime(view.definition.intervalMs)}</p>
@@ -37,11 +39,10 @@ export function AutoUpgraderCard({ view, paused, onPurchase, onToggle, onTargetC
         onClick={() => onToggle(!view.enabled)}>{view.enabled ? 'DISABLE' : 'ENABLE'}</button>
     </> : <>
       <p>Price: <strong>{formatPrice(view.definition.purchaseCost)}</strong></p>
+      <p className="spending-disclosure" id="auto-upgrader-spending">Automatically spends cash on the selected Business: one upgrade every 30s when affordable. Starts disabled.</p>
       <RequirementList result={view.requirements} id="auto-upgrader-requirements" />
-      {view.requirements.met && <p>{view.affordable ? 'Ready to purchase. Starts disabled.' : 'INSUFFICIENT CASH'}</p>}
-      <p className="spending-disclosure" id="auto-upgrader-spending">Automatically spends cash on the selected Business: one upgrade every 30s when affordable.</p>
-      <button className="action-button purchase-button" disabled={paused || !view.canPurchase}
-        aria-describedby="auto-upgrader-requirements auto-upgrader-spending" onClick={onPurchase}>Buy Business Auto-Upgrader</button>
+      <div className="card-action-area"><button className="action-button purchase-button" disabled={paused || !view.canPurchase}
+        aria-describedby={acquisition.note ? "auto-upgrader-requirements auto-upgrader-spending auto-upgrader-helper" : "auto-upgrader-requirements auto-upgrader-spending"} onClick={onPurchase}>Buy Business Auto-Upgrader</button>{acquisition.note && <p id="auto-upgrader-helper" className="purchase-note">{acquisition.note}</p>}</div>
     </>}
   </section>;
 }
