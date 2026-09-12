@@ -1,0 +1,46 @@
+name: Verify Reset Progress
+
+on:
+  push:
+    branches: [work/reset-progress]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the verification branch
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
+      - name: Prepare isolated verification snapshot
+        run: |
+          mkdir -p "$RUNNER_TEMP/reset-workspace"
+          git archive --format=tar.gz HEAD -o "$RUNNER_TEMP/reset-workspace/source.tar.gz"
+          git bundle create "$RUNNER_TEMP/reset-workspace/history.bundle" --all
+          tar -czf "$RUNNER_TEMP/reset-workspace/dependencies.tar.gz" node_modules
+          git rev-parse HEAD > "$RUNNER_TEMP/reset-workspace/COMMIT.txt"
+      - name: Upload verification snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: reset-verification-workspace
+          path: ${{ runner.temp }}/reset-workspace/
+          retention-days: 3
+          if-no-files-found: error
