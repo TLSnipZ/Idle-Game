@@ -52,19 +52,19 @@ test('pending artwork is hidden, decorative and eager so it can load while hidde
 test('a decoded image reveals the card artwork', async () => {
   const image = await mount();
   Object.defineProperty(image, 'naturalWidth', { value: 564, configurable: true });
-  await act(() => image.dispatchEvent(new Event('load')));
+  await act(() => { image.dispatchEvent(new Event('load')); });
   expect(image.parentElement?.hidden).toBe(false);
 });
 
-test('a failed request removes the whole artwork slot, not the business controls', async () => {
+test('a failed request removes the whole artwork slot', async () => {
   const image = await mount();
-  await act(() => image.dispatchEvent(new Event('error')));
+  await act(() => { image.dispatchEvent(new Event('error')); });
   expect(container.querySelector('.business-artwork')).toBeNull();
 });
 
 test('an empty decoded image cannot reveal a black placeholder', async () => {
   const image = await mount();
   Object.defineProperty(image, 'naturalWidth', { value: 0, configurable: true });
-  await act(() => image.dispatchEvent(new Event('load')));
+  await act(() => { image.dispatchEvent(new Event('load')); });
   expect(container.querySelector('.business-artwork')).toBeNull();
 });
