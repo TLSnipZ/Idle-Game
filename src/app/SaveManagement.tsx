@@ -14,6 +14,7 @@ export function SaveManagement({ actions }: { readonly actions: SaveActions }) {
 export function useSaveManagement(actions: SaveActions, locale: Locale = DEFAULT_LOCALE) {
   const [state, setState] = useState(INITIAL_SAVE_MANAGEMENT);
   const [controls] = useState(() => createSaveManagement(actions, setState, undefined, locale));
+  useEffect(() => { controls.setLocale(locale); }, [controls, locale]);
   return { state, controls };
 }
 
