@@ -82,13 +82,17 @@ Phase 9B accessibility remain preserved contracts.
   immediately visible. PR #16 removes the unfinished artwork slot and sticky category
   bar and refines the finance snapshot. Operations styling is in `Operations.css`;
   gameplay, Save v17 / CE1 and balance remain unchanged. See [OPERATIONS_OVERHAUL.md](OPERATIONS_OVERHAUL.md).
-- **Overview / City card spacing: implemented and browser-checked; publication and live acceptance pending.**
+- **Overview / City card spacing: merged in PR #18; checked build/deploy passed; manual live acceptance pending.**
   Fix reproduced zero-gap Overview cards and district-to-Heat boundary using only
   scoped container rules in `sections.css`: 1.5rem above 740px and 1rem on narrow
   views. Preserve existing City catalog columns and section gaps; remove Heat's
   duplicate bottom margin. 22 before/after Chromium cases passed across EN/DE,
   320–1920px and enlarged text. HUD, Operations, Garage and Empire geometry are
   unchanged. No artwork, React or gameplay changes. See [SECTION_SPACING.md](SECTION_SPACING.md).
+  Release run `34723960641` successfully built and deployed commit
+  `f559bb3486f5710bd82724763f7e6113c624a6bb`. Another 18 cases passed against that
+  exact production artifact without injecting fix CSS; compiled JavaScript is
+  byte-identical to the previous release. Full Vitest suite was not run.
 - **Business Visual Identity / Artworks: paused behind Operations live acceptance.**
   Dockside remains the artwork/crop reference candidate, but no later Business artwork
   is promoted until the rebuilt Operations layout is deployed and manually accepted.
@@ -114,7 +118,7 @@ and the shared camera/lighting/showroom language.
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
 | Deployed / live review pending | HUD XP containment | PR #17; checked build and browser geometry passed; run 34722063196 deploy succeeded after retry. |
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
-| Current hotfix | Overview / City spacing | Scoped card gaps only; 22 browser cases passed. Publication/live acceptance pending; see SECTION_SPACING.md. |
+| Deployed / live review pending | Overview / City spacing | PR #18; checked build/deploy passed in run 34723960641; 22 candidate plus 18 production browser cases passed. See SECTION_SPACING.md. |
 | Live review pending | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
 | Next | Business Visual Identity | Resume Dockside Golden Reference acceptance after Operations is stable; then remaining Businesses. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
@@ -143,7 +147,7 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Current task is the Overview / City spacing hotfix, followed by presentation live acceptance.**
+**The Overview / City spacing hotfix is deployed; next is presentation live acceptance.**
 All work remains presentation-only and must preserve Save v17 / CE1, GameState,
 economy, balance, gates, automation authority, RNG, localization and runtime behavior.
 Further Business artwork is blocked until the presentation is technically green and
