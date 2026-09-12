@@ -1,12 +1,32 @@
 /* Global HUD 2.0 / Activity Center. Presentation only; no gameplay state. */
 .hud-command-row { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(18rem, .9fr); gap: var(--space-md); align-items: stretch; }
-.hud-command-row .global-status { margin: 0; gap: var(--space-xs); }
+.hud-command-row .global-status { margin: 0; gap: var(--space-xs); min-width: 0; }
 .hud-command-row .global-status > div { padding: var(--space-xs) var(--space-sm); }
 .hud-command-row .global-status dt { font-size: .62rem; }
 .hud-command-row .global-status dd { font-size: clamp(1rem, 1.6vw, 1.35rem); line-height: 1.2; }
 .hud-command-row .hud-cash dd { font-size: clamp(1.15rem, 2vw, 1.65rem); }
-.hud-command-row .hud-xp-progress { height: .38rem; margin-top: .18rem; }
-.hud-command-row .hud-xp-text { font-size: .62rem; }
+/* Native progress defaults to an intrinsic width (10em in Chromium). Bound it to
+   the Level column, and keep the XP caption out of the large stat's inline line box. */
+.hud-command-row .hud-level dd { min-width: 0; }
+.hud-command-row .hud-xp-progress {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: .38rem;
+  margin: .3rem 0 .2rem;
+  accent-color: var(--color-cool);
+}
+.hud-command-row .hud-xp-text {
+  display: block;
+  max-width: 100%;
+  font-size: .62rem;
+  line-height: 1.4;
+  color: var(--color-secondary);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .global-indicators.activity-center { display: block; min-width: 0; margin-top: 0; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-background); overflow: hidden; }
 .activity-center.has-activity { border-color: var(--color-accent); background: var(--gradient-surface); }
 .activity-center-heading { display: flex; justify-content: space-between; gap: var(--space-sm); align-items: center; padding: .38rem .55rem; border-bottom: 1px solid var(--color-border); font-size: .6rem; letter-spacing: var(--tracking-label); color: var(--color-secondary); }
