@@ -60,17 +60,19 @@ Phase 9B accessibility remain preserved contracts.
   PR #8 retired the duplicate visible legacy newsfeed; ordinary latest feedback now
   belongs to Activity Center while accessibility announcements and critical recovery
   errors remain preserved. See [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
-- **Solara City Branding: implementation in progress.**
-  Establish the canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained
-  header/footer brand accents without pulling Business artwork or later gameplay
-  phases forward. See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
-- **Next after Branding live acceptance: Business Visual Identity / Artworks → Active Vehicle + Tier-1 Garage → Heat / Police 2.0.**
-  Business art starts with Dockside as the Golden Reference, then Neon Laundry,
-  Afterdark Customs and Solara Nights using one consistent Solara direction.
+- **Solara City Branding: merged in PR #10; live accepted before Business Visual Identity.**
+  Canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained shell accents.
+  See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
+- **Business Visual Identity / Artworks: Dockside Golden Reference pass in progress.**
+  Dockside is the approval gate for camera, lighting, detail density and responsive
+  crop behavior. No later Business artwork is promoted before Dockside is visually
+  approved and integrated. See [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
+- **After the Dockside Golden Reference:** Neon Laundry → Afterdark Customs → Solara Nights,
+  then **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately
-  scoped and not started; no automatic asset generation follows this branding pass.
+  scoped and not started.
 
 The earlier Vortex Golden Reference model-integration plan is cancelled. External
 Candidate A is approved only for Vehicle Art-Style Direction; its sedan is not a
@@ -84,8 +86,8 @@ and the shared camera/lighting/showroom language.
 | --- | --- | --- |
 | Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. Compact-by-default details are live accepted; see GUIDANCE.md. |
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
-| Current | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents only. No Business art or gameplay changes. |
-| Next | Business Visual Identity | Dockside Golden Reference first; then the remaining Businesses. |
+| Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
+| Current | Business Visual Identity | Dockside Golden Reference first; then the remaining Businesses. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP and Keep/Lose clarity; no reward/reset change. |
@@ -107,12 +109,13 @@ and deeper city/Empire systems require separate scopes and save compatibility re
 ## Current presentation handoff
 
 The presentation stack is now: full EN/DE Solara voice → compact Global HUD 2.0 /
-Activity Center → compact expandable Next Objective. These surfaces are manually
-accepted and must remain visually subordinate to gameplay content while keeping key
-state globally discoverable. Ordinary global feedback belongs to Activity Center;
-critical recovery errors may still render outside it.
+Activity Center → compact expandable Next Objective → canonical Solara City branding.
+These surfaces are manually accepted and must remain visually subordinate to gameplay
+content while keeping key state globally discoverable. Ordinary global feedback
+belongs to Activity Center; critical recovery errors may still render outside it.
 
-**Current phase is Solara City Branding.** Branding is presentation-only and must
-preserve Save v17 / CE1, GameState, economy, balance, gates, RNG, localization and
-runtime authority. After live visual acceptance, proceed to Business Visual Identity /
-Artworks with Dockside as the first Golden Reference.
+**Current phase is Business Visual Identity / Artworks — Dockside Golden Reference.**
+This phase is presentation-only and must preserve Save v17 / CE1, GameState, economy,
+balance, gates, RNG, localization and runtime authority. Generated candidates remain
+review material until explicitly approved; only then may an optimized runtime asset
+be integrated and used as the style authority for the remaining Businesses.
