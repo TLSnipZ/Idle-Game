@@ -32,8 +32,13 @@ Phase 9B accessibility remain preserved contracts.
   Player 10 / Laundry 10; Nights is Player 16 / Afterdark 8 / Neon Mile. Acquisition
   gates only: existing owners remain valid, Save v17 / CE1 and runtime unchanged.
   Territory/Crew share requirements/action spacing and locked versus Cash helpers.
-- **Next: Reset Progress / New Game**, after POST 3D deployment/live verification.
-- Then **Next Objective / Guidance → Settings & Localization Foundation → Business
+- **Reset Progress / New Game: implemented; deployed acceptance pending.**
+  Empire → Save & Transfer now offers a full canonical restart with explicit
+  `RESET` consent, a backup warning and guarded write-before-publication. Unlike
+  Rebirth, permanent progression is also cleared without rewards. Save v17 / CE1
+  and existing migration/economy contracts remain unchanged. See [RESET_PROGRESS.md](RESET_PROGRESS.md).
+- **Next: Next Objective / Guidance**, after New Game deployment/live verification.
+- Then **Settings & Localization Foundation → Business
   Visual Identity / Artworks → Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
   Settings planning includes a menu, English/Deutsch, centralized translation keys,
   locale formatting, reduced-motion preference and later audio/visual options.
@@ -61,7 +66,7 @@ and the shared camera/lighting/showroom language. No automatic next-phase work.
 | P2 | City Visual Layer | District imagery, compact city overview and eventually a Solara map with ownership/Heat/Event context. |
 | P2 | Crew Visual Identity | Approved portraits, role icons and assignment visualization within the Golden Reference style. |
 | P2 | Event Discoverability | Stronger active priority/direct access and eventual art. POST 1C only clarifies existing timer copy and navigation. |
-| High QoL | Reset Progress / New Game | Explicit destructive warning and strong confirmation; canonical fresh replacement erases ALL temporary/permanent progress and statistics, rebases runtime/savedAt. CE1 export remains separately available. No placeholder control now. |
+| Implemented | Reset Progress / New Game | Explicit `RESET` confirmation; canonical fresh replacement erases run and permanent progress without EP rewards, rebases runtime/savedAt and preserves CE1 backup restore. Guarded durable storage protects failed/conflicting saves. See RESET_PROGRESS.md. |
 
 ## Major expansions retained
 

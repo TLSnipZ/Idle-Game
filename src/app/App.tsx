@@ -58,7 +58,15 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />
       <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{section.label}</h1><p>{section.description}</p></div>
-        <SectionContent active={active} game={game} onNavigate={setActive} save={save} rebirth={rebirth} />
+        <SectionContent active={active} game={{ ...game, resetProgress: confirmation => {
+          const result = game.resetProgress(confirmation);
+          if (result.ok) {
+            save.controls.clear();
+            rebirth.controls.clear();
+            setActive(DEFAULT_SECTION);
+          }
+          return result;
+        } }} onNavigate={setActive} save={save} rebirth={rebirth} />
       </div>
       <p className="session-note">Local progress <span aria-hidden="true">/</span> Earn while away for up to {formatOfflineDuration(getOfflineCapMs(game.snapshot.state))}.</p>
     </main>

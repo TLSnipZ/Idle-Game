@@ -12,6 +12,7 @@ import type { useRebirthControls } from './RebirthPanel';
 import { selectRebirth } from '../game/rebirth';
 import { SkillTree } from './SkillTree';
 import { Achievements } from './Achievements';
+import { ResetProgress } from './ResetProgress';
 import { Statistics } from './Statistics';
 import { SaveManagementView } from './SaveManagement';
 import type { useSaveManagement } from './SaveManagement';
@@ -42,7 +43,9 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
       <Achievements state={state} />
       <Statistics state={state} />
       <section aria-labelledby="save-transfer-heading"><h2 id="save-transfer-heading">Save &amp; Transfer</h2>
-        <SaveManagementView state={save.state} controls={save.controls} /></section>
+        <SaveManagementView state={save.state} controls={save.controls} />
+        <ResetProgress key={game.replacementSequence} unavailable={paused || game.persistence.kind === 'blocked'}
+          onReset={game.resetProgress} /></section>
     </div>;
   }
 }

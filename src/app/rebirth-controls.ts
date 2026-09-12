@@ -25,5 +25,6 @@ export function createRebirthControls(rebirth: () => RebirthTransactionResult, p
     const result = rebirth();
     update({ confirming: false, message: describeRebirth(result) });
   }
-  return { request, cancel, confirm, getSnapshot: () => state };
+  function clear() { update(INITIAL_REBIRTH_CONTROLS); }
+  return { clear, request, cancel, confirm, getSnapshot: () => state };
 }

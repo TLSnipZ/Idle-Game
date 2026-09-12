@@ -78,5 +78,10 @@ export function createSaveManagement(
     pending = null;
     update({ confirming: false, message: result.ok ? 'Save imported and stored locally. No offline income added.' : failure(result.error) });
   }
-  return { edit, exportCode, copyCode, validate, cancel, confirm, getSnapshot: () => state };
+  // A successful full reset invalidates old import approval and pending clipboard callbacks.
+  function clear() {
+    revision++; pending = null;
+    state = INITIAL_SAVE_MANAGEMENT; publish(state);
+  }
+  return { clear, edit, exportCode, copyCode, validate, cancel, confirm, getSnapshot: () => state };
 }

@@ -17,6 +17,11 @@ export type RebirthTransactionResult = { readonly ok: true; readonly reward: num
   | Extract<RebirthResult, { ok: false }>
   | { readonly ok: false; readonly error: 'runtime-unavailable' | 'persistence-failure'; readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
 
+export const RESET_CONFIRMATION_TEXT = 'RESET';
+export type ResetProgressResult = { readonly ok: true }
+  | { readonly ok: false; readonly error: 'confirmation-required' | 'runtime-unavailable' | 'persistence-failure';
+      readonly detail?: Extract<WriteResult, { ok: false }>['error'] };
+
 export const AUTOSAVE_CADENCE_MS = 5_000;
 export type PersistenceStatus = Omit<Extract<BootstrapResult, { kind: 'offline-error' }>, 'state'>
   | { readonly kind: 'ready' | 'loaded' | 'saved' }
@@ -162,6 +167,36 @@ export function createPersistentGame(
     commit(); // Clears run events and fractional runtime time, after the durable write.
     return { ok: true, reward: candidate.reward };
   }
+  /** Full New Game, not Rebirth: discard the old run only after a guarded durable write.
+   * Do not reconcile the discarded interval or evaluate achievements/rewards here.
+   * Preparation, storage and publication are synchronous; no await may split them.
+   */
+  function resetProgress(confirmation: string): ResetProgressResult {
+    if (confirmation !== RESET_CONFIRMATION_TEXT) return { ok: false, error: 'confirmation-required' };
+    if (!active || !runtime) return { ok: false, error: 'runtime-unavailable' };
+    if (view.persistence.kind === 'blocked')
+      return { ok: false, error: 'persistence-failure', detail: 'storage-conflict' };
+    const candidate = createInitialGameState();
+    let commit: (() => void) | null;
+    try { commit = runtime.prepareReplacement(candidate); }
+    catch { return { ok: false, error: 'runtime-unavailable' }; }
+    if (!commit) return { ok: false, error: 'runtime-unavailable' };
+    // Unlike an explicit import, New Game does not override corrupt/newer/conflicting storage.
+    const written = saves.save(candidate);
+    if (!written.ok) {
+      view = { ...view, persistence: written.error === 'storage-conflict'
+        ? { kind: 'blocked', error: written.error } : { kind: 'error', error: written.error } };
+      publish(view);
+      return { ok: false, error: 'persistence-failure', detail: written.error };
+    }
+    view = { ...view, persistence: { kind: 'saved' }, offline: null };
+    commit(); // Also clears runtime feedback and fractional elapsed time, with a fresh clock anchor.
+    // Invalidate queued callbacks from the old autosave cycle and start one new cycle.
+    generation += 1;
+    cancel?.(); cancel = null;
+    startAutosave();
+    return { ok: true };
+  }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

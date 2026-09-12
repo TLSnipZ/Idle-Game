@@ -25,6 +25,7 @@ import { describeAction } from './game-presentation';
 import type { PersistentSnapshot } from '../platform/persistent-game';
 
 export function useGame() {
+  const [replacementSequence, setReplacementSequence] = useState(0);
   const [feedback, setFeedback] = useState<{ sequence: number; message: string; tone?: 'success' | 'warning' }>({ sequence: 0, message: '' });
   const [view, setView] = useState<PersistentSnapshot>(() => ({
     result: { ok: true, state: createInitialGameState() },
@@ -145,7 +146,29 @@ export function useGame() {
 
   function rebirth() {
     const result = runtime.rebirth();
-    if (result.ok) setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
+    if (result.ok) {
+      setReplacementSequence(previous => previous + 1);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
+    }
+    return result;
+  }
+
+  function importCode(code: string) {
+    const result = runtime.importCode(code);
+    if (result.ok) {
+      setReplacementSequence(previous => previous + 1);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, message: '' }));
+    }
+    return result;
+  }
+
+  function resetProgress(confirmation: string) {
+    const result = runtime.resetProgress(confirmation);
+    if (result.ok) {
+      setReplacementSequence(previous => previous + 1);
+      setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'success',
+        message: 'NEW GAME · All progress has been reset and saved. Start with your first delivery in Operations.' }));
+    }
     return result;
   }
 
@@ -156,5 +179,5 @@ export function useGame() {
         : 'Auto-Upgrader target could not be changed.' }));
   }
 
-  return { changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: runtime, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }
