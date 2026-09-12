@@ -30,7 +30,7 @@ import { moneyFromMinorUnits, STARTER_JOB } from '../features/economy';
 import { getXpThresholdForLevel } from '../features/progression';
 
 function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = {}): ReturnType<typeof useGame> {
-  return { snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
+  return { replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
     offline: null, feedback: { sequence: 0, message: '' }, achievementEvent: undefined, cityEvent: undefined,
     automationEvent: undefined, levelEvent: undefined, dismissOffline: vi.fn(),
     runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
@@ -104,7 +104,9 @@ describe('five-section presentation navigation', () => {
     expect(html.indexOf('aria-label="Cancel Rebirth"')).toBeLessThan(html.indexOf('>Confirm Rebirth</button>'));
     expect(html).toContain('You keep'); expect(html).toContain('You lose');
     expect(html).toContain('+4 Empire Points');
-    expect(html).not.toMatch(/Reset Progress|New Game/);
+    // New Game is now implemented, but remains in Save & Transfer, separate from Rebirth.
+    expect(html).toContain('New Game / Reset Progress');
+    expect(html.indexOf('id="reset-heading"')).toBeGreaterThan(html.indexOf('id="save-transfer-heading"'));
   });
   it('Overview summarizes current state without management controls and shortcuts only navigate', () => {
     const s = autoUpgraderState(), before = JSON.stringify(s), navigate = vi.fn();

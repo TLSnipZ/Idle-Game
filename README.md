@@ -69,7 +69,7 @@ The current game has **one purchasable vehicle**. Additional models, an Active V
 
 **Playable development build — still growing, not a finished release.**
 
-The current `main` branch includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**. Current saves use **schema v17**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow. Current saves use **schema v17**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
@@ -79,7 +79,7 @@ These are **planned directions, not features in the current build**. Scope and o
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | Full New Game reset, next-objective guidance, Settings, English/German localization and continued accessibility polish. |
+| **A clearer, more comfortable game** | Next-objective guidance, Settings, English/German localization and continued accessibility polish. |
 | **Global HUD & activity** | A compact sticky HUD, a more usable activity feed and easier access to City Events from anywhere in the interface. |
 | **A stronger Solara identity** | Final logo and favicon, followed by controlled Business artwork batches and richer city presentation. |
 | **A growing Garage** | Active Vehicle selection, the remaining Tier-1 cars and, later, per-vehicle tuning and additional catalog tiers. |
@@ -106,6 +106,8 @@ Before clearing browser data or switching devices, use **Empire → Save & Trans
 - CE1 codes are portable backup data, **not encrypted secrets**. They should not be treated as account credentials.
 
 Rebirth is **not** a full New Game reset: it keeps the permanent progression listed in the in-game review. Always read the Keep/Lose summary before confirming.
+
+For a complete restart, open **Empire → Save & Transfer → New Game / Reset Progress**. Export and copy a backup first. Review the warning, type `RESET`, and explicitly confirm. This erases **all run and permanent progress**, including vehicles, EP, skills, achievements and statistics, without awarding EP. The new game is published only after saving succeeds; corrupt, newer or conflicting saves are not silently overwritten. See the [New Game safety contract](docs/RESET_PROGRESS.md).
 
 </details>
 

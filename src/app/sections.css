@@ -202,3 +202,14 @@
 .card-action-area > .purchase-button, .card-action-area > .purchase-note { margin: 0; }
 .card-action-area > .purchase-button:disabled { opacity: 1; }
 .card-action-area > .purchase-note { min-height: 0; }
+
+/* Full New Game is separate from transfer and Rebirth; content may grow at any zoom. */
+.reset-panel { margin-top: var(--space-lg); padding: var(--space-lg); border-inline-start: 3px solid var(--color-danger); }
+.reset-panel > p { color: var(--color-secondary); line-height: 1.6; }
+.reset-panel label { display: block; margin-bottom: var(--space-sm); }
+.reset-panel input { box-sizing: border-box; width: 100%; max-width: 24rem; min-height: 44px;
+  padding: var(--space-sm) var(--space-md); font: inherit; color: var(--color-text);
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); }
+.reset-panel input:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.reset-panel .confirmation-actions { margin-top: var(--space-md); }
+.reset-panel .action-button { min-height: 44px; white-space: normal; }
