@@ -26,6 +26,7 @@
 .operations-disclosure-body { padding: .25rem 0 .4rem; color: var(--color-muted); font-size: .78rem; line-height: 1.5; }
 .operations-disclosure-body p { margin: .35rem 0; }
 .operations-disclosure-body .modifier-breakdown { margin-block: .45rem; }
+.compact-requirements .requirements { padding-bottom: .4rem; }
 
 .business-heading-row { align-items: center; }
 .business-total-compact { flex: 0 0 auto; display: grid; gap: .1rem; min-width: 10rem; padding: .6rem .8rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-surface); text-align: right; }
@@ -54,15 +55,26 @@
 .business-card-action .purchase-note { min-height: 0; margin-top: .45rem; }
 
 .upgrades-block, .automation-block { padding-top: .2rem; }
-.operations-page .upgrade-catalog, .operations-page .automation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); margin: 0; }
+.operations-page .upgrade-catalog, .operations-page .automation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); margin: 0; align-items: stretch; }
 .operations-page .upgrade-panel { display: flex; flex-direction: column; min-width: 0; margin: 0; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-standard); }
-.operations-page .upgrade-panel h3, .operations-page .automation-card h3, .operations-page .automation-card h4 { margin: .3rem 0; }
-.operations-page .upgrade-panel > p, .operations-page .automation-card > p { margin: .4rem 0; color: var(--color-secondary); font-size: .78rem; line-height: 1.45; }
-.operations-page .upgrade-panel .production, .operations-page .automation-role { color: var(--color-cool); font-weight: 700; }
+.operations-page .upgrade-panel h3, .operations-page .automation-card h3, .operations-page .automation-card h4 { margin: .35rem 0; font-size: 1.08rem; }
+.operations-page .upgrade-panel > p, .operations-page .automation-card > p { margin: .35rem 0; color: var(--color-secondary); font-size: .78rem; line-height: 1.45; }
 .operations-page .upgrade-panel .requirements { font-size: .72rem; }
 .operations-page .upgrade-panel .action-button, .operations-page .automation-card .action-button { margin-top: auto; }
-.operations-page .automation-card progress { height: .55rem; }
-.operations-page .auto-target select { width: 100%; min-height: 44px; }
+.upgrade-metrics, .automation-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin: .7rem 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-border); }
+.upgrade-metrics > div, .automation-metrics > div { min-width: 0; padding: .65rem .7rem; background: color-mix(in srgb, var(--color-background) 80%, var(--color-surface) 20%); }
+.upgrade-metrics span, .automation-metrics span, .automation-price span { display: block; color: var(--color-muted); font-size: .62rem; text-transform: uppercase; letter-spacing: .075em; }
+.upgrade-metrics strong, .automation-metrics strong, .automation-price strong { display: block; margin-top: .2rem; font-size: .95rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.upgrade-metrics small { display: block; margin-top: .12rem; color: var(--color-muted); font-size: .66rem; line-height: 1.3; }
+.upgrade-state { margin: .35rem 0 .65rem; color: var(--color-muted); font-size: .7rem; font-weight: 700; letter-spacing: .04em; }
+.upgrade-state.is-active { color: var(--color-cool); }
+.automation-price, .automation-next-state { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: .65rem 0; padding: .65rem .7rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); }
+.automation-next-state span { color: var(--color-secondary); font-size: .75rem; }
+.automation-next-state strong { color: var(--color-cool); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.operations-page .automation-card label { display: block; margin-top: .55rem; color: var(--color-secondary); font-size: .72rem; }
+.operations-page .automation-card progress { width: 100%; height: .55rem; margin: .45rem 0; accent-color: var(--color-cool); }
+.operations-page .auto-target { margin-top: .55rem; }
+.operations-page .auto-target select { width: 100%; min-height: 44px; margin-top: .3rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-background); color: var(--color-text); font: inherit; padding: .55rem .65rem; }
 
 @media (max-width: 900px) {
   .operations-page .business-grid, .operations-page .upgrade-catalog, .operations-page .automation-grid { grid-template-columns: minmax(0, 1fr); }
@@ -93,5 +105,5 @@
   .job-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .job-metrics dt { font-size: .58rem; }
   .job-metrics dd { font-size: .86rem; }
-  .business-stat-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .business-stat-grid, .upgrade-metrics, .automation-metrics { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
