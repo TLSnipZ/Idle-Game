@@ -15,6 +15,14 @@ Implemented foundation:
 - Escape and backdrop dismissal for the Settings dialog,
 - responsive Settings presentation.
 
+## Localization voice pass
+
+The follow-up voice pass establishes the shared writing contract in [LOCALIZATION_VOICE.md](LOCALIZATION_VOICE.md).
+
+English and German both use original Solara City satire: dry crime-business humor, absurd capitalism, nightlife swagger and bureaucratic nonsense. German copy is adapted naturally rather than translated literally. Gameplay-critical facts always stay explicit before any joke.
+
+The pass also moves the global HUD, primary navigation and global runtime indicators onto the same typed localization path. Future surfaces must reuse this dictionary as they are touched instead of creating another translation mechanism.
+
 ## Contracts
 
 Settings are presentation state only. A missing, malformed or unavailable settings record falls back safely to English with motion enabled. Storage failure never pauses gameplay and never enters the game's durable save transaction. No migration or CE1 change is required.
@@ -23,6 +31,6 @@ The translation dictionary is intentionally centralized in `src/app/localization
 
 ## Verification
 
-Repository-side implementation was performed through the GitHub connector. The execution environment available to this session could not resolve github.com for a local checkout, so `npm ci`, typecheck, tests and build could not be rerun locally here. The pull request should therefore be treated as awaiting GitHub/maintainer CI and live visual acceptance before this phase is marked manually verified.
+Repository-side implementation was performed through the GitHub connector. The execution environment available to this session could not run the project's npm/typecheck/test/build suite, so the pull request should be treated as awaiting GitHub/maintainer CI and live visual acceptance before this phase is marked manually verified.
 
-Manual acceptance should cover desktop and narrow mobile widths, English↔Deutsch switching, persistence after reload, Escape/backdrop close behavior, keyboard focus, reduced-motion behavior, and confirmation that existing save/export/import/offline/Rebirth progression remains unchanged.
+Manual acceptance should cover desktop and narrow mobile widths, English↔Deutsch switching, persistence after reload, Escape/backdrop close behavior, keyboard focus, reduced-motion behavior, localized navigation/HUD/global indicators, and confirmation that existing save/export/import/offline/Rebirth progression remains unchanged.

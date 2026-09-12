@@ -1,8 +1,22 @@
 import { PRIMARY_SECTIONS } from './navigation';
 import type { Navigate, SectionId } from './navigation';
-export function Navigation({ active, onNavigate }: { readonly active: SectionId; readonly onNavigate: Navigate }) {
-  return <nav className="primary-navigation" aria-label="Primary sections">{PRIMARY_SECTIONS.map(section =>
+import type { MessageKey } from './localization';
+
+const SECTION_LABEL_KEY: Record<SectionId, MessageKey> = {
+  overview: 'overviewLabel',
+  operations: 'operationsLabel',
+  city: 'cityLabel',
+  collection: 'collectionLabel',
+  empire: 'empireLabel',
+};
+
+export function Navigation({ active, onNavigate, t }: {
+  readonly active: SectionId;
+  readonly onNavigate: Navigate;
+  readonly t: (key: MessageKey) => string;
+}) {
+  return <nav className="primary-navigation" aria-label={t('primaryNavigation')}>{PRIMARY_SECTIONS.map(section =>
     <button type="button" key={section.id} aria-current={active === section.id ? 'page' : undefined}
-      aria-controls="section-content" onClick={() => onNavigate(section.id)}>{section.label}</button>
+      aria-controls="section-content" onClick={() => onNavigate(section.id)}>{t(SECTION_LABEL_KEY[section.id])}</button>
   )}</nav>;
 }
