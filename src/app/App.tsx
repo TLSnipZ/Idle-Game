@@ -14,6 +14,8 @@ import { GlobalStatus } from './GlobalStatus';
 import { GlobalFeedback } from './GlobalFeedback';
 import { useActionFocus } from './use-action-focus';
 import { RebirthNotice } from './RebirthNotice';
+import { NextObjective } from './NextObjective';
+import { guidanceDestination } from './guidance-presentation';
 import './App.css';
 import './sections.css';
 
@@ -30,8 +32,20 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const previous = useRef(active);
   const [reviewRequest, setReviewRequest] = useState(0);
   const handledReview = useRef(0);
+  const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
+  const handledObjective = useRef(0);
   useEffect(() => {
-    if (reviewRequest !== handledReview.current && active === SECTION.empire.id) {
+    if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
+      const requested = document.getElementById(objectiveRequest.headingId);
+      const target = requested && main.current?.contains(requested) ? requested : heading.current;
+      if (target) {
+        target.tabIndex = -1;
+        target.classList.add('guidance-destination');
+        target.focus({ preventScroll: true });
+        target.scrollIntoView({ block: 'start', behavior: 'instant' });
+      }
+      handledObjective.current = objectiveRequest.sequence;
+    } else if (reviewRequest !== handledReview.current && active === SECTION.empire.id) {
       const target = main.current?.querySelector<HTMLElement>('#rebirth-heading');
       target?.focus({ preventScroll: true });
       target?.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -41,7 +55,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
       window.scrollTo({ top: 0 });
     }
     previous.current = active;
-  }, [active, reviewRequest]);
+  }, [active, reviewRequest, objectiveRequest]);
   const section = PRIMARY_SECTIONS.find(section => section.id === active) ?? SECTION.overview;
   const paused = game.runtimeError !== null;
   const dashboard = dashboardPresentation(game.snapshot.state);
@@ -56,6 +70,11 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />
       {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => setActive(SECTION.empire.id)}>Return to Empire · Confirmation awaiting your choice</button>}
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />
+      <NextObjective key={game.replacementSequence} state={game.snapshot.state} onNavigate={destination => {
+        const target = guidanceDestination(destination);
+        setActive(target.section);
+        setObjectiveRequest(request => ({ ...target, sequence: (request?.sequence ?? 0) + 1 }));
+      }} />
       <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{section.label}</h1><p>{section.description}</p></div>
         <SectionContent active={active} game={{ ...game, resetProgress: confirmation => {

@@ -32,14 +32,21 @@ Phase 9B accessibility remain preserved contracts.
   Player 10 / Laundry 10; Nights is Player 16 / Afterdark 8 / Neon Mile. Acquisition
   gates only: existing owners remain valid, Save v17 / CE1 and runtime unchanged.
   Territory/Crew share requirements/action spacing and locked versus Cash helpers.
-- **Reset Progress / New Game: implemented; deployed acceptance pending.**
+- **Reset Progress / New Game: implemented and merged; user reported working live after PR #1.**
   Empire → Save & Transfer now offers a full canonical restart with explicit
   `RESET` consent, a backup warning and guarded write-before-publication. Unlike
   Rebirth, permanent progression is also cleared without rewards. Save v17 / CE1
   and existing migration/economy contracts remain unchanged. See [RESET_PROGRESS.md](RESET_PROGRESS.md).
-- **Next: Next Objective / Guidance**, after New Game deployment/live verification.
-- Then **Settings & Localization Foundation → Business
+- **Next Objective / Guidance: implemented; deployment and visual acceptance pending.**
+  Read-only all-section next step, catalog-backed prerequisites and exact Cash/EP,
+  optional in-memory goal choice, focused navigation without gameplay actions.
+  Save v17 / CE1 unchanged. See [GUIDANCE.md](GUIDANCE.md).
+- **Next: Settings & Localization Foundation**, after Guidance deployment/live review.
+- Then **Global HUD 2.0 / Activity Center → Solara City Branding → Business
   Visual Identity / Artworks → Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
+  HUD plans include an animated compact scroll mode, global News and City Events
+  with the existing two choices; branding includes the approved direction and favicon.
+  These are planning notes only, not new implementation.
   Settings planning includes a menu, English/Deutsch, centralized translation keys,
   locale formatting, reduced-motion preference and later audio/visual options.
   Business art starts with a Dockside Golden Reference, then Laundry, Afterdark and
@@ -59,7 +66,7 @@ and the shared camera/lighting/showroom language. No automatic next-phase work.
 
 | Priority | Item | Constraints / direction |
 | --- | --- | --- |
-| P1 | Next Objective / Guidance | Derive a target, progress, missing requirements/cash and navigation action from current state. No saved guidance, gameplay change, forced optimal strategy or automatic play; remain non-intrusive. Possible goals span Dockside, Dispatcher, the first vehicle, Neon, Crew and Rebirth. |
+| Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. No saved guidance or gameplay effects. Deployment/visual acceptance pending; see GUIDANCE.md. |
 | P1 | Long-section navigation | Live audit at 320px found approximately 7,300px Operations and 10,500px Empire. Explore accessible jumps, local nav, direct Save access or selective collapsible distant systems. Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show bonus/current absolute impact and optional payback using authoritative evaluators, explicit assumptions and presentation-only estimates. Utility specialists such as Mara are not judged solely by ROI. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP, concise Keep/Lose and full confirmation detail; no reward/reset change. |
