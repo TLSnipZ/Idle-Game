@@ -93,17 +93,22 @@ Phase 9B accessibility remain preserved contracts.
   `f559bb3486f5710bd82724763f7e6113c624a6bb`. Another 18 cases passed against that
   exact production artifact without injecting fix CSS; compiled JavaScript is
   byte-identical to the previous release. Full Vitest suite was not run.
-- **Business Visual Identity / Artworks: Dockside integration resumed by explicit user request.**
-  A storefront-only crop of the user-approved concept is integrated on branch
-  `dockside-approved-artwork-integration`: 564x270 WebP, 24,454 bytes, checked asset
-  checksum. The bounded artwork strip is isolated in `BusinessArtwork.css`; pending
-  or failed images leave no empty placeholder. Existing Operations grid, Earnings
-  Details, gameplay and previous HUD/spacing fixes are preserved. Six regression
-  tests added (not run locally); 16 candidate and 16 baseline EN/DE browser cases
-  passed. Production build/deploy and the new crop's manual live acceptance are
-  still distinct gates; consult the integration PR for final release evidence.
-  The stale document claiming the removed PR #16 image was still integrated has
-  been corrected. See [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
+- **Dockside storefront reference: merged in PR #19; checked build and Pages deployment passed.**
+  User-authorized reintegration uses a storefront-only crop of the approved concept:
+  564x270 WebP, 24,454 bytes, verified checksum. The bounded strip is isolated in
+  `BusinessArtwork.css`; pending or failed images leave no empty placeholder.
+  Existing Operations grid, Earnings Details, gameplay and HUD/spacing fixes remain.
+  Run `34725691641` built and deployed commit
+  `1e0a5151072e6679e54fce71ceda7effe63c01a7` successfully. Artifact `10307672623`
+  contains the exact inspected image bytes. Its actual compiled CSS/JS passed 16
+  additional EN/DE Chromium cases at 320–1920px without a candidate component/CSS
+  patch, plus delivery, acquisition, equipment purchase, upgrade, Earnings Details,
+  navigation-return and failed-image checks. Before merge, 16 candidate and 16
+  baseline cases passed. The offline harness embeds assets and provides test storage.
+  Six Vitest tests were added but not executed; the Pages workflow does not run them.
+  **Manual approval of the new crop/integration is pending**, so no later Business
+  artwork starts yet. Source provenance and corrected history:
+  [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
 - **After Dockside live acceptance:** Neon Laundry → Afterdark Customs → Solara Nights,
   then **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
@@ -127,7 +132,7 @@ and the shared camera/lighting/showroom language.
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
 | Deployed / live review pending | Overview / City spacing | PR #18; checked build/deploy passed in run 34723960641; 22 candidate plus 18 production browser cases passed. See SECTION_SPACING.md. |
 | Live review pending | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
-| Current | Business Visual Identity | User resumed Dockside storefront integration; keep the repaired layout. Build/deploy and crop acceptance before later Businesses. |
+| Deployed / live review pending | Dockside Business artwork | PR #19; checked build/deploy and actual artifact verification passed. User approval before Neon Laundry. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP and Keep/Lose clarity; no reward/reset change. |
@@ -154,9 +159,8 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Current task: Dockside reference integration, explicitly resumed by the user.**
+**Dockside reference integration is deployed; next is its live visual acceptance.**
 Keep the repaired Operations, HUD and section-spacing baseline. All work remains
 presentation-only and must preserve Save v17 / CE1, GameState, economy, balance,
-gates, automation authority, RNG, localization and runtime behavior. The new Dockside
-crop needs its own live acceptance; no later Business artwork or gameplay phase
-starts automatically.
+gates, automation authority, RNG, localization and runtime behavior. No later
+Business artwork or gameplay phase starts automatically.
