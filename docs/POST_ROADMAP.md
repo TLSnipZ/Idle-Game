@@ -41,17 +41,24 @@ Phase 9B accessibility remain preserved contracts.
   Read-only all-section next step, catalog-backed prerequisites and exact Cash/EP,
   optional in-memory goal choice, focused navigation without gameplay actions.
   Save v17 / CE1 unchanged. See [GUIDANCE.md](GUIDANCE.md).
-- **Settings & Localization Foundation: implemented and merged in PR #3; live acceptance pending.**
+- **Settings & Localization Foundation: implemented and merged in PR #3; live accepted as functional.**
   Global Settings, English/Deutsch, typed translation keys, locale presentation and
   reduced-motion preferences are device-local and do not alter Save v17 / CE1.
   See [SETTINGS_LOCALIZATION.md](SETTINGS_LOCALIZATION.md).
-- **Localization Voice Pass: implemented in PR #4; merge/live acceptance pending.**
-  English and German global shell, primary navigation, HUD labels and global activity
-  indicators now follow the original Solara City satirical crime-sandbox voice.
-  German is adapted naturally rather than translated literally. Gameplay-critical
-  prices, requirements, timers, rewards and Heat remain explicit. No copied
-  Rockstar/GTA dialogue or protected text. See [LOCALIZATION_VOICE.md](LOCALIZATION_VOICE.md).
-- **Next after Localization Voice Pass: Global HUD 2.0 / Activity Center**, then
+- **Localization Voice Pass: merged in PR #4; build compatibility hotfixed in PR #5.**
+  This established the canonical original Solara City writing contract and localized
+  the global shell, navigation, HUD labels and high-level status indicators. The
+  subsequent repository-wide audit showed that gameplay surfaces still contained
+  substantial English-only copy.
+- **Full UI Localization & Solara Voice Pass: implemented in PR #6; CI/deployment and live visual acceptance pending.**
+  The complete presentation tree now follows English/Deutsch and the Solara voice:
+  Overview, Guidance, Operations, Businesses, Upgrades, Automation, City, Territories,
+  Heat, Crew, Events, Garage, Rebirth, Skills, Achievements, Statistics, Save/Transfer,
+  Reset, Offline Return, requirements, accessibility copy and runtime/action feedback.
+  Catalog flavor copy is localized by stable IDs while GameState, Save v17 / CE1,
+  economy, balance, gates and runtime authority remain unchanged. See
+  [FULL_UI_LOCALIZATION.md](FULL_UI_LOCALIZATION.md) and [LOCALIZATION_VOICE.md](LOCALIZATION_VOICE.md).
+- **Next only after Full UI Localization is merged, deployed and accepted: Global HUD 2.0 / Activity Center**, then
   **Solara City Branding → Business Visual Identity / Artworks → Active Vehicle +
   Tier-1 Garage → Heat / Police 2.0**.
   HUD plans include an animated compact scroll mode, global News and City Events
@@ -190,12 +197,16 @@ POST 3C Operations navigation follows successful deployed/live 3B verification.
 
 PR #3 introduced presentation-only Settings, English/Deutsch locale selection,
 central typed translation keys, device-local preferences and reduced-motion support.
-The follow-up Voice Pass in PR #4 establishes the canonical Solara City writing
-contract for both locales and migrates the global shell, primary navigation, HUD
-labels and high-level status indicators onto it. Save v17 / CE1, GameState, economy,
-balance, runtime, offline, Rebirth, Businesses and vehicles are unchanged.
+PR #4 established the canonical Solara City writing contract and migrated the global
+shell; PR #5 restored build compatibility for the new translator props.
+
+The repository-wide follow-up in PR #6 is the **Full UI Localization & Solara Voice
+Pass**. It extends locale-aware copy through every current player-facing gameplay
+surface, presentation/helper feedback and catalog flavor layer while keeping Save v17 /
+CE1 and authoritative gameplay language-neutral. See FULL_UI_LOCALIZATION.md for the
+coverage and acceptance checklist.
 
 The next phase remains **Global HUD 2.0 / Activity Center**, but it must not begin
-until the Voice Pass is merged and visually accepted. Future player-facing copy
-should use the same localization system and voice rules as each surface is touched;
-no parallel translation mechanism should be introduced.
+until PR #6 is merged, deployed and visually accepted in both locales. Future
+player-facing copy must ship in English and German under the same voice contract;
+no parallel English-only UI path should be introduced.

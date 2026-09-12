@@ -3,7 +3,7 @@ import { CITY_NAME } from '../features/territories';
 import { getOfflineCapMs } from '../game/offline-cap';
 import { formatOfflineDuration } from './offline-presentation';
 import { OfflineReturn } from './OfflineReturn';
-import { useGame } from './use-game';
+import { setGamePresentationLocale, useGame } from './use-game';
 import { useSaveManagement } from './SaveManagement';
 import { useRebirthControls } from './RebirthPanel';
 import { DEFAULT_SECTION, PRIMARY_SECTIONS, SECTION } from './navigation';
@@ -19,6 +19,7 @@ import { guidanceDestination } from './guidance-presentation';
 import { SettingsPanel } from './SettingsPanel';
 import { translate } from './localization';
 import type { MessageKey } from './localization';
+import { LocalizationProvider } from './LocalizationProvider';
 import { useSettings } from './use-settings';
 import './App.css';
 import './sections.css';
@@ -37,8 +38,8 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const preferences = useSettings();
   const t = (key: MessageKey) => translate(preferences.settings.locale, key);
-  const save = useSaveManagement(game.saveActions);
-  const rebirth = useRebirthControls(game.rebirth);
+  const save = useSaveManagement(game.saveActions, preferences.settings.locale);
+  const rebirth = useRebirthControls(game.rebirth, preferences.settings.locale);
   const heading = useRef<HTMLHeadingElement>(null);
   const main = useRef<HTMLElement>(null);
   const captureAction = useActionFocus();
@@ -47,6 +48,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const handledReview = useRef(0);
   const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
   const handledObjective = useRef(0);
+  useEffect(() => { setGamePresentationLocale(preferences.settings.locale); }, [preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
       const requested = document.getElementById(objectiveRequest.headingId);
@@ -67,7 +69,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const [sectionLabelKey, sectionDescriptionKey] = SECTION_COPY[section.id];
   const paused = game.runtimeError !== null;
   const dashboard = dashboardPresentation(game.snapshot.state);
-  return <div className="app-shell">
+  return <LocalizationProvider locale={preferences.settings.locale}><div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>{t('skip')}</a>
     <header className="app-header"><span className="wordmark">{CITY_NAME}</span><span className="edition">{t('tagline')}</span><div className="header-actions">{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">{t('autosave')}</span>}<button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
     <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} t={t} />
@@ -85,5 +87,5 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
     </main>
     <footer className="app-footer"><span>{CITY_NAME} <span aria-hidden="true">/</span> {t('footerGenre')}</span><span>{t('footerTagline')}</span></footer>
     <SettingsPanel open={settingsOpen} settings={preferences.settings} t={t} onClose={() => setSettingsOpen(false)} onLocale={preferences.setLocale} onReducedMotion={preferences.setReducedMotion} />
-  </div>;
+  </div></LocalizationProvider>;
 }

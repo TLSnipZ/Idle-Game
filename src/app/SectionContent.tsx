@@ -16,6 +16,7 @@ import { ResetProgress } from './ResetProgress';
 import { Statistics } from './Statistics';
 import { SaveManagementView } from './SaveManagement';
 import type { useSaveManagement } from './SaveManagement';
+import { useLocalizedText } from './LocalizationProvider';
 
 export interface SectionContentProps {
   readonly active: SectionId;
@@ -26,6 +27,7 @@ export interface SectionContentProps {
 }
 /** One active presentation tree. Runtime and confirmation controllers live above it. */
 export function SectionContent({ active, game, onNavigate, save, rebirth }: SectionContentProps) {
+  const text = useLocalizedText();
   const state = game.snapshot.state;
   const paused = game.runtimeError !== null;
   switch (active) {
@@ -42,7 +44,7 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
       <SkillTree state={state} paused={paused} onPurchase={game.buySkill} />
       <Achievements state={state} />
       <Statistics state={state} />
-      <section aria-labelledby="save-transfer-heading"><h2 id="save-transfer-heading">Save &amp; Transfer</h2>
+      <section aria-labelledby="save-transfer-heading"><h2 id="save-transfer-heading">{text('Save & Transfer', 'Speichern & Schmuggeln')}</h2>
         <SaveManagementView state={save.state} controls={save.controls} />
         <ResetProgress key={game.replacementSequence} unavailable={paused || game.persistence.kind === 'blocked'}
           onReset={game.resetProgress} /></section>
