@@ -1,4 +1,14 @@
-/* Dockside Golden Reference support styles. Presentation-only. */
+/* Business visual identity. Presentation-only. */
+.dockside-reference { grid-column: auto; min-width: 0; overflow: hidden; padding: 0; }
+.dockside-reference .business-content { padding: var(--space-lg); }
+.dockside-card-art { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #08121c; border-bottom: 1px solid var(--color-border); }
+.dockside-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; }
+.dockside-tagline { margin: -.15rem 0 var(--space-sm); color: var(--color-warm); font-weight: 750; letter-spacing: .015em; }
+.dockside-breakdown { margin-top: var(--space-md); border-top: 1px solid var(--color-border); padding-top: var(--space-sm); }
+.dockside-breakdown summary { min-height: 44px; align-content: center; cursor: pointer; color: var(--color-cool); font-weight: 700; }
+.dockside-breakdown p { margin-block: var(--space-sm); color: var(--color-secondary); font-size: .84rem; }
+
+/* Keep equipment visually related without turning the whole Operations page into one giant hero. */
 .equipment-section { margin-top: var(--space-xl); padding: var(--space-lg); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: linear-gradient(180deg, #0b1723, #08121c); box-shadow: 0 16px 40px #0005; }
 .equipment-section > h2 { margin-top: 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .045em; }
 .equipment-section > p { color: var(--color-secondary); }
@@ -10,7 +20,11 @@
 .equipment-section .upgrade-panel .production { color: var(--color-cool); font-weight: 700; }
 .equipment-section .upgrade-panel .requirements { font-size: .75rem; }
 .equipment-section .upgrade-panel .action-button { margin-top: auto; min-height: 44px; }
+
 @media (max-width: 740px) {
+  .dockside-reference .business-content { padding: var(--space-md); }
+  .dockside-card-art { aspect-ratio: 3 / 2; }
+  .dockside-card-art img { object-position: 66% 50%; }
   .equipment-section { padding: var(--space-md); }
   .equipment-section .upgrade-catalog { grid-template-columns: minmax(0, 1fr); }
 }
