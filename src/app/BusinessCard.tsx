@@ -10,7 +10,6 @@ import { formatPrice } from './number-format';
 import { businessPresentation } from './game-presentation';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
-import docksideArtwork from '../assets/businesses/dockside-detail-card.webp';
 
 interface BusinessCardProps {
   readonly definition?: BusinessDefinition;
@@ -34,17 +33,16 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
   const isDockside = definition.id === STARTER_BUSINESS.id;
 
   return <section className={`panel business-card operations-business-card ${owned ? 'is-owned' : ''}`} aria-labelledby={headingId}>
-    {isDockside && <div className="business-card-art" aria-hidden="true"><img src={docksideArtwork} alt="" loading="lazy" decoding="async" /></div>}
     <div className="business-content">
       <div className="panel-heading business-card-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
       <div className="business-title-row"><div><h3 id={headingId}>{definition.name}</h3>{isDockside && <p className="dockside-tagline">{text('Clean cars. Dirty money.', 'Saubere Autos. Schmutziges Geld.')}</p>}</div>{progress && <span className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
       <p className="business-description">{description}</p>
 
-      <div className="business-stat-grid">
-        {!owned && <div><span>{text('Purchase price', 'Kaufpreis')}</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
+      <div className={`business-stat-grid ${progress ? 'is-three-up' : 'is-acquisition'}`}>
+        {!owned && !progress && <div><span>{text('Purchase price', 'Kaufpreis')}</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
         <div className={view.live ? 'is-live' : ''}><span>{view.productionLabel}</span><strong>{view.live ? '+' : ''}<RateValue text={formatProduction(progress?.production ?? definition.baseProductionCentsPerSecond)} /></strong></div>
         {progress && <div><span>{text('Next level', 'Nächstes Level')}</span><strong>{progress.nextProduction ? <RateValue text={formatProduction(progress.nextProduction)} /> : text('MAX LEVEL', 'MAX-LEVEL')}</strong></div>}
-        {progress?.upgradeCost && <div><span>{text('Upgrade', 'Upgrade')}</span><strong>{formatPrice(progress.upgradeCost)}</strong></div>}
+        {progress && <div><span>{text('Upgrade', 'Upgrade')}</span><strong>{progress.upgradeCost ? formatPrice(progress.upgradeCost) : text('MAX', 'MAX')}</strong></div>}
       </div>
 
       {!owned && requirements && <RequirementList result={requirements} id={`${definition.id}-requirements`} />}
