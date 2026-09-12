@@ -41,14 +41,22 @@ Phase 9B accessibility remain preserved contracts.
   Read-only all-section next step, catalog-backed prerequisites and exact Cash/EP,
   optional in-memory goal choice, focused navigation without gameplay actions.
   Save v17 / CE1 unchanged. See [GUIDANCE.md](GUIDANCE.md).
-- **Next: Settings & Localization Foundation**, after Guidance deployment/live review.
-- Then **Global HUD 2.0 / Activity Center → Solara City Branding → Business
-  Visual Identity / Artworks → Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
+- **Settings & Localization Foundation: implemented and merged in PR #3; live acceptance pending.**
+  Global Settings, English/Deutsch, typed translation keys, locale presentation and
+  reduced-motion preferences are device-local and do not alter Save v17 / CE1.
+  See [SETTINGS_LOCALIZATION.md](SETTINGS_LOCALIZATION.md).
+- **Localization Voice Pass: implemented in PR #4; merge/live acceptance pending.**
+  English and German global shell, primary navigation, HUD labels and global activity
+  indicators now follow the original Solara City satirical crime-sandbox voice.
+  German is adapted naturally rather than translated literally. Gameplay-critical
+  prices, requirements, timers, rewards and Heat remain explicit. No copied
+  Rockstar/GTA dialogue or protected text. See [LOCALIZATION_VOICE.md](LOCALIZATION_VOICE.md).
+- **Next after Localization Voice Pass: Global HUD 2.0 / Activity Center**, then
+  **Solara City Branding → Business Visual Identity / Artworks → Active Vehicle +
+  Tier-1 Garage → Heat / Police 2.0**.
   HUD plans include an animated compact scroll mode, global News and City Events
   with the existing two choices; branding includes the approved direction and favicon.
   These are planning notes only, not new implementation.
-  Settings planning includes a menu, English/Deutsch, centralized translation keys,
-  locale formatting, reduced-motion preference and later audio/visual options.
   Business art starts with a Dockside Golden Reference, then Laundry, Afterdark and
   Nights using one consistent Solara direction. No later system or artwork ships now.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
@@ -177,3 +185,17 @@ packages, preserve pooled fractions and historical validators, and introduce
 one selected automation target with the recommended v17 migration. Monitor XP
 pacing and higher Dockside/EP accumulation under enabled offline automation.
 POST 3C Operations navigation follows successful deployed/live 3B verification.
+
+## Settings & Localization / Voice Pass handoff
+
+PR #3 introduced presentation-only Settings, English/Deutsch locale selection,
+central typed translation keys, device-local preferences and reduced-motion support.
+The follow-up Voice Pass in PR #4 establishes the canonical Solara City writing
+contract for both locales and migrates the global shell, primary navigation, HUD
+labels and high-level status indicators onto it. Save v17 / CE1, GameState, economy,
+balance, runtime, offline, Rebirth, Businesses and vehicles are unchanged.
+
+The next phase remains **Global HUD 2.0 / Activity Center**, but it must not begin
+until the Voice Pass is merged and visually accepted. Future player-facing copy
+should use the same localization system and voice rules as each surface is touched;
+no parallel translation mechanism should be introduced.
