@@ -24,6 +24,25 @@
 .objective-controls select { min-width: 0; width: 100%; min-height: 44px; font: inherit; font-size: .85rem; color: var(--color-text); background: var(--color-background); border: 1px solid var(--color-border); padding: var(--space-sm); border-radius: var(--radius-control); }
 .objective-controls details p { color: var(--color-muted); font-size: .75rem; line-height: 1.5; margin-top: var(--space-sm); }
 .guidance-destination { scroll-margin-block-start: 14rem; }
-@media (max-width: 740px) { .next-objective { padding: var(--space-sm); } .objective-compact { align-items: flex-start; } .objective-compact-progress span { display: none; } .objective-details { grid-template-columns: minmax(0, 1fr); } .guidance-destination { scroll-margin-block-start: 21rem; } }
+
+/* Collection hotfix: keep the canonical Kairo artwork fluid at every viewport width. */
+.garage-catalog { display: grid; gap: var(--space-xl); margin-block: var(--space-sm); min-width: 0; }
+.vehicle-card { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); width: 100%; max-width: 68rem; min-width: 0; padding: 0; align-items: start; overflow: hidden; }
+.showroom-stage { min-width: 0; max-width: 100%; padding: var(--space-lg); display: flex; flex-direction: column; position: relative; background: var(--color-warm-tint); overflow: hidden; }
+.showroom-stage .panel-heading { min-width: 0; }
+.vehicle-artwork { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 1672 / 941; object-fit: contain; object-position: center; border-radius: var(--radius-card); margin-block: var(--space-md); }
+.vehicle-specification { min-width: 0; padding: var(--space-lg); }
+
+@media (max-width: 1000px) { .vehicle-card { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 740px) {
+  .next-objective { padding: var(--space-sm); }
+  .objective-compact { align-items: flex-start; }
+  .objective-compact-progress span { display: none; }
+  .objective-details { grid-template-columns: minmax(0, 1fr); }
+  .guidance-destination { scroll-margin-block-start: 21rem; }
+  .vehicle-card { grid-template-columns: minmax(0, 1fr); }
+  .showroom-stage, .vehicle-specification { padding: var(--space-md); }
+  .vehicle-artwork { width: 100%; max-width: 100%; height: auto; }
+}
 @media (max-width: 420px) { .objective-compact .eyebrow span { display: none; } .objective-expand { padding-inline: .55rem; } }
 @media (max-height: 600px) { .guidance-destination { scroll-margin-block-start: 1rem; } }
