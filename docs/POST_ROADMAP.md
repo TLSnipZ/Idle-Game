@@ -50,7 +50,7 @@ Phase 9B accessibility remain preserved contracts.
   the global shell, navigation, HUD labels and high-level status indicators. The
   subsequent repository-wide audit showed that gameplay surfaces still contained
   substantial English-only copy.
-- **Full UI Localization & Solara Voice Pass: implemented in PR #6; CI/deployment and live visual acceptance pending.**
+- **Full UI Localization & Solara Voice Pass: merged in PR #6; Pages typecheck/build/deploy passed; manual live visual acceptance pending.**
   The complete presentation tree now follows English/Deutsch and the Solara voice:
   Overview, Guidance, Operations, Businesses, Upgrades, Automation, City, Territories,
   Heat, Crew, Events, Garage, Rebirth, Skills, Achievements, Statistics, Save/Transfer,
@@ -58,7 +58,7 @@ Phase 9B accessibility remain preserved contracts.
   Catalog flavor copy is localized by stable IDs while GameState, Save v17 / CE1,
   economy, balance, gates and runtime authority remain unchanged. See
   [FULL_UI_LOCALIZATION.md](FULL_UI_LOCALIZATION.md) and [LOCALIZATION_VOICE.md](LOCALIZATION_VOICE.md).
-- **Next only after Full UI Localization is merged, deployed and accepted: Global HUD 2.0 / Activity Center**, then
+- **Next only after Full UI Localization is manually accepted live: Global HUD 2.0 / Activity Center**, then
   **Solara City Branding → Business Visual Identity / Artworks → Active Vehicle +
   Tier-1 Garage → Heat / Police 2.0**.
   HUD plans include an animated compact scroll mode, global News and City Events
@@ -200,13 +200,14 @@ central typed translation keys, device-local preferences and reduced-motion supp
 PR #4 established the canonical Solara City writing contract and migrated the global
 shell; PR #5 restored build compatibility for the new translator props.
 
-The repository-wide follow-up in PR #6 is the **Full UI Localization & Solara Voice
-Pass**. It extends locale-aware copy through every current player-facing gameplay
-surface, presentation/helper feedback and catalog flavor layer while keeping Save v17 /
-CE1 and authoritative gameplay language-neutral. See FULL_UI_LOCALIZATION.md for the
+PR #6 is the merged **Full UI Localization & Solara Voice Pass**. The main Pages
+workflow passed typecheck/build and deployed successfully. The pass extends
+locale-aware copy through every current player-facing gameplay surface,
+presentation/helper feedback and catalog flavor layer while keeping Save v17 / CE1
+and authoritative gameplay language-neutral. See FULL_UI_LOCALIZATION.md for the
 coverage and acceptance checklist.
 
 The next phase remains **Global HUD 2.0 / Activity Center**, but it must not begin
-until PR #6 is merged, deployed and visually accepted in both locales. Future
+until the deployed English/German presentation is manually accepted. Future
 player-facing copy must ship in English and German under the same voice contract;
 no parallel English-only UI path should be introduced.
