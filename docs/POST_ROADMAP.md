@@ -63,11 +63,17 @@ Phase 9B accessibility remain preserved contracts.
 - **Solara City Branding: merged in PR #10; live accepted before Business Visual Identity.**
   Canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained shell accents.
   See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
-- **Business Visual Identity / Artworks: Dockside Golden Reference pass in progress.**
-  Dockside is the approval gate for camera, lighting, detail density and responsive
-  crop behavior. No later Business artwork is promoted before Dockside is visually
-  approved and integrated. See [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
-- **After the Dockside Golden Reference:** Neon Laundry → Afterdark Customs → Solara Nights,
+- **Operations Page Overhaul: implementation in progress before further Business artwork rollout.**
+  Rebuild Jobs, Businesses, Upgrades and Automation as one isolated responsive UX system.
+  Desktop uses two Businesses per row; mobile stacks one per row. Secondary reward,
+  earnings and mechanics detail move into disclosures while key gameplay truth stays
+  immediately visible. Operations styling is isolated in `Operations.css`; gameplay,
+  Save v17 / CE1 and balance remain unchanged. See [OPERATIONS_OVERHAUL.md](OPERATIONS_OVERHAUL.md).
+- **Business Visual Identity / Artworks: paused behind Operations live acceptance.**
+  Dockside remains the artwork/crop reference candidate, but no later Business artwork
+  is promoted until the rebuilt Operations layout is deployed and manually accepted.
+  See [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
+- **After Operations + Dockside acceptance:** Neon Laundry → Afterdark Customs → Solara Nights,
   then **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
@@ -87,7 +93,8 @@ and the shared camera/lighting/showroom language.
 | Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. Compact-by-default details are live accepted; see GUIDANCE.md. |
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
-| Current | Business Visual Identity | Dockside Golden Reference first; then the remaining Businesses. |
+| Current | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
+| Next | Business Visual Identity | Resume Dockside Golden Reference acceptance after Operations is stable; then remaining Businesses. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP and Keep/Lose clarity; no reward/reset change. |
@@ -114,8 +121,7 @@ These surfaces are manually accepted and must remain visually subordinate to gam
 content while keeping key state globally discoverable. Ordinary global feedback
 belongs to Activity Center; critical recovery errors may still render outside it.
 
-**Current phase is Business Visual Identity / Artworks — Dockside Golden Reference.**
-This phase is presentation-only and must preserve Save v17 / CE1, GameState, economy,
-balance, gates, RNG, localization and runtime authority. Generated candidates remain
-review material until explicitly approved; only then may an optimized runtime asset
-be integrated and used as the style authority for the remaining Businesses.
+**Current phase is Operations Page Overhaul.** It is presentation-only and must preserve
+Save v17 / CE1, GameState, economy, balance, gates, automation authority, RNG,
+localization and runtime behavior. Further Business artwork is blocked until this page
+is technically green and manually accepted live.

@@ -33,38 +33,32 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
   const description = localizedContent(locale, definition.id, 'description', definition.description);
   const isDockside = definition.id === STARTER_BUSINESS.id;
 
-  return (
-    <section className={`panel business-card ${isDockside ? 'dockside-reference' : ''} ${owned ? 'is-owned' : ''}`} aria-labelledby={headingId}>
-      {isDockside && <div className="dockside-card-art" aria-hidden="true"><img src={docksideArtwork} alt="" loading="lazy" decoding="async" /></div>}
-      <div className="business-content">
-        <div className="panel-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
-        <h3 id={headingId}>{definition.name}</h3>
-        {isDockside && <p className="dockside-tagline">{text('Clean cars. Dirty money.', 'Saubere Autos. Schmutziges Geld.')}</p>}
-        {progress && <p className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</p>}
-        <p className="business-description">{description}</p>
-        <div className="business-terms">
-          {!owned && <div><span className="metric-label">{text('Purchase price', 'Kaufpreis')}</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
-          <div className={view.live ? 'production is-live production-readout' : 'production production-readout'}>
-            <span className="metric-label"><span className="status-dot" aria-hidden="true" />{view.productionLabel}</span>
-            <strong>{view.live ? '+' : ''}<RateValue text={formatProduction(progress?.production ?? definition.baseProductionCentsPerSecond)} /></strong>
-            {paused && <span className="rate-note">{text('Effective rate · currently inactive', 'Effektive Rate · aktuell inaktiv')}</span>}
-          </div>
-        </div>
-        {!owned && requirements && <RequirementList result={requirements} id={`${definition.id}-requirements`} />}
-        {progress && <div className="business-terms">
-          <div><span className="metric-label">{text('Next level', 'Nächstes Level')}</span><strong>{progress.nextProduction ? <RateValue text={formatProduction(progress.nextProduction)} /> : text('MAX LEVEL', 'MAX-LEVEL')}</strong></div>
-          {progress.upgradeCost && <div><span className="metric-label">{text('Next upgrade price', 'Nächster Upgrade-Preis')}</span><strong>{formatPrice(progress.upgradeCost)}</strong></div>}
-        </div>}
-        {progress && progress.modifiers.length > 0 && (isDockside ? <details className="dockside-breakdown"><summary>{text('Earnings details', 'Einnahmen-Details')}</summary><p>{text(`Base at Level ${progress.level}:`, `Basis auf Level ${progress.level}:`)} <RateValue text={formatProduction(progress.baseProduction)} /></p><ModifierBreakdown modifiers={progress.modifiers} /><p>{text('Effective:', 'Effektiv:')} <RateValue text={formatProduction(progress.production)} /></p></details> : <div className="purchase-note"><p>{text(`Base at Level ${progress.level}:`, `Basis auf Level ${progress.level}:`)} <RateValue text={formatProduction(progress.baseProduction)} /></p><ModifierBreakdown modifiers={progress.modifiers} /><p>{text('Effective:', 'Effektiv:')} <RateValue text={formatProduction(progress.production)} /></p></div>)}
-        <div className="card-action-area">
-          <button className="action-button purchase-button" disabled={view.disabled} onClick={progress ? onUpgrade : onPurchase}
-            aria-label={progress ? text(`Upgrade ${definition.name}${progress.upgradeCost === null ? ', maximum level reached' : ` to Level ${progress.level + 1}`}`, `${definition.name} upgraden${progress.upgradeCost === null ? ', Max-Level erreicht' : ` auf Level ${progress.level + 1}`}`) : text(`Acquire ${definition.name}`, `${definition.name} übernehmen`)}
-            aria-describedby={view.note ? noteId : undefined}>
-            <span>{view.buttonLabel}</span>{!view.disabled && <span aria-hidden="true">↗</span>}
-          </button>
-          {view.note && <p id={noteId} className="purchase-note">{view.note}</p>}
-        </div>
+  return <section className={`panel business-card operations-business-card ${owned ? 'is-owned' : ''}`} aria-labelledby={headingId}>
+    {isDockside && <div className="business-card-art" aria-hidden="true"><img src={docksideArtwork} alt="" loading="lazy" decoding="async" /></div>}
+    <div className="business-content">
+      <div className="panel-heading business-card-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
+      <div className="business-title-row"><div><h3 id={headingId}>{definition.name}</h3>{isDockside && <p className="dockside-tagline">{text('Clean cars. Dirty money.', 'Saubere Autos. Schmutziges Geld.')}</p>}</div>{progress && <span className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
+      <p className="business-description">{description}</p>
+
+      <div className="business-stat-grid">
+        {!owned && <div><span>{text('Purchase price', 'Kaufpreis')}</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
+        <div className={view.live ? 'is-live' : ''}><span>{view.productionLabel}</span><strong>{view.live ? '+' : ''}<RateValue text={formatProduction(progress?.production ?? definition.baseProductionCentsPerSecond)} /></strong></div>
+        {progress && <div><span>{text('Next level', 'Nächstes Level')}</span><strong>{progress.nextProduction ? <RateValue text={formatProduction(progress.nextProduction)} /> : text('MAX LEVEL', 'MAX-LEVEL')}</strong></div>}
+        {progress?.upgradeCost && <div><span>{text('Upgrade', 'Upgrade')}</span><strong>{formatPrice(progress.upgradeCost)}</strong></div>}
       </div>
-    </section>
-  );
+
+      {!owned && requirements && <RequirementList result={requirements} id={`${definition.id}-requirements`} />}
+      {progress && progress.modifiers.length > 0 && <details className="operations-disclosure earnings-disclosure"><summary>{text('Earnings details', 'Einnahmen-Details')}</summary><div className="operations-disclosure-body"><p>{text(`Base at Level ${progress.level}:`, `Basis auf Level ${progress.level}:`)} <strong><RateValue text={formatProduction(progress.baseProduction)} /></strong></p><ModifierBreakdown modifiers={progress.modifiers} /><p>{text('Effective:', 'Effektiv:')} <strong><RateValue text={formatProduction(progress.production)} /></strong></p></div></details>}
+
+      <div className="card-action-area business-card-action">
+        <button className="action-button purchase-button" disabled={view.disabled} onClick={progress ? onUpgrade : onPurchase}
+          aria-label={progress ? text(`Upgrade ${definition.name}${progress.upgradeCost === null ? ', maximum level reached' : ` to Level ${progress.level + 1}`}`, `${definition.name} upgraden${progress.upgradeCost === null ? ', Max-Level erreicht' : ` auf Level ${progress.level + 1}`}`) : text(`Acquire ${definition.name}`, `${definition.name} übernehmen`)}
+          aria-describedby={view.note ? noteId : undefined}>
+          <span>{view.buttonLabel}</span>{!view.disabled && <span aria-hidden="true">↗</span>}
+        </button>
+        {paused && <span className="rate-note">{text('Session paused', 'Session pausiert')}</span>}
+        {view.note && <p id={noteId} className="purchase-note">{view.note}</p>}
+      </div>
+    </div>
+  </section>;
 }
