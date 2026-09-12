@@ -1,0 +1,22 @@
+/* Solara City branding layer. Presentation only; no gameplay authority. */
+.solara-brand { display: inline-flex; align-items: center; gap: .72rem; min-width: 0; }
+.solara-symbol { position: relative; display: inline-grid; place-items: center; width: 2.45rem; height: 2.45rem; flex: 0 0 auto; overflow: hidden; border: 1px solid color-mix(in srgb, var(--color-warm) 70%, var(--color-border)); border-radius: .72rem; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--color-warm) 28%, transparent), transparent 47%), linear-gradient(155deg, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 65%), var(--color-background); box-shadow: 0 0 0 1px #ffffff05 inset, 0 0 26px color-mix(in srgb, var(--color-warm) 14%, transparent); }
+.solara-sun { position: absolute; top: .48rem; width: .92rem; height: .92rem; border-radius: 50%; background: linear-gradient(145deg, var(--color-warm), var(--color-accent)); box-shadow: 0 0 18px color-mix(in srgb, var(--color-warm) 52%, transparent); }
+.solara-horizon { position: absolute; left: .38rem; right: .38rem; bottom: .49rem; height: .46rem; border-top: 2px solid var(--color-cool); transform: skewX(-18deg); }
+.solara-horizon::before, .solara-horizon::after { content: ''; position: absolute; top: .12rem; height: 1px; background: color-mix(in srgb, var(--color-cool) 68%, transparent); }
+.solara-horizon::before { left: .12rem; width: 65%; }
+.solara-horizon::after { right: .02rem; top: .28rem; width: 42%; }
+.solara-wordmark { display: grid; line-height: .86; text-transform: uppercase; }
+.solara-wordmark strong { font-size: .88rem; font-weight: 820; letter-spacing: .19em; color: var(--color-text); }
+.solara-wordmark span { margin-top: .3rem; font-size: .53rem; font-weight: 720; letter-spacing: .5em; color: var(--color-warm); }
+.app-header { background: linear-gradient(90deg, color-mix(in srgb, var(--color-warm) 4%, transparent), transparent 28%, transparent 72%, color-mix(in srgb, var(--color-cool) 4%, transparent)); }
+.app-header .edition { margin-right: auto; padding-left: .15rem; }
+.app-footer::before { content: 'SC'; display: inline-grid; place-items: center; width: 1.55rem; height: 1.55rem; margin-right: .45rem; border: 1px solid color-mix(in srgb, var(--color-warm) 58%, var(--color-border)); border-radius: .42rem; color: var(--color-warm); font-size: .48rem; font-weight: 800; letter-spacing: -.02em; }
+@media (max-width: 740px) {
+  .solara-symbol { width: 2.15rem; height: 2.15rem; border-radius: .62rem; }
+  .solara-wordmark strong { font-size: .77rem; letter-spacing: .16em; }
+  .solara-wordmark span { font-size: .48rem; letter-spacing: .42em; }
+  .app-header .edition { order: 3; flex-basis: 100%; padding-left: 3rem; margin-top: -.45rem; }
+}
+@media (max-width: 420px) { .app-header .edition { display: none; } }
+@media (prefers-reduced-motion: reduce) { .solara-symbol, .solara-sun { transition: none; } }
