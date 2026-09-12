@@ -27,6 +27,7 @@ import './sections.css';
 import './SettingsPanel.css';
 import './Hud2.css';
 import './Branding.css';
+import './BusinessVisualIdentity.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
 export function App() { return <GameShell game={useGame()} />; }

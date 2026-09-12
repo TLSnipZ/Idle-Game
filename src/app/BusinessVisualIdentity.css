@@ -1,0 +1,16 @@
+/* Dockside Golden Reference support styles. Presentation-only. */
+.equipment-section { margin-top: var(--space-xl); padding: var(--space-lg); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: linear-gradient(180deg, #0b1723, #08121c); box-shadow: 0 16px 40px #0005; }
+.equipment-section > h2 { margin-top: 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: .045em; }
+.equipment-section > p { color: var(--color-secondary); }
+.equipment-section .upgrade-catalog { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--space-sm); }
+.equipment-section .upgrade-panel { display: flex; flex-direction: column; min-width: 0; padding: var(--space-md); border: 1px solid var(--color-border); border-top: 2px solid var(--color-cool); border-radius: var(--radius-card); background: #07111b; box-shadow: none; }
+.equipment-section .upgrade-panel:has(.ownership-badge.is-owned) { border-color: color-mix(in srgb, var(--color-success) 55%, var(--color-border)); background: linear-gradient(180deg, #0b1b20, #07111b); }
+.equipment-section .upgrade-panel h3 { margin-block: .25rem var(--space-sm); font-size: 1rem; line-height: 1.2; }
+.equipment-section .upgrade-panel > p { margin-block: .35rem; color: var(--color-secondary); font-size: .8rem; line-height: 1.45; }
+.equipment-section .upgrade-panel .production { color: var(--color-cool); font-weight: 700; }
+.equipment-section .upgrade-panel .requirements { font-size: .75rem; }
+.equipment-section .upgrade-panel .action-button { margin-top: auto; min-height: 44px; }
+@media (max-width: 740px) {
+  .equipment-section { padding: var(--space-md); }
+  .equipment-section .upgrade-catalog { grid-template-columns: minmax(0, 1fr); }
+}
