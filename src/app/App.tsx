@@ -21,10 +21,12 @@ import { translate } from './localization';
 import type { MessageKey } from './localization';
 import { LocalizationProvider } from './LocalizationProvider';
 import { useSettings } from './use-settings';
+import { BrandLockup } from './BrandLockup';
 import './App.css';
 import './sections.css';
 import './SettingsPanel.css';
 import './Hud2.css';
+import './Branding.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
 export function App() { return <GameShell game={useGame()} />; }
@@ -72,7 +74,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const dashboard = dashboardPresentation(game.snapshot.state);
   return <LocalizationProvider locale={preferences.settings.locale}><div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>{t('skip')}</a>
-    <header className="app-header"><span className="wordmark">{CITY_NAME}</span><span className="edition">{t('tagline')}</span><div className="header-actions">{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">{t('autosave')}</span>}<button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
+    <header className="app-header"><BrandLockup /><span className="edition">{t('tagline')}</span><div className="header-actions">{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">{t('autosave')}</span>}<button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
     <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} newsMessage={game.feedback.message} t={t} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
       <RebirthNotice preview={dashboard.empire} onReview={() => { setActive(SECTION.empire.id); setReviewRequest(request => request + 1); }} />
