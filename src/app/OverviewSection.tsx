@@ -7,6 +7,7 @@ import type { Navigate } from './navigation';
 import { heatPresentation } from './heat-presentation';
 import { PlayerProgress } from './PlayerProgress';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
+import { localizedContent } from './content-localization';
 export function OverviewSection({ state, paused, onNavigate }: {
   readonly state: GameState; readonly paused: boolean; readonly onNavigate: Navigate;
 }) {
@@ -14,6 +15,7 @@ export function OverviewSection({ state, paused, onNavigate }: {
   const text = useLocalizedText();
   const view = dashboardPresentation(state);
   const heat = heatPresentation(state, locale);
+  const eventName = view.event.pending ? localizedContent(locale, view.event.pending.id, 'name', view.event.pending.name) : null;
   return <div className="overview-command">
     <article className="panel summary-card overview-economy"><h2>{text('ECONOMY', 'KOHLE & KONSEQUENZEN')}</h2><p className="summary-value">{view.cash}</p>
       <p>{text('Current total business production:', 'Aktuelle Gesamtproduktion deiner völlig seriösen Betriebe:')} <strong><RateValue text={view.production} /></strong>{paused && text(' · Session paused', ' · Session pausiert')}</p>
@@ -27,7 +29,7 @@ export function OverviewSection({ state, paused, onNavigate }: {
     <article className="panel summary-card overview-empire"><h2>{text('EMPIRE', 'IMPERIUM')}</h2><p className="summary-value">{formatInteger(view.empire.empirePoints)} EP</p>
       <p>{text('Rebirths:', 'Rebirths:')} {formatInteger(view.empire.rebirthCount)}</p><p>{view.empire.eligible ? text('Rebirth requirements met — the reset button is wearing a suit now.', 'Rebirth-Voraussetzungen erfüllt — der Reset-Knopf trägt jetzt Anzug.') : text('Build toward your next Rebirth. Temporary money, permanent ego.', 'Arbeite auf den nächsten Rebirth hin. Temporäres Geld, permanentes Ego.')}</p>
       <button className="action-button section-shortcut" onClick={() => onNavigate(SECTION.empire.id)}>{text('VIEW EMPIRE', 'IMPERIUM ÖFFNEN')}</button></article>
-    <article className={`panel summary-card overview-event ${view.event.pending ? 'is-pending' : 'is-idle'}`}><h2>{text('CITY EVENT', 'STADTEVENT')}</h2><p>{view.event.pending?.name ?? text('No active event', 'Kein aktives Event')}</p>
+    <article className={`panel summary-card overview-event ${view.event.pending ? 'is-pending' : 'is-idle'}`}><h2>{text('CITY EVENT', 'STADTEVENT')}</h2><p>{eventName ?? text('No active event', 'Kein aktives Event')}</p>
       <p>{view.event.pending ? text('A choice is waiting in City. Your operation keeps earning while consequences queue politely.', 'In der Stadt wartet eine Entscheidung. Dein Laden verdient weiter, während die Konsequenzen höflich Schlange stehen.') : text(`Next opportunity: ${view.event.countdown} · Solara may manufacture a new problem when the timer ends.`, `Nächste Gelegenheit: ${view.event.countdown} · Danach produziert Solara vielleicht wieder ein Problem mit Geschäftsmodell.`)}</p>
       {view.event.pending && <button className="action-button section-shortcut" onClick={() => onNavigate(SECTION.city.id)}>{text('VIEW EVENT', 'EVENT ANSEHEN')}</button>}</article>
     <article className="panel summary-card overview-crew"><h2>{text('CREW', 'CREW')}</h2><p>{text('Recruited:', 'Rekrutiert:')} {view.crew.recruitedCrewCount} / {view.crew.totalConfiguredCrew}</p>
