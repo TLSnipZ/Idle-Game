@@ -33,15 +33,17 @@ export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
   const storageError = persistence.kind === 'blocked' || persistence.kind === 'error' || persistence.kind === 'offline-error';
   const achievements = achievementEvent ? ACHIEVEMENT_CATALOG.filter(item => achievementEvent.ids.includes(item.id))
     .map(item => localizedContent(locale, item.id, 'name', item.name)) : [];
-  return <aside className="global-feedback" aria-label={text('Session feedback', 'Session-Rückmeldungen')} tabIndex={0}>
-    <div className={`feedback-command feedback-${feedback.tone ?? 'info'}`} role="status" aria-live="polite" aria-atomic="true"><span key={feedback.sequence}>{feedback.message}</span></div>
-    <div className="feedback-achievement" role="status" aria-live="polite" aria-atomic="true">{achievementEvent && achievements.length > 0 && <span key={achievementEvent.sequence}>{text(achievements.length === 1 ? 'ACHIEVEMENT UNLOCKED' : 'ACHIEVEMENTS UNLOCKED', achievements.length === 1 ? 'ACHIEVEMENT FREIGESCHALTET' : 'ACHIEVEMENTS FREIGESCHALTET')} — {achievements.join(' · ')}</span>}</div>
-    <div role="status" aria-live="polite" aria-atomic="true">{levelEvent && !paused && <span key={levelEvent.sequence}>{describeLevelIncrease(levelEvent, locale)}{levelEvent.unlocks?.length ? ` · ${text('New unlock available:', 'Neue Freischaltung:')} ${levelEvent.unlocks.map(name => localizedUnlock(name, locale)).join(', ')}` : ''}</span>}</div>
-    <div className="feedback-event" role="status" aria-live="polite" aria-atomic="true">{cityEvent && cityEvent.id === game.snapshot.state.events.pendingEventId && <span key={cityEvent.sequence}>{describeEventSpawn(cityEvent.id, locale)}</span>}</div>
-    <div>{automationEvent && !paused && <span>{text('Last dispatch:', 'Letzter Dispatch:')} {describeAutomatedJobs(automationEvent, locale)}</span>}</div>
-    {transferMessage && <p role="status">{transferMessage}</p>}
-    {rebirthMessage && <p role="status">{rebirthMessage}</p>}
-    <div role="alert">{paused && <div className="runtime-error"><strong>{text('Session paused. Production has stopped.', 'Session pausiert. Produktion steht. Selbst das fragwürdigste Imperium braucht manchmal Neustart.')}</strong><p>{text('Reload to restore the last available local save. Unsaved progress may be lost.', 'Neu laden, um den letzten verfügbaren lokalen Save wiederherzustellen. Ungespeicherter Fortschritt könnte verloren gehen.')}</p></div>}</div>
-    <div role="status" aria-live="polite" aria-atomic="true" className={storageError ? 'runtime-error' : undefined}>{storageError ? describePersistence(persistence, locale) : ''}</div>
+  return <aside className="global-feedback legacy-feed-announcer" aria-label={text('Session feedback', 'Session-Rückmeldungen')}>
+    <div className="legacy-feed-announcements">
+      <div className={`feedback-command feedback-${feedback.tone ?? 'info'}`} role="status" aria-live="polite" aria-atomic="true"><span key={feedback.sequence}>{feedback.message}</span></div>
+      <div className="feedback-achievement" role="status" aria-live="polite" aria-atomic="true">{achievementEvent && achievements.length > 0 && <span key={achievementEvent.sequence}>{text(achievements.length === 1 ? 'ACHIEVEMENT UNLOCKED' : 'ACHIEVEMENTS UNLOCKED', achievements.length === 1 ? 'ACHIEVEMENT FREIGESCHALTET' : 'ACHIEVEMENTS FREIGESCHALTET')} — {achievements.join(' · ')}</span>}</div>
+      <div role="status" aria-live="polite" aria-atomic="true">{levelEvent && !paused && <span key={levelEvent.sequence}>{describeLevelIncrease(levelEvent, locale)}{levelEvent.unlocks?.length ? ` · ${text('New unlock available:', 'Neue Freischaltung:')} ${levelEvent.unlocks.map(name => localizedUnlock(name, locale)).join(', ')}` : ''}</span>}</div>
+      <div className="feedback-event" role="status" aria-live="polite" aria-atomic="true">{cityEvent && cityEvent.id === game.snapshot.state.events.pendingEventId && <span key={cityEvent.sequence}>{describeEventSpawn(cityEvent.id, locale)}</span>}</div>
+      <div role="status" aria-live="polite">{automationEvent && !paused && <span>{text('Last dispatch:', 'Letzter Dispatch:')} {describeAutomatedJobs(automationEvent, locale)}</span>}</div>
+      {transferMessage && <p role="status">{transferMessage}</p>}
+      {rebirthMessage && <p role="status">{rebirthMessage}</p>}
+    </div>
+    {paused && <div role="alert" className="runtime-error"><strong>{text('Session paused. Production has stopped.', 'Session pausiert. Produktion steht. Selbst das fragwürdigste Imperium braucht manchmal Neustart.')}</strong><p>{text('Reload to restore the last available local save. Unsaved progress may be lost.', 'Neu laden, um den letzten verfügbaren lokalen Save wiederherzustellen. Ungespeicherter Fortschritt könnte verloren gehen.')}</p></div>}
+    {storageError && <div role="status" aria-live="polite" aria-atomic="true" className="runtime-error">{describePersistence(persistence, locale)}</div>}
   </aside>;
 }
