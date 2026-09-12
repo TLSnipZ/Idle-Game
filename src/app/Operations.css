@@ -83,7 +83,6 @@
 
 @media (max-width: 740px) {
   .operations-page { gap: var(--space-lg); }
-  .operations-tabs { position: sticky; top: 10.2rem; z-index: 4; }
   .operations-tabs button { padding-inline: .45rem; font-size: .68rem; letter-spacing: .045em; }
   .operations-section-heading { align-items: flex-start; }
   .business-heading-row { align-items: stretch; flex-direction: column; }
