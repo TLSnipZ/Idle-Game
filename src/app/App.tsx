@@ -3,7 +3,7 @@ import { CITY_NAME } from '../features/territories';
 import { getOfflineCapMs } from '../game/offline-cap';
 import { formatOfflineDuration } from './offline-presentation';
 import { OfflineReturn } from './OfflineReturn';
-import { useGame } from './use-game';
+import { setGamePresentationLocale, useGame } from './use-game';
 import { useSaveManagement } from './SaveManagement';
 import { useRebirthControls } from './RebirthPanel';
 import { DEFAULT_SECTION, PRIMARY_SECTIONS, SECTION } from './navigation';
@@ -48,7 +48,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const handledReview = useRef(0);
   const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
   const handledObjective = useRef(0);
-  useEffect(() => { game.setPresentationLocale(preferences.settings.locale); }, [game.setPresentationLocale, preferences.settings.locale]);
+  useEffect(() => { setGamePresentationLocale(preferences.settings.locale); }, [preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
       const requested = document.getElementById(objectiveRequest.headingId);
