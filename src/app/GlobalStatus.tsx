@@ -32,7 +32,7 @@ export function GlobalStatus({ view, active, onNavigate, paused, t = defaultTran
           <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>{t('heat')}</dt><dd>{view.heat.heat} · {heatTierLabel(view.heat.tier.label, locale)}</dd></div>
           <div className="hud-empire"><dt>{t('empirePoints')}</dt><dd>{formatInteger(view.empire.empirePoints)} EP</dd></div>
         </dl>
-        <div className={`activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
+        <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
           <div className="activity-center-heading"><span>{text('ACTIVITY CENTER', 'AKTIVITÄTSZENTRALE')}</span><strong>{activities ? text(`${activities} live`, `${activities} aktiv`) : text('ALL QUIET', 'ALLES RUHIG')}</strong></div>
           <div className="activity-center-items">
             {view.event.pending && <button type="button" className="activity-item activity-event" onClick={() => onNavigate(SECTION.city.id)}><span>{t('cityEventActive')}</span><strong>{eventName}</strong></button>}
