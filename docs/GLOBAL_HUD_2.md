@@ -8,6 +8,7 @@ Global HUD 2.0 compresses the always-visible command layer without changing game
 
 The new Activity Center consolidates high-value global situations:
 
+- latest command/session feedback -> rendered inside Activity Center
 - pending City Event -> navigates to City
 - enabled Business Auto-Upgrader -> navigates to Operations
 - Rebirth eligibility and current EP reward -> navigates to Empire
@@ -15,6 +16,12 @@ The new Activity Center consolidates high-value global situations:
 - quiet state -> compact localized idle copy
 
 All copy follows the English/German Solara localization voice contract.
+
+## Legacy feed retirement
+
+The pre-HUD-2 `GlobalFeedback` visual feed is retired. Normal action, achievement, level, event and automation announcements no longer render as a second visible news strip below the HUD. The live-region announcers remain visually hidden for assistive technology and compatibility, while ordinary latest command feedback is surfaced in Activity Center. Runtime and storage-critical errors remain allowed to render visibly outside the Activity Center because hiding recovery information would be unsafe UX.
+
+There must be exactly one normal global news/activity surface: **Activity Center**.
 
 ## Architecture contract
 
@@ -35,7 +42,8 @@ The legacy `.global-indicators` selector remains on the Activity Center as a com
 3. live desktop/mobile presentation was manually accepted;
 4. Event, Auto-Upgrader and Rebirth Activity Center items remain navigation-only;
 5. EN/DE copy remains localized under the Solara voice contract;
-6. Save v17 / CE1 and gameplay authority remain unchanged.
+6. Save v17 / CE1 and gameplay authority remain unchanged;
+7. legacy visible newsfeed is removed; Activity Center is the sole normal global activity/news surface.
 
 ## Handoff
 

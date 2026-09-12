@@ -73,7 +73,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   return <LocalizationProvider locale={preferences.settings.locale}><div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>{t('skip')}</a>
     <header className="app-header"><span className="wordmark">{CITY_NAME}</span><span className="edition">{t('tagline')}</span><div className="header-actions">{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">{t('autosave')}</span>}<button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
-    <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} t={t} />
+    <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} newsMessage={game.feedback.message} t={t} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
       <RebirthNotice preview={dashboard.empire} onReview={() => { setActive(SECTION.empire.id); setReviewRequest(request => request + 1); }} />
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />

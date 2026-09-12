@@ -12,17 +12,18 @@ import { localizedContent } from './content-localization';
 
 const defaultTranslate = (key: MessageKey) => translate(DEFAULT_LOCALE, key);
 
-export function GlobalStatus({ view, active, onNavigate, paused, t = defaultTranslate }: {
+export function GlobalStatus({ view, active, onNavigate, paused, newsMessage = '', t = defaultTranslate }: {
   readonly view: ReturnType<typeof dashboardPresentation>;
   readonly active: SectionId;
   readonly onNavigate: Navigate;
   readonly paused: boolean;
+  readonly newsMessage?: string;
   readonly t?: (key: MessageKey) => string;
 }) {
   const locale = useLocale();
   const text = useLocalizedText();
   const eventName = view.event.pending ? localizedContent(locale, view.event.pending.id, 'name', view.event.pending.name) : '';
-  const activities = Number(Boolean(view.event.pending)) + Number(view.autoActive) + Number(paused) + Number(view.empire.eligible);
+  const activities = Number(Boolean(view.event.pending)) + Number(view.autoActive) + Number(paused) + Number(view.empire.eligible) + Number(Boolean(newsMessage));
   return <div className="global-chrome">
     <div className="global-chrome-inner">
       <div className="hud-command-row">
@@ -35,6 +36,7 @@ export function GlobalStatus({ view, active, onNavigate, paused, t = defaultTran
         <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
           <div className="activity-center-heading"><span>{text('ACTIVITY CENTER', 'AKTIVITÄTSZENTRALE')}</span><strong>{activities ? text(`${activities} live`, `${activities} aktiv`) : text('ALL QUIET', 'ALLES RUHIG')}</strong></div>
           <div className="activity-center-items">
+            {newsMessage && <div className="activity-item activity-news" role="status"><span>{text('LATEST', 'NEUSTES')}</span><strong>{newsMessage}</strong></div>}
             {view.event.pending && <button type="button" className="activity-item activity-event" onClick={() => onNavigate(SECTION.city.id)}><span>{t('cityEventActive')}</span><strong>{eventName}</strong></button>}
             {view.autoActive && <button type="button" className="activity-item activity-auto" onClick={() => onNavigate(SECTION.operations.id)}><span>{text('AUTOMATION', 'AUTOMATISIERUNG')}</span><strong>{paused ? t('autoPaused') : t('autoActive')}</strong></button>}
             {view.empire.eligible && view.empire.reward !== null && <button type="button" className="activity-item activity-rebirth" onClick={() => onNavigate(SECTION.empire.id)}><span>{text('REBIRTH READY', 'REBIRTH BEREIT')}</span><strong>+{formatInteger(view.empire.reward)} EP · {text('your empire has discovered reincarnation', 'dein Imperium hat Wiedergeburt entdeckt')}</strong></button>}
