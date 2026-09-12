@@ -42,12 +42,14 @@ export function createSaveManagement(
   copy: (code: string) => Promise<boolean> = copySaveCode,
   locale: Locale = DEFAULT_LOCALE,
 ) {
+  let currentLocale = locale;
   let state = INITIAL_SAVE_MANAGEMENT;
   let pending: string | null = null;
   let revision = 0;
   const update = (patch: Partial<SaveManagementState>) => {
     state = { ...state, ...patch }; publish(state);
   };
+  function setLocale(next: Locale) { currentLocale = next; }
   function edit(input: string) {
     revision++; pending = null;
     update({ input, confirming: false, invalidInput: false, message: '' });
@@ -55,36 +57,36 @@ export function createSaveManagement(
   function exportCode() {
     revision++;
     const result = actions.exportCode();
-    update(result.ok ? { exported: result.code, message: localize(locale, 'Save code ready. Copy it or select the text manually.', 'Save-Code bereit. Kopieren oder manuell markieren — diskrete Übergabe inklusive.') }
-      : { message: failure(result.error, locale) });
+    update(result.ok ? { exported: result.code, message: localize(currentLocale, 'Save code ready. Copy it or select the text manually.', 'Save-Code bereit. Kopieren oder manuell markieren — diskrete Übergabe inklusive.') }
+      : { message: failure(result.error, currentLocale) });
   }
   async function copyCode() {
     if (!state.exported) return;
     const current = ++revision;
     const copied = await copy(state.exported);
-    if (revision === current) update({ message: copied ? localize(locale, 'Save code copied.', 'Save-Code kopiert. Übergabe erfolgreich.')
-      : localize(locale, 'Clipboard unavailable. Your code is still below; select and copy it manually.', 'Zwischenablage nicht verfügbar. Der Code steht noch unten — Handarbeit, wie früher.') });
+    if (revision === current) update({ message: copied ? localize(currentLocale, 'Save code copied.', 'Save-Code kopiert. Übergabe erfolgreich.')
+      : localize(currentLocale, 'Clipboard unavailable. Your code is still below; select and copy it manually.', 'Zwischenablage nicht verfügbar. Der Code steht noch unten — Handarbeit, wie früher.') });
   }
   function validate() {
     revision++;
     const result = validateSaveCode(state.input);
     pending = result.ok ? state.input : null;
-    update({ confirming: result.ok, invalidInput: !result.ok, message: result.ok ? localize(locale, 'Valid save. Confirm below to replace current progress.', 'Gültiger Save. Unten bestätigen, um den aktuellen Fortschritt zu ersetzen. Der Notar wurde nicht eingeladen.') : failure(result.error, locale) });
+    update({ confirming: result.ok, invalidInput: !result.ok, message: result.ok ? localize(currentLocale, 'Valid save. Confirm below to replace current progress.', 'Gültiger Save. Unten bestätigen, um den aktuellen Fortschritt zu ersetzen. Der Notar wurde nicht eingeladen.') : failure(result.error, currentLocale) });
   }
   function cancel() {
     revision++; pending = null;
-    update({ confirming: false, message: localize(locale, 'Import cancelled. Current progress was not replaced.', 'Import abgebrochen. Aktueller Fortschritt bleibt. Datenintegrität durch kalte Füße.') });
+    update({ confirming: false, message: localize(currentLocale, 'Import cancelled. Current progress was not replaced.', 'Import abgebrochen. Aktueller Fortschritt bleibt. Datenintegrität durch kalte Füße.') });
   }
   function confirm() {
     if (pending === null) return;
     revision++;
     const result = actions.importCode(pending);
     pending = null;
-    update({ confirming: false, message: result.ok ? localize(locale, 'Save imported and stored locally. No offline income added.', 'Save importiert und lokal gespeichert. Keine Offline-Einnahmen gutgeschrieben — doppelte Buchführung gibt’s nur im Witz.') : failure(result.error, locale) });
+    update({ confirming: false, message: result.ok ? localize(currentLocale, 'Save imported and stored locally. No offline income added.', 'Save importiert und lokal gespeichert. Keine Offline-Einnahmen gutgeschrieben — doppelte Buchführung gibt’s nur im Witz.') : failure(result.error, currentLocale) });
   }
   function clear() {
     revision++; pending = null;
     state = INITIAL_SAVE_MANAGEMENT; publish(state);
   }
-  return { clear, edit, exportCode, copyCode, validate, cancel, confirm, getSnapshot: () => state };
+  return { setLocale, clear, edit, exportCode, copyCode, validate, cancel, confirm, getSnapshot: () => state };
 }
