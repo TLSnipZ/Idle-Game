@@ -10,6 +10,8 @@ import { formatPrice } from './number-format';
 import { businessPresentation } from './game-presentation';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
+import { BusinessArtwork } from './BusinessArtwork';
+import { findBusinessArtwork } from './business-artwork';
 
 interface BusinessCardProps {
   readonly definition?: BusinessDefinition;
@@ -31,8 +33,10 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
   const subtitle = localizedContent(locale, definition.id, 'subtitle', definition.subtitle ?? 'Business');
   const description = localizedContent(locale, definition.id, 'description', definition.description);
   const isDockside = definition.id === STARTER_BUSINESS.id;
+  const artwork = findBusinessArtwork(definition.id);
 
   return <section className={`panel business-card operations-business-card ${owned ? 'is-owned' : ''}`} aria-labelledby={headingId}>
+    {artwork && <BusinessArtwork key={artwork.src} artwork={artwork} />}
     <div className="business-content">
       <div className="panel-heading business-card-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
       <div className="business-title-row"><div><h3 id={headingId}>{definition.name}</h3>{isDockside && <p className="dockside-tagline">{text('Clean cars. Dirty money.', 'Saubere Autos. Schmutziges Geld.')}</p>}</div>{progress && <span className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
