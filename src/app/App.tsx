@@ -22,6 +22,7 @@ import type { MessageKey } from './localization';
 import { useSettings } from './use-settings';
 import './App.css';
 import './sections.css';
+import './SettingsPanel.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
 export function App() { return <GameShell game={useGame()} />; }
