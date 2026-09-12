@@ -4,14 +4,17 @@ import { Navigation } from './Navigation';
 import { HudPlayerProgress } from './HudPlayerProgress';
 import { SECTION } from './navigation';
 import type { Navigate, SectionId } from './navigation';
+import { DEFAULT_LOCALE, translate } from './localization';
 import type { MessageKey } from './localization';
 
-export function GlobalStatus({ view, active, onNavigate, paused, t }: {
+const defaultTranslate = (key: MessageKey) => translate(DEFAULT_LOCALE, key);
+
+export function GlobalStatus({ view, active, onNavigate, paused, t = defaultTranslate }: {
   readonly view: ReturnType<typeof dashboardPresentation>;
   readonly active: SectionId;
   readonly onNavigate: Navigate;
   readonly paused: boolean;
-  readonly t: (key: MessageKey) => string;
+  readonly t?: (key: MessageKey) => string;
 }) {
   return <div className="global-chrome">
     <div className="global-chrome-inner">
