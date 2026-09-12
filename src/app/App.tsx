@@ -38,8 +38,8 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const preferences = useSettings();
   const t = (key: MessageKey) => translate(preferences.settings.locale, key);
-  const save = useSaveManagement(game.saveActions);
-  const rebirth = useRebirthControls(game.rebirth);
+  const save = useSaveManagement(game.saveActions, preferences.settings.locale);
+  const rebirth = useRebirthControls(game.rebirth, preferences.settings.locale);
   const heading = useRef<HTMLHeadingElement>(null);
   const main = useRef<HTMLElement>(null);
   const captureAction = useActionFocus();
