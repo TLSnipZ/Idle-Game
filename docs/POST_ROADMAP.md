@@ -60,12 +60,17 @@ Phase 9B accessibility remain preserved contracts.
   PR #8 retired the duplicate visible legacy newsfeed; ordinary latest feedback now
   belongs to Activity Center while accessibility announcements and critical recovery
   errors remain preserved. See [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
-- **Current hotfix — HUD XP column containment: implemented; merge/Pages/live acceptance pending.**
+- **HUD XP column containment: merged in PR #17; production typecheck/build passed.**
   Reproduced native XP progress overflowing into Heat after PR #16. Only HUD CSS
   changes: fluid contained progress and a separate wrapping XP caption. 35 offline
-  Chromium layout cases passed across EN/DE and 320-2048px; three Vitest regression
-  guards added but not run locally. Operations layout and gameplay remain untouched.
-  Verification and the known out-of-scope text-zoom issue are in [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
+  Chromium layout cases passed before merge; 22 additional checks passed against
+  the freshly built Pages artifact with no injected fix stylesheet. Compiled game
+  JavaScript is byte-identical to the previous build. Three Vitest regression guards
+  were added but the suite was not run locally or by the Pages workflow.
+  Run `34722063196` built commit `68d6bbb21bb8e916a58ed3051fcc54cbe0189f0b` successfully;
+  its deployment was queued at the verification checkpoint. Consult that run for the
+  current Pages status; manual live acceptance remains pending. Operations layout
+  and gameplay are untouched. Details: [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
 - **Solara City Branding: merged in PR #10; live accepted before Business Visual Identity.**
   Canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained shell accents.
   See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
@@ -99,7 +104,7 @@ and the shared camera/lighting/showroom language.
 | --- | --- | --- |
 | Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. Compact-by-default details are live accepted; see GUIDANCE.md. |
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
-| Current hotfix | HUD XP containment | Fluid native XP progress, own caption line and shrink-safe containers; verify before declaring live accepted. |
+| Merged / live review pending | HUD XP containment | PR #17; typecheck/build and browser geometry checks passed. Deployment status is tracked by run 34722063196. |
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
 | Current | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
 | Next | Business Visual Identity | Resume Dockside Golden Reference acceptance after Operations is stable; then remaining Businesses. |
