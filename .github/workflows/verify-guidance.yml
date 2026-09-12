@@ -1,0 +1,96 @@
+name: Verify Guidance
+
+on:
+  push:
+    branches: [work/verify-guidance]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out verification infrastructure
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Restore the reviewed feature commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          candidate="$RUNNER_TEMP/guidance-candidate.bundle"
+          : > "$candidate"
+          for blob in 639ad2cce1050fd124ce69ccb4cf543d33f605cf 2cefaf330e226fe8b9bd0dd03d000046728b4c66 1cd82b1d6a0aa9bd0edad4153a6d8cf9594ae423 a167fbe82d696c5a6cbe4528b789399580256815 ab1ab3b19a94768a96b9b9c2445d127de2ec0ac3 e25d4600bc4a3e2ccd4d2903cca5abc9fa30ab47 76b78875d2cf8ad02f5b0fee19019c5de7c14dc0 d5ee1df350675fd331b4d4d6fd2f971b0d5b0577; do
+            gh api "repos/$GITHUB_REPOSITORY/git/blobs/$blob" --jq .content | base64 --decode >> "$candidate"
+          done
+          echo "5781899960278b8526f65867c002c468f2bd41ad57aa30a4c1b669ee2995bbb0  $candidate" | sha256sum --check
+          git bundle verify "$candidate"
+          git fetch "$candidate" HEAD
+          test "$(git rev-parse FETCH_HEAD)" = 071ac333b96e166242c413e0cbeeccef2592e4f7
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD^)" = 27a6241d27c10b10940a4b9181131a1da3df1452
+          test -z "$(git status --porcelain)"
+          test ! -e .github/workflows/verify-guidance.yml
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Fresh dependency install
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Full test suite
+        run: npm run test
+      - name: Production build
+        run: npm run build
+      - name: Diff and scope check
+        run: |
+          set -euo pipefail
+          git diff --check HEAD^ HEAD
+          git diff --exit-code HEAD^ HEAD -- src/features src/platform src/game/game-state.ts src/game/save-schema.ts src/game/requirements.ts src/game/rebirth.ts src/app/use-game.ts src/app/SectionContent.tsx package.json package-lock.json .nvmrc src/assets .github docs/GAME_DESIGN.md
+          test -z "$(git status --porcelain)"
+          git show --stat --oneline HEAD
+      - name: Prepare verified history
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/guidance-verified"
+          git branch guidance-delivery HEAD
+          git bundle create "$RUNNER_TEMP/guidance-verified/history.bundle" refs/heads/guidance-delivery
+          git bundle verify "$RUNNER_TEMP/guidance-verified/history.bundle"
+          git rev-parse HEAD > "$RUNNER_TEMP/guidance-verified/COMMIT.txt"
+      - name: Upload verified history
+        uses: actions/upload-artifact@v4
+        with:
+          name: guidance-verified-history
+          path: ${{ runner.temp }}/guidance-verified/
+          retention-days: 30
+          if-no-files-found: error
+
+  publish-feature:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified history
+        uses: actions/download-artifact@v4
+        with:
+          name: guidance-verified-history
+          path: verified
+      - name: Publish feature branch only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git clone --branch guidance-delivery verified/history.bundle guidance-publish
+          cd guidance-publish
+          test "$(git rev-parse HEAD)" = 071ac333b96e166242c413e0cbeeccef2592e4f7
+          git remote set-url origin "https://github.com/$GITHUB_REPOSITORY.git"
+          gh auth setup-git
+          git push origin HEAD:refs/heads/feat/next-objective
