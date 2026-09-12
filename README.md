@@ -51,9 +51,10 @@ Open **Operations** to make your first deliveries and acquire **Dockside Detail*
 | **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
 | **Garage** | Purchase the **Kairo KX-R**, the first canonical Solara vehicle, with its own approved artwork and a permanent ownership bonus. |
 | **Achievements & statistics** | Unlock **six permanent achievements** and track **eight lifetime statistics** across runs. These record progress without adding gameplay bonuses. |
+| **Next Objective** | Follow a suggested progression step with exact Level/Cash requirements, or choose an optional goal. Jump to the relevant card from any section; guidance never purchases or resets anything. |
 | **Offline progress & backups** | Return to credited Business and Dispatcher earnings for up to **8 hours**, extendable to **12 hours** through Never Sleeps. Save locally and transfer progress with **CE1 export/import codes**. |
 
-The interface has five sections: **Overview** for your dashboard, **Operations** for earning and automation, **City** for territories, Heat, crew and events, **Collection** for the Garage, and **Empire** for Rebirth, skills, milestones and save transfer. Operations also has **Jobs / Businesses / Automation** jump navigation.
+The interface has five sections: **Overview** for your dashboard, **Operations** for earning and automation, **City** for territories, Heat, crew and events, **Collection** for the Garage, and **Empire** for Rebirth, skills, milestones and save transfer. Operations also has **Jobs / Businesses / Automation** jump navigation. **Next Objective** is shared across all five sections; its optional goal selection is not saved. See [Guidance](docs/GUIDANCE.md) for its suggested-route policy.
 
 ## Your first permanent garage investment
 
@@ -69,7 +70,7 @@ The current game has **one purchasable vehicle**. Additional models, an Active V
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow. Current saves use **schema v17**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. Current saves use **schema v17**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
@@ -79,7 +80,7 @@ These are **planned directions, not features in the current build**. Scope and o
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | Next-objective guidance, Settings, English/German localization and continued accessibility polish. |
+| **A clearer, more comfortable game** | Settings, English/German localization and continued accessibility polish. |
 | **Global HUD & activity** | A compact sticky HUD, a more usable activity feed and easier access to City Events from anywhere in the interface. |
 | **A stronger Solara identity** | Final logo and favicon, followed by controlled Business artwork batches and richer city presentation. |
 | **A growing Garage** | Active Vehicle selection, the remaining Tier-1 cars and, later, per-vehicle tuning and additional catalog tiers. |

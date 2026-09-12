@@ -2507,3 +2507,21 @@ command feedback. The shared `.card-action-area` supplies 16px separation / 8px
 helper spacing in Operations and City. Native disabled controls remain readable;
 Crew cash copy uses recruitment wording. App's existing local action focus recovery
 and POST 3C jump navigation remain unchanged.
+
+
+## Next Objective / Guidance — read-only composition
+
+`game/guidance.ts` derives one suggested or explicitly tracked objective from
+current catalogs, `evaluateRequirements`, Business costs, XP thresholds and Rebirth
+preview. It recursively exposes one unmet prerequisite with cycle detection;
+existing ownership bypasses acquisition gates. No clock, RNG, persistence,
+reconciliation, reward, or command dispatch belongs to guidance. Money is exact;
+only bounded visual percentages become Numbers.
+
+`NextObjective` is shared outside the active section and holds only an optional
+in-memory goal ID. Existing replacementSequence clears tracking after successful
+Import, Rebirth or New Game. `guidance-presentation.ts` maps read-only destinations
+to existing card headings; GameShell handles explicit focus/scroll once per intent.
+Ordinary state updates do not navigate. UI work does not modify Save v17 / CE1,
+runtime algorithms, content, balance, or the prior confirmation flows. See
+[GUIDANCE.md](GUIDANCE.md) for route policy, integration audit and review limits.
