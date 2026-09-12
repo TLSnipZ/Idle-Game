@@ -60,15 +60,22 @@ Phase 9B accessibility remain preserved contracts.
   PR #8 retired the duplicate visible legacy newsfeed; ordinary latest feedback now
   belongs to Activity Center while accessibility announcements and critical recovery
   errors remain preserved. See [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
+- **Current hotfix — HUD XP column containment: implemented; merge/Pages/live acceptance pending.**
+  Reproduced native XP progress overflowing into Heat after PR #16. Only HUD CSS
+  changes: fluid contained progress and a separate wrapping XP caption. 35 offline
+  Chromium layout cases passed across EN/DE and 320-2048px; three Vitest regression
+  guards added but not run locally. Operations layout and gameplay remain untouched.
+  Verification and the known out-of-scope text-zoom issue are in [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
 - **Solara City Branding: merged in PR #10; live accepted before Business Visual Identity.**
   Canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained shell accents.
   See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
-- **Operations Page Overhaul: implementation in progress before further Business artwork rollout.**
-  Rebuild Jobs, Businesses, Upgrades and Automation as one isolated responsive UX system.
+- **Operations Page Overhaul: merged in PR #15, refined by PR #16; final live acceptance pending.**
+  Jobs, Businesses, Upgrades and Automation use one isolated responsive UX system.
   Desktop uses two Businesses per row; mobile stacks one per row. Secondary reward,
   earnings and mechanics detail move into disclosures while key gameplay truth stays
-  immediately visible. Operations styling is isolated in `Operations.css`; gameplay,
-  Save v17 / CE1 and balance remain unchanged. See [OPERATIONS_OVERHAUL.md](OPERATIONS_OVERHAUL.md).
+  immediately visible. PR #16 removes the unfinished artwork slot and sticky category
+  bar and refines the finance snapshot. Operations styling is in `Operations.css`;
+  gameplay, Save v17 / CE1 and balance remain unchanged. See [OPERATIONS_OVERHAUL.md](OPERATIONS_OVERHAUL.md).
 - **Business Visual Identity / Artworks: paused behind Operations live acceptance.**
   Dockside remains the artwork/crop reference candidate, but no later Business artwork
   is promoted until the rebuilt Operations layout is deployed and manually accepted.
@@ -92,6 +99,7 @@ and the shared camera/lighting/showroom language.
 | --- | --- | --- |
 | Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. Compact-by-default details are live accepted; see GUIDANCE.md. |
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
+| Current hotfix | HUD XP containment | Fluid native XP progress, own caption line and shrink-safe containers; verify before declaring live accepted. |
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
 | Current | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
 | Next | Business Visual Identity | Resume Dockside Golden Reference acceptance after Operations is stable; then remaining Businesses. |
@@ -117,11 +125,12 @@ and deeper city/Empire systems require separate scopes and save compatibility re
 
 The presentation stack is now: full EN/DE Solara voice → compact Global HUD 2.0 /
 Activity Center → compact expandable Next Objective → canonical Solara City branding.
-These surfaces are manually accepted and must remain visually subordinate to gameplay
-content while keeping key state globally discoverable. Ordinary global feedback
-belongs to Activity Center; critical recovery errors may still render outside it.
+These surfaces were manually accepted before the later HUD sizing regression;
+see the current hotfix above. Ordinary global feedback belongs to Activity Center;
+critical recovery errors may still render outside it.
 
-**Current phase is Operations Page Overhaul.** It is presentation-only and must preserve
-Save v17 / CE1, GameState, economy, balance, gates, automation authority, RNG,
-localization and runtime behavior. Further Business artwork is blocked until this page
-is technically green and manually accepted live.
+**Current phase is Operations Page Overhaul acceptance, with the HUD containment hotfix first.**
+All work remains presentation-only and must preserve Save v17 / CE1, GameState,
+economy, balance, gates, automation authority, RNG, localization and runtime behavior.
+Further Business artwork is blocked until the presentation is technically green and
+manually accepted live.
