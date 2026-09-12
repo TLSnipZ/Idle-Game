@@ -1,228 +1,18 @@
-/* Domain compositions. Palette, type and motion remain POST 1A tokens.
-   Shared controls/focus live in App.css/global.css; no visual timers or assets. */
-
-/* HUD: retain five native navigation controls and the existing focus ring. */
-.global-status .hud-cash { background: var(--color-cool-tint); border-radius: var(--radius-control); }
-.primary-navigation { gap: var(--space-sm); }
-
-/* Overview: one economy anchor, supporting progression, then city/legacy. */
-.overview-command { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-lg); }
-.overview-economy { grid-column: span 8; padding: var(--space-lg); background: var(--gradient-surface); border-inline-start: 3px solid var(--color-cool); }
-.overview-economy .summary-value { font-size: clamp(2.4rem, 5vw, 4.5rem); line-height: 1.2; margin-block: var(--space-sm); }
-.overview-economy .section-shortcut { max-width: 28rem; margin-top: var(--space-sm); }
-.overview-player { grid-column: span 4; justify-content: center; }
-.overview-player h3 { font-size: 2rem; }
-.overview-pressure, .overview-empire { grid-column: span 6; }
-.overview-pressure .summary-value { color: inherit; }
-.overview-empire .summary-value { color: var(--color-warm); }
-.overview-event { grid-column: 1 / -1; }
-.overview-event.is-idle { display: block; background: transparent; border: 0; box-shadow: none; padding-block: var(--space-sm); }
-.overview-event.is-idle h2, .overview-event.is-idle p { display: inline; margin-inline-end: var(--space-md); }
-.overview-event.is-pending { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-sm) var(--space-lg); border-inline-start: 3px solid var(--color-accent); background: var(--color-accent-tint); }
-.overview-event.is-pending h2 { grid-column: 1 / -1; }
-.overview-event.is-pending p { margin: 0; }
-.overview-event.is-pending .section-shortcut { grid-column: 2; grid-row: 2 / 4; align-self: center; margin: 0; }
-.overview-crew { grid-column: span 8; }
-.overview-collection { grid-column: span 4; }
-.overview-crew, .overview-collection { border: 0; border-top: 1px solid var(--color-border); background: transparent; box-shadow: none; }
-
-/* Operations: direct work beside the main business; lighter equipment below. */
-.operations-anchor { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr); gap: var(--space-xl); align-items: start; }
-.operations-business { min-width: 0; }
-.operations-business > h2 { margin-top: 0; }
-.starter-panel { border: 0; border-top: 2px solid var(--color-cool); box-shadow: none; }
-.action-outcomes { display: flex; flex-wrap: wrap; gap: var(--space-lg); padding-block: var(--space-sm); border-block: 1px solid var(--color-border); }
-.action-outcomes dt { color: var(--color-secondary); font-size: var(--text-label); text-transform: uppercase; letter-spacing: var(--tracking-label); }
-.action-outcomes dd { margin: var(--space-xs) 0 0; font-variant-numeric: tabular-nums; font-size: 1.2rem; font-weight: 700; }
-.business-card { overflow: visible; border-top: 2px solid var(--color-cool); }
-.garage-scene { border-start-start-radius: var(--radius-card); border-start-end-radius: var(--radius-card); }
-.business-level { display: inline-block; padding: var(--space-xs) var(--space-sm); background: var(--color-cool-tint); border-radius: var(--radius-control); color: var(--color-cool); font-weight: 700; }
-.business-terms:has(> :only-child) { grid-template-columns: minmax(0, 1fr); }
-.production-readout strong { font-size: clamp(1.8rem, 3vw, 2.7rem); }
-.equipment-section { padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
-.equipment-section .upgrade-catalog { grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
-.equipment-section .upgrade-panel { display: flex; flex-direction: column; padding: var(--space-lg); box-shadow: none; }
-.equipment-section .upgrade-panel .action-button { margin-top: auto; }
-.equipment-section .requirements { font-size: .875rem; }
-.equipment-section .requirements p, .equipment-section .requirements ul { margin-block: var(--space-sm); }
-.automation-card { display: flex; flex-direction: column; border-top: 2px solid var(--color-cool); }
-.automation-card .action-button { margin-top: auto; }
-.automation-role { color: var(--color-cool); font-weight: 650; }
-.auto-spend-card { border-top-color: var(--color-warning); }
-.spending-disclosure { padding: var(--space-md); border-inline-start: 3px solid var(--color-warning); background: var(--color-warm-tint); color: var(--color-warning); font-weight: 650; }
-
-/* City: districts and pressure, then assignments/roster and live situations. */
-.district-pressure-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
-.district-zone { min-width: 0; }
-.district-zone > h3 { margin-top: 0; }
-.district-zone .territory-catalog { grid-template-columns: minmax(0, 1fr); }
-.territory-card { border-top: 0; border-inline-start: 2px solid var(--color-border); box-shadow: none; }
-.territory-card.is-owned { border-inline-start-color: var(--color-success); }
-.territory-card h4 { font-family: var(--font-display); font-size: 1.5rem; margin-block: var(--space-sm); }
-.territory-story { max-width: 65ch; }
-.territory-effect { padding-block: var(--space-sm); color: var(--color-cool); }
-.acquisition-warning { color: var(--color-warning); font-weight: 650; }
-.heat-panel { background: var(--gradient-surface); border-top: 3px solid currentColor; border-radius: var(--radius-feature); padding: var(--space-xl); }
-.heat-readout { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-sm); margin-block: var(--space-lg); font-variant-numeric: tabular-nums; }
-.heat-readout strong { font: 750 clamp(3rem, 6vw, 5rem)/1 var(--font-display); }
-.heat-details { color: var(--color-secondary); }
-.heat-penalty { font-weight: 700; color: var(--color-text); }
-.heat-action { border-top: 1px solid var(--color-border); padding-top: var(--space-md); margin-top: var(--space-lg); color: var(--color-secondary); }
-.crew-cooling { color: var(--color-cool); }
-.subsection-label { font-size: .875rem; text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--color-secondary); margin-top: var(--space-xl); }
-.crew-slot { border: 0; border-inline-start: 2px solid var(--color-cool); box-shadow: none; }
-.crew-slot h4 { margin: 0; color: var(--color-cool); letter-spacing: var(--tracking-label); }
-.slot-occupant { font-size: 1.3rem; font-weight: 700; }
-.crew-card { display: flex; flex-direction: column; box-shadow: none; }
-.crew-identity h4 { font: 700 1.4rem/1.3 var(--font-display); margin-block: var(--space-sm); }
-.specialist-effect { border-block: 1px solid var(--color-border); padding-block: var(--space-md); font-weight: 650; color: var(--color-cool); }
-.crew-card .action-button { margin-top: auto; }
-.event-idle { border: 0; border-inline-start: 2px solid var(--color-border); background: var(--color-surface); box-shadow: none; }
-.event-idle p { margin-block: var(--space-sm); }
-.event-pending { padding: clamp(1.5rem, 4vw, 3rem); }
-.event-story { max-width: 65ch; border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-md); }
-.event-story h3 { font: 750 clamp(1.6rem, 3vw, 2.5rem)/1.2 var(--font-display); overflow-wrap: anywhere; }
-.event-timer-state { color: var(--color-secondary); font-size: .875rem; }
-.event-choice { display: flex; flex-direction: column; padding: var(--space-lg); background: var(--color-background); border-radius: var(--radius-card); }
-.event-choice h4 { font-size: 1rem; color: var(--color-accent); margin-top: 0; }
-.event-choice ul { padding-left: var(--space-lg); }
-.event-choice .action-button { margin-top: auto; }
-.choice-unavailable { color: var(--color-warning); }
-
-/* Collection: canonical wide artwork; gameplay information stays in HTML. */
-.garage-catalog { display: grid; gap: var(--space-xl); margin-block: var(--space-sm); }
-.vehicle-card { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); max-width: 68rem; padding: 0; align-items: start; }
-.showroom-stage { min-width: 0; padding: var(--space-lg); display: flex; flex-direction: column; position: relative; background: var(--color-warm-tint); }
-.showroom-stage::after { content: ''; pointer-events: none; position: absolute; inset: auto var(--space-xl) var(--space-lg); height: 1px; background: var(--color-warm); }
-.showroom-stage .panel-heading { display: block; }
-.showroom-stage h3 { font-size: clamp(2.4rem, 4vw, 3.25rem); margin-block: var(--space-sm); }
-.vehicle-manufacturer { display: block; font-size: 1rem; letter-spacing: var(--tracking-label); text-transform: uppercase; }
-.vehicle-artwork { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 1672 / 941; object-fit: contain; border-radius: var(--radius-card); margin-block: var(--space-md); }
-.vehicle-specification { min-width: 0; padding: var(--space-lg); }
-.garage > .panel-heading h2 { margin-block: var(--space-sm); }
-.showroom-stage .eyebrow { margin-block: var(--space-sm); }
-.vehicle-specification .production { font-size: 1.35rem; padding-block: var(--space-sm); border-block: 1px solid var(--color-border); }
-
-/* Empire: consequential reset, readable branches, permanent record and transfer. */
-.rebirth-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: var(--space-lg) var(--space-xl); }
-.rebirth-panel > .panel-heading, .rebirth-panel > .save-confirm, .rebirth-panel > .action-button, .rebirth-panel > p { grid-column: 1 / -1; }
-.rebirth-brief { min-width: 0; }
-.rebirth-reward { font-size: 1.6rem; font-weight: 750; color: var(--color-warm); }
-.rebirth-policy { align-items: start; }
-.rebirth-keep, .rebirth-lose { min-width: 0; border-top: 2px solid var(--color-border); padding: var(--space-md); background: var(--color-background); border-radius: var(--radius-card); }
-.rebirth-keep { border-top-color: var(--color-warm); }
-.rebirth-lose { border-top-color: var(--color-danger); }
-.rebirth-policy h3 { text-transform: uppercase; font-size: 1rem; letter-spacing: .08em; }
-.confirmation-actions { display: flex; gap: var(--space-md); flex-wrap: wrap; }
-.confirmation-actions .action-button { flex: 1 1 14rem; }
-.confirmation-actions .action-button + .action-button { margin-top: 0; }
-.skill-node { padding: var(--space-lg); box-shadow: none; }
-.skill-foundation { grid-column: 1 / -1; border-top: 2px solid var(--color-warm); background: var(--gradient-surface); }
-.skill-branch { margin-inline-start: var(--space-md); border-inline-start: 2px solid var(--color-border); }
-.skill-rank { font-size: 1.2rem; font-weight: 700; color: var(--color-warm); }
-.achievement-card { border-top-width: 2px; }
-.achievement-card h3 { margin-block: var(--space-sm); }
-.achievement-card.is-unlocked h3 { color: var(--color-warm); }
-.achievement-progress { font-weight: 650; }
-.empire-record .statistics-entry { border: 0; border-top: 1px solid var(--color-border); padding-inline: 0; border-radius: 0; }
-.empire-record .statistics-entry strong { font-size: 2rem; }
-.empire-record .statistics-entry p { color: var(--color-secondary); font-size: .875rem; }
-.export-tools, .import-tools { padding: var(--space-lg); border-top: 2px solid var(--color-border); background: var(--color-background); border-radius: var(--radius-card); }
-.import-tools { border-top-color: var(--color-danger); }
-.export-tools h4, .import-tools h4 { margin-top: 0; text-transform: uppercase; letter-spacing: .08em; }
-.save-feedback-error { color: var(--color-danger); border-inline-start: 2px solid var(--color-danger); padding-inline-start: var(--space-md); }
-.save-panel textarea { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
-
-/* Existing tablet/mobile breakpoints; DOM order and visible text remain primary. */
-@media (max-width: 1000px) {
-  .district-pressure-layout, .rebirth-panel, .vehicle-card { grid-template-columns: minmax(0, 1fr); }
-  .district-zone .territory-catalog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .operations-anchor { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
-}
-@media (max-width: 740px) {
-  .overview-command, .operations-anchor, .vehicle-card, .district-zone .territory-catalog { grid-template-columns: minmax(0, 1fr); }
-  .overview-command > article { grid-column: 1; }
-  .overview-event.is-pending { display: flex; }
-  .overview-event.is-pending .section-shortcut { align-self: stretch; }
-  .overview-event.is-idle h2, .overview-event.is-idle p { display: block; }
-  .heat-panel, .vehicle-specification, .showroom-stage { padding: var(--space-lg); }
-  .skill-branch { margin-inline-start: var(--space-sm); }
-  .confirmation-actions { flex-direction: column; }
-  .confirmation-actions .action-button { flex-basis: auto; }
-}
-
-/* POST 2D: presentation-only progression, stable feedback and local focus. */
-.hud-level dd { min-block-size: 3.5rem; }
-.hud-xp-progress { display: block; width: 100%; height: .35rem; margin-block: .2rem; accent-color: var(--color-cool); background: var(--color-background); border: 0; border-radius: .2rem; }
-.hud-xp-progress::-webkit-progress-bar { background: var(--color-background); border-radius: .2rem; }
-.hud-xp-progress::-webkit-progress-value { background: var(--color-cool); border-radius: .2rem; }
-.hud-xp-progress::-moz-progress-bar { background: var(--color-cool); }
-.hud-xp-text { display: block; font-size: .72rem; line-height: 1.3; font-weight: 500; color: var(--color-secondary); }
-/* Reserve space before eligibility and messages change; overflow remains readable
-   with keyboard scrolling instead of moving the whole document below. */
-.rebirth-notice-slot { min-block-size: 3.25rem; position: relative; }
-.rebirth-notice { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-height: 44px; color: var(--color-warm); font-size: .85rem; border-inline-start: 2px solid var(--color-warm); padding-inline: .5rem; background: var(--color-warm-tint); border-radius: var(--radius-control); }
-.rebirth-notice > span { min-width: 0; }
-.rebirth-notice button { min-height: 44px; flex-shrink: 0; padding: .4rem .65rem; color: inherit; background: transparent; border: 1px solid var(--color-warm); border-radius: var(--radius-control); font: inherit; cursor: pointer; }
-.rebirth-review-mobile { display: none; }
-.global-feedback { block-size: 4.75rem; overflow: auto; scrollbar-gutter: stable; padding: .25rem; }
-.global-feedback:focus-visible, .rebirth-notice button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-#rebirth-heading { scroll-margin-block-start: 14rem; }
-@media (max-width: 740px) {
-  .rebirth-review-desktop { display: none; }
-  .rebirth-review-mobile { display: inline; }
-  .rebirth-notice { font-size: .75rem; }
-  .rebirth-notice button { padding-inline: .5rem; }
-  #rebirth-heading { scroll-margin-block-start: 1rem; }
-}
-@media (max-height: 600px) { #rebirth-heading { scroll-margin-block-start: 1rem; } }
-
-/* Four simultaneous Businesses: stable, compact portfolio layout. */
-.operations-anchor { display: flex; flex-direction: column; }
-.operations-business { min-width: 0; width: 100%; }
-.business-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.business-grid .business-content { padding: 1rem; }
-.business-grid .business-card { min-width: 0; overflow: visible; }
-.business-grid h3 { overflow-wrap: normal; word-break: normal; }
-.business-grid .production strong { font-size: clamp(1.2rem, 3vw, 1.8rem); }
-.business-total { margin-block: .5rem 1rem; }
-.auto-target { display: grid; gap: .4rem; min-width: 0; }
-.auto-target select { width: 100%; max-width: 100%; min-width: 0; min-height: 44px; font: inherit; padding: .5rem; }
-.auto-target select:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-#auto-upgrader-timing { font-variant-numeric: tabular-nums; }
-@media (max-width: 760px) { .business-grid { grid-template-columns: minmax(0, 1fr); } }
-
-/* Explicit local navigation; ordinary action focus continues to use preventScroll. */
-.operations-navigation { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
-.operations-navigation button { min-height: 44px; padding: var(--space-sm) var(--space-md); font: inherit; font-size: .875rem; color: var(--color-secondary); background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-control); white-space: nowrap; cursor: pointer; }
-.operations-navigation button:focus-visible, .operations-target:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.operations-target { scroll-margin-block-start: 1rem; }
-.card-action-area { display: grid; gap: var(--space-sm); margin-block-start: var(--space-md); }
-.card-action-area > .purchase-button, .card-action-area > .purchase-note { margin: 0; }
-.card-action-area > .purchase-button:disabled { opacity: 1; }
-.card-action-area > .purchase-note { min-height: 0; }
-
-/* Full New Game is separate from transfer and Rebirth; content may grow at any zoom. */
-.reset-panel { margin-top: var(--space-lg); padding: var(--space-lg); border-inline-start: 3px solid var(--color-danger); }
-.reset-panel > p { color: var(--color-secondary); line-height: 1.6; }
-.reset-panel label { display: block; margin-bottom: var(--space-sm); }
-.reset-panel input { box-sizing: border-box; width: 100%; max-width: 24rem; min-height: 44px;
-  padding: var(--space-sm) var(--space-md); font: inherit; color: var(--color-text);
-  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); }
-.reset-panel input:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.reset-panel .confirmation-actions { margin-top: var(--space-md); }
-.reset-panel .action-button { min-height: 44px; white-space: normal; }
-
-/* Guidance is shared across sections, not a second HUD or an executable action. */
-.next-objective { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 17rem); align-items: start;
-  gap: var(--space-md); padding: var(--space-md); margin-block: var(--space-md);
-  border: 1px solid var(--color-border); border-inline-start: 3px solid var(--color-cool);
-  border-radius: var(--radius-card); background: var(--color-surface); }
-.next-objective > div { min-width: 0; }
+/* Compact Next Objective UX polish. Existing section styles remain in App.css; guidance is presentation-only. */
+.next-objective { display: block; padding: var(--space-sm) var(--space-md); margin-block: var(--space-md); border: 1px solid var(--color-border); border-inline-start: 3px solid var(--color-cool); border-radius: var(--radius-card); background: var(--color-surface); }
 .next-objective p { margin: 0; }
 .next-objective .eyebrow span { color: var(--color-muted); letter-spacing: normal; text-transform: none; }
-.next-objective h2 { margin-block: var(--space-xs); font-size: clamp(1rem, 2vw, 1.2rem); overflow-wrap: break-word; }
+.objective-compact { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-width: 0; }
+.objective-compact-copy { min-width: 0; }
+.next-objective h2 { margin-block: .15rem; font-size: clamp(.95rem, 1.8vw, 1.1rem); overflow-wrap: break-word; }
+.objective-compact-progress { color: var(--color-secondary); font-size: .76rem; line-height: 1.35; overflow-wrap: anywhere; }
+.objective-compact-progress strong { color: var(--color-cool); font-variant-numeric: tabular-nums; }
+.objective-compact-progress span { color: var(--color-muted); }
+.objective-expand { flex-shrink: 0; min-height: 44px; padding: .45rem .7rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); color: var(--color-secondary); background: transparent; font: inherit; font-size: .78rem; cursor: pointer; }
+.objective-expand:hover { border-color: var(--color-cool); color: var(--color-cool); }
+.objective-expand:focus-visible, .objective-controls summary:focus-visible, .objective-controls select:focus-visible, .guidance-destination:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+.objective-details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 17rem); align-items: start; gap: var(--space-md); padding-top: var(--space-md); margin-top: var(--space-sm); border-top: 1px solid var(--color-border); }
+.objective-details > div { min-width: 0; }
 .objective-context, .objective-note, .objective-cash-hint { color: var(--color-secondary); font-size: .8rem; line-height: 1.5; }
 .objective-progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--space-sm); margin-block: var(--space-sm); }
 .objective-progress p { font-size: .85rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -231,13 +21,9 @@
 .objective-controls .action-button { min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
 .objective-controls summary { cursor: pointer; min-height: 44px; align-content: center; font-size: .85rem; color: var(--color-secondary); }
 .objective-controls label { display: block; margin-block: var(--space-sm); font-size: .85rem; }
-.objective-controls select { min-width: 0; width: 100%; min-height: 44px; font: inherit; font-size: .85rem;
-  color: var(--color-text); background: var(--color-background); border: 1px solid var(--color-border); padding: var(--space-sm); border-radius: var(--radius-control); }
+.objective-controls select { min-width: 0; width: 100%; min-height: 44px; font: inherit; font-size: .85rem; color: var(--color-text); background: var(--color-background); border: 1px solid var(--color-border); padding: var(--space-sm); border-radius: var(--radius-control); }
 .objective-controls details p { color: var(--color-muted); font-size: .75rem; line-height: 1.5; margin-top: var(--space-sm); }
-.objective-controls summary:focus-visible, .objective-controls select:focus-visible, .guidance-destination:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
 .guidance-destination { scroll-margin-block-start: 14rem; }
-@media (max-width: 740px) {
-  .next-objective { grid-template-columns: minmax(0, 1fr); }
-  .guidance-destination { scroll-margin-block-start: 21rem; }
-}
+@media (max-width: 740px) { .next-objective { padding: var(--space-sm); } .objective-compact { align-items: flex-start; } .objective-compact-progress span { display: none; } .objective-details { grid-template-columns: minmax(0, 1fr); } .guidance-destination { scroll-margin-block-start: 21rem; } }
+@media (max-width: 420px) { .objective-compact .eyebrow span { display: none; } .objective-expand { padding-inline: .55rem; } }
 @media (max-height: 600px) { .guidance-destination { scroll-margin-block-start: 1rem; } }
