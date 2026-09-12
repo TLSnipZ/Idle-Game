@@ -9,38 +9,91 @@ permissions:
 
 jobs:
   verify:
+    if: github.ref == 'refs/heads/work/reset-progress'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Check out the verification branch
+      - name: Check out verification infrastructure
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Restore the reviewed feature commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          candidate="$RUNNER_TEMP/reset-candidate.bundle"
+          : > "$candidate"
+          for blob in 3da2635a9124a1b3aae620b511384c02183a7dfe 1fd869c09fc7d2d575ff7e66efa435a7d8c0eaeb 7e6740d9ec989849ecafc57fc151cb0829e8b423; do
+            gh api "repos/$GITHUB_REPOSITORY/git/blobs/$blob" --jq .content | base64 --decode >> "$candidate"
+          done
+          echo "0b648061352cdf82df8c449b9bf5736ebb981c2e12d17d827ea16b2fcbe431a4  $candidate" | sha256sum --check
+          git bundle verify "$candidate"
+          git fetch "$candidate" HEAD
+          test "$(git rev-parse FETCH_HEAD)" = 7b398d87c65d56cd73aac665051dabbc0923d1ad
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD^)" = 8ed9d697fc1dfd8b6014a12af54245e77379e3be
+          test -z "$(git status --porcelain)"
+          test ! -e .github/workflows/verify-reset-progress.yml
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
-      - name: Install dependencies
+      - name: Fresh dependency install
         run: npm ci --no-audit --no-fund
       - name: Typecheck
         run: npm run typecheck
-      - name: Test
+      - name: Full test suite
         run: npm run test
-      - name: Build
+      - name: Production build
         run: npm run build
-      - name: Prepare isolated verification snapshot
+      - name: Diff and scope check
         run: |
-          mkdir -p "$RUNNER_TEMP/reset-workspace"
-          git archive --format=tar.gz HEAD -o "$RUNNER_TEMP/reset-workspace/source.tar.gz"
-          git bundle create "$RUNNER_TEMP/reset-workspace/history.bundle" --all
-          tar -czf "$RUNNER_TEMP/reset-workspace/dependencies.tar.gz" node_modules
-          git rev-parse HEAD > "$RUNNER_TEMP/reset-workspace/COMMIT.txt"
-      - name: Upload verification snapshot
+          set -euo pipefail
+          git diff --check HEAD^ HEAD
+          git diff --exit-code HEAD^ HEAD -- package.json package-lock.json .nvmrc src/features src/assets src/game/game-state.ts src/game/save-schema.ts src/platform/game-runtime.ts src/platform/local-save.ts
+          test -z "$(git status --porcelain)"
+          git show --stat --oneline HEAD
+      - name: Prepare verified history
+        run: |
+          mkdir -p "$RUNNER_TEMP/reset-verified"
+          git branch reset-progress-delivery HEAD
+          git bundle create "$RUNNER_TEMP/reset-verified/history.bundle" refs/heads/reset-progress-delivery
+          git bundle verify "$RUNNER_TEMP/reset-verified/history.bundle"
+          git rev-parse HEAD > "$RUNNER_TEMP/reset-verified/COMMIT.txt"
+      - name: Upload verified history
         uses: actions/upload-artifact@v4
         with:
-          name: reset-verification-workspace
-          path: ${{ runner.temp }}/reset-workspace/
-          retention-days: 3
+          name: reset-progress-verified-history
+          path: ${{ runner.temp }}/reset-verified/
+          retention-days: 30
           if-no-files-found: error
+
+  publish-feature:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Download verified history
+        uses: actions/download-artifact@v4
+        with:
+          name: reset-progress-verified-history
+          path: verified
+      - name: Publish feature branch only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git clone --branch reset-progress-delivery verified/history.bundle feature
+          cd feature
+          test "$(git rev-parse HEAD)" = 7b398d87c65d56cd73aac665051dabbc0923d1ad
+          test "$(git rev-parse HEAD^)" = 8ed9d697fc1dfd8b6014a12af54245e77379e3be
+          test -z "$(git status --porcelain)"
+          git remote set-url origin "https://github.com/$GITHUB_REPOSITORY.git"
+          gh auth setup-git
+          git push origin HEAD:refs/heads/feat/reset-progress
+          echo "Verified feature branch published. main and the deployed game are unchanged." >> "$GITHUB_STEP_SUMMARY"
