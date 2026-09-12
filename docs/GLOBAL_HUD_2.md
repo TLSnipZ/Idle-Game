@@ -1,0 +1,42 @@
+# Global HUD 2.0 / Activity Center
+
+Status: implementation in review.
+
+## Scope
+
+Global HUD 2.0 compresses the always-visible command layer without changing gameplay authority. Cash, Player Level/XP, Heat and Empire Points remain globally visible. Primary five-section navigation remains native and unchanged in responsibility.
+
+The new Activity Center consolidates high-value global situations:
+
+- pending City Event -> navigates to City
+- enabled Business Auto-Upgrader -> navigates to Operations
+- Rebirth eligibility and current EP reward -> navigates to Empire
+- paused/runtime-critical state -> informational system alert
+- quiet state -> compact localized idle copy
+
+All copy follows the English/German Solara localization voice contract.
+
+## Architecture contract
+
+The Activity Center is derived presentation only. It does not persist notification state, resolve events, toggle automation, perform Rebirth, mutate Heat, spend Cash or duplicate gameplay commands. Existing selectors and navigation remain authoritative.
+
+Save v17 / CE1, GameState, economy, balance, requirements, RNG and runtime authority are unchanged.
+
+## Presentation
+
+Desktop uses a compact two-column command row: core stats beside the Activity Center, with primary navigation below. Smaller widths stack the Activity Center while keeping the four core stats horizontally available. Existing focus-visible behavior and native buttons are preserved.
+
+The legacy `.global-indicators` selector remains on the Activity Center as a compatibility contract for existing navigation/runtime tests while the visual treatment is replaced by HUD 2.0.
+
+## Acceptance gate
+
+Before the phase is considered live-complete:
+
+1. production typecheck/build must pass;
+2. GitHub Pages deploy must succeed;
+3. desktop and mobile should be manually checked for HUD height, wrapping and horizontal overflow;
+4. Event, Auto-Upgrader and Rebirth Activity Center items must navigate only and never execute their underlying action;
+5. EN/DE copy must remain localized;
+6. no Save v17 / CE1 or gameplay-authority change is allowed.
+
+After acceptance, the roadmap continues to Solara City Branding, then Business Visual Identity / Artworks.
