@@ -1,6 +1,6 @@
 # Global HUD 2.0 / Activity Center
 
-Status: implementation in review.
+Status: **live-complete and manually accepted** after PR #7. Production typecheck/build and GitHub Pages deployment passed; desktop/mobile presentation was accepted by the user.
 
 ## Scope
 
@@ -28,15 +28,15 @@ Desktop uses a compact two-column command row: core stats beside the Activity Ce
 
 The legacy `.global-indicators` selector remains on the Activity Center as a compatibility contract for existing navigation/runtime tests while the visual treatment is replaced by HUD 2.0.
 
-## Acceptance gate
+## Acceptance result
 
-Before the phase is considered live-complete:
+1. production typecheck/build passed;
+2. GitHub Pages deploy succeeded;
+3. live desktop/mobile presentation was manually accepted;
+4. Event, Auto-Upgrader and Rebirth Activity Center items remain navigation-only;
+5. EN/DE copy remains localized under the Solara voice contract;
+6. Save v17 / CE1 and gameplay authority remain unchanged.
 
-1. production typecheck/build must pass;
-2. GitHub Pages deploy must succeed;
-3. desktop and mobile should be manually checked for HUD height, wrapping and horizontal overflow;
-4. Event, Auto-Upgrader and Rebirth Activity Center items must navigate only and never execute their underlying action;
-5. EN/DE copy must remain localized;
-6. no Save v17 / CE1 or gameplay-authority change is allowed.
+## Handoff
 
-After acceptance, the roadmap continues to Solara City Branding, then Business Visual Identity / Artworks.
+**Next phase: Solara City Branding**, followed by Business Visual Identity / Artworks. Branding should establish the final city identity and favicon without pulling future Business artwork, Active Vehicle, Tier-1 Garage or Heat / Police 2.0 forward.
