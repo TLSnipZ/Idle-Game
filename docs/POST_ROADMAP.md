@@ -60,7 +60,7 @@ Phase 9B accessibility remain preserved contracts.
   PR #8 retired the duplicate visible legacy newsfeed; ordinary latest feedback now
   belongs to Activity Center while accessibility announcements and critical recovery
   errors remain preserved. See [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
-- **HUD XP column containment: merged in PR #17; production typecheck/build passed.**
+- **HUD XP column containment: merged in PR #17; production typecheck/build/deploy passed after retry.**
   Reproduced native XP progress overflowing into Heat after PR #16. Only HUD CSS
   changes: fluid contained progress and a separate wrapping XP caption. 35 offline
   Chromium layout cases passed before merge; 22 additional checks passed against
@@ -68,9 +68,10 @@ Phase 9B accessibility remain preserved contracts.
   JavaScript is byte-identical to the previous build. Three Vitest regression guards
   were added but the suite was not run locally or by the Pages workflow.
   Run `34722063196` built commit `68d6bbb21bb8e916a58ed3051fcc54cbe0189f0b` successfully;
-  its deployment was queued at the verification checkpoint. Consult that run for the
-  current Pages status; manual live acceptance remains pending. Operations layout
-  and gameplay are untouched. Details: [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
+  the user restarted its queued deployment and reported success. The latest attempt's
+  build and deploy jobs are now both confirmed successful through the GitHub API.
+  Manual visual acceptance remains separate. Operations layout and gameplay are
+  untouched. Details: [GLOBAL_HUD_2.md](GLOBAL_HUD_2.md).
 - **Solara City Branding: merged in PR #10; live accepted before Business Visual Identity.**
   Canonical city symbol, `SOLARA / CITY` lockup, favicon and restrained shell accents.
   See [SOLARA_CITY_BRANDING.md](SOLARA_CITY_BRANDING.md).
@@ -81,6 +82,13 @@ Phase 9B accessibility remain preserved contracts.
   immediately visible. PR #16 removes the unfinished artwork slot and sticky category
   bar and refines the finance snapshot. Operations styling is in `Operations.css`;
   gameplay, Save v17 / CE1 and balance remain unchanged. See [OPERATIONS_OVERHAUL.md](OPERATIONS_OVERHAUL.md).
+- **Overview / City card spacing: implemented and browser-checked; publication and live acceptance pending.**
+  Fix reproduced zero-gap Overview cards and district-to-Heat boundary using only
+  scoped container rules in `sections.css`: 1.5rem above 740px and 1rem on narrow
+  views. Preserve existing City catalog columns and section gaps; remove Heat's
+  duplicate bottom margin. 22 before/after Chromium cases passed across EN/DE,
+  320–1920px and enlarged text. HUD, Operations, Garage and Empire geometry are
+  unchanged. No artwork, React or gameplay changes. See [SECTION_SPACING.md](SECTION_SPACING.md).
 - **Business Visual Identity / Artworks: paused behind Operations live acceptance.**
   Dockside remains the artwork/crop reference candidate, but no later Business artwork
   is promoted until the rebuilt Operations layout is deployed and manually accepted.
@@ -104,9 +112,10 @@ and the shared camera/lighting/showroom language.
 | --- | --- | --- |
 | Implemented | Next Objective / Guidance | Catalog-driven suggested path and optional goals, exact prerequisite progress / missing Cash, navigation-only actions. Compact-by-default details are live accepted; see GUIDANCE.md. |
 | Implemented | Global HUD 2.0 / Activity Center | Compact global command layer; Activity Center is the sole normal global news/activity surface after PR #8. |
-| Merged / live review pending | HUD XP containment | PR #17; typecheck/build and browser geometry checks passed. Deployment status is tracked by run 34722063196. |
+| Deployed / live review pending | HUD XP containment | PR #17; checked build and browser geometry passed; run 34722063196 deploy succeeded after retry. |
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
-| Current | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
+| Current hotfix | Overview / City spacing | Scoped card gaps only; 22 browser cases passed. Publication/live acceptance pending; see SECTION_SPACING.md. |
+| Live review pending | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
 | Next | Business Visual Identity | Resume Dockside Golden Reference acceptance after Operations is stable; then remaining Businesses. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
@@ -134,7 +143,7 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Current phase is Operations Page Overhaul acceptance, with the HUD containment hotfix first.**
+**Current task is the Overview / City spacing hotfix, followed by presentation live acceptance.**
 All work remains presentation-only and must preserve Save v17 / CE1, GameState,
 economy, balance, gates, automation authority, RNG, localization and runtime behavior.
 Further Business artwork is blocked until the presentation is technically green and
