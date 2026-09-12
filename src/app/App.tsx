@@ -48,6 +48,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const handledReview = useRef(0);
   const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
   const handledObjective = useRef(0);
+  useEffect(() => { game.setPresentationLocale(preferences.settings.locale); }, [game.setPresentationLocale, preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
       const requested = document.getElementById(objectiveRequest.headingId);
