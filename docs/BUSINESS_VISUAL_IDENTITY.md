@@ -1,52 +1,46 @@
 # Business Visual Identity / Artworks
 
-Status: Dockside Golden Reference candidate review.
+Status: Dockside compact Golden Reference integration under live review.
 
 ## Goal and sequence
 
-Give each current Business a recognizable visual identity while preserving one coherent Solara City art language. The first approved asset is Dockside; all later Business art derives from its camera, lighting, detail density and crop behavior.
+Give each current Business a recognizable visual identity while preserving one coherent Solara City art language. Dockside establishes the reference; later Businesses derive its artwork treatment without changing the compact two-card Operations layout.
 
-1. Dockside Detail — Golden Reference.
+1. Dockside Detail — compact Golden Reference.
 2. Neon Laundry — derived utility / laundromat identity.
 3. Afterdark Customs — derived performance-shop / street identity.
 4. Solara Nights — derived premium nightlife identity.
 
-No later Business artwork is promoted before Dockside is explicitly approved.
+No later Business artwork is promoted before the corrected Dockside card is explicitly accepted live.
 
-## Dockside Golden Reference contract
+## Locked layout rule
 
-The production reference must read as a believable premium game-rendered Business exterior inside Solara City:
+Business artwork must **not** turn a normal Business into a full-width hero surface. On wide layouts, two Business cards remain able to sit beside each other just as before the artwork pass. Artwork enriches the card; it does not redefine the entire Operations hierarchy.
 
-- cinematic exterior three-quarter view;
-- nighttime / late-evening coastal industrial district;
-- Dockside Detail establishment is the focal point, not a random hero vehicle;
-- wet asphalt, painted metal, glass and believable industrial material response;
-- controlled cyan/pink practical lighting with restrained warm industrial highlights;
-- dock containers, service/detailing-bay cues and port infrastructure support the location without dominating it;
-- no real-world brands, copied franchise typography or trademarked vehicle identity;
-- no baked gameplay prices, stats, requirements, buttons or UI labels;
-- quiet margins keep the central establishment readable across desktop, tablet and narrow-card crops;
-- detailed stylized realism consistent with the existing Kairo KX-R rendering direction, not stock-photo photorealism or cartoon art.
+Dockside therefore uses:
 
-## First candidate review
+- a compact 16:9 artwork strip inside the existing card footprint;
+- the existing Business name, status, Level, production and upgrade controls as HTML;
+- an optional disclosure for Earnings / modifier details;
+- normal grid participation rather than spanning the full Business row;
+- responsive stacking only at the existing narrow breakpoints.
 
-The first generated Dockside mood candidate is useful **direction evidence**, but is not the Golden Reference yet. It establishes attractive harbor atmosphere, wet-surface lighting and a strong Solara coastal-city mood. However, it currently behaves too much like a promotional poster / city-wide harbor showcase, includes substantial baked presentation text and gives a hero vehicle too much visual priority.
+## Dockside artwork direction
 
-The next production candidate must therefore tighten the frame around **Dockside Detail itself**, remove poster/UI copy from the image, reduce vehicle dominance and lean further into nighttime industrial cyan/pink practical light while retaining restrained warm highlights.
+The approved visual target is the previously user-approved Dockside concept direction: premium cinematic Solara waterfront detailing, wet reflective pavement, service bays, harbor infrastructure, warm sunset/industrial practical light against dark cyan/navy shadows, and a high-end criminal-business feel.
 
-Generated candidates remain review material only. Nothing is imported into the runtime bundle until explicit user approval.
+The first live implementation was rejected because its visible treatment did not resemble the approved concept closely enough and the card became too large/present. The correction uses a crop derived directly from the approved concept artwork as the current runtime reference, removes the oversized hero layout, and keeps gameplay information outside the image.
 
-## Crop / integration contract after approval
+The crop is presentation-only and may be refined further after live review. No fake statistics, buttons or gameplay outcomes from the concept mockup are authoritative.
 
-The approved source must remain useful at wide desktop and narrow stacked-card widths. Keep storefront/service-bay identity in the central safe zone; secondary props may be lost at narrow crops. Critical gameplay information remains HTML.
+## Integration contract
 
-After explicit approval:
-
-- optimize the approved source for runtime, preferably WebP;
-- map the stable Business ID to presentation artwork outside GameState;
-- render it responsively in `BusinessCard` with fluid width, contained overflow and stable crop behavior;
-- preserve Business name, ownership, Level, price, production, requirements and actions as HTML;
-- perform live desktop/mobile crop acceptance before extending the style to the remaining Businesses.
+- runtime art is optimized WebP;
+- asset location is presentation-only and never stored in GameState / Save v17 / CE1;
+- Business name, ownership, Level, price, production, requirements and actions remain real HTML/game data;
+- artwork uses fluid width with crop-safe `object-fit: cover`;
+- Earnings details remain optional and collapsible;
+- desktop preserves two-card Business density; mobile stacks normally.
 
 ## Freeze
 
