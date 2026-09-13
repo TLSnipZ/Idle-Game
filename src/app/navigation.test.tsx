@@ -30,7 +30,7 @@ import { moneyFromMinorUnits, STARTER_JOB } from '../features/economy';
 import { getXpThresholdForLevel } from '../features/progression';
 
 function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = {}): ReturnType<typeof useGame> {
-  return { replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
+  return { setPresentationLocale: vi.fn(), replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
     offline: null, feedback: { sequence: 0, message: '' }, achievementEvent: undefined, cityEvent: undefined,
     automationEvent: undefined, levelEvent: undefined, dismissOffline: vi.fn(),
     runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
