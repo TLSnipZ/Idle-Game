@@ -6,6 +6,9 @@ This is the current post-roadmap status and priority source.
 
 User explicitly moved this ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
 for implementation, defects, verification and overhaul priorities.
+PR #24 implements Villager and the audit fixes. Verification run 34759819504 passed:
+2,190 tests passing, 62 inherited UI failures (down from 64), no new regressions,
+and 255 production Chromium section/Garage cases plus cross-feature flows.
 Sequence: complete this audit → repair inherited UI test coverage → Tier-1 Garage
 (Kairo Senda / Namera Lilt) → Heat / Police 2.0.
 

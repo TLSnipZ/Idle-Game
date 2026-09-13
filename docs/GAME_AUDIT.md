@@ -43,10 +43,20 @@ Baseline: merged Active Vehicle commit
 `d758fbb207d1ecb91dc0971d105391476498266d`, 2,223 tests:
 2,159 passing and 64 pre-existing presentation failures.
 
-Initial candidate verification: 2,249 tests, 2,185 passing and the same 64 failures;
-all 26 new tests passed. Three more territory-locale regression cases and the
-responsive/announcement repairs were subsequently added. Final execution evidence
-will replace this paragraph once those checks finish.
+Final code verification succeeded in
+[Actions run 34759819504](https://github.com/TLSnipZ/Idle-Game/actions/runs/34759819504),
+against code commit `1e98681382790f650b6048332255d950c07ca79b`:
+**2,252 tests — 2,190 pass, 62 inherited failures, zero new failures, zero removed
+tests, no increase in skips. All 29 added tests pass.** Two inherited tests now
+pass following actual territory-message and Dispatcher-announcement fixes.
+
+The full production browser matrix passed: **225 section cases + 30 Garage cases**,
+plus the language/confirmation and three advanced gameplay flows below. Maximum
+document overflow was **0px** and no clipped checked metrics/navigation labels or
+JavaScript page errors were reported. Evidence:
+[verification artifact 10318422800](https://github.com/TLSnipZ/Idle-Game/actions/runs/34759819504/artifacts/10318422800).
+PR [#24](https://github.com/TLSnipZ/Idle-Game/pull/24) records final review and release.
+Subsequent changes to this report are documentation only.
 
 The workflow installs dependencies with npm ci, builds with strict TypeScript,
 runs candidate and baseline full suites, rejects new failures/removed tests/more
@@ -78,7 +88,7 @@ approval. Safari/Firefox, actual mobile hardware, screen-reader listening,
 | P2 | Unify localization and requirement presentation | Keyed strings, inline EN/DE pairs and catalog fields remain distributed. Parsing English requirement sentences is fragile. This patch centralizes the repeated helper but does not redesign all messages. | Typed message parameters and requirement discriminants; parity checks for all supported locales; proper names and exact amounts remain unchanged. |
 | P2 | Consolidate responsive CSS and clarify Operations metrics | Historical overrides are split across App.css, sections.css and Operations.css. The German mobile overflow was real; rigid columns and nowrap financial values are fragile under long text. | Feature-owned styles, exact prices/rates visible at 320px and zoom, no overflow-hiding workaround; keep browser matrix coverage. |
 | P2 | Make save guarantees clearer per action | Business/Garage/automation configuration uses save-before-publish; some older actions intentionally retain live progress with a warning if saving fails. This is covered by existing persistence tests, not a newly proven rollback defect. | Deliberately choose and document one player-facing policy; clearly distinguish saved success from volatile progress; preserve conflict protection, old saves and offline chronology. |
-| P2 | Review Activity Center density and announcements on devices | The HUD carries finances, progress and several activities; horizontal scrolling and long translated copy warrant direct mobile/assistive-technology review. Duplicate command status was removed here. | Useful first-screen actions, visible pending events, one intelligible announcement per event and focus retained during ticks. |
+| P2 | Review Activity Center density and announcements on devices | The measured chrome reaches 494px at 320px width in the Villager advanced-state fixture (900px viewport height). Horizontal scrolling and long translated copy warrant direct mobile/assistive-technology review. Duplicate command status was removed here. | Useful first-screen actions, visible pending events, one intelligible announcement per event and focus retained during ticks. |
 | P3 — roadmap content | Add meaningful Garage/city decisions after reliability work | Only KX-R is purchasable today, so the active-vehicle foundation has little choice yet. Territory and Heat depth are still intentionally small. Existing balance tests cover the numerical contracts, not player enjoyment. | Follow Tier-1 Kairo Senda/Namera Lilt design, then Heat/Police 2.0; test distinct tradeoffs instead of stacking unrelated bonuses. |
 
 No new economy, save, migration or offline failure was observed in the executed
@@ -87,6 +97,7 @@ against every browser/storage condition.
 
 ## Handoff
 
-Finish this audit's checks and publish the reviewed PR. Next technical priority is
+This audit's automated acceptance checks have passed; PR #24 carries the release.
+Next technical priority is
 the inherited UI-test repair above; then resume Tier-1 Garage and Heat/Police 2.0.
 Do not silently start those content phases as part of this audit.

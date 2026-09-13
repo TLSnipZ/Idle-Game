@@ -5,7 +5,9 @@
 The 2026-09-13 extension adds a third, written **Villager · Hrrm** option with
 readable English glosses, a native modal Settings dialog, and per-runtime language
 feedback. Preferences remain device-local; current saves are v18 and CE1 is
-unchanged. See [GAME_AUDIT.md](GAME_AUDIT.md) for executed verification and remaining
+unchanged. PR #24 passed strict build, 29 added regression tests and the full
+255-case production Chromium matrix. The 62 inherited UI-test failures and visual
+acceptance limits are recorded in [GAME_AUDIT.md](GAME_AUDIT.md) for executed verification and remaining
 review work. The sections below record the original foundation.
 
 ## Scope
