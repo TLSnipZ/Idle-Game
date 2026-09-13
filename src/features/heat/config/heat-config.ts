@@ -2,6 +2,8 @@ import { moneyFromMinorUnits } from '../../economy';
 
 export const MAX_HEAT = 100;
 export const HEAT_DECAY_INTERVAL_MS = 60_000;
+/** Defensive floor for shared duration reductions; current Lilt/Mara minimum is 42s. */
+export const MIN_HEAT_DECAY_INTERVAL_MS = 1_000;
 export const MANUAL_JOB_HEAT = 1;
 export const DISPATCHER_JOBS_PER_HEAT = 5;
 export const NEON_MILE_ACQUISITION_HEAT = 10;

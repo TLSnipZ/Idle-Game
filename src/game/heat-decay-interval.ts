@@ -1,5 +1,5 @@
 import { activeCrewMembers } from '../features/crew';
-import { HEAT_DECAY_INTERVAL_MS } from '../features/heat';
+import { HEAT_DECAY_INTERVAL_MS, MIN_HEAT_DECAY_INTERVAL_MS } from '../features/heat';
 import { collectModifiers } from './effective-stats';
 import { evaluateIntervalMs } from './modifiers';
 import type { GameState } from './game-state';
@@ -10,5 +10,5 @@ export function getHeatDecayIntervalMs(state: GameState): number {
   for (const member of activeCrewMembers(state.crew)) {
     if (member.effect.type === 'heat-decay-interval') interval = Math.min(interval, member.effect.intervalMs);
   }
-  return evaluateIntervalMs(interval, 1000, collectModifiers(state));
+  return evaluateIntervalMs(interval, MIN_HEAT_DECAY_INTERVAL_MS, collectModifiers(state));
 }
