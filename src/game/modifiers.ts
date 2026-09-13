@@ -4,7 +4,7 @@ import { addRational, multiplyRational, rational, requireRational, RationalOverf
 import type { Rational } from '../shared/rational';
 
 export type StatTarget = { readonly stat: 'business-production'; readonly businessId: string | null }
-  | { readonly stat: 'job-reward'; readonly context?: 'manual' | 'dispatcher' } | { readonly stat: 'xp-reward' } | { readonly stat: 'heat-decay-interval' };
+  | { readonly stat: 'job-reward'; readonly context?: 'manual' | 'dispatcher' } | { readonly stat: 'heat-response-cost' } | { readonly stat: 'xp-reward' } | { readonly stat: 'heat-decay-interval' };
 interface ModifierIdentity {
   readonly id: string;
   readonly sourceId: string;

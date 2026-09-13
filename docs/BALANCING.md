@@ -1,5 +1,14 @@
 # Base Game balance
 
+## Current phase — Heat V: Support network
+
+Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce
+the MANHUNT decoy cost through exact shared modifiers, down to **$810**.
+Save **v20 / CE1 unchanged**. See [Heat support](HEAT_SUPPORT.md). CI pending.
+The retained Heat / Police 2.0 **I–V sequence is complete** at this scope.
+Further post-roadmap expansions require their own scope. Older records below are historical.
+
+
 ## Current phase — Heat IV: MANHUNT
 
 Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
