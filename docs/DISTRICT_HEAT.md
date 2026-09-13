@@ -48,6 +48,7 @@ on code `91749a14e3bf7a00f95abf388f70d371bece984e` passed strict build,
 Evidence artifact: `10325411638`. This final follow-up changes documentation only.
 Merge/deployment evidence is recorded in the PR; manual live acceptance remains separate.
 
-## Next separate phase
+## Current continuation
 
-Heat IV — MANHUNT. No additional escalation mechanics are part of this phase.
+[Heat IV — MANHUNT](MANHUNT.md) adds a local 80+ travel gate and voluntary decoy.
+The original Heat III rules and verification above are historical.

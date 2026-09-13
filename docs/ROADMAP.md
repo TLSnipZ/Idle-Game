@@ -1,5 +1,23 @@
 # Roadmap
 
+## Current phase — Heat IV: MANHUNT
+
+Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
+decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
+See [MANHUNT](MANHUNT.md) for balance, persistence and acceptance. Verification passed; see [PR #32](https://github.com/TLSnipZ/Idle-Game/pull/32).
+Verified in [PR #32](https://github.com/TLSnipZ/Idle-Game/pull/32):
+[run 34781843741](https://github.com/TLSnipZ/Idle-Game/actions/runs/34781843741)
+on code `4545e8bf32b267f9930cbb3f307d710cbc363abe`: strict build,
+**2,413/2,413 tests** (29 added; zero failures/skips), **330 Chromium cases**
+(45 Garage, 225 sections, 15 each risk/police/district/MANHUNT), and whitespace
+checks passed. Evidence artifact: `10325630553`.
+The final follow-up changes documentation only. Merge and deployment evidence
+are recorded in the PR; manual live acceptance remains separate.
+
+Next separate phase: **Heat V — deeper cross-system integration**.
+Earlier phase records below are historical.
+
+
 ## Current phase — Heat III: District Heat
 
 Implemented: separate Waterfront/Neon Heat, durable owned-district travel,

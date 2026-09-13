@@ -1,3 +1,4 @@
+import { deployDecoy } from '../game/deploy-decoy';
 import { setActiveDistrict } from '../game/set-active-district';
 import { getActiveDistrictId } from '../features/territories';
 import { setActiveVehicle } from '../game/set-active-vehicle';
@@ -105,7 +106,7 @@ export function createPersistentGame(
     cancel?.(); cancel = null;
     runtime?.stop();
   }
-  function execute(command: Parameters<ReturnType<typeof createGameRuntime>['execute']>[0]) {
+  function execute(command: Parameters<ReturnType<typeof createGameRuntime>['execute']>[0], requireDurable = false) {
     if (!active || !runtime) return;
     let commandInput: GameState | null = null;
     let succeeded = false;
@@ -116,7 +117,7 @@ export function createPersistentGame(
       succeeded = result.ok;
       return result;
     }, (candidate, previous) => {
-      const guarded = getActiveDistrictId(candidate.city) !== getActiveDistrictId(previous.city)
+      const guarded = requireDurable || getActiveDistrictId(candidate.city) !== getActiveDistrictId(previous.city)
         || candidate.garage !== previous.garage
         || candidate.businesses.owned !== previous.businesses.owned
         || candidate.automation.businessAutoUpgradeTargetId !== previous.automation.businessAutoUpgradeTargetId
@@ -147,8 +148,14 @@ export function createPersistentGame(
       || view.persistence.kind === 'offline-error') return;
     const state = runtime.getSnapshot().result.state;
     const prepared = setActiveDistrict(state, id);
-    if (!prepared.ok || prepared.state === state) return prepared;
+    // Heat may cool before the next tick; recheck a pursuit lock after reconciliation.
+    if ((!prepared.ok && prepared.error !== 'district-manhunt') || (prepared.ok && prepared.state === state)) return prepared;
     return execute(current => setActiveDistrict(current, id));
+  }
+  function deployManhuntDecoy() {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
+      || view.persistence.kind === 'offline-error') return;
+    return execute(deployDecoy, true);
   }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
@@ -220,5 +227,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { deployManhuntDecoy, selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

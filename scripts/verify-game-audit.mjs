@@ -324,7 +324,7 @@ try {
     await page.addInitScript(({ fixture, locale }) => {
       if (sessionStorage.getItem('district-audit')) return;
       fixture.savedAt = Date.now();
-      fixture.state.city = { heat: 80, heatDecayElapsedMs: 0,
+      fixture.state.city = { heat: 79, heatDecayElapsedMs: 0,
         ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] };
       fixture.state.economy.cash = '100000';
       localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
@@ -337,7 +337,7 @@ try {
     await district.selectOption('territory:neon-mile');
     let current = (await saved(page)).state;
     assert.equal(current.city.heat, 0);
-    assert.equal(current.city.districts.parked.heat, 80);
+    assert.equal(current.city.districts.parked.heat, 79);
     await page.locator('.risky-delivery-button').focus();
     await page.keyboard.press('Enter');
     current = (await saved(page)).state;
@@ -346,14 +346,14 @@ try {
     await page.locator('.discreet-delivery-button').click();
     current = (await saved(page)).state;
     assert.equal(current.city.heat, 3);
-    assert.equal(current.city.districts.parked.heat, 80);
+    assert.equal(current.city.districts.parked.heat, 79);
     assert.equal(current.economy.cash, '105500');
     assert.equal(current.progression.xp, 10);
     await district.selectOption('territory:waterfront');
     await page.locator('.delivery-button').click();
     current = (await saved(page)).state;
-    assert.equal(current.economy.cash, '107562');
-    assert.equal(current.city.heat, 81);
+    assert.equal(current.economy.cash, '107975');
+    assert.equal(current.city.heat, 80);
     assert.equal(current.city.districts.parked.heat, 3);
     if (locale === 'villager') await assertVillagerOnly(page);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
@@ -361,7 +361,11 @@ try {
     await page.reload(); await navigation(page).nth(2).click();
     current = (await saved(page)).state;
     assert.equal(current.city.districts.activeId, 'territory:waterfront');
-    assert.equal(current.city.heat, 81); assert.equal(current.city.districts.parked.heat, 3);
+    assert.equal(current.city.heat, 80); assert.equal(current.city.districts.parked.heat, 3);
+    assert.equal(await page.locator('#active-district').isDisabled(), true);
+    await navigation(page).nth(1).click();
+    await page.locator('.discreet-delivery-button').click();
+    assert.equal(await page.locator('#active-district').isDisabled(), false);
     await page.locator('#active-district').selectOption('territory:neon-mile');
     assert.equal((await saved(page)).state.city.heat, 3);
     if (locale === 'villager') await assertVillagerOnly(page);
@@ -369,9 +373,55 @@ try {
     await context.close();
   }
 
+
+  // MANHUNT: maximum local pursuit, durable paid escape, travel and reload.
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (sessionStorage.getItem('manhunt-audit')) return;
+      fixture.savedAt = Date.now();
+      fixture.state.city = { heat: 100, heatDecayElapsedMs: 0,
+        ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] };
+      fixture.state.economy.cash = '125000';
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('manhunt-audit', 'true');
+    }, { fixture: fixtures[0], locale });
+    await page.goto('http://127.0.0.1:4174'); await navigation(page).nth(1).click();
+    const travel = page.locator('#active-district'), decoy = page.locator('.manhunt-decoy-button');
+    assert.equal(await travel.isDisabled(), true);
+    assert.equal(await decoy.isDisabled(), false);
+    assert.equal(await page.locator('.delivery-button').isDisabled(), false);
+    assert.equal(await page.locator('.discreet-delivery-button').isDisabled(), false);
+    assert.equal(await page.locator('.risky-delivery-button').isDisabled(), true);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    await decoy.focus(); await page.keyboard.press('Enter');
+    let current = (await saved(page)).state;
+    assert.equal(current.city.heat, 70); assert.equal(current.economy.cash, '0');
+    assert.equal(current.progression.xp, 0);
+    assert.equal(current.permanentProgression.statistics.manualJobsCompleted, 0);
+    assert.equal(await travel.isDisabled(), false);
+    assert.equal(await decoy.isDisabled(), true);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({ path: 'browser-evidence/manhunt-' + locale + '-' + width + '.png', fullPage: true });
+    await travel.selectOption('territory:neon-mile');
+    current = (await saved(page)).state;
+    assert.equal(current.city.heat, 0); assert.equal(current.city.districts.parked.heat, 70);
+    await page.reload(); await navigation(page).nth(2).click();
+    current = (await saved(page)).state;
+    assert.equal(current.economy.cash, '0');
+    assert.equal(current.city.districts.activeId, 'territory:neon-mile');
+    assert.equal(current.city.districts.parked.heat, 70);
+    assert.equal(await page.locator('.manhunt-decoy-button').isDisabled(), true);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.deepEqual(errors, []); await context.close();
+  }
+
   const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
   assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
-  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, localeSwitchAndFeedback: true,
+  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, manhuntCases: 15, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));

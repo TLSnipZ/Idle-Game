@@ -26,14 +26,14 @@ function away(heat = 80, remainder = 0) {
 }
 describe('District Heat ownership and travel', () => {
   it('swaps exact Heat and remainders without money, XP or lifetime changes', () => {
-    const state = owned(80, 23456), before = JSON.stringify(state);
+    const state = owned(79, 23456), before = JSON.stringify(state);
     const selected = setActiveDistrict(state, N.id);
     expect(selected.ok).toBe(true);
     expect(selected.state.city).toMatchObject({ heat: 0, heatDecayElapsedMs: 0,
-      districts: { activeId: N.id, parked: { heat: 80, heatDecayElapsedMs: 23456 } } });
+      districts: { activeId: N.id, parked: { heat: 79, heatDecayElapsedMs: 23456 } } });
     expect(setActiveDistrict(selected.state, N.id).state).toBe(selected.state);
     const back = setActiveDistrict(selected.state, W.id);
-    expect(getDistrictHeat(back.state.city, W.id)).toMatchObject({ heat: 80, heatDecayElapsedMs: 23456 });
+    expect(getDistrictHeat(back.state.city, W.id)).toMatchObject({ heat: 79, heatDecayElapsedMs: 23456 });
     expect(getDistrictHeat(back.state.city, N.id)).toEqual({ heat: 0, heatDecayElapsedMs: 0 });
     expect(back.state.economy).toBe(state.economy);
     expect(back.state.permanentProgression).toBe(state.permanentProgression);

@@ -6,7 +6,7 @@ import { DELIVERY_DISPATCHER } from '../features/automation';
 
 function fixture() {
   const s = createInitialGameState();
-  return rebirthRuntime({ ...s, city: { ...s.city, ownedTerritoryIds: [W.id, N.id], heat: 80, heatDecayElapsedMs: 0 },
+  return rebirthRuntime({ ...s, city: { ...s.city, ownedTerritoryIds: [W.id, N.id], heat: 79, heatDecayElapsedMs: 0 },
     automation: { ...s.automation, unlockedIds: [DELIVERY_DISPATCHER.id] } });
 }
 describe('durable district selection', () => {
@@ -14,8 +14,8 @@ describe('durable district selection', () => {
     const f = fixture(); f.at(10000);
     expect(f.game.selectActiveDistrict(N.id)?.ok).toBe(true);
     const state = f.game.getSnapshot().result.state;
-    expect(state.economy.cash).toBe('2062');
-    expect(getDistrictHeat(state.city, W.id).heat).toBe(80);
+    expect(state.economy.cash).toBe('2475');
+    expect(getDistrictHeat(state.city, W.id).heat).toBe(79);
     const write = f.events.findIndex(e => e.type === 'write' && getActiveDistrictId(e.state.city) === N.id);
     const publish = f.events.findIndex(e => e.type === 'publish' && getActiveDistrictId(e.state.city) === N.id);
     expect(write).toBeGreaterThanOrEqual(0); expect(publish).toBeGreaterThan(write);
@@ -29,7 +29,7 @@ describe('durable district selection', () => {
     const f = fixture(), raw = f.raw(); f.fail();
     expect(f.game.selectActiveDistrict(N.id)).toBeUndefined();
     expect(getActiveDistrictId(f.game.getSnapshot().result.state.city)).toBe(W.id);
-    expect(f.game.getSnapshot().result.state.city.heat).toBe(80);
+    expect(f.game.getSnapshot().result.state.city.heat).toBe(79);
     expect(f.game.getSnapshot().persistence.kind).toBe('error');
     expect(f.raw()).toBe(raw); f.game.stop();
   });
