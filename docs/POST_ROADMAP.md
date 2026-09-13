@@ -2,19 +2,17 @@
 
 ## Current artwork handoff
 
-Tier-1 artwork integration is implemented on `art/tier-one-vehicles`. The user approved the blue Senda and red Lilt with “Leg los broooo” after the explicit model-approval question. Clean standalone derivatives and optimized WebP delivery are included; verification and deployment are tracked in the artwork PR. Heat / Police 2.0 follows this release and is not started here.
+Tier-1 artwork is implemented and verified in [PR #28](https://github.com/TLSnipZ/Idle-Game/pull/28). [Run 34774339210](https://github.com/TLSnipZ/Idle-Game/actions/runs/34774339210) verified code commit `298ef28287bfe6f090736698f06861c7b0adb35a`: strict build, 2,283/2,283 tests (zero failures/skips), 45 Garage and 225 whole-game Chromium cases, and whitespace checks passed. Evidence artifact: `10322962950`. This documentation-only follow-up does not change the verified runtime or tests. The PR records merge/deployment separately. Heat / Police 2.0 is the next separate phase and has not started.
 
 This is the current post-roadmap status and priority source.
 
-## Current priority — Tier-1 Garage (gameplay verified; artwork approval open)
+## Current priority — Tier-1 Garage (gameplay and artwork verified)
 
 The authorized Garage expansion adds Senda and Lilt mechanics, Save v19 and three
 localized cards. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md) for exact contracts,
-balance limits and pending artwork approval. All **2,283 tests and 270 Chromium cases pass** in
+balance limits and artwork approval provenance. All **2,283 tests and 270 Chromium cases pass** in
 [run 34766756642](https://github.com/TLSnipZ/Idle-Game/actions/runs/34766756642).
-PR #27 records merge and deployment status separately. The immediate Garage
-checkpoint is approval/refinement of the two Model Candidate A images, then
-production art integration. Heat / Police 2.0 is not started.
+PR #27 delivered the gameplay. PR #28 completes the approved model artwork; its verification is recorded above and its release is tracked in the PR. Heat / Police 2.0 is next and has not started.
 
 The user moved the whole-game audit and regression repairs ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
 for implementation, defects, verification and overhaul priorities.
@@ -26,7 +24,7 @@ regression restoration: **2,252 / 2,252 tests pass, zero failures/skips**, and a
 255 Chromium cases pass. CI now requires a fully passing suite. Verification:
 [run 34764804304](https://github.com/TLSnipZ/Idle-Game/actions/runs/34764804304).
 The audit handed off to the current Tier-1 Garage work above; Heat / Police 2.0
-follows the remaining artwork acceptance checkpoint.
+follows the Tier-1 artwork release.
 
 ## Active Vehicle implementation — merged PR #23
 

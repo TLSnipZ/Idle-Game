@@ -2,7 +2,7 @@
 
 ## Current artwork handoff
 
-Tier-1 artwork integration is implemented on `art/tier-one-vehicles`. The user approved the blue Senda and red Lilt with “Leg los broooo” after the explicit model-approval question. Clean standalone derivatives and optimized WebP delivery are included; verification and deployment are tracked in the artwork PR. Heat / Police 2.0 follows this release and is not started here.
+Tier-1 artwork is implemented and verified in [PR #28](https://github.com/TLSnipZ/Idle-Game/pull/28). [Run 34774339210](https://github.com/TLSnipZ/Idle-Game/actions/runs/34774339210) verified code commit `298ef28287bfe6f090736698f06861c7b0adb35a`: strict build, 2,283/2,283 tests (zero failures/skips), 45 Garage and 225 whole-game Chromium cases, and whitespace checks passed. Evidence artifact: `10322962950`. This documentation-only follow-up does not change the verified runtime or tests. The PR records merge/deployment separately. Heat / Police 2.0 is the next separate phase and has not started.
 
 Completed: **P1 UI regression restoration** (PR #26), following the whole-game
 audit and Villager overkill (PRs #24–25). All **2,252 tests pass, zero failures or
@@ -10,8 +10,7 @@ skips**; strict build, whitespace checks and all 255 Chromium cases passed.
 Automation description links, instant Operations navigation and shared action
 spacing are repaired. Evidence: [GAME_AUDIT.md](GAME_AUDIT.md).
 Current phase: **Tier-1 Garage — Kairo Senda / Namera Lilt** gameplay and automated
-verification complete in PR #27: 2,283 tests and 270 Chromium cases pass. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md). New model artwork awaits
-explicit reference approval. Heat / Police 2.0 follows this Garage block. Other P2 audit items remain tracked; no additional content shipped in P1.
+verification complete in PR #27: 2,283 tests and 270 Chromium cases pass. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md). Approved Senda and Lilt artwork is integrated and verified in PR #28. Heat / Police 2.0 follows this Garage block. Other P2 audit items remain tracked; no additional content shipped in P1.
 
 Previous milestone: **Active Vehicle Foundation / Save v18** is implemented on
 `feat/active-vehicle-complete` in PR #23; executed checks and release state are
