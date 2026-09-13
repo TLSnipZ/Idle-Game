@@ -16,7 +16,7 @@ export function VehicleTuning({ state, paused, onConfigure }: {
   const selected = findTuning(build?.selectedId);
   const active = state.garage.activeVehicleId === STARTER_VEHICLE.id;
   return <section className="vehicle-tuning panel" aria-labelledby="tuning-heading">
-    <h3 id="tuning-heading">{text('KX-R Workshop', 'KX-R-Werkstatt')}</h3>
+    <h3 id="tuning-heading" tabIndex={-1}>{text('KX-R Workshop', 'KX-R-Werkstatt')}</h3>
     <p>{text('One car, one setup. Buy and fit permanent parts; swap owned setups or restore stock for free. Rebirth keeps the build. Your accountant keeps the nightmares.',
       'Ein Auto, ein Setup. Teile dauerhaft kaufen und einbauen. Gekaufte Setups und Serie kostenlos wechseln. Rebirth behält den Ausbau. Dein Buchhalter behält die Albträume.')}</p>
     <p className="tuning-selection">{text('Fitted:', 'Eingebaut:')} <strong>{selected ? text(selected.name, selected.germanName) : text('Stock', 'Serie')}</strong>

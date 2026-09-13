@@ -586,6 +586,8 @@ try {
     await navigation(page).nth(1).click();
     await page.locator('.operations-primary-action').click();
     assert.equal((await saved(page)).state.economy.cash, '2502700');
+    if (locale === 'villager') await assertVillagerOnly(page);
+    else assert.ok((await page.locator('.modifier-breakdown').first().textContent()).includes(locale === 'de' ? 'Kurier-Steuergerät' : 'Courier ECU'));
     await navigation(page).nth(3).click();
     await fleet.click();
     assert.equal((await saved(page)).state.economy.cash, '2502700');
