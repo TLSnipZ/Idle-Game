@@ -110,10 +110,20 @@ h1 em { color: var(--color-cool); font-style: normal; }
   .save-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
-.offline-return { padding: clamp(1rem, 3vw, 2rem); margin-bottom: 1.5rem; border-color: var(--color-cool); }
-.offline-return p { line-height: 1.5; }
-.offline-income { color: var(--color-cool); font-size: clamp(1.5rem, 4vw, 2.5rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.offline-return button { max-width: 16rem; }
+.offline-return { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .25rem 1rem; padding: .75rem 1rem; margin-bottom: 1rem; box-shadow: none; overflow-wrap: anywhere; }
+.offline-summary { min-width: 0; }
+.offline-summary h2 { margin: 0; font-size: 1rem; }
+.offline-return p { margin: .25rem 0; line-height: 1.45; font-size: .85rem; }
+.offline-return .offline-income { color: var(--color-cool); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.offline-return .offline-continue { width: auto; max-width: 12rem; min-height: 44px; padding: .55rem .8rem; background: var(--color-cool-tint); color: var(--color-cool); border-color: var(--color-border); white-space: normal; overflow-wrap: anywhere; }
+.offline-continue:enabled:hover { border-color: var(--color-cool); }
+.offline-details { grid-column: 1 / -1; min-width: 0; }
+.offline-details summary { width: fit-content; max-width: 100%; box-sizing: border-box; min-height: 44px; padding-block: .65rem; cursor: pointer; color: var(--color-muted); font-size: .8rem; }
+.offline-details[open] { padding-bottom: .25rem; }
+@media (max-width: 480px) {
+  .offline-return { grid-template-columns: minmax(0, 1fr); }
+  .offline-return .offline-continue { max-width: 100%; justify-self: start; }
+}
 
 .business-terms > div { min-width: 0; }
 .business-terms strong { display: block; overflow-wrap: anywhere; }

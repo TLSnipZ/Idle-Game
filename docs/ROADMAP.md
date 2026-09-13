@@ -1,5 +1,14 @@
 # Roadmap
 
+## Interlude — compact Welcome back panel
+
+The offline return panel now shows a compact heading, earnings and Continue action.
+Income breakdown, XP, elapsed/credited time and cap notes expand through native
+Details. Automatic spending remains visible before expansion. Styling wraps on
+mobile and supports EN, DE and Villager. Presentation only; Save v21 / CE1 and
+offline credit/dismissal semantics are unchanged. Verification is recorded in the
+patch PR. Senda/Lilt tuning remains the next separate gameplay phase.
+
 ## Current phase — Garage 2.0 I: KX-R tuning
 
 Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](GARAGE_TUNING.md) for prices, balance, persistence and verification scope.
