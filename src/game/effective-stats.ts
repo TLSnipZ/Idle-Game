@@ -2,7 +2,7 @@ import { collectCrewModifiers } from '../features/crew';
 import { collectHeatModifiers } from '../features/heat';
 import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
-import { findVehicle } from '../features/vehicles';
+import { assertGarageState, findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
 import { findBusiness, getLevelProduction, getOwnedProductionInputs } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
@@ -20,13 +20,9 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
     seen.add(id);
     return upgrade.modifier;
   });
-  if (!Array.isArray(state.garage.ownedVehicleIds)) throw new RangeError('Invalid authoritative vehicle ownership');
-  const vehicles = state.garage.ownedVehicleIds.map(id => {
-    const vehicle = findVehicle(id);
-    if (!vehicle || seen.has(id)) throw new RangeError('Invalid authoritative vehicle ownership');
-    seen.add(id);
-    return vehicle.modifier;
-  });
+  assertGarageState(state.garage);
+  const activeVehicle = findVehicle(state.garage.activeVehicleId);
+  const vehicles = activeVehicle ? [activeVehicle.modifier] : [];
   return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {

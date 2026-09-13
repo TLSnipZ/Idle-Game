@@ -29,7 +29,7 @@ describe('permanent stat sources', () => {
     expect(evaluateBusinessProduction(skillState({ [SILENT]: rank }), B.id, 1)).toMatchObject({ ok: true, effective: rational(BigInt(n), BigInt(d)) });
   });
   it('stacks permanent/vehicle/temporary sources exactly, with stable IDs and scoped filtering', () => {
-    const state = { ...skillState({ [ROOT]: 2, [SILENT]: 1, [FAST]: 1, [LEARN]: 1 }), garage: { ownedVehicleIds: [V.id] } };
+    const state = { ...skillState({ [ROOT]: 2, [SILENT]: 1, [FAST]: 1, [LEARN]: 1 }), garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id } };
     const base = evaluateBusinessProduction(state, B.id, 1); expect(base).toMatchObject({ ok: true, effective: rational(3993n, 40n) });
     if (!base.ok) throw Error('fixture');
     expect(base.applied.map(m => m.sourceId).sort()).toEqual([ROOT, SILENT, V.id].sort());
@@ -41,7 +41,7 @@ describe('permanent stat sources', () => {
   });
   it('preserves both production fractions through arbitrary split durations with skills', () => {
     const original = skillState({ [ROOT]: 2, [SILENT]: 1 });
-    const state = { ...original, garage: { ownedVehicleIds: [V.id] }, businesses: { ...original.businesses,
+    const state = { ...original, garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id }, businesses: { ...original.businesses,
       productionRemainderMilliCents: 975, productionRemainderSubMilliCents: rational(1n, 3n) } };
     const before = JSON.stringify(state); let split: GameState = state;
     for (const duration of [1, 13, 273, 901, 12345]) split = simulateElapsed(split, duration).state;

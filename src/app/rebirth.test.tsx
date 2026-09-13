@@ -51,7 +51,7 @@ describe('Rebirth confirmation', () => {
     expect(after.economy.cash).toBe('0'); expect(after.progression.xp).toBe(0);
     expect(after.businesses.owned).toEqual({}); expect(after.upgrades.purchasedIds).toEqual([]);
     expect(after.automation.unlockedIds).toEqual([]); expect(after.permanentProgression.rebirthCount).toBe(1);
-    expect(renderToStaticMarkup(<Garage state={after} paused={false} onPurchase={() => {}} />)).toContain('OWNED');
+    expect(renderToStaticMarkup(<Garage state={after} paused={false} onPurchase={() => {}} onSelect={() => {}} />)).toContain('OWNED');
     const raw = h.f.raw(); h.controls.confirm(); expect(h.f.raw()).toBe(raw); h.f.game.stop();
   });
   it('storage failure reports no reset and keeps the previous save and live operation', () => {

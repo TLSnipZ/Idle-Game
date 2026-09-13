@@ -43,7 +43,7 @@ function jobStack(value = 0) {
 function productionStack() {
   const s = crewState({ operations: null, logistics: J.id });
   return { ...s, businesses: { ...s.businesses, owned: { [B.id]: { level: 1 } } },
-    garage: { ownedVehicleIds: [V.id] }, permanentProgression: { ...s.permanentProgression, skills: { [ROOT]: 2, [SILENT]: 1 } } };
+    garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id }, permanentProgression: { ...s.permanentProgression, skills: { [ROOT]: 2, [SILENT]: 1 } } };
 }
 
 describe('Crew catalog and acquisition', () => {

@@ -113,8 +113,8 @@ describe('POST 1B system compositions', () => {
   it.each([false, true])('Garage information stays independent of image loading, owned=%s', owned => {
     const s = fresh(), vehicle = VEHICLE_CATALOG[0];
     if (!vehicle) throw Error('catalog fixture');
-    const state = owned ? { ...s, garage: { ownedVehicleIds: [vehicle.id] } } : s;
-    const panel = dom(<Garage state={state} paused={false} onPurchase={noop} />);
+    const state = owned ? { ...s, garage: { ownedVehicleIds: [vehicle.id], activeVehicleId: vehicle.id } } : s;
+    const panel = dom(<Garage state={state} paused={false} onPurchase={noop} onSelect={noop} />);
     expect(panel.querySelectorAll('article')).toHaveLength(1);
     expect(panel.querySelectorAll('img')).toHaveLength(1);
     expect(panel.textContent).toContain('Kairo KX-R');
@@ -130,8 +130,8 @@ it.each(['locked', 'unaffordable', 'ready', 'owned'] as const)('KX-R %s uses acc
   const state = { ...initial, progression: { xp: mode === 'locked' ? 0 : 1600 },
     economy: { cash: moneyFromMinorUnits(mode === 'ready' ? '2500000' : '0') },
     businesses: { ...initial.businesses, owned: { [STARTER_BUSINESS.id]: { level: 5 } } },
-    garage: { ownedVehicleIds: mode === 'owned' ? [vehicle.id] : [] } };
-  const panel = dom(<Garage state={state} paused={false} onPurchase={noop} />);
+    garage: { ownedVehicleIds: mode === 'owned' ? [vehicle.id] : [], activeVehicleId: mode === 'owned' ? vehicle.id : null } };
+  const panel = dom(<Garage state={state} paused={false} onPurchase={noop} onSelect={noop} />);
   const image = panel.querySelector('img');
   expect(image?.getAttribute('alt')).toBe('Kairo KX-R in the Solara City garage');
   expect(image?.getAttribute('src')).toContain('kairo-kx-r.webp');

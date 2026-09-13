@@ -3,7 +3,10 @@ import type { Modifier } from '../../../game/modifiers';
 import type { Requirement } from '../../../game/requirement';
 
 export type VehicleId = `vehicle:${string}`;
-export interface GarageState { readonly ownedVehicleIds: readonly VehicleId[] }
+export interface GarageState {
+  readonly ownedVehicleIds: readonly VehicleId[];
+  readonly activeVehicleId: VehicleId | null;
+}
 export interface VehicleDefinition {
   readonly id: VehicleId;
   readonly name: string;

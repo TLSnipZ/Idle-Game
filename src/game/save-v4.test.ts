@@ -19,9 +19,9 @@ function current() {
 describe('v4 delegation saves', () => {
   it('migrates realistic v3 with all upgrades preserving every previous field and timestamp', () => {
     const original = old(); const text = stringifySaveFixture(original); const result = parseSave(text);
-    expect(CURRENT_SAVE_VERSION).toBe(17);
+    expect(CURRENT_SAVE_VERSION).toBe(18);
     expect(result).toEqual({ ok: true, envelope: { ...original, version: CURRENT_SAVE_VERSION,
-      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 } } } });
+      state: { ...original.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] }, permanentProgression: { statistics: createInitialStatistics(0), unlockedAchievementIds: [], skills: {}, empirePoints: 0, rebirthCount: 0 }, garage: { ownedVehicleIds: [], activeVehicleId: null }, progression: { xp: 0 }, automation: { businessAutoUpgradeTargetId: 'business:dockside-detail' as const, enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [], starterJobElapsedMs: 0 } } } });
     expect(stringifySaveFixture(original)).toBe(text);
     expect(validateSaveCode(encodeSaveText(text))).toEqual(result);
   });

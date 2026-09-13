@@ -14,6 +14,6 @@ export function rebirthState(playerLevel = 20, businessLevel = 25): GameState {
     progression: { xp: getXpThresholdForLevel(playerLevel) },
     businesses: { ...state.businesses, owned: { [B.id]: { level: businessLevel } },
       productionRemainderMilliCents: 975, productionRemainderSubMilliCents: rational(1n, 3n) },
-    garage: { ownedVehicleIds: [V.id] }, upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) },
+    garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id }, upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) },
     automation: { businessAutoUpgradeTargetId: 'business:dockside-detail', enabledIds: [], businessAutoUpgradeElapsedMs: 0, unlockedIds: [D.id], starterJobElapsedMs: 7000 } };
 }

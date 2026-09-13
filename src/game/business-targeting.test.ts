@@ -26,12 +26,12 @@ function portfolio(): GameState {
     automation: { ...s.automation, businessAutoUpgradeTargetId: C, businessAutoUpgradeElapsedMs: 20000 } };
 }
 function simulate(s: GameState, ms: number) { const result = simulateGameElapsed(s, ms); if (!result.ok) throw Error(result.error); return result; }
-const envelope = <T>(state: T, version = 17) => ({ format: 'crime-empire-save', version, savedAt: 123456789, state });
-function historical(s: GameState) { const { businessAutoUpgradeTargetId: _target, ...automation } = s.automation; return { ...s, automation }; }
+const envelope = <T>(state: T, version = 18) => ({ format: 'crime-empire-save', version, savedAt: 123456789, state });
+function historical(s: GameState) { const { businessAutoUpgradeTargetId: _target, ...automation } = s.automation; const { activeVehicleId: _active, ...garage } = s.garage; return { ...s, automation, garage }; }
 afterEach(() => vi.restoreAllMocks());
 describe('v17 target compatibility', () => {
   it('adds only the stable target to fresh automation; new Businesses remain absent', () => {
-    const s = createInitialGameState(); expect(CURRENT_SAVE_VERSION).toBe(17);
+    const s = createInitialGameState(); expect(CURRENT_SAVE_VERSION).toBe(18);
     expect(s.businesses.owned).toEqual({});
     expect(s.automation).toEqual({ unlockedIds: [], enabledIds: [], starterJobElapsedMs: 0, businessAutoUpgradeElapsedMs: 0, businessAutoUpgradeTargetId: D.id });
   });

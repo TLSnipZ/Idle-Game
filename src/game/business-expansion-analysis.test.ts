@@ -110,10 +110,10 @@ describe('POST 3A isolated proposed-economy evidence', () => {
       const state = { ...fresh, businesses: { ...fresh.businesses, owned },
         upgrades: { purchasedIds: [PRESSURE_WASHER.id, DETAILING_LINE.id, FLEET_LOGISTICS.id] } };
       const total = productionDollars(state);
-      const kxr = productionDollars({ ...state, garage: { ownedVehicleIds: [V.id] } });
+      const kxr = productionDollars({ ...state, garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id } });
       expect(kxr / total).toBeCloseTo(1.1, 10);
       const jax = { ...state, crew: { recruitedIds: [JAX_MERCER.id], assignments: { operations: null, logistics: JAX_MERCER.id } } };
-      const skill = { ...jax, garage: { ownedVehicleIds: [V.id] }, permanentProgression: { ...fresh.permanentProgression,
+      const skill = { ...jax, garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id }, permanentProgression: { ...fresh.permanentProgression,
         skills: { 'skill:streetwise-investment': 3, 'skill:silent-partner': 2 } } };
       const shares = Object.entries(owned).map(([id, entry]) => {
         const rate = evaluateBusinessProduction(state, id, entry.level);
@@ -133,7 +133,7 @@ describe('POST 3A isolated proposed-economy evidence', () => {
     state = { ...state, economy: { cash: moneyFromMinorUnits('100000000') },
       progression: { xp: getXpThresholdForLevel(20) }, city: { ...state.city, ownedTerritoryIds: [...state.city.ownedTerritoryIds, NEON_MILE.id] },
       businesses: { ...state.businesses, owned: { [B.id]: { level: 25 } } },
-      garage: { ownedVehicleIds: [V.id] } };
+      garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id } };
     const before = successful(simulateElapsed(state, 13));
     const laundry = BUSINESS_PROPOSALS[0];
     if (!laundry) throw Error('proposal missing');

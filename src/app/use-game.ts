@@ -12,6 +12,7 @@ import { acquireTerritory } from '../game/acquire-territory';
 import { describeTerritoryAcquisition } from './territory-presentation';
 import { purchaseSkillRank } from '../game/purchase-skill-rank';
 import { describeSkillPurchase } from './skill-presentation';
+import { findVehicle } from '../features/vehicles';
 import { purchaseVehicle } from '../game/purchase-vehicle';
 import { purchaseAutomation } from '../game/purchase-automation';
 import { purchaseUpgrade } from '../game/purchase-upgrade';
@@ -84,6 +85,17 @@ export function useGame() {
     if (result) setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('vehicle', result, id, presentationLocale) }));
     else if (runtime.getSnapshot().persistence.kind === 'error' || runtime.getSnapshot().persistence.kind === 'blocked') setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'warning', message: localize(presentationLocale, 'Vehicle purchase could not be saved. No purchase was made.', 'Fahrzeugkauf konnte nicht gespeichert werden. Kein Kauf durchgeführt. Deine Garage bleibt finanziell verantwortungsvoll — leider.') }));
   }
+  function chooseActiveVehicle(id: string) {
+    const before = runtime.getSnapshot().result.state;
+    const result = runtime.selectActiveVehicle(id);
+    if (result?.ok && result.state === before) return;
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result?.ok ? localize(presentationLocale,
+        `${findVehicle(id)?.name} is active. One car earns the bonus; the others can admire the parking.`,
+        `${findVehicle(id)?.name} ist aktiv. Ein Auto liefert den Bonus, der Rest bewundert den Parkplatz.`)
+        : localize(presentationLocale, 'Vehicle selection could not be saved. Your active car is unchanged.',
+          'Fahrzeugauswahl konnte nicht gespeichert werden. Dein aktives Auto bleibt im Dienst.') }));
+  }
   function coolDown() { runtime.execute(state => { const result = layLow(state); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeLayLow(result, presentationLocale) })); return result; }); }
   function takeTerritory(id: unknown) { runtime.execute(state => { const result = acquireTerritory(state, id); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeTerritoryAcquisition(result, id, presentationLocale) })); return result; }); }
   function buySkill(id: unknown) { runtime.execute(state => { const result = purchaseSkillRank(state, id); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeSkillPurchase(result, id, presentationLocale) })); return result; }); }
@@ -104,5 +116,5 @@ export function useGame() {
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message: result?.ok ? localize(presentationLocale, `Auto-Upgrader target set to ${findBusiness(id)?.name}.`, `Auto-Upgrader-Ziel auf ${findBusiness(id)?.name} gesetzt. Dein Cash kennt jetzt seine nächste Bestimmung.`) : localize(presentationLocale, 'Auto-Upgrader target could not be changed.', 'Auto-Upgrader-Ziel konnte nicht geändert werden. Die Maschine verweigert die Umstrukturierung.') }));
   }
 
-  return { replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

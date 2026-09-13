@@ -1,4 +1,4 @@
-import { findVehicle } from '../features/vehicles';
+import { assertGarageState, findVehicle } from '../features/vehicles';
 import { spendCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
 import { evaluateRequirements } from './requirements';
@@ -9,6 +9,7 @@ export type PurchaseVehicleResult = { readonly ok: true; readonly state: GameSta
   | { readonly ok: false; readonly state: GameState; readonly error: EconomyError | 'unknown-vehicle' | 'already-owned' }
   | { readonly ok: false; readonly state: GameState; readonly error: 'prerequisite-not-met'; readonly requirements: RequirementResult };
 export function purchaseVehicle(state: GameState, id: unknown): PurchaseVehicleResult {
+  assertGarageState(state.garage);
   const vehicle = findVehicle(id);
   if (!vehicle) return { ok: false, state, error: 'unknown-vehicle' };
   if (state.garage.ownedVehicleIds.includes(vehicle.id)) return { ok: false, state, error: 'already-owned' };
@@ -17,5 +18,6 @@ export function purchaseVehicle(state: GameState, id: unknown): PurchaseVehicleR
   const payment = spendCash(state.economy, vehicle.purchaseCost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
   return { ok: true, state: { ...state, economy: payment.state,
-    garage: { ownedVehicleIds: [...state.garage.ownedVehicleIds, vehicle.id] } } };
+    garage: { ownedVehicleIds: [...state.garage.ownedVehicleIds, vehicle.id],
+      activeVehicleId: state.garage.activeVehicleId ?? vehicle.id } } };
 }
