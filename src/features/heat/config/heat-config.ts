@@ -28,3 +28,8 @@ export const POLICE_SURVEILLANCE_HEAT = HEAT_TIERS[2].minimum;
 export const WATCHED_RISK_BONUS_BASIS_POINTS = 2_500;
 export const DISCREET_DELIVERY_BONUS_BASIS_POINTS = -5_000;
 export const DISCREET_DELIVERY_HEAT_REDUCTION = 2;
+
+/** Local pursuit uses the existing MANHUNT tier, never a second saved meter. */
+export const MANHUNT_HEAT = HEAT_TIERS[4].minimum;
+export const DECOY_COST = moneyFromMinorUnits('125000');
+export const DECOY_HEAT_REDUCTION = 30;

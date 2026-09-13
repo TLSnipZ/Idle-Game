@@ -51,6 +51,8 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : localize(locale, `${business?.name ?? 'Business'} acquired. Live production has started.`, `${business?.name ?? 'Business'} übernommen. Produktion läuft. Papierkram angeblich auch.`);
   }
   switch (result.error) {
+    case 'no-manhunt': return localize(locale, 'No local MANHUNT. Keep the decoy money.', 'Keine lokale Großfahndung. Das Geld fürs Ablenkungsmanöver bleibt bei dir.');
+    case 'district-manhunt': return localize(locale, 'Police roadblocks prevent travel. Clear local MANHUNT first.', 'Polizeisperren verhindern den Wechsel. Erst die lokale Großfahndung abschütteln.');
     case 'district-not-owned': return localize(locale, 'Control that district before moving operations.', 'Erst den Bezirk übernehmen, dann den Standort wechseln. Expansion braucht leider Papierkram.');
     case 'district-event-pending': return localize(locale, 'Resolve the current City Event before travelling.', 'Erst das aktuelle Stadtevent klären. Wegfahren ersetzt keinen Anwalt.');
     case 'too-hot': return localize(locale, 'Risky delivery refused. Cool down first; your client has developed a sudden respect for the law.', 'Risiko-Lieferung abgelehnt. Erst abkühlen; dein Auftraggeber hat plötzlich Respekt vor dem Gesetz.');

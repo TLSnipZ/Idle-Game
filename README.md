@@ -26,7 +26,15 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
-## Current phase — Heat III: District Heat
+## Current phase — Heat IV: MANHUNT
+
+Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
+decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
+See [MANHUNT](docs/MANHUNT.md) for balance, persistence and acceptance. CI pending.
+Next separate phase: **Heat V — deeper cross-system integration**.
+Earlier phase records below are historical.
+
+## Previous phase — Heat III: District Heat
 
 Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
 local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
@@ -92,7 +100,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
 | **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
-| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT is next; more Business depth, crew and event development, and richer territory progression remain planned. |
+| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V cross-system integration is next; more Business depth, crew and event development, and richer territory progression remain planned. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
 

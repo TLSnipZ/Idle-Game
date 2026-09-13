@@ -1,5 +1,14 @@
 # Base Game balance
 
+## Current phase — Heat IV: MANHUNT
+
+Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
+decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
+See [MANHUNT](MANHUNT.md) for balance, persistence and acceptance. CI pending.
+Next separate phase: **Heat V — deeper cross-system integration**.
+Earlier phase records below are historical.
+
+
 ## Current phase — Heat III: District Heat
 
 Implemented: separate Waterfront/Neon Heat, durable owned-district travel,

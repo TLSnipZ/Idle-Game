@@ -1,0 +1,6 @@
+.manhunt-panel { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-border); overflow-wrap: anywhere; }
+.manhunt-panel h3, .manhunt-panel h4 { margin: 0 0 .75rem; }
+.manhunt-panel p { line-height: 1.5; }
+.manhunt-panel.is-active { border-color: var(--color-hot); }
+.manhunt-panel.is-active .manhunt-status { color: var(--color-hot); font-weight: 700; }
+.manhunt-decoy-button { min-height: 44px; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
