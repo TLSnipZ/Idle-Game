@@ -44,6 +44,7 @@ try {
       if (locale === 'villager') assert.match(heading, /^H[rm]+/);
       const geometry = await page.evaluate(() => ({
         overflow: document.documentElement.scrollWidth - innerWidth,
+        chromeHeight: Math.round(document.querySelector('.global-chrome')?.getBoundingClientRect().height ?? 0),
         section: document.querySelector('#section-content')?.getAttribute('data-section'),
         brokenImages: [...document.images].filter(image => image.complete && image.naturalWidth === 0).map(image => image.src),
       }));
@@ -95,7 +96,9 @@ try {
   assert.match(code, /^CE1-/);
   await page.locator('#import-code').fill('CE1-invalid');
   await page.locator('.import-tools button').first().click();
-  assert.equal(await page.locator('#import-confirmation').count(), 0);
+  assert.equal(await page.locator('.import-tools .save-confirm').count(), 0);
+  assert.equal(await page.locator('#import-code').getAttribute('aria-invalid'), 'true');
+  assert.ok((await saved(page)).state.permanentProgression.statistics.manualJobsCompleted >= 6);
   await page.locator('.reset-panel > button').click();
   await page.locator('#reset-confirmation-text').fill('RESET');
   await settings(page, 'villager');
@@ -107,8 +110,70 @@ try {
   assert.deepEqual((await saved(page)).state.garage, beforeReload.state.garage);
   assert.deepEqual(errors, []);
   await context.close();
+  // Cross-feature commands in each locale using a disposable advanced save.
+  for (const locale of ['en', 'de', 'villager']) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (sessionStorage.getItem('advanced-audit')) return;
+      fixture.savedAt = Date.now();
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('advanced-audit', 'true');
+    }, { fixture: fixtures[2], locale });
+    await page.goto('http://127.0.0.1:4174');
+    await navigation(page).nth(1).click();
+    await page.locator('.auto-spend-card > button').click();
+    assert.deepEqual((await saved(page)).state.automation.enabledIds, []);
+    await page.locator('#auto-upgrader-target').selectOption('business:dockside-detail');
+    assert.equal((await saved(page)).state.automation.businessAutoUpgradeTargetId, 'business:dockside-detail');
+    const level = (await saved(page)).state.businesses.owned['business:dockside-detail'].level;
+    await page.locator('.business-card .purchase-button').first().click();
+    assert.equal((await saved(page)).state.businesses.owned['business:dockside-detail'].level, level + 1);
+    await navigation(page).nth(2).click();
+    const heat = (await saved(page)).state.city.heat;
+    await page.locator('.heat-action button').click();
+    assert.ok((await saved(page)).state.city.heat < heat);
+    await page.locator('.crew-slots .crew-slot button').first().click();
+    assert.equal((await saved(page)).state.crew.assignments.operations, null);
+    await page.locator('.event-choice button').first().click();
+    assert.equal((await saved(page)).state.events.pendingEventId, null);
+    await navigation(page).nth(4).click();
+    const ep = (await saved(page)).state.permanentProgression.empirePoints;
+    await page.locator('.skill-node button:not(:disabled)').first().click();
+    assert.ok((await saved(page)).state.permanentProgression.empirePoints < ep);
+    await page.locator('.rebirth-panel > .rebirth-button').click();
+    const nextLocale = locale === 'de' ? 'villager' : 'de';
+    await settings(page, nextLocale);
+    assert.equal(await page.locator('#rebirth-warning').count(), 1);
+    await page.locator('.rebirth-panel .confirmation-actions button').first().click();
+    const cancellation = await page.locator('.rebirth-panel > [role="status"]').textContent();
+    if (nextLocale === 'villager') assert.match(cancellation, /^H[rm]+/);
+    else assert.ok(cancellation.includes('Rebirth abgebrochen.'));
+    const before = (await saved(page)).state;
+    await page.locator('.rebirth-panel > .rebirth-button').click();
+    await page.locator('.rebirth-panel .confirmation-actions .rebirth-button').click();
+    const reborn = (await saved(page)).state;
+    assert.deepEqual(reborn.garage, before.garage);
+    assert.equal(reborn.permanentProgression.rebirthCount, before.permanentProgression.rebirthCount + 1);
+    assert.deepEqual(reborn.businesses.owned, {});
+    await page.locator('.reset-panel > button').click();
+    await page.locator('#reset-confirmation-text').fill('reset');
+    assert.equal(await page.locator('#reset-confirmation .danger-button').isDisabled(), true);
+    await page.locator('#reset-confirmation-text').fill('RESET');
+    await page.locator('#reset-confirmation .danger-button').click();
+    const restarted = await saved(page);
+    assert.deepEqual(restarted.state.garage, { ownedVehicleIds: [], activeVehicleId: null });
+    assert.equal(restarted.state.permanentProgression.empirePoints, 0);
+    await page.reload();
+    assert.deepEqual((await saved(page)).state.garage, restarted.state.garage);
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
   console.log(JSON.stringify({ sectionCases: results.length, localeSwitchAndFeedback: true,
-    keyboardModalAndReload: true, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
+    keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));
   await browser?.close(); server.kill('SIGTERM');
