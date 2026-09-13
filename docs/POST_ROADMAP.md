@@ -4,12 +4,15 @@ This is the current post-roadmap status and priority source.
 
 ## Active Vehicle implementation — current branch
 
-Active Vehicle Foundation and Save v18 are implemented on `feat/active-vehicle-complete`;
-verification is in progress, not merged or live. PR #22 was a design-only checkpoint.
-The four storefronts were merged in PR #21 and deployed successfully. The next release
-requires the actual selection/migration/UI patch, CI evidence and live acceptance.
+Active Vehicle Foundation and Save v18 are implemented in PR #23.
+Its verification and release evidence are recorded below and in the PR. Manual live
+acceptance remains separate. PR #22 was a design-only checkpoint.
+The four storefronts were merged in PR #21 and deployed successfully. PR #23 supplies the actual selection/migration/UI patch and CI evidence.
 Afterward: Tier-1 Garage (Kairo Senda / Namera Lilt), then Heat / Police 2.0.
-See [ACTIVE_VEHICLE.md](ACTIVE_VEHICLE.md) for current scope and verification.
+Verification: run [34757750344](https://github.com/TLSnipZ/Idle-Game/actions/runs/34757750344)
+passed typecheck/build, regression comparison (2,159 passed / the same 64 existing
+failures; all 47 new tests passed) and 20 EN/DE production Chromium cases. No baseline
+tests were removed. See [ACTIVE_VEHICLE.md](ACTIVE_VEHICLE.md) for scope and evidence.
 
 The following numbered entries retain their historical save-version and acceptance records. ROADMAP.md retains
 historical Base Game records. Main before this branch used Save v17 / CE1, including POST 2C vehicle
@@ -206,10 +209,10 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Previous task: the user's approved four-storefront preview, merged and deployed in PR #21.**
-Dockside's prior crop is replaced, Laundry's matching preview crop is retained, and
-Afterdark Customs plus Solara Nights are added. No new artwork generation or UI
-redesign. Check the current integration PR for merge/Pages verification, then review
-all four actual in-game cards. The user has authorized Active Vehicle Foundation; that implementation is the current
-branch described at the top. Tier-1 content remains the subsequent separate phase. Preserve Save v17 / CE1, GameState,
-economy, balance, gates, automation authority, RNG, localization and runtime behavior.
+**Current task: Active Vehicle Foundation, implemented in PR #23.**
+The approved four-storefront package was merged and deployed in PR #21. PR #22
+contained the Garage design only. PR #23 adds the actual selection, Save v18 migration,
+active-only modifier, durable runtime transaction and localized Garage UI.
+Preserve Save v18 / CE1, active ownership invariants and the existing economy,
+Business balance, automation, RNG, offline and Rebirth protections. Tier-1 cars are
+the next separate scope after acceptance; Heat / Police 2.0 follows the Garage block.

@@ -1,6 +1,6 @@
 # Active Vehicle Foundation
 
-Status: implementation prepared on `feat/active-vehicle-complete`; CI and production-browser verification in progress. Not merged or live. PR #22 contained only this design checkpoint, not the feature implementation.
+Status: implementation complete in PR #23. Release/merge status is recorded in the PR; manual live acceptance remains a separate checkpoint. PR #22 contained only this design document, not the feature implementation.
 
 ## Scope
 
@@ -51,5 +51,27 @@ therefore runs on GitHub Actions through a separate read-only, non-deploying wor
 It compares the complete candidate test suite with pinned baseline `4291873`, rejects
 new failures and increased skips, and checks the actual production build in Chromium
 using disposable validated v17 saves in EN/DE. Reports and screenshots are CI artifacts;
-manual visual acceptance remains a separate user review. Final run evidence follows
-before this implementation PR is marked ready. No unrun check is considered passed.
+manual visual acceptance remains a separate user review. Executed verification and the latest release status are recorded in PR #23. No unrun
+check is considered passed.
+
+## Executed verification — 2026-09-13
+
+[Run 34757750344](https://github.com/TLSnipZ/Idle-Game/actions/runs/34757750344)
+verified code commit `2237867d8386f6d7e6463994e5eaadd5048c4105`:
+
+- Fresh Node 24 dependency install, strict typecheck and production build passed.
+- Complete baseline: 2,176 tests, 2,112 passed, 64 failed.
+- Complete candidate: 2,223 tests, 2,159 passed, the same 64 failed.
+- All 47 added tests passed. No new failures, removed baseline tests or increased skips.
+  The full suite is **not green**; existing app/presentation failures remain recorded
+  by exact file/test identity in the report. No failing test was disabled.
+- Twenty actual production Chromium cases passed: EN/DE at 320, 390, 740, 1024 and
+  1440px, both empty and owned v17 Garage bootstrap, purchase/automatic activation,
+  decoded KX-R art, persisted v18 selection and reload. No page errors or document
+  overflow in these Garage cases. Real Settings language switching also passed.
+- `git diff --check` passed. Business assets and existing stylesheets are unchanged;
+  only the isolated Garage summary stylesheet was added.
+
+[Verification artifacts and screenshots](https://github.com/TLSnipZ/Idle-Game/actions/runs/34757750344/artifacts/10318240240)
+are retained for seven days. Screenshots were captured by CI; no human visual review
+is claimed. Merge and Pages deployment are separate checkpoints recorded in PR #23.

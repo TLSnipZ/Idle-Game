@@ -3,12 +3,12 @@
 ## Status & scope
 
 **POST 2A design complete; POST 2B Model Reference approved; POST 2C integration
-implemented, live verification pending.** POST 2C descends from
+implemented and visually accepted by the user.** POST 2C descends from
 `10f170447d09e12f7ef1293539ef979c506fa563`.
 
 This catalog contains fourteen identities: **Kairo KX-R implemented, thirteen
 remaining vehicles planned**. Proposed names/values for rows 2–14 are not live.
-Active Vehicle Foundation is implemented on the current branch (verification pending);
+Active Vehicle Foundation is implemented in PR #23 (verification/release evidence in the PR);
 Tuning and additional vehicles remain future systems. BALANCING.md is live balance authority.
 
 ### Current production behavior

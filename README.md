@@ -70,7 +70,7 @@ The current game has **one purchasable vehicle**. The first purchase activates a
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This branch adds **Active Vehicle Foundation**, currently under verification. Current saves use **schema v18**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Active Vehicle Foundation**; [PR #23](https://github.com/TLSnipZ/Idle-Game/pull/23) records verification and release evidence. Current saves use **schema v18**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 

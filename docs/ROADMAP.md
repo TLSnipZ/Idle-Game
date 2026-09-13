@@ -1,7 +1,8 @@
 # Roadmap
 
 Current continuation: **Active Vehicle Foundation / Save v18** is implemented on
-`feat/active-vehicle-complete`, with CI verification in progress; not merged or live.
+`feat/active-vehicle-complete` in PR #23; executed checks and release state are
+recorded there. Manual live acceptance remains separate.
 The Base Game records below are historical. [POST_ROADMAP.md](POST_ROADMAP.md) and
 [ACTIVE_VEHICLE.md](ACTIVE_VEHICLE.md) own current expansion status. PR #22 was only
 a design checkpoint. Tier-1 Garage content follows this feature's acceptance.
