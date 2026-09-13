@@ -85,7 +85,8 @@ describe('Lilt interval utility', () => {
     const before = simulateGameElapsed(state, interval - 1).state;
     expect(before.city).toMatchObject({ heat: 10, heatDecayElapsedMs: interval - 1 });
     expect(simulateGameElapsed(before, 1).state.city).toMatchObject({ heat: 9, heatDecayElapsedMs: 0 });
-    expect(simulateGameElapsed(state, interval).state).toEqual(simulateGameElapsed(before, 1).state);
+    // Peak-Heat statistics observe each batch's final state; compare the cooling slice only.
+    expect(simulateGameElapsed(state, interval).state.city).toEqual(simulateGameElapsed(before, 1).state.city);
     expect(evaluateJobReward(state)).toMatchObject({ reward: '2500' });
   });
   it('switching preserves a due remainder and grants no tick; zero Heat never banks time', () => {

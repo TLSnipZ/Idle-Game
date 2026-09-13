@@ -99,7 +99,7 @@ describe('five-section presentation navigation', () => {
       [SECTION.overview.id]: ['ECONOMY','PLAYER','CITY PRESSURE','CREW','EMPIRE','CITY EVENT','VIEW COLLECTION'],
       [SECTION.operations.id]: ['JOBS','Waterfront Delivery','BUSINESSES','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','Business Auto-Upgrader'],
       [SECTION.city.id]: ['Solara City','Waterfront','Neon Mile','HEAT','LAY LOW','CREW','CITY EVENTS','No active event'],
-      [SECTION.collection.id]: ['Garage','Kairo KX-R','Owned vehicles: 0 / 1'],
+      [SECTION.collection.id]: ['Garage','Kairo KX-R','Owned vehicles: 0 / 3'],
       [SECTION.empire.id]: ['Rebirth','Empire Points','Empire Foundations','ACHIEVEMENTS','STATISTICS','Save &amp; Transfer','Export save','Validate import'],
     };
     for (const text of surfaces[section.id]) expect(html).toContain(text);

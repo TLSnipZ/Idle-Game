@@ -9,6 +9,7 @@ import { setActiveVehicle } from '../game/set-active-vehicle';
 import { getHeatDecayIntervalMs } from '../game/heat-decay-interval';
 import { parseSave } from '../game/save-schema';
 import { validateSaveCode, exportSaveCode } from '../game/save-code';
+import { unlockEligibleAchievements } from '../game/achievements';
 import { createInitialGameState } from '../game/game-state';
 function state(id: VehicleId = K.id) {
   const initial = rebirthState();
@@ -55,7 +56,7 @@ it.each([S.id, L.id])('%s survives Rebirth below purchase gates; New Game clears
   expect(f.game.getSnapshot().result.state).toEqual(createInitialGameState()); f.game.stop();
 });
 it('imports all three vehicles without historical earnings and retains selection after reload', () => {
-  const f = rebirthRuntime(), incoming = state(L.id), code = exportSaveCode(incoming, 1);
+  const f = rebirthRuntime(), incoming = unlockEligibleAchievements(state(L.id)).state, code = exportSaveCode(incoming, 1);
   if (!code.ok) throw Error(code.error); f.wall(1000000);
   expect(f.game.importCode(code.code).ok).toBe(true);
   expect(f.game.getSnapshot().result.state).toEqual(incoming); f.game.stop();
