@@ -25,7 +25,7 @@ export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
       <div className="feedback-achievement" role="status" aria-live="polite" aria-atomic="true">{achievementEvent && achievements.length > 0 && <span key={achievementEvent.sequence}>{text(achievements.length === 1 ? 'ACHIEVEMENT UNLOCKED' : 'ACHIEVEMENTS UNLOCKED', achievements.length === 1 ? 'ACHIEVEMENT FREIGESCHALTET' : 'ACHIEVEMENTS FREIGESCHALTET')} — {achievements.join(' · ')}</span>}</div>
       <div role="status" aria-live="polite" aria-atomic="true">{levelEvent && !paused && <span key={levelEvent.sequence}>{describeLevelIncrease(levelEvent, locale)}{levelEvent.unlocks?.length ? ` · ${text('New unlock available:', 'Neue Freischaltung:')} ${levelEvent.unlocks.map(name => localizedUnlock(name, locale)).join(', ')}` : ''}</span>}</div>
       <div className="feedback-event" role="status" aria-live="polite" aria-atomic="true">{cityEvent && cityEvent.id === game.snapshot.state.events.pendingEventId && <span key={cityEvent.sequence}>{describeEventSpawn(cityEvent.id, locale)}</span>}</div>
-      <div role="status" aria-live="polite">{automationEvent && !paused && <span>{text('Last dispatch:', 'Letzter Dispatch:')} {describeAutomatedJobs(automationEvent, locale)}</span>}</div>
+      <div>{automationEvent && !paused && <span>{text('Last dispatch:', 'Letzter Dispatch:')} {describeAutomatedJobs(automationEvent, locale)}</span>}</div>
       {transferMessage && <p role="status">{transferMessage}</p>}
       {rebirthMessage && <p role="status">{rebirthMessage}</p>}
     </div>
