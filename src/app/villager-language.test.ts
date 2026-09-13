@@ -1,3 +1,7 @@
+import { describeTerritoryAcquisition } from './territory-presentation';
+import { acquireTerritory } from '../game/acquire-territory';
+import { createInitialGameState } from '../game/game-state';
+import type { Locale } from './localization';
 import { describe, expect, it, vi } from 'vitest';
 import { isLocale, localeTag, translate } from './localization';
 import { localize } from './LocalizationProvider';
@@ -10,6 +14,12 @@ import { createResetProgressControls } from './reset-progress-controls';
 import { createRebirthControls } from './rebirth-controls';
 
 describe('Villager presentation and localization audit regressions', () => {
+  it.each<Locale>(['en', 'de', 'villager'])('reports the concrete missing territory gate in %s', locale => {
+    const result = acquireTerritory(createInitialGameState(), 'territory:neon-mile');
+    const message = describeTerritoryAcquisition(result, 'territory:neon-mile', locale);
+    expect(message).toContain(locale === 'de' ? 'Spielerlevel 12' : 'Player Level 12');
+    if (locale === 'villager') expect(message).toMatch(/^H[rm]+/);
+  });
   it.each(['en', 'de', 'villager'])('accepts supported preference %s', value => expect(isLocale(value)).toBe(true));
   it.each(['fr', '', null, {}, 42])('rejects invalid preference %j', value => expect(isLocale(value)).toBe(false));
   it('keeps exact numbers, units and confirmation words with readable English glosses', () => {

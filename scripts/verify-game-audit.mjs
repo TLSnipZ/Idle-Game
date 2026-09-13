@@ -46,9 +46,14 @@ try {
         overflow: document.documentElement.scrollWidth - innerWidth,
         chromeHeight: Math.round(document.querySelector('.global-chrome')?.getBoundingClientRect().height ?? 0),
         section: document.querySelector('#section-content')?.getAttribute('data-section'),
+        overflowNodes: [...document.querySelectorAll('button, select, h2, h3, strong, dt, .operations-section-heading')].filter(element => {
+          const box = element.getBoundingClientRect();
+          return box.right > innerWidth + 1 && box.width > 0 && !element.closest('.activity-center-items, .global-status');
+        }).slice(0, 8).map(element => ({ tag: element.tagName, className: element.className, text: element.textContent.slice(0, 100), right: Math.round(element.getBoundingClientRect().right) })),
+        clippedMetrics: [...document.querySelectorAll('.business-stat-grid strong, .job-metrics dt')].filter(element => element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1).map(element => ({ text: element.textContent, client: element.clientWidth, scroll: element.scrollWidth })),
         brokenImages: [...document.images].filter(image => image.complete && image.naturalWidth === 0).map(image => image.src),
       }));
-      assert.ok(geometry.overflow <= 1, JSON.stringify({ locale, width, stage, ...geometry }));
+      if (geometry.overflow > 1 || geometry.clippedMetrics.length) console.log('LAYOUT FINDING ' + JSON.stringify({ locale, width, stage, ...geometry }));
       assert.deepEqual(geometry.brokenImages, []);
       if (locale === 'villager' && stage === 1 && [390, 1440].includes(width)) {
         await page.screenshot({ path: 'browser-evidence/audit-' + width + '-' + section + '.png', fullPage: true });
@@ -172,6 +177,8 @@ try {
     assert.deepEqual(errors, []);
     await context.close();
   }
+  const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
+  assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
   console.log(JSON.stringify({ sectionCases: results.length, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {

@@ -1,4 +1,4 @@
-import { villagerText } from './villager-language';
+import { localizedRequirementDescription as translatedRequirement } from './requirement-localization';
 import { acquisitionPresentation } from './acquisition-presentation';
 export { acquisitionPresentation } from './acquisition-presentation';
 import { describeCrewCommand } from './crew-presentation';
@@ -17,17 +17,7 @@ import { DEFAULT_LOCALE } from './localization';
 import type { Locale } from './localization';
 import { localize } from './LocalizationProvider';
 
-function translatedRequirement(description: string, locale: Locale) {
-  if (locale === 'villager') return villagerText(description);
-  if (locale === 'en') return description;
-  if (description === 'Own at least one business') return 'Besitze mindestens ein Business';
-  if (description.startsWith('Player Level ')) return description.replace('Player Level ', 'Spielerlevel ');
-  if (description.startsWith('Own ')) return description.replace('Own ', 'Besitze ');
-  if (description.startsWith('Control ')) return description.replace('Control ', 'Kontrolliere ');
-  if (description.startsWith('Purchase ')) return description.replace('Purchase ', 'Kaufe ');
-  if (description.startsWith('Unlock ')) return description.replace('Unlock ', 'Schalte frei: ');
-  return description;
-}
+
 
 export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown, locale: Locale = DEFAULT_LOCALE): string {
   const business = findBusiness(contentId ?? STARTER_BUSINESS.id);
