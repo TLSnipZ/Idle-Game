@@ -1,7 +1,7 @@
 .operations-page { display: grid; gap: var(--space-xl); min-width: 0; }
 
 .operations-tabs { display: flex; flex-wrap: wrap; gap: .35rem; padding: .35rem; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-surface) 88%, #000 12%); box-shadow: var(--shadow-standard); position: static !important; top: auto !important; inset-block-start: auto !important; }
-.operations-tabs button { flex: 1 1 auto; white-space: nowrap; min-width: 0; min-height: 44px; padding: .7rem .85rem; border: 1px solid transparent; border-radius: calc(var(--radius-control) - .1rem); background: transparent; color: var(--color-secondary); font: inherit; font-size: .78rem; font-weight: 750; letter-spacing: .08em; cursor: pointer; }
+.operations-tabs button { flex: 1 1 auto; white-space: normal; overflow-wrap: anywhere; min-width: 0; min-height: 44px; padding: .7rem .85rem; border: 1px solid transparent; border-radius: calc(var(--radius-control) - .1rem); background: transparent; color: var(--color-secondary); font: inherit; font-size: .78rem; font-weight: 750; letter-spacing: .08em; cursor: pointer; }
 .operations-tabs button:hover { color: var(--color-text); border-color: var(--color-border); background: var(--color-cool-tint); }
 .operations-tabs button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 

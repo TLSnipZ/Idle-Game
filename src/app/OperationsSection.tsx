@@ -50,7 +50,6 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
       <button type="button" onClick={() => jump(automation.current)}>{text('AUTOMATION', 'AUTOMATISIERUNG')}</button>
     </nav>
 
-    <DistrictHeat state={snapshot.state} paused={paused || game.persistence.kind === 'blocked'} onChoose={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
     <section className="operations-block jobs-block" aria-labelledby="starter-heading">
       <div className="operations-section-heading">
         <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" ref={jobs} tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
@@ -73,6 +72,8 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
       <RiskyDelivery state={snapshot.state} paused={paused} onRun={game.runRiskyDelivery} />
       <DiscreetDelivery state={snapshot.state} paused={paused} onRun={game.runDiscreetDelivery} />
     </section>
+
+    <DistrictHeat state={snapshot.state} paused={paused || game.persistence.kind === 'blocked'} onChoose={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
 
     <section className="operations-block businesses-block" aria-labelledby="businesses-heading">
       <div className="operations-section-heading business-heading-row">
