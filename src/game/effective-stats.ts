@@ -21,12 +21,18 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
     return upgrade.modifier;
   });
   if (!Array.isArray(state.garage.ownedVehicleIds)) throw new RangeError('Invalid authoritative vehicle ownership');
-  const vehicles = state.garage.ownedVehicleIds.map(id => {
+  const vehicles: Modifier[] = [];
+  for (const id of state.garage.ownedVehicleIds) {
     const vehicle = findVehicle(id);
     if (!vehicle || seen.has(id)) throw new RangeError('Invalid authoritative vehicle ownership');
     seen.add(id);
-    return vehicle.modifier;
-  });
+    if (id === state.garage.activeVehicleId) vehicles.push(vehicle.modifier);
+  }
+  if (state.garage.ownedVehicleIds.length === 0
+      ? state.garage.activeVehicleId !== null
+      : state.garage.activeVehicleId === null || !state.garage.ownedVehicleIds.includes(state.garage.activeVehicleId)) {
+    throw new RangeError('Invalid authoritative active vehicle');
+  }
   return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {

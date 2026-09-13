@@ -1,0 +1,22 @@
+/* Local Garage addition: preserve the accepted vehicle artwork and other pages. */
+.garage .garage-active-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-sm);
+  margin-block: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-cool);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  overflow-wrap: anywhere;
+}
+.garage .garage-active-summary h3 {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-muted);
+  font-size: .7rem;
+  letter-spacing: .08em;
+}
+.garage .garage-active-summary strong { color: var(--color-cool); font-size: 1.1rem; }
+.garage .garage-active-summary p { margin: 0; font-size: .85rem; }
+.garage .garage-selection-note, .garage .garage-current-bonus { color: var(--color-secondary); line-height: 1.5; }
+.garage .vehicle-card.is-active-vehicle { border-color: var(--color-cool); }

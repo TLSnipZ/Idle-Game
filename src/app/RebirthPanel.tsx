@@ -35,7 +35,7 @@ function policyLabel(label: string, locale: Locale) {
     'Delivery Dispatcher and unfinished delivery progress': 'Delivery Dispatcher und unfertiger Lieferfortschritt',
     'Business Auto-Upgrader ownership, enabled state and progress': 'Business Auto-Upgrader: Besitz, Aktivstatus und Fortschritt',
     'Player XP / Level (returns to Level 1)': 'Spieler-XP / Level (zurück auf Level 1)',
-    'Vehicles': 'Fahrzeuge',
+    'Vehicles': 'Fahrzeuge', 'Active vehicle selection': 'Aktive Fahrzeugauswahl',
     'Empire Points': 'Empire Points',
     'Rebirth count': 'Anzahl Rebirths',
     'Permanent skills': 'Permanente Skills',

@@ -25,7 +25,7 @@ export const REBIRTH_POLICY = {
   upgrades: { action: 'reset', labels: ['Normal upgrades'] },
   automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress', 'Business Auto-Upgrader ownership, enabled state and progress'] },
   progression: { action: 'reset', labels: ['Player XP / Level (returns to Level 1)'] },
-  garage: { action: 'retain', labels: ['Vehicles'] },
+  garage: { action: 'retain', labels: ['Vehicles', 'Active vehicle selection'] },
   permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills', 'Achievements', 'Lifetime Statistics'] },
 } as const satisfies Record<keyof GameState, { readonly action: 'reset' | 'retain' | 'accumulate'; readonly labels: readonly string[] }>;
 

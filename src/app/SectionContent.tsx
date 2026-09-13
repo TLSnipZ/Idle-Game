@@ -38,7 +38,7 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />
       <CityEvents state={state} paused={paused} onChoose={game.chooseEvent} />
     </div>;
-    case SECTION.collection.id: return <Garage state={state} paused={paused} onPurchase={game.buyVehicle} />;
+    case SECTION.collection.id: return <Garage state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onActivate={game.activateVehicle} />;
     case SECTION.empire.id: return <div className="section-stack">
       <RebirthPanelView preview={selectRebirth(state)} unavailable={paused || game.persistence.kind === 'blocked'} interaction={rebirth.interaction} controls={rebirth.controls} />
       <SkillTree state={state} paused={paused} onPurchase={game.buySkill} />

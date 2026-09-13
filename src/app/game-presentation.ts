@@ -71,6 +71,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
     case 'max-rank-reached': return localize(locale, 'This skill is already at max rank.', 'Skill ist bereits auf Max-Rang. Noch mehr wäre vermutlich steuerpflichtig.');
     case 'insufficient-funds': return localize(locale, 'Not enough cash yet. Complete a delivery to keep building your balance.', 'Zu wenig Cash. Fahr noch eine Lieferung — finanzielle Würde kommt später.');
     case 'already-owned': return action === 'vehicle' ? localize(locale, 'This vehicle is already yours.', 'Das Auto gehört dir schon. Zweimal kaufen ist eher Versicherungsbetrug.') : localize(locale, 'This business is already yours.', 'Das Business gehört dir schon. Monopole bitte Schritt für Schritt.');
+    case 'vehicle-not-owned': return localize(locale, 'Choose a vehicle you own. Window shopping does not count.', 'Wähle ein Fahrzeug aus deinem Besitz. Schaufensterbummel zählt nicht.');
     case 'unknown-vehicle': return localize(locale, 'This vehicle is unavailable. No purchase was made.', 'Fahrzeug nicht verfügbar. Kein Cash weg, keine spontane Midlife-Crisis.');
     case 'unknown-business': return localize(locale, 'This business is unavailable. No purchase was made.', 'Business nicht verfügbar. Transaktion abgebrochen, Anwalt enttäuscht.');
     case 'unknown-automation': return localize(locale, 'This delegation is unavailable.', 'Diese Automatisierung gibt’s nicht. Arbeit muss heute wohl doch jemand machen.');

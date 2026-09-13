@@ -12,7 +12,7 @@ import { describeAction } from './game-presentation';
 import { purchaseVehicle } from '../game/purchase-vehicle';
 import { evaluateBusinessProduction } from '../game/effective-stats';
 import { vehicleArtwork } from './vehicle-artwork';
-const render=(state:GameState,paused=false)=>renderToStaticMarkup(<Garage state={state} paused={paused} onPurchase={()=>{}} />);
+const render=(state:GameState,paused=false)=>renderToStaticMarkup(<Garage state={state} paused={paused} onActivate={() => {}} onPurchase={()=>{}} />);
 function eligible() {
   const state=createInitialGameState();return {...state,progression:{xp:3600},economy:{cash:moneyFromMinorUnits('5000000')},
     businesses:{...state.businesses,owned:{[B.id]:{level:10}}}};
@@ -31,8 +31,8 @@ describe('Garage presentation',()=>{
     expect(render(eligible(),true)).toContain('Session paused');expect(render(eligible(),true)).toContain('disabled');
   });
   it('shows grandfathered ownership active with no locks or repurchase button',()=>{
-    const html=render({...createInitialGameState(),garage:{ownedVehicleIds:[V.id]}});
-    expect(html).toContain('Owned vehicles: 1 / 1');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).not.toContain('Active');
+    const html=render({...createInitialGameState(),garage:{ownedVehicleIds: [V.id], activeVehicleId: V.id}});
+    expect(html).toContain('Owned vehicles: 1 / 1');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).toContain('OWNED · ACTIVE'); expect(html).toContain('while active');
     expect(html).not.toContain('LOCKED');expect(html).not.toContain('<button');
   });
   it('names the vehicle from central modifier metadata and keeps artwork separate',()=>{

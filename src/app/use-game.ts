@@ -1,4 +1,5 @@
 import { setBusinessAutoUpgraderTarget } from '../game/set-auto-upgrader-target';
+import { findVehicle } from '../features/vehicles';
 import { findBusiness } from '../features/businesses';
 import { setAutomationEnabled } from '../game/set-automation-enabled';
 import { describeAutomationToggle } from './automation-presentation';
@@ -84,6 +85,15 @@ export function useGame() {
     if (result) setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('vehicle', result, id, presentationLocale) }));
     else if (runtime.getSnapshot().persistence.kind === 'error' || runtime.getSnapshot().persistence.kind === 'blocked') setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'warning', message: localize(presentationLocale, 'Vehicle purchase could not be saved. No purchase was made.', 'Fahrzeugkauf konnte nicht gespeichert werden. Kein Kauf durchgeführt. Deine Garage bleibt finanziell verantwortungsvoll — leider.') }));
   }
+  function activateVehicle(id: string) {
+    const wasActive = runtime.getSnapshot().result.state.garage.activeVehicleId === id;
+    const result = runtime.activateVehicle(id);
+    const message = result?.ok
+      ? wasActive ? localize(presentationLocale, 'Already active. No paperwork required.', 'Schon aktiv. Ausnahmsweise kein Papierkram.')
+        : localize(presentationLocale, `${findVehicle(id)?.name} is now active. One driver, one questionable career.`, `${findVehicle(id)?.name} ist jetzt aktiv. Ein Fahrer, eine fragwürdige Karriere.`)
+      : result ? localize(presentationLocale, 'Select a vehicle you own. Window shopping does not count.', 'Wähle ein Fahrzeug aus deinem Besitz. Schaufensterbummel zählt nicht.') : unsaved();
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message }));
+  }
   function coolDown() { runtime.execute(state => { const result = layLow(state); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeLayLow(result, presentationLocale) })); return result; }); }
   function takeTerritory(id: unknown) { runtime.execute(state => { const result = acquireTerritory(state, id); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeTerritoryAcquisition(result, id, presentationLocale) })); return result; }); }
   function buySkill(id: unknown) { runtime.execute(state => { const result = purchaseSkillRank(state, id); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeSkillPurchase(result, id, presentationLocale) })); return result; }); }
@@ -104,5 +114,5 @@ export function useGame() {
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message: result?.ok ? localize(presentationLocale, `Auto-Upgrader target set to ${findBusiness(id)?.name}.`, `Auto-Upgrader-Ziel auf ${findBusiness(id)?.name} gesetzt. Dein Cash kennt jetzt seine nächste Bestimmung.`) : localize(presentationLocale, 'Auto-Upgrader target could not be changed.', 'Auto-Upgrader-Ziel konnte nicht geändert werden. Die Maschine verweigert die Umstrukturierung.') }));
   }
 
-  return { replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { activateVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

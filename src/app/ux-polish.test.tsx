@@ -36,7 +36,7 @@ describe('POST 1C readable state and responsive intent', () => {
   });
   it('uses concrete requirements and a single useful empty-slot message', () => {
     const state = createInitialGameState();
-    const html = renderToStaticMarkup(<><Garage state={state} paused={false} onPurchase={noop} />
+    const html = renderToStaticMarkup(<><Garage state={state} paused={false} onActivate={() => {}} onPurchase={noop} />
       <CrewPanel state={state} paused={false} onRecruit={noop} onAssign={noop} onUnassign={noop} /></>);
     expect(html).toContain('LOCKED'); expect(html).toContain('Required — Player Level');
     expect(html).not.toMatch(/Not met|Requirements not met|Current: Empty|No active specialist/);

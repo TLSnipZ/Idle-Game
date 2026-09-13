@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 17;
+export const CURRENT_SAVE_VERSION = 18;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -107,13 +107,27 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
   const ownedVehicleIds: VehicleId[] = [];
   if (version >= 6) {
-    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds']) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
+    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds', ...(version >= 18 ? ['activeVehicleId'] : [])]) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
     for (const id of value.garage.ownedVehicleIds) {
       const vehicleId = version < 16
         ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
-        : findVehicle(id)?.id;
+        : version < 18 ? id === KXR_VEHICLE_ID ? KXR_VEHICLE_ID : undefined : findVehicle(id)?.id;
       if (!vehicleId || ownedVehicleIds.includes(vehicleId)) return null;
       ownedVehicleIds.push(vehicleId);
+    }
+  }
+  // Normalize legacy state for typed migrations; emit old shapes between steps.
+  let activeVehicleId: VehicleId | null = ownedVehicleIds[0] ?? null;
+  if (version >= 18) {
+    if (!record(value.garage)) return null;
+    const requested = value.garage.activeVehicleId;
+    if (ownedVehicleIds.length === 0) {
+      if (requested !== null) return null;
+      activeVehicleId = null;
+    } else {
+      const active = findVehicle(requested);
+      if (!active || !ownedVehicleIds.includes(active.id)) return null;
+      activeVehicleId = active.id;
     }
   }
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
@@ -135,7 +149,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -219,7 +233,7 @@ function migrateV14ToV15(value: unknown): GameState | null { return validateStat
 /** Identity only: historical strict validation rejects duplicates/unknown IDs. */
 function migrateV15ToV16(value: unknown): GameState | null {
   const valid = validateState(value, 15);
-  return valid ? { ...valid, garage: { ownedVehicleIds: valid.garage.ownedVehicleIds.map(
+  return valid ? { ...valid, garage: { activeVehicleId: valid.garage.ownedVehicleIds.length ? KXR_VEHICLE_ID : null, ownedVehicleIds: valid.garage.ownedVehicleIds.map(
     id => id === LEGACY_VEHICLE_ID ? KXR_VEHICLE_ID : id,
   ) } } : null;
 }
@@ -228,17 +242,26 @@ function migrateV15ToV16(value: unknown): GameState | null {
 function legacyAutomation(value: unknown): unknown {
   if (!record(value) || !record(value.automation)) return value;
   const { enabledIds: _enabled, businessAutoUpgradeElapsedMs: _elapsed, businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
-  return { ...value, automation };
+  return withoutActiveVehicle({ ...value, automation });
 }
 
 /** Preserve the historical v15/v16 targetless contract between sequential steps. */
 function withoutTarget(value: GameState | null): unknown {
   if (!value) return null;
   const { businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
-  return { ...value, automation };
+  return withoutActiveVehicle({ ...value, automation });
 }
 /** Schema transformation only; all elapsed progress is retained for runtime. */
-function migrateV16ToV17(value: unknown): GameState | null { return validateState(value, 16); }
+function migrateV16ToV17(value: unknown): unknown { return withoutActiveVehicle(validateState(value, 16)); }
+
+/** Called only on validated migration OUTPUTS, never on raw historical input. */
+function withoutActiveVehicle(value: unknown): unknown {
+  if (!record(value) || !record(value.garage)) return value;
+  const { activeVehicleId: _active, ...garage } = value.garage;
+  return { ...value, garage };
+}
+/** No rewards/rebases: sole legacy owners keep their effect; non-owners stay empty. */
+function migrateV17ToV18(value: unknown): GameState | null { return validateState(value, 17); }
 
 /** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
@@ -267,6 +290,7 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 14) migrated = withoutTarget(migrateV14ToV15(migrated));
   if (value.version <= 15) migrated = withoutTarget(migrateV15ToV16(migrated));
   if (value.version <= 16) migrated = migrateV16ToV17(migrated);
+  if (value.version <= 17) migrated = migrateV17ToV18(migrated);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

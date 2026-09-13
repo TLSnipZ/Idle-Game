@@ -30,5 +30,5 @@ export interface GameState {
 }
 
 export function createInitialGameState(): GameState {
-  return { events: createInitialEventState(), crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [] }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
+  return { events: createInitialEventState(), crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [], activeVehicleId: null }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
 }

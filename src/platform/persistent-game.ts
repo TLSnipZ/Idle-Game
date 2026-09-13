@@ -1,3 +1,4 @@
+import { setActiveVehicle } from '../game/set-active-vehicle';
 import type { GameState } from '../game/game-state';
 import { performRebirth } from '../game/rebirth';
 import type { RebirthResult } from '../game/rebirth';
@@ -128,6 +129,15 @@ export function createPersistentGame(
     if (succeeded && !durableCommand && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
     return completed;
   }
+  /** No-op selection reads no clocks/writes no save; a real change revalidates after
+   * old-effect reconciliation and uses execute's existing durable garage guard. */
+  function activateVehicle(id: unknown) {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked') return;
+    const current = runtime.getSnapshot().result.state;
+    const request = setActiveVehicle(current, id);
+    if (!request.ok || request.state === current) return request;
+    return execute(state => setActiveVehicle(state, id));
+  }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
     return saves.exportCode(runtime.getSnapshot().result.state);
@@ -198,5 +208,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { activateVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }
