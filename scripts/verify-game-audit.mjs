@@ -50,7 +50,7 @@ try {
           const box = element.getBoundingClientRect();
           return box.right > innerWidth + 1 && box.width > 0 && !element.closest('.activity-center-items, .global-status');
         }).slice(0, 8).map(element => ({ tag: element.tagName, className: element.className, text: element.textContent.slice(0, 100), right: Math.round(element.getBoundingClientRect().right) })),
-        clippedMetrics: [...document.querySelectorAll('.business-stat-grid strong, .job-metrics dt')].filter(element => element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1).map(element => ({ text: element.textContent, client: element.clientWidth, scroll: element.scrollWidth })),
+        clippedMetrics: [...document.querySelectorAll('.business-stat-grid strong, .job-metrics dt, .primary-navigation button, .operations-tabs button')].filter(element => element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1).map(element => ({ text: element.textContent, client: element.clientWidth, scroll: element.scrollWidth })),
         brokenImages: [...document.images].filter(image => image.complete && image.naturalWidth === 0).map(image => image.src),
       }));
       if (geometry.overflow > 1 || geometry.clippedMetrics.length) console.log('LAYOUT FINDING ' + JSON.stringify({ locale, width, stage, ...geometry }));

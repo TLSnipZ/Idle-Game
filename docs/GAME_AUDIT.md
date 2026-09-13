@@ -31,7 +31,7 @@ formatting. Switching back remains recognizable. Save v18 and CE1 are unchanged.
 | Settings only claimed modal behavior | Background controls remained reachable by keyboard; focus was not deliberately restored | Native modal dialog with Escape, backdrop dismissal and return focus |
 | Generic territory failure message | A blocked acquisition did not say which gates were missing | Report actual unmet requirements, translated through one shared helper; restores the existing territory assertion |
 | Excessive live announcements | Latest command appeared in two simultaneous status regions; automatic Dispatcher updates repeatedly interrupted reading | Keep one command announcement; periodic dispatch summaries remain readable without announcing each cycle |
-| Narrow Operations layout | Chromium reproduced 10px document overflow at 320px in German | Wrap complete local navigation controls and heading rows; permit exact financial values to wrap |
+| Narrow layouts and long labels | Chromium reproduced 10px German Operations overflow; Villager revealed a 36px overflow from shrinking navigation buttons with nowrap text | Wrap complete navigation controls at their text width and heading rows; wrap long metric labels/values; bound the skip link to the viewport |
 
 The requirement translation helper replaces four diverging copies. Changes are
 presentation and diagnostics only; there is no rebalancing, extra car, save-schema

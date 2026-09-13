@@ -104,7 +104,6 @@
 }
 
 @media (max-width: 420px) {
-  .operations-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .operations-tabs button { font-size: .61rem; }
   .job-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .job-metrics dt { font-size: .58rem; }
