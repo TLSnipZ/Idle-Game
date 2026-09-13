@@ -18,6 +18,9 @@ const DE: Record<string, LocalizedFields> = {
 
   'vehicle:kairo-kx-r': { category: 'Business-Starter', description: 'Leichter Street-Performance-Hatch. Dein erster Tuner für ein wachsendes Imperium und fragwürdige Parkhausentscheidungen.' },
 
+  'vehicle:kairo-senda': { category: 'Selbstfahrer-Verdiener', description: 'Spielerisches Coupé mit Heckantrieb und sehr persönlichem Lieferservice. Das Trinkgeld stimmt, wenn der Chef selbst fährt.' },
+  'vehicle:namera-lilt': { category: 'Unauffälliger Küstenflitzer', description: 'Leichter Zweisitzer-Roadster für die Küste. Offenes Dach, leiser Abgang und absolut kein Platz für Zeugen.' },
+
   'crew:rico-vale': { description: 'Waterfront-Verhandler, der aus jeder Lieferung mehr Cash herausredet. Charmant genug, dass selbst Rechnungen nervös werden.' },
   'crew:mara-knox': { description: 'Diskrete lokale Problemlöserin, die Aufmerksamkeit schneller verschwinden lässt. Wie genau, bleibt Teil des Service.' },
   'crew:jax-mercer': { description: 'Operations-Mechaniker, der deine Businesses effizient am Laufen hält. Schraubt an Maschinen, Abläufen und gelegentlich der Definition von legal.' },

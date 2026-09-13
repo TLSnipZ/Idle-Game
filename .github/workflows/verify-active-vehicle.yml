@@ -55,7 +55,7 @@ jobs:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-game-audit.mjs
       - name: Verify whitespace
-        run: git diff --check 141b24cbb00109aca34bfb098bd137f47169bd4a HEAD
+        run: git diff --check ba36d2abb3e1e666463d6eae916f8c53fc06b245 HEAD
       - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@v4

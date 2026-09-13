@@ -2,8 +2,9 @@
 
 ## Current implementation
 
-Active Vehicle branch: Save **v18**, unchanged **CE1** transport, one canonical vehicle
-**Kairo KX-R** (`vehicle:kairo-kx-r`). The numbered phase sections below preserve
+Tier-1 Garage (PR #27, gameplay verified): Save **v19**, unchanged **CE1** transport, three vehicles:
+Kairo KX-R, Kairo Senda and Namera Lilt. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md)
+for scoped job rewards, integer cooling modifiers and the historical identity boundary. The numbered phase sections below preserve
 historical architecture decisions; their Vortex/v15 references describe those phases.
 See POST 2C for the vehicle identity boundary and POST 3B below for Business targeting.
 

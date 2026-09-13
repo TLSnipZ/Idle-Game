@@ -9,7 +9,7 @@ export function selectDispatcher(state: GameState) {
   const unlocked = state.automation.unlockedIds.includes(DELIVERY_DISPATCHER.id);
   const requirements = evaluateRequirements(state, DELIVERY_DISPATCHER.requirements);
   const eligible = requirements.met;
-  const reward = evaluateJobReward(state);
+  const reward = evaluateJobReward(state, 'dispatcher');
   return { definition: DELIVERY_DISPATCHER, unlocked, eligible, requirements,
     canPurchase: !unlocked && eligible && canAfford(state.economy, DELIVERY_DISPATCHER.purchaseCost),
     reward: reward.ok ? reward.reward : null, intervalMs: DELIVERY_DISPATCHER.intervalMs,

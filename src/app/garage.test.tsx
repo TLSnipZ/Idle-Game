@@ -14,12 +14,12 @@ import { evaluateBusinessProduction } from '../game/effective-stats';
 import { vehicleArtwork } from './vehicle-artwork';
 const render=(state:GameState,paused=false)=>renderToStaticMarkup(<Garage state={state} paused={paused} onPurchase={()=>{}} onSelect={()=>{}} />);
 function eligible() {
-  const state=createInitialGameState();return {...state,progression:{xp:3600},economy:{cash:moneyFromMinorUnits('5000000')},
+  const state=createInitialGameState();return {...state,progression:{xp:3600},economy:{cash:moneyFromMinorUnits('5500000')},
     businesses:{...state.businesses,owned:{[B.id]:{level:10}}}};
 }
 describe('Garage presentation',()=>{
-  it('shows 0/1, scoped effect, accessible unmet requirements and disabled purchase',()=>{
-    const html=render(createInitialGameState());expect(html).toContain('Owned vehicles: 0 / 1');
+  it('shows 0/3, scoped effect, accessible unmet requirements and disabled purchase',()=>{
+    const html=render(createInitialGameState());expect(html).toContain('Owned vehicles: 0 / 3');
     expect(html).toContain('Required — Player Level 5');expect(html).toContain('Required — Own Dockside Detail');
     expect(html).toContain('Required — Dockside Detail Level 5');expect(html).toContain('LOCKED');
     expect(html).toContain('+10% Business Production');expect(html).toContain('$25,000');
@@ -32,8 +32,10 @@ describe('Garage presentation',()=>{
   });
   it('shows grandfathered ownership active with no locks or repurchase button',()=>{
     const html=render({...createInitialGameState(),garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id }});
-    expect(html).toContain('Owned vehicles: 1 / 1');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).toContain('Active vehicle'); expect(html).toContain('OWNED · ACTIVE');
-    expect(html).not.toContain('LOCKED');expect(html).not.toContain('<button');
+    expect(html).toContain('Owned vehicles: 1 / 3');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).toContain('Active vehicle'); expect(html).toContain('OWNED · ACTIVE');
+    const starterCard = html.match(/<article[^>]*>[\s\S]*?<\/article>/)?.[0] ?? '';
+    expect(starterCard).not.toContain('LOCKED');expect(starterCard).not.toContain('<button');
+    expect(html).toContain('Buy Kairo Senda'); expect(html).toContain('Buy Namera Lilt');
   });
   it('names the vehicle from central modifier metadata and keeps artwork separate',()=>{
     const state=purchaseVehicle(eligible(),V.id).state;const evaluation=evaluateBusinessProduction(state,B.id,10);

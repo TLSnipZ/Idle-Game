@@ -37,16 +37,16 @@ try {
     });
     await page.locator('.garage-active-summary').waitFor();
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-    assert.equal(saved.version, 18);
+    assert.equal(saved.version, 19);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
     if (!owner) {
-      await page.locator('.garage .purchase-button').click();
+      await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] .purchase-button').click();
       await page.waitForFunction(() => JSON.parse(localStorage.getItem('crime-empire:save')).state.garage.activeVehicleId === 'vehicle:kairo-kx-r');
     }
     const carName = await page.locator('.garage-active-summary strong').textContent();
     if (locale === 'villager') assert.match(carName, /^[hmr -]+$/i);
     else assert.equal(carName, 'Kairo KX-R');
-    assert.equal(await page.locator('.garage button').count(), 0, 'Active car has no redundant selection/purchase button');
+    assert.equal(await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button').count(), 0, 'Active car has no redundant selection/purchase button');
     const image = page.locator('.vehicle-artwork');
     await image.scrollIntoViewIfNeeded();
     await page.waitForFunction(() => { const image = document.querySelector('.vehicle-artwork'); return image?.complete && image.naturalWidth > 0; });
@@ -63,6 +63,45 @@ try {
     assert.equal(saved.state.garage.activeVehicleId, 'vehicle:kairo-kx-r');
     assert.deepEqual(errors, []);
     results.push({ locale, width, migratedOwner: owner, purchaseAndReload: true, geometry });
+    await context.close();
+  }
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (!sessionStorage.getItem('tier-one')) {
+        fixture.savedAt = Date.now();
+        localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+        localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+        sessionStorage.setItem('tier-one', 'true');
+      }
+    }, { fixture: fixtures[2], locale });
+    await page.goto('http://127.0.0.1:4173');
+    await page.locator('.primary-navigation button').nth(3).click();
+    const ids = ['vehicle:kairo-senda', 'vehicle:namera-lilt', 'vehicle:kairo-kx-r'];
+    for (const id of ids) {
+      const card = page.locator('article[aria-labelledby="' + id + '-heading"]');
+      await card.locator('.purchase-button').click();
+      const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
+      assert.ok(saved.state.garage.ownedVehicleIds.includes(id));
+      assert.equal(saved.state.garage.activeVehicleId, ids[0], 'Later purchase preserves first activation');
+    }
+    for (const id of [ids[1], ids[2], ids[0]]) {
+      const card = page.locator('article[aria-labelledby="' + id + '-heading"]');
+      const select = card.locator('button');
+      await select.focus(); await page.keyboard.press('Enter');
+      const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
+      assert.equal(saved.version, 19); assert.equal(saved.state.garage.activeVehicleId, id);
+      assert.equal(await card.locator('button').count(), 0);
+      assert.equal(await page.locator('.garage button').count(), 2);
+      assert.equal(saved.state.garage.ownedVehicleIds.length, 3);
+    }
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Three-car Garage fits viewport');
+    if (width === 390 || width === 1440) await page.screenshot({ path: 'browser-evidence/tier-one-' + locale + '-' + width + '.png', fullPage: true });
+    await page.reload();
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')).state.garage.activeVehicleId), ids[0]);
+    assert.deepEqual(errors, []); results.push({ locale, width, tierOnePurchaseSwitchReload: true });
     await context.close();
   }
   // Real Settings controls switch the presentation without changing the selected vehicle.

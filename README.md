@@ -49,7 +49,7 @@ Open **Operations** to make your first deliveries and acquire **Dockside Detail*
 | **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
 | **Heat & City Events** | Manage rising Heat and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
 | **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
-| **Garage** | Purchase the **Kairo KX-R**, the first canonical Solara vehicle, with its own approved artwork and a production bonus while active. |
+| **Garage** | Choose **Kairo KX-R**, **Kairo Senda** or **Namera Lilt** for production, manual delivery Cash or faster Heat cooling. Only the active car supplies its effect. |
 | **Achievements & statistics** | Unlock **six permanent achievements** and track **eight lifetime statistics** across runs. These record progress without adding gameplay bonuses. |
 | **Next Objective** | Follow a suggested progression step with exact Level/Cash requirements, or choose an optional goal. Jump to the relevant card from any section; guidance never purchases or resets anything. |
 | **Offline progress & backups** | Return to credited Business and Dispatcher earnings for up to **8 hours**, extendable to **12 hours** through Never Sleeps. Save locally and transfer progress with **CE1 export/import codes**. |
@@ -64,13 +64,13 @@ The interface has five sections: **Overview** for your dashboard, **Operations**
 | --- | --- | --- |
 | **$25,000** | Player Level 5 · Dockside Detail Level 5 | **+10% global Business Production**, including offline and after Rebirth |
 
-The current game has **one purchasable vehicle**. The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. Additional models and tuning are planned — not hidden features waiting to be unlocked. The [vehicle catalog](docs/VEHICLE_CATALOG.md) separates the implemented KX-R from future concepts.
+The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. KX-R has approved artwork; Senda and Lilt are complete text cards pending model-art approval. Later models and tuning remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
 
 ## Development status
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Active Vehicle Foundation**; [PR #23](https://github.com/TLSnipZ/Idle-Game/pull/23) records verification and release evidence. Current saves use **schema v18**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v19**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
@@ -80,10 +80,10 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | English, Deutsch and a playful Villager mode with pure Villager gibberish; whole-game audit precedes new content. |
+| **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. |
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
-| **A growing Garage** | Active Vehicle Foundation is merged; Tier-1 Kairo Senda / Namera Lilt follow the current game audit, then later tuning and catalog tiers. |
+| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork awaits approval. Tuning and later catalog tiers remain planned. |
 | **A deeper city** | Heat/Police expansion, more Business depth, crew and event development, and richer territory progression. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.

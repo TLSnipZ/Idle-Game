@@ -19,8 +19,38 @@ export const STARTER_VEHICLE: VehicleDefinition = Object.freeze({
     operation: 'multiply-basis-points', bonusBasisPoints: 1000,
   }),
 });
+export const KAIRO_SENDA: VehicleDefinition = Object.freeze({
+  id: 'vehicle:kairo-senda', name: 'Kairo Senda', manufacturer: 'Kairo', model: 'Senda', category: 'Hands-on earner',
+  description: 'A playful rear-drive coupe with a very personal delivery service. The tips are better when the boss drives.',
+  purchaseCost: moneyFromMinorUnits('4000000'),
+  requirements: Object.freeze<Requirement[]>([
+    { type: 'player-level', minimumLevel: 6 },
+    { type: 'business-owned', businessId: STARTER_BUSINESS.id },
+    { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 7 },
+  ]),
+  modifier: Object.freeze({
+    id: 'modifier:kairo-senda-manual-cash', sourceId: 'vehicle:kairo-senda',
+    target: Object.freeze({ stat: 'job-reward', context: 'manual' }),
+    operation: 'multiply-basis-points', bonusBasisPoints: 1200,
+  }),
+});
+export const NAMERA_LILT: VehicleDefinition = Object.freeze({
+  id: 'vehicle:namera-lilt', name: 'Namera Lilt', manufacturer: 'Namera', model: 'Lilt', category: 'Low-profile runabout',
+  description: 'A light two-seat coastal roadster. Open roof, quiet exits, absolutely no room for witnesses.',
+  purchaseCost: moneyFromMinorUnits('5500000'),
+  requirements: Object.freeze<Requirement[]>([
+    { type: 'player-level', minimumLevel: 7 },
+    { type: 'business-owned', businessId: STARTER_BUSINESS.id },
+    { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 8 },
+  ]),
+  modifier: Object.freeze({
+    id: 'modifier:namera-lilt-cooling', sourceId: 'vehicle:namera-lilt',
+    target: Object.freeze({ stat: 'heat-decay-interval' }),
+    operation: 'reduce-interval', reductionMs: 3000,
+  }),
+});
 /** Explicit presentation order, independent of modifier evaluation order. */
-export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE]);
+export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT]);
 export function findVehicle(id: unknown): VehicleDefinition | undefined {
   return VEHICLE_CATALOG.find(vehicle => vehicle.id === id);
 }

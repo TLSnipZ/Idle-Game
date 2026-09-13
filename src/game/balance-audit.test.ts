@@ -131,10 +131,10 @@ describe('Phase 9C deterministic progression routes', () => {
     expect(active.state.progression.xp - s.progression.xp).toBe((active.progress.autoUpgrader?.levelsPurchased ?? 0) * 25);
     console.info(JSON.stringify({ preRebirthOffline: active.progress.autoUpgrader, finalLevel: active.state.businesses.owned[B.id]?.level }));
   });
-  it('retains the exact catalogs without extra content or observational fields', () => {
+  it('retains current catalogs and unchanged observational fields', () => {
     expect([TERRITORY_CATALOG.length, CREW_CATALOG.length, EVENT_CATALOG.length, ACHIEVEMENT_CATALOG.length,
       Object.keys(createInitialStatistics()).length, VEHICLE_CATALOG.length, UPGRADE_CATALOG.length, SKILL_CATALOG.length])
-      .toEqual([2,3,3,6,8,1,5,5]);
+      .toEqual([2,3,3,6,8,3,5,5]);
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, A.id]);
   });
   it('roundtrips a rich current v17 save and CE1 code without balance compensation or field changes', () => {
@@ -147,10 +147,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(18);
+    expect(CURRENT_SAVE_VERSION).toBe(19);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 18, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 19, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);
