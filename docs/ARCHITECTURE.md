@@ -2,7 +2,7 @@
 
 ## Current implementation
 
-Tier-1 Garage candidate: Save **v19**, unchanged **CE1** transport, three vehicles:
+Tier-1 Garage (PR #27, gameplay verified): Save **v19**, unchanged **CE1** transport, three vehicles:
 Kairo KX-R, Kairo Senda and Namera Lilt. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md)
 for scoped job rewards, integer cooling modifiers and the historical identity boundary. The numbered phase sections below preserve
 historical architecture decisions; their Vortex/v15 references describe those phases.

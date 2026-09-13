@@ -7,7 +7,7 @@ implemented and visually accepted by the user.** POST 2C descends from
 `10f170447d09e12f7ef1293539ef979c506fa563`.
 
 This catalog contains fourteen identities: **KX-R, Senda and Lilt implemented in
-the Tier-1 candidate; eleven remaining vehicles planned**. Rows 2–3 now use the
+Tier-1 Garage (PR #27); eleven remaining vehicles planned**. Rows 2–3 now use the
 specified price/gates/effects; their model artwork still awaits explicit approval.
 See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md) for current implementation and release
 status. The following design sections preserve historical proposals; Tuning and
@@ -25,7 +25,7 @@ rows 4–14 remain future work. BALANCING.md is the current balance authority.
 | Modifier ID | `modifier:kairo-kx-r-production` |
 | Permanence | Ownership and active selection survive Rebirth; active bonus applies to rebuilt businesses |
 | State | `garage: { ownedVehicleIds: [...], activeVehicleId: VehicleId | null }`; three current vehicles, no build/manufacturer fields |
-| Save / transfer | Save v19 in the Tier-1 candidate / unchanged `CE1-` container |
+| Save / transfer | Save v19 (Tier-1 Garage) / unchanged `CE1-` container |
 | Model Reference | User-approved Final Refinement, first canonical Vehicle Model Reference |
 
 An owner stores `garage: { ownedVehicleIds: ['vehicle:kairo-kx-r'], activeVehicleId: 'vehicle:kairo-kx-r' }`;

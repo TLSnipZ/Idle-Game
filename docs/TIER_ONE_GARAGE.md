@@ -1,7 +1,8 @@
 # Tier-1 Garage
 
-Implementation candidate from `ba36d2abb3e1e666463d6eae916f8c53fc06b245`.
-Verification and release evidence will be recorded after CI.
+Gameplay implementation and automated verification complete in PR #27, from
+`ba36d2abb3e1e666463d6eae916f8c53fc06b245`. Model artwork approval remains open.
+Executed evidence and separate release status are recorded below.
 
 | Vehicle | Cost | Acquisition gates | Effect while active |
 | --- | --- | --- | --- |
@@ -78,3 +79,31 @@ historical Garage bootstrap and the whole-game audit. Record executed evidence;
 automated screenshots do not constitute user model approval.
 
 Heat / Police 2.0 remains the following separately authorized phase.
+
+## Executed verification — 2026-09-13
+
+[Run 34766756642](https://github.com/TLSnipZ/Idle-Game/actions/runs/34766756642)
+verified code commit `54e507f518deeae0b7aab769e46399fc7ed8812e`:
+
+- Fresh Node 24 install, strict TypeScript/Vite production build and whitespace checks passed.
+- **2,283 / 2,283 tests pass**, zero failures, skips, TODOs or runtime-error suites.
+  All 31 added cases pass; no existing test case was removed or disabled.
+- **45 Garage Chromium cases**: historical v17 owner/non-owner bootstrap, original
+  purchase/art/reload checks, plus 15 actual three-car purchase/keyboard-switch/reload
+  flows in EN/DE/Villager at 320/390/740/1024/1440px.
+- **225 whole-game Chromium section cases** pass across all three locales, five
+  widths and fresh/mid/advanced state. No overflow, clipped financial metrics,
+  broken loaded images or page errors. Settings/focus/locale changes, feedback,
+  export/invalid import, automation, Crew, Events, skills, Rebirth and RESET pass.
+- [Reports and screenshots](https://github.com/TLSnipZ/Idle-Game/actions/runs/34766756642/artifacts/10320792797)
+  are retained for seven days. Automated browser checks do not replace human
+  visual/model approval.
+
+[PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records merge and Pages
+deployment status separately. The final evidence commit changes documentation only;
+the code verified above is unchanged.
+
+Model Candidate A review sheet was generated in this task conversation: steel-blue
+Senda fixed-roof coupe and red open-top Lilt. Neither candidate is approved or
+integrated. The next Garage checkpoint is explicit approval/refinement and separate
+production artwork integration. Heat / Police 2.0 is not started.
