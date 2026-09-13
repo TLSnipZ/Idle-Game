@@ -1,3 +1,4 @@
+import { HeatSupport } from './HeatSupport';
 import type { GameState } from '../game/game-state';
 import { selectDecoy } from '../game/deploy-decoy';
 import { useLocalizedText } from './LocalizationProvider';
@@ -21,6 +22,7 @@ export function ManhuntPanel({ state, paused, onDecoy, nested = false }: {
       'Normale und diskrete Lieferungen, Untertauchen und passive Abkühlung funktionieren weiter. Ein kalter Nachbarbezirk hilft wenig, wenn die Ausfahrt voller Cops ist.')}</p>
     <p id="decoy-effect">{text(`Decoy convoy: ${formatPrice(view.cost)} for −${view.reduction} local Heat. Only during MANHUNT. No Cash reward or XP.`,
       `Ablenkungsmanöver: ${formatPrice(view.cost)} für −${view.reduction} lokales Heat. Nur während der Großfahndung. Keine Cash-Belohnung und keine XP.`)}</p>
+    <HeatSupport pricing={view} />
     {view.active && <p>{text(`Heat after decoy: ${view.heatAfterDecoy}. Travel reopens once any pending City Event is resolved.`,
       `Heat danach: ${view.heatAfterDecoy}. Nach Abschluss eines offenen Stadtevents ist der Bezirkswechsel wieder frei.`)}</p>}
     <p>{text('Cheaper exits: discreet deliveries pay while cooling; Lay Low costs less for a smaller reduction. Waiting costs no Cash.',

@@ -419,9 +419,69 @@ try {
     assert.deepEqual(errors, []); await context.close();
   }
 
+
+  // Heat V: visible scoped discounts, active car/Crew changes and local cover.
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      // Deterministic action-only clock isolates exact spending from Business production.
+      Date.now = () => 1700000000000;
+      Object.defineProperty(performance, 'now', { value: () => 0 });
+      if (sessionStorage.getItem('support-audit')) return;
+      fixture.savedAt = Date.now();
+      fixture.state.city = { heat: 100, heatDecayElapsedMs: 0,
+        ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] };
+      fixture.state.economy.cash = '1000000';
+      fixture.state.businesses.owned = { 'business:dockside-detail': { level: 10 } };
+      fixture.state.crew = { recruitedIds: ['crew:mara-knox'],
+        assignments: { operations: 'crew:mara-knox', logistics: null } };
+      fixture.state.garage = { ownedVehicleIds: ['vehicle:kairo-kx-r', 'vehicle:namera-lilt'],
+        activeVehicleId: 'vehicle:namera-lilt' };
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('support-audit', 'true');
+    }, { fixture: fixtures[0], locale });
+    await page.goto('http://127.0.0.1:4174'); await navigation(page).nth(1).click();
+    await page.locator('.heat-support summary').click();
+    assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 3);
+    assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('810'));
+    if (locale === 'villager') await assertVillagerOnly(page);
+    await navigation(page).nth(3).click();
+    await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button').click();
+    await navigation(page).nth(1).click();
+    assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('900'));
+    assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 2);
+    await navigation(page).nth(3).click();
+    await page.locator('article[aria-labelledby="vehicle:namera-lilt-heading"] button').click();
+    await navigation(page).nth(1).click();
+    const decoy = page.locator('.manhunt-decoy-button');
+    assert.ok((await decoy.textContent()).includes('810'));
+    await decoy.focus(); await page.keyboard.press('Enter');
+    let current = (await saved(page)).state;
+    assert.equal(current.economy.cash, '919000'); assert.equal(current.city.heat, 70);
+    await page.locator('.heat-support summary').click();
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    if (locale === 'villager') await assertVillagerOnly(page);
+    await page.screenshot({ path: 'browser-evidence/support-' + locale + '-' + width + '.png', fullPage: true });
+    await navigation(page).nth(2).click();
+    await page.locator('.crew-slots .crew-slot button').first().click();
+    assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('900'));
+    await page.locator('#active-district').selectOption('territory:neon-mile');
+    assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 1);
+    current = (await saved(page)).state;
+    assert.equal(current.city.districts.parked.heat, 70); assert.equal(current.city.heat, 0);
+    await page.reload(); await navigation(page).nth(2).click();
+    assert.equal((await saved(page)).state.economy.cash, '919000');
+    assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 1);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.deepEqual(errors, []); await context.close();
+  }
+
   const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
   assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
-  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, manhuntCases: 15, localeSwitchAndFeedback: true,
+  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, manhuntCases: 15, heatSupportCases: 15, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));

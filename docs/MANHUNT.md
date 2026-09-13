@@ -69,4 +69,5 @@ are recorded in the PR; manual live acceptance remains separate.
 
 ## Next handoff
 
-Heat V — deeper cross-system integration, separately scoped from this release.
+[Heat V — Support network](HEAT_SUPPORT.md) adds scoped discounts to the base decoy price.
+The Phase IV base-price records above are historical; the displayed current quote is authoritative.

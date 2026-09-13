@@ -1,5 +1,23 @@
 # Post-roadmap priorities
 
+## Current phase — Heat V: Support network
+
+Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce
+the MANHUNT decoy cost through exact shared modifiers, down to **$810**.
+Save **v20 / CE1 unchanged**. See [Heat support](HEAT_SUPPORT.md). Verification passed; see [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33).
+Verified in [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33):
+[run 34783614823](https://github.com/TLSnipZ/Idle-Game/actions/runs/34783614823)
+on code `fb0c5ade7e4ed52190b6cb088fedd4ffff5fe6fc` passed strict build,
+**2,441/2,441 tests** (28 added; zero failures/skips), **345 Chromium cases**
+(45 Garage, 225 sections, 15 each risk/police/district/MANHUNT/support), and
+whitespace checks. Evidence artifact: `10326270313`.
+This follow-up changes documentation only. Merge/deployment evidence is recorded
+in the PR; manual live acceptance remains separate.
+
+The retained Heat / Police 2.0 **I–V sequence is complete** at this scope.
+Further post-roadmap expansions require their own scope. Older records below are historical.
+
+
 ## Current phase — Heat IV: MANHUNT
 
 Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat

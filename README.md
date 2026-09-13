@@ -26,7 +26,15 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
-## Current phase — Heat IV: MANHUNT
+## Current phase — Heat V: Support network
+
+Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce
+the MANHUNT decoy cost through exact shared modifiers, down to **$810**.
+Save **v20 / CE1 unchanged**. See [Heat support](docs/HEAT_SUPPORT.md). Verification passed; see [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33).
+The retained Heat / Police 2.0 **I–V sequence is complete** at this scope.
+Further post-roadmap expansions require their own scope. Older records below are historical.
+
+## Previous phase — Heat IV: MANHUNT
 
 Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
 decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
@@ -100,7 +108,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
 | **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
-| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V cross-system integration is next; more Business depth, crew and event development, and richer territory progression remain planned. |
+| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V adds Business/Crew/active-car support for decoy costs; more Business depth, crew and event development, and richer territory progression remain planned. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
 

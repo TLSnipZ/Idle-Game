@@ -4,3 +4,9 @@
 .manhunt-panel.is-active { border-color: var(--color-hot); }
 .manhunt-panel.is-active .manhunt-status { color: var(--color-hot); font-weight: 700; }
 .manhunt-decoy-button { min-height: 44px; max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.heat-support { margin-block: .75rem; }
+.heat-support summary { cursor: pointer; line-height: 1.5; min-height: 44px; overflow-wrap: anywhere; }
+.heat-support ul { padding-left: 1.25rem; }
+.heat-support li { margin-block: .75rem; }
+.heat-support li span { display: block; color: var(--color-secondary); }
+.heat-support li[data-support-active="true"] strong { color: var(--color-success); }
