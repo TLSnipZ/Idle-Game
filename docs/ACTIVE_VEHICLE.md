@@ -1,6 +1,6 @@
 # Active Vehicle Foundation
 
-Status: implementation and verification in progress on `feat/active-vehicle-foundation`. No release is implied by this checkpoint.
+Status: implementation prepared on `feat/active-vehicle-complete`; CI and production-browser verification in progress. Not merged or live. PR #22 contained only this design checkpoint, not the feature implementation.
 
 ## Scope
 
@@ -37,3 +37,19 @@ A PR, merge, successful Pages build and successful deployment are separate state
 ## Next
 
 After live acceptance: separately scoped Tier-1 Garage expansion and balance/art review for Kairo Senda and Namera Lilt. Heat / Police 2.0 follows the planned Garage block. Do not start a later phase automatically.
+
+## Implementation handoff
+
+The actual implementation adds the pure selection command, validates the exact current
+Garage shape, freezes pre-v18 vehicle identities, and strips normalized active fields
+between validated historical migration steps. The persistent selection entry point
+performs an IO-free preflight; real changes use the existing guarded Garage transaction.
+The single production KX-R is unchanged; a second car is injected only in isolated tests.
+
+Local shell and file tools stopped responding during dependency installation. Verification
+therefore runs on GitHub Actions through a separate read-only, non-deploying workflow.
+It compares the complete candidate test suite with pinned baseline `4291873`, rejects
+new failures and increased skips, and checks the actual production build in Chromium
+using disposable validated v17 saves in EN/DE. Reports and screenshots are CI artifacts;
+manual visual acceptance remains a separate user review. Final run evidence follows
+before this implementation PR is marked ready. No unrun check is considered passed.

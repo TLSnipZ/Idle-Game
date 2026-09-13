@@ -13,6 +13,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      SOLARA_BROWSER_FIXTURES: ${{ runner.temp }}/solara-browser-fixtures.json
     steps:
       - uses: actions/checkout@v7
         with:
@@ -45,6 +47,14 @@ jobs:
         run: npm run test -- --reporter=json --outputFile=../baseline-tests.json > ../baseline-tests.log 2>&1
       - name: Reject new failures and skipped or removed tests
         run: node scripts/compare-test-results.mjs baseline-tests.json candidate-tests.json
+      - name: Install isolated browser verifier
+        run: |
+          npm install --prefix "$RUNNER_TEMP/solara-browser" --no-audit --no-fund --package-lock=false playwright@1.58.2
+          node "$RUNNER_TEMP/solara-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify production Garage in Chromium
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-garage-browser.mjs
       - name: Verify whitespace
         run: git diff --check 42918734a41964328c512f7d1d6a17741ec44f02 HEAD
       - name: Upload verification evidence
@@ -57,4 +67,5 @@ jobs:
             candidate-tests.log
             baseline-tests.json
             baseline-tests.log
+            browser-evidence/
           retention-days: 7

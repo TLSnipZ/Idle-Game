@@ -8,7 +8,8 @@ implemented, live verification pending.** POST 2C descends from
 
 This catalog contains fourteen identities: **Kairo KX-R implemented, thirteen
 remaining vehicles planned**. Proposed names/values for rows 2–14 are not live.
-Active Vehicle and Tuning remain future systems. BALANCING.md is live balance authority.
+Active Vehicle Foundation is implemented on the current branch (verification pending);
+Tuning and additional vehicles remain future systems. BALANCING.md is live balance authority.
 
 ### Current production behavior
 
@@ -18,15 +19,15 @@ Active Vehicle and Tuning remain future systems. BALANCING.md is live balance au
 | Manufacturer / role | Kairo Motors / Business starter |
 | Price | $25,000 (`2500000` integer cents) |
 | Acquisition | Player Level 5, Dockside owned at Level 5; no additional gate |
-| Effect | +10% global Business Production (1,000 basis points) while owned |
+| Effect | +10% global Business Production (1,000 basis points) while active |
 | Modifier ID | `modifier:kairo-kx-r-production` |
-| Permanence | Ownership survives Rebirth; bonus applies to rebuilt businesses |
-| State | `garage: { ownedVehicleIds: [...] }`; one current vehicle, no active/build/manufacturer fields |
-| Save / transfer | Save v16 / unchanged `CE1-` container |
+| Permanence | Ownership and active selection survive Rebirth; active bonus applies to rebuilt businesses |
+| State | `garage: { ownedVehicleIds: [...], activeVehicleId: VehicleId | null }`; one current vehicle, no build/manufacturer fields |
+| Save / transfer | Save v18 on the Active Vehicle branch / unchanged `CE1-` container |
 | Model Reference | User-approved Final Refinement, first canonical Vehicle Model Reference |
 
-An owner stores `garage: { ownedVehicleIds: ['vehicle:kairo-kx-r'] }`; fresh players
-have an empty array. Images, price, bonuses and manufacturer are not saved.
+An owner stores `garage: { ownedVehicleIds: ['vehicle:kairo-kx-r'], activeVehicleId: 'vehicle:kairo-kx-r' }`;
+fresh players have an empty array and null selection. Images, price, bonuses and manufacturer are not saved.
 The former Vortex S9 was `$50,000 / P7 / D10 / +15%`, stored as
 `vehicle:starter-sport-sedan`. Historical ownership migrates, without compensation,
 to KX-R. No hidden Vortex catalog entry remains. Six Achievements and eight

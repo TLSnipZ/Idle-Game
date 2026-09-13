@@ -62,11 +62,11 @@ describe('vehicle acquisition', () => {
   });
   it('spends exactly beyond Number precision and derives counts/eligibility', () => {
     const state={...eligible(),economy:{cash:moneyFromMinorUnits('900719925474099312345')}};
-    expect(selectGarage(state)).toEqual({ownedVehicleCount:0,totalConfiguredVehicles:1});
+    expect(selectGarage(state)).toEqual({activeVehicle:null,ownedVehicleCount:0,totalConfiguredVehicles:1});
     expect(selectVehicle(state,V.id)).toMatchObject({eligible:true,affordable:true,canPurchase:true});
     const purchased=purchaseVehicle(state,V.id).state;
     expect(purchased.economy.cash).toBe('900719925474096812345');
-    expect(selectGarage(purchased)).toEqual({ownedVehicleCount:1,totalConfiguredVehicles:1});
+    expect(selectGarage(purchased)).toEqual({activeVehicle:V,ownedVehicleCount:1,totalConfiguredVehicles:1});
     expect(selectVehicle(purchased,V.id)?.canPurchase).toBe(false); expect(selectVehicle(state,'unknown')).toBeNull();
   });
   it('announces newly eligible vehicle at the exact level 5 boundary', () => {

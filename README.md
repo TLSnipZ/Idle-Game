@@ -49,7 +49,7 @@ Open **Operations** to make your first deliveries and acquire **Dockside Detail*
 | **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
 | **Heat & City Events** | Manage rising Heat and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
 | **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
-| **Garage** | Purchase the **Kairo KX-R**, the first canonical Solara vehicle, with its own approved artwork and a permanent ownership bonus. |
+| **Garage** | Purchase the **Kairo KX-R**, the first canonical Solara vehicle, with its own approved artwork and a production bonus while active. |
 | **Achievements & statistics** | Unlock **six permanent achievements** and track **eight lifetime statistics** across runs. These record progress without adding gameplay bonuses. |
 | **Next Objective** | Follow a suggested progression step with exact Level/Cash requirements, or choose an optional goal. Jump to the relevant card from any section; guidance never purchases or resets anything. |
 | **Offline progress & backups** | Return to credited Business and Dispatcher earnings for up to **8 hours**, extendable to **12 hours** through Never Sleeps. Save locally and transfer progress with **CE1 export/import codes**. |
@@ -64,26 +64,26 @@ The interface has five sections: **Overview** for your dashboard, **Operations**
 | --- | --- | --- |
 | **$25,000** | Player Level 5 · Dockside Detail Level 5 | **+10% global Business Production**, including offline and after Rebirth |
 
-The current game has **one purchasable vehicle**. Additional models, an Active Vehicle system and tuning are planned — not hidden features waiting to be unlocked. The [vehicle catalog](docs/VEHICLE_CATALOG.md) separates the implemented KX-R from future concepts.
+The current game has **one purchasable vehicle**. The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. Additional models and tuning are planned — not hidden features waiting to be unlocked. The [vehicle catalog](docs/VEHICLE_CATALOG.md) separates the implemented KX-R from future concepts.
 
 ## Development status
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. Current saves use **schema v17**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This branch adds **Active Vehicle Foundation**, currently under verification. Current saves use **schema v18**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
 ## What's next?
 
-These are **planned directions, not features in the current build**. Scope and order may evolve as the game is tested.
+Current implementation and planned follow-ons are distinguished below. Scope and order may evolve as the game is tested.
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | Settings, English/German localization and continued accessibility polish. |
-| **Global HUD & activity** | A compact sticky HUD, a more usable activity feed and easier access to City Events from anywhere in the interface. |
-| **A stronger Solara identity** | Final logo and favicon, followed by controlled Business artwork batches and richer city presentation. |
-| **A growing Garage** | Active Vehicle selection, the remaining Tier-1 cars and, later, per-vehicle tuning and additional catalog tiers. |
+| **A clearer, more comfortable game** | Settings and full English/German Solara voice are implemented; further accessibility polish remains planned. |
+| **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
+| **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
+| **A growing Garage** | Active Vehicle Foundation is in this branch; Tier-1 Kairo Senda / Namera Lilt follow acceptance, then later tuning and catalog tiers. |
 | **A deeper city** | Heat/Police expansion, more Business depth, crew and event development, and richer territory progression. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.

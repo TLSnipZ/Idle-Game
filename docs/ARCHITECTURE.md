@@ -2,7 +2,7 @@
 
 ## Current implementation
 
-POST 3B: current Save **v17**, unchanged **CE1** transport, one canonical vehicle
+Active Vehicle branch: Save **v18**, unchanged **CE1** transport, one canonical vehicle
 **Kairo KX-R** (`vehicle:kairo-kx-r`). The numbered phase sections below preserve
 historical architecture decisions; their Vortex/v15 references describe those phases.
 See POST 2C for the vehicle identity boundary and POST 3B below for Business targeting.
@@ -2525,3 +2525,19 @@ to existing card headings; GameShell handles explicit focus/scroll once per inte
 Ordinary state updates do not navigate. UI work does not modify Save v17 / CE1,
 runtime algorithms, content, balance, or the prior confirmation flows. See
 [GUIDANCE.md](GUIDANCE.md) for route policy, integration audit and review limits.
+
+## Active Vehicle Foundation — Save v18
+
+Garage adds exactly one `activeVehicleId`: null with no vehicles, otherwise a known
+owned ID. Current validation rejects inconsistent ownership/selection; only migration
+selects the historical KX-R automatically. Sequential v1–v17 validation remains strict.
+A first purchase activates automatically, later purchases preserve selection. Only
+the active vehicle contributes a modifier through the central collector.
+
+`setActiveVehicle` is pure. `selectActiveVehicle` in the persistent runtime rejects
+unavailable sessions and preflights before clock/RNG/storage access. An already-active
+ID returns the identical state without publishing. A real change reconciles the old
+rate, revalidates, saves the complete candidate, then publishes. Failed writes retain
+the old reconciled selection. Earned Money fractions are retained; a successful
+selection change starts a fresh runtime sub-ms boundary. Offline credit uses the saved
+selection before interaction. Rebirth retains the entire Garage; New Game clears it.

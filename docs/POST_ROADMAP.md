@@ -1,7 +1,18 @@
 # Post-roadmap priorities
 
-This is the current post-roadmap status and priority source. ROADMAP.md retains
-historical Base Game records. Current Save v17 / CE1 includes POST 2C vehicle
+This is the current post-roadmap status and priority source.
+
+## Active Vehicle implementation — current branch
+
+Active Vehicle Foundation and Save v18 are implemented on `feat/active-vehicle-complete`;
+verification is in progress, not merged or live. PR #22 was a design-only checkpoint.
+The four storefronts were merged in PR #21 and deployed successfully. The next release
+requires the actual selection/migration/UI patch, CI evidence and live acceptance.
+Afterward: Tier-1 Garage (Kairo Senda / Namera Lilt), then Heat / Police 2.0.
+See [ACTIVE_VEHICLE.md](ACTIVE_VEHICLE.md) for current scope and verification.
+
+The following numbered entries retain their historical save-version and acceptance records. ROADMAP.md retains
+historical Base Game records. Main before this branch used Save v17 / CE1, including POST 2C vehicle
 identity migration and POST 3B selected Business targeting. Non-vehicle Phase 9C balance, Phase 9D runtime safeguards and
 Phase 9B accessibility remain preserved contracts.
 
@@ -195,10 +206,10 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Current task: the user's approved four-storefront preview, implemented as one batch.**
+**Previous task: the user's approved four-storefront preview, merged and deployed in PR #21.**
 Dockside's prior crop is replaced, Laundry's matching preview crop is retained, and
 Afterdark Customs plus Solara Nights are added. No new artwork generation or UI
 redesign. Check the current integration PR for merge/Pages verification, then review
-all four actual in-game cards. Active Vehicle + Tier-1 Garage is the next separately
-authorized phase; do not start it automatically. Preserve Save v17 / CE1, GameState,
+all four actual in-game cards. The user has authorized Active Vehicle Foundation; that implementation is the current
+branch described at the top. Tier-1 content remains the subsequent separate phase. Preserve Save v17 / CE1, GameState,
 economy, balance, gates, automation authority, RNG, localization and runtime behavior.
