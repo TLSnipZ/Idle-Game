@@ -1,3 +1,4 @@
+import { SaveStatus } from './SaveStatus';
 import { useEffect, useRef, useState } from 'react';
 import { CITY_NAME } from '../features/territories';
 import { getOfflineCapMs } from '../game/offline-cap';
@@ -71,7 +72,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const dashboard = dashboardPresentation(game.snapshot.state);
   return <LocalizationProvider locale={preferences.settings.locale}><div className="app-shell">
     <a className="skip-link" href="#main" onClick={() => main.current?.focus()}>{t('skip')}</a>
-    <header className="app-header"><BrandLockup /><span className="edition">{t('tagline')}</span><div className="header-actions">{(game.persistence.kind === 'ready' || game.persistence.kind === 'saved' || game.persistence.kind === 'loaded') && <span className="save-health">{t('autosave')}</span>}<button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
+    <header className="app-header"><BrandLockup /><span className="edition">{t('tagline')}</span><div className="header-actions"><SaveStatus status={game.persistence} /><button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
     <GlobalStatus view={dashboard} active={active} onNavigate={setActive} paused={paused} newsMessage={game.feedback.message} t={t} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
       <RebirthNotice preview={dashboard.empire} onReview={() => { setActive(SECTION.empire.id); setReviewRequest(request => request + 1); }} />
