@@ -46,7 +46,7 @@ try {
         overflow: document.documentElement.scrollWidth - innerWidth,
         chromeHeight: Math.round(document.querySelector('.global-chrome')?.getBoundingClientRect().height ?? 0),
         section: document.querySelector('#section-content')?.getAttribute('data-section'),
-        overflowNodes: [...document.querySelectorAll('button, select, h2, h3, strong, dt, .operations-section-heading')].filter(element => {
+        overflowNodes: [...document.querySelectorAll('a, button, select, h2, h3, strong, dt, .app-header span, .app-footer span, .operations-section-heading')].filter(element => {
           const box = element.getBoundingClientRect();
           return box.right > innerWidth + 1 && box.width > 0 && !element.closest('.activity-center-items, .global-status');
         }).slice(0, 8).map(element => ({ tag: element.tagName, className: element.className, text: element.textContent.slice(0, 100), right: Math.round(element.getBoundingClientRect().right) })),

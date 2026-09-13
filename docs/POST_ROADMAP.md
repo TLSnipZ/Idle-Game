@@ -6,7 +6,7 @@ This is the current post-roadmap status and priority source.
 
 User explicitly moved this ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
 for implementation, defects, verification and overhaul priorities.
-Sequence: complete this audit → address its release-critical findings → Tier-1 Garage
+Sequence: complete this audit → repair inherited UI test coverage → Tier-1 Garage
 (Kairo Senda / Namera Lilt) → Heat / Police 2.0.
 
 ## Active Vehicle implementation — merged PR #23
@@ -15,7 +15,7 @@ Active Vehicle Foundation and Save v18 are implemented in PR #23.
 Its verification and release evidence are recorded below and in the PR. Manual live
 acceptance remains separate. PR #22 was a design-only checkpoint.
 The four storefronts were merged in PR #21 and deployed successfully. PR #23 supplies the actual selection/migration/UI patch and CI evidence.
-Afterward: Tier-1 Garage (Kairo Senda / Namera Lilt), then Heat / Police 2.0.
+The current audit and its test-repair follow-up now precede Tier-1 Garage, then Heat / Police 2.0.
 Verification: run [34757750344](https://github.com/TLSnipZ/Idle-Game/actions/runs/34757750344)
 passed typecheck/build, regression comparison (2,159 passed / the same 64 existing
 failures; all 47 new tests passed) and 20 EN/DE production Chromium cases. No baseline

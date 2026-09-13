@@ -16,7 +16,7 @@
 .jobs-block { padding: var(--space-lg); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: linear-gradient(145deg, color-mix(in srgb, var(--color-surface) 94%, var(--color-accent) 6%), var(--color-surface)); box-shadow: var(--shadow-standard); }
 .job-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: var(--space-md) 0; }
 .job-metrics > div { min-width: 0; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: color-mix(in srgb, var(--color-background) 76%, transparent); }
-.job-metrics dt { margin-bottom: .25rem; color: var(--color-muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; }
+.job-metrics dt { overflow-wrap: anywhere; margin-bottom: .25rem; color: var(--color-muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; }
 .job-metrics dd { margin: 0; color: var(--color-text); font-size: clamp(1rem, 2vw, 1.35rem); font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .job-metrics > div:first-child dd { color: var(--color-cool); }
 .operations-primary-action { margin-top: .2rem; }

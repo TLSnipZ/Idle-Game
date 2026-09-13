@@ -248,7 +248,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .primary-navigation button[aria-current="page"] { text-decoration: underline; text-underline-offset: .3em; }
 .primary-navigation button:focus-visible, .global-indicators button:focus-visible,
 .action-button:focus-visible, .save-panel textarea:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.skip-link { position: fixed; min-height: 44px; }
+.skip-link { position: fixed; min-height: 44px; max-width: calc(100vw - 2rem); box-sizing: border-box; overflow-wrap: anywhere; }
 .save-confirm .action-button + .action-button, .crew-card .action-button + .action-button { margin-top: .75rem; }
 .save-confirm { border-inline-start: 3px solid var(--color-accent); }
 .panel-heading { flex-wrap: wrap; }
