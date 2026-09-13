@@ -2,7 +2,12 @@
 
 This is the current post-roadmap status and priority source.
 
-## Current priority — Tier-1 Garage (next)
+## Current priority — Tier-1 Garage (implementation / verification)
+
+The authorized Garage expansion adds Senda and Lilt mechanics, Save v19 and three
+localized cards. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md) for exact contracts,
+balance limits and pending artwork approval. CI and deployment status are recorded
+there after execution.
 
 The user moved the whole-game audit and regression repairs ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
 for implementation, defects, verification and overhaul priorities.

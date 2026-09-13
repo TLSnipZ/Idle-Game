@@ -24,6 +24,10 @@ export function activeVehicleEffectChanged(previous: GameState, next: GameState)
   if (before.target.stat !== after.target.stat
     || (before.target.stat === 'business-production' && after.target.stat === 'business-production'
       && before.target.businessId !== after.target.businessId)) return true;
+  if (before.target.stat === 'job-reward' && after.target.stat === 'job-reward'
+    && before.target.context !== after.target.context) return true;
+  if (before.operation === 'reduce-interval')
+    return after.operation !== 'reduce-interval' || before.reductionMs !== after.reductionMs;
   return before.operation === 'add-flat'
     ? after.operation !== 'add-flat' || before.amount !== after.amount
     : after.operation !== 'multiply-basis-points' || before.bonusBasisPoints !== after.bonusBasisPoints;

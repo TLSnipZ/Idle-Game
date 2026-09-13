@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 18;
+export const CURRENT_SAVE_VERSION = 19;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -111,7 +111,7 @@ function validateState(value: unknown, version: number): GameState | null {
     for (const id of value.garage.ownedVehicleIds) {
       const vehicleId = version < 16
         ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
-        : version < 18 ? id === KXR_VEHICLE_ID ? KXR_VEHICLE_ID : undefined : findVehicle(id)?.id;
+        : version < 19 ? id === KXR_VEHICLE_ID ? KXR_VEHICLE_ID : undefined : findVehicle(id)?.id;
       if (!vehicleId || ownedVehicleIds.includes(vehicleId)) return null;
       ownedVehicleIds.push(vehicleId);
     }
@@ -290,6 +290,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 15) migrated = withoutActiveVehicle(withoutTarget(migrateV15ToV16(migrated)));
   if (value.version <= 16) migrated = withoutActiveVehicle(migrateV16ToV17(migrated));
   if (value.version <= 17) migrated = migrateV17ToV18(migrated);
+  // v18 has the same shape but a frozen one-car identity set. No rewards or timing changes.
+  if (value.version <= 18) migrated = validateState(migrated, 18);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

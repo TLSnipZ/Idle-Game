@@ -113,7 +113,7 @@ try {
     assert.equal(await trigger.evaluate(element => element === document.activeElement), true);
     await page.reload();
     assert.equal(await page.locator('html').getAttribute('lang'), locale === 'villager' ? 'en-x-villager' : locale);
-    assert.equal((await saved(page)).version, 18);
+    assert.equal((await saved(page)).version, 19);
     assert.deepEqual(errors, []);
     await context.close();
   }

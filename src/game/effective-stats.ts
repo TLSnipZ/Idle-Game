@@ -40,7 +40,7 @@ export function effectiveProductionRates(state: GameState) {
   }
   return { ok: true as const, rates };
 }
-export function evaluateJobReward(state: GameState) {
-  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward' }, collectModifiers(state));
+export function evaluateJobReward(state: GameState, context: 'manual' | 'dispatcher' = 'manual') {
+  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, collectModifiers(state));
   return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), effective: evaluated.effective, base: evaluated.base, applied: evaluated.applied } : evaluated;
 }

@@ -1,5 +1,12 @@
 # Base Game balance
 
+Current Tier-1 expansion: Senda costs **$40,000**, requires Player **6** / owned
+Dockside **7**, and gives **+12% manual Job Cash** only while active. Lilt costs
+**$55,000**, requires Player **7** / owned Dockside **8**, and subtracts **3 seconds**
+from the Crew-derived cooling interval: **60→57s**, or **45→42s** with assigned Mara.
+Only one vehicle contributes. KX-R remains $25,000 / P5 / D5 / +10% production.
+See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md) for marginal tradeoffs and validation.
+
 Current authoritative values after **POST 3D Business Progression Gates**. Non-Business Phase 9C balance is unchanged. Values remain provisional, but
 this document describes the implemented game only. Feature config and central domain
 helpers are the source of truth; UI uses their selectors. Phase 9C evidence and

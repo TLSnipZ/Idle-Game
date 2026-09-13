@@ -5,8 +5,9 @@ audit and Villager overkill (PRs #24–25). All **2,252 tests pass, zero failure
 skips**; strict build, whitespace checks and all 255 Chromium cases passed.
 Automation description links, instant Operations navigation and shared action
 spacing are repaired. Evidence: [GAME_AUDIT.md](GAME_AUDIT.md).
-Next phase: **Tier-1 Garage — Kairo Senda / Namera Lilt**, followed by Heat / Police
-2.0. Other P2 audit items remain tracked; no additional content shipped in P1.
+Current phase: **Tier-1 Garage — Kairo Senda / Namera Lilt** implementation and
+verification. See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md). New model artwork awaits
+explicit reference approval. Heat / Police 2.0 follows this Garage block. Other P2 audit items remain tracked; no additional content shipped in P1.
 
 Previous milestone: **Active Vehicle Foundation / Save v18** is implemented on
 `feat/active-vehicle-complete` in PR #23; executed checks and release state are

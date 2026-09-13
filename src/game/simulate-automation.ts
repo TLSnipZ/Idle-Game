@@ -33,7 +33,7 @@ export function planDispatcher(state: GameState, elapsedMs: unknown): Dispatcher
   const progress = Number(total % interval);
   let income = empty.income;
   if (completedJobs > 0) {
-    const reward = evaluateJobReward(state);
+    const reward = evaluateJobReward(state, 'dispatcher');
     if (!reward.ok) return { ok: false, state, error: reward.error };
     const batch = multiplyMoney(reward.reward, completedJobs);
     if (!batch.ok) return { ok: false, state, error: batch.error };

@@ -6,10 +6,12 @@
 implemented and visually accepted by the user.** POST 2C descends from
 `10f170447d09e12f7ef1293539ef979c506fa563`.
 
-This catalog contains fourteen identities: **Kairo KX-R implemented, thirteen
-remaining vehicles planned**. Proposed names/values for rows 2–14 are not live.
-Active Vehicle Foundation is implemented in PR #23 (verification/release evidence in the PR);
-Tuning and additional vehicles remain future systems. BALANCING.md is live balance authority.
+This catalog contains fourteen identities: **KX-R, Senda and Lilt implemented in
+the Tier-1 candidate; eleven remaining vehicles planned**. Rows 2–3 now use the
+specified price/gates/effects; their model artwork still awaits explicit approval.
+See [TIER_ONE_GARAGE.md](TIER_ONE_GARAGE.md) for current implementation and release
+status. The following design sections preserve historical proposals; Tuning and
+rows 4–14 remain future work. BALANCING.md is the current balance authority.
 
 ### Current production behavior
 
@@ -22,8 +24,8 @@ Tuning and additional vehicles remain future systems. BALANCING.md is live balan
 | Effect | +10% global Business Production (1,000 basis points) while active |
 | Modifier ID | `modifier:kairo-kx-r-production` |
 | Permanence | Ownership and active selection survive Rebirth; active bonus applies to rebuilt businesses |
-| State | `garage: { ownedVehicleIds: [...], activeVehicleId: VehicleId | null }`; one current vehicle, no build/manufacturer fields |
-| Save / transfer | Save v18 on the Active Vehicle branch / unchanged `CE1-` container |
+| State | `garage: { ownedVehicleIds: [...], activeVehicleId: VehicleId | null }`; three current vehicles, no build/manufacturer fields |
+| Save / transfer | Save v19 in the Tier-1 candidate / unchanged `CE1-` container |
 | Model Reference | User-approved Final Refinement, first canonical Vehicle Model Reference |
 
 An owner stores `garage: { ownedVehicleIds: ['vehicle:kairo-kx-r'], activeVehicleId: 'vehicle:kairo-kx-r' }`;

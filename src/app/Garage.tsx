@@ -45,7 +45,11 @@ export function Garage({ state, paused, onPurchase, onSelect }: {
           width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />}
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>
-        <p className="production">{formatModifier(vehicle.modifier)} {text('Business Production · while active', 'Business-Produktion · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
+        <p className="production">{formatModifier(vehicle.modifier)} {vehicle.modifier.target.stat === 'business-production'
+          ? text('Business Production · while active', 'Business-Produktion · wenn aktiv')
+          : vehicle.modifier.target.stat === 'job-reward'
+            ? text('Manual Job Cash · while active', 'Manueller Job-Cash · wenn aktiv')
+            : text('seconds per Heat cooling interval · while active', 'Sekunden pro Heat-Abkühlintervall · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
         {view.owned && !view.active && <button type="button" className="action-button"
           disabled={paused} onClick={() => onSelect(vehicle.id)}
           aria-label={text(`Activate ${vehicle.name}`, `${vehicle.name} aktivieren`)}>

@@ -18,10 +18,16 @@ it('production-browser v17 fixtures migrate with unchanged ownership, cash and a
   }));
   for (const fixture of fixtures) {
     const result = migrateToCurrentSave(fixture);
-    expect(result).toMatchObject({ ok: true, envelope: { version: 18, state: {
+    expect(result).toMatchObject({ ok: true, envelope: { version: 19, state: {
       economy: state.economy, garage: { ...fixture.state.garage,
         activeVehicleId: fixture.state.garage.ownedVehicleIds[0] ?? null },
     } } });
   }
+  const tierOne = { format: 'crime-empire-save', version: 19, savedAt: 1000, state: {
+    ...fresh, economy: { cash: moneyFromMinorUnits('20000000') }, progression: { xp: getXpThresholdForLevel(7) },
+    businesses: { ...fresh.businesses, owned: { [STARTER_BUSINESS.id]: { level: 8 } } },
+  } };
+  expect(migrateToCurrentSave(tierOne)).toMatchObject({ ok: true, envelope: tierOne });
+  fixtures.push(tierOne);
   if (process.env.SOLARA_BROWSER_FIXTURES) writeFileSync(process.env.SOLARA_BROWSER_FIXTURES, JSON.stringify(fixtures));
 });
