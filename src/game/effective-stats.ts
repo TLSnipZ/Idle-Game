@@ -1,5 +1,5 @@
 import { collectCrewModifiers } from '../features/crew';
-import { RISKY_DELIVERY_BONUS_BASIS_POINTS, collectHeatModifiers } from '../features/heat';
+import { DISCREET_DELIVERY_BONUS_BASIS_POINTS, getPolicePressure, collectHeatModifiers } from '../features/heat';
 import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
 import { assertGarageState, findVehicle } from '../features/vehicles';
@@ -47,7 +47,14 @@ export function evaluateRiskyJobReward(state: GameState) {
   return evaluateDeliveryReward(state, 'manual', [{
     id: 'modifier:risky-delivery', sourceId: 'heat:risky-delivery',
     target: { stat: 'job-reward', context: 'manual' },
-    operation: 'multiply-basis-points', bonusBasisPoints: RISKY_DELIVERY_BONUS_BASIS_POINTS,
+    operation: 'multiply-basis-points', bonusBasisPoints: getPolicePressure(state.city.heat).riskyBonusBasisPoints,
+  }]);
+}
+export function evaluateDiscreetJobReward(state: GameState) {
+  return evaluateDeliveryReward(state, 'manual', [{
+    id: 'modifier:discreet-delivery', sourceId: 'heat:discreet-delivery',
+    target: { stat: 'job-reward', context: 'manual' },
+    operation: 'multiply-basis-points', bonusBasisPoints: DISCREET_DELIVERY_BONUS_BASIS_POINTS,
   }]);
 }
 function evaluateDeliveryReward(state: GameState, context: 'manual' | 'dispatcher', extra: readonly Modifier[]) {

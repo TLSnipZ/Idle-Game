@@ -1,5 +1,8 @@
 # Heat / Police 2.0 — I: Risk & Reward
 
+Current continuation: [II Police Pressure](POLICE_PRESSURE.md) adds a +25% WATCHED
+premium and discreet cooling delivery. The Phase I values below are historical.
+
 ## Scope and authority
 
 The user's request to start the next phase after PR #28 authorizes this first

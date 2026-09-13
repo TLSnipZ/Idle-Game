@@ -1,3 +1,4 @@
+import { DiscreetDelivery } from './DiscreetDelivery';
 import { RiskyDelivery } from './RiskyDelivery';
 import { useRef } from 'react';
 import type { useGame } from './use-game';
@@ -66,6 +67,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
         <div className="operations-disclosure-body"><p>{text('Base reward:', 'Basis-Auszahlung:')} <strong>{formatReward(reward.base)}</strong></p><ModifierBreakdown modifiers={reward.applied} /><p>{text('Effective reward:', 'Tatsächliche Auszahlung:')} <strong>{formatReward(reward.reward)}</strong></p></div>
       </details>}
       <RiskyDelivery state={snapshot.state} paused={paused} onRun={game.runRiskyDelivery} />
+      <DiscreetDelivery state={snapshot.state} paused={paused} onRun={game.runDiscreetDelivery} />
     </section>
 
     <section className="operations-block businesses-block" aria-labelledby="businesses-heading">

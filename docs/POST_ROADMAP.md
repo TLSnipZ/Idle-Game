@@ -1,5 +1,20 @@
 # Post-roadmap priorities
 
+## Current phase — II Police Pressure
+
+Implemented on `feat/police-pressure`: WATCHED reduces risk premium to +25%;
+discreet delivery pays half normal Cash, zero XP, and cools up to 2 Heat.
+See [POLICE_PRESSURE.md](POLICE_PRESSURE.md). Save v19 / CE1 unchanged.
+Verified in [PR #30](https://github.com/TLSnipZ/Idle-Game/pull/30):
+[run 34777563745](https://github.com/TLSnipZ/Idle-Game/actions/runs/34777563745)
+on `bf28818fd514cc68baf74f6bd90c18dc6b11ae7b`: strict build, **2,354/2,354 tests**
+(39 added, zero failures/skips), **45 Garage + 225 section + 15 risk + 15 police
+Chromium cases**, and whitespace checks passed. Evidence artifact: `10323499963`.
+This final follow-up changes documentation only. Merge/deployment evidence is
+recorded in the PR; manual live acceptance remains separate.
+PR #29 completed and deployed Heat I.
+Next separate scope: III District Heat. Earlier handoffs below are historical.
+
 ## Current phase — Heat / Police 2.0 I: Risk & Reward
 
 Implemented on `feat/heat-risk-reward`: optional +50% Cash / +5 Heat delivery,

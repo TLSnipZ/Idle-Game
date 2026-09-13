@@ -246,7 +246,7 @@ try {
     await page.keyboard.press('Enter');
     const after = (await saved(page)).state;
     assert.equal(after.city.heat, 64);
-    assert.equal(BigInt(after.economy.cash) - BigInt(before.economy.cash), 3750n);
+    assert.equal(BigInt(after.economy.cash) - BigInt(before.economy.cash), 3125n);
     assert.equal(after.permanentProgression.statistics.manualJobsCompleted, before.permanentProgression.statistics.manualJobsCompleted + 1);
     assert.equal(await button.isDisabled(), true);
     assert.equal(await page.locator('.delivery-button').isDisabled(), false);
@@ -265,9 +265,56 @@ try {
     await context.close();
   }
 
+
+  // Police Pressure: watch threshold, current premium, active cooling, HOT and persistence.
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (sessionStorage.getItem('police-audit')) return;
+      fixture.savedAt = Date.now(); fixture.state.city.heat = 40;
+      fixture.state.city.heatDecayElapsedMs = 0; fixture.state.economy.cash = '100000';
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('police-audit', 'true');
+    }, { fixture: fixtures[0], locale });
+    await page.goto('http://127.0.0.1:4174');
+    await navigation(page).nth(1).click();
+    const discreet = page.locator('.discreet-delivery-button'), risk = page.locator('.risky-delivery-button');
+    assert.ok((await page.locator('.risky-delivery:not(.discreet-delivery)').textContent()).includes('+25%'));
+    await discreet.focus(); await page.keyboard.press('Enter');
+    let current = (await saved(page)).state;
+    assert.equal(current.city.heat, 38); assert.equal(current.economy.cash, '101250');
+    assert.equal(current.progression.xp, 0);
+    assert.ok((await page.locator('.risky-delivery:not(.discreet-delivery)').textContent()).includes('+50%'));
+    await risk.click(); current = (await saved(page)).state;
+    assert.equal(current.city.heat, 43); assert.equal(current.economy.cash, '105000');
+    for (let i = 0; i < 4; i++) await risk.click();
+    current = (await saved(page)).state;
+    assert.equal(current.city.heat, 63); assert.equal(current.economy.cash, '117500');
+    assert.equal(await risk.isDisabled(), true);
+    await discreet.click(); await discreet.click();
+    current = (await saved(page)).state;
+    assert.equal(current.city.heat, 59); assert.equal(current.economy.cash, '119750');
+    assert.equal(current.progression.xp, 50);
+    assert.equal(await risk.isDisabled(), false);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({ path: 'browser-evidence/police-' + locale + '-' + width + '.png', fullPage: true });
+    await page.reload(); await navigation(page).nth(1).click();
+    assert.equal((await saved(page)).state.economy.cash, '119750');
+    assert.equal((await saved(page)).state.city.heat, 59);
+    await navigation(page).nth(2).click();
+    assert.equal(await page.locator('.police-pressure').count(), 1);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+
   const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
   assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
-  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, localeSwitchAndFeedback: true,
+  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));
