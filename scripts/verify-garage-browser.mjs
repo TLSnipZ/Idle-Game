@@ -7,6 +7,30 @@ const fixtures = JSON.parse(readFileSync(process.env.SOLARA_BROWSER_FIXTURES, 'u
 const server = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4173'], { stdio: 'inherit' });
 let browser;
 const results = [];
+async function verifyArtwork(page, width, locale) {
+  const pictures = page.locator('.garage .vehicle-artwork');
+  assert.equal(await pictures.count(), 3, 'Every configured vehicle has its own image');
+  const sources = [];
+  for (const picture of await pictures.all()) {
+    await picture.scrollIntoViewIfNeeded();
+    const view = await picture.evaluate(async image => {
+      await image.decode();
+      const box = image.getBoundingClientRect();
+      return { src: image.currentSrc, alt: image.alt, width: image.naturalWidth, height: image.naturalHeight,
+        left: box.left, right: box.right, ratio: box.width / box.height,
+        loading: image.loading, fit: getComputedStyle(image).objectFit };
+    });
+    assert.equal(view.width, 1672); assert.equal(view.height, 941);
+    assert.ok(view.left >= -1 && view.right <= width + 1, 'Whole artwork fits viewport');
+    assert.ok(Math.abs(view.ratio - 1672 / 941) < 0.02, 'Artwork is not distorted');
+    assert.equal(view.fit, 'contain'); assert.equal(view.loading, 'lazy');
+    assert.ok(view.src.endsWith('.webp') && !view.src.includes('reference'));
+    assert.ok(view.alt.length > 0);
+    if (locale === 'villager') assert.match(view.alt, /^[hmr -]+$/i);
+    sources.push(view.src);
+  }
+  assert.equal(new Set(sources).size, 3, 'Models never reuse another car image');
+}
 mkdirSync('browser-evidence', { recursive: true });
 try {
   let ready = false;
@@ -47,9 +71,7 @@ try {
     if (locale === 'villager') assert.match(carName, /^[hmr -]+$/i);
     else assert.equal(carName, 'Kairo KX-R');
     assert.equal(await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button').count(), 0, 'Active car has no redundant selection/purchase button');
-    const image = page.locator('.vehicle-artwork');
-    await image.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => { const image = document.querySelector('.vehicle-artwork'); return image?.complete && image.naturalWidth > 0; });
+    await verifyArtwork(page, width, locale);
     const geometry = await page.locator('.garage-active-summary').evaluate(element => {
       const box = element.getBoundingClientRect();
       return { x: box.x, right: box.right, width: box.width, scroll: element.scrollWidth, client: element.clientWidth,
@@ -79,6 +101,7 @@ try {
     }, { fixture: fixtures[2], locale });
     await page.goto('http://127.0.0.1:4173');
     await page.locator('.primary-navigation button').nth(3).click();
+    await verifyArtwork(page, width, locale);
     const ids = ['vehicle:kairo-senda', 'vehicle:namera-lilt', 'vehicle:kairo-kx-r'];
     for (const id of ids) {
       const card = page.locator('article[aria-labelledby="' + id + '-heading"]');

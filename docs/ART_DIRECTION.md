@@ -376,3 +376,27 @@ Owned, locked, unaffordable and purchasable use the same composition and artwork
 No filler specifications, new controls, filters, crop, asset conversion or image
 changes. Canonical PNG, production WebP, lazy/async delivery and alt treatment
 remain exactly POST 2C. Desktop/mobile live visual acceptance remains pending.
+
+## Tier-1 model approval and production artwork
+
+The user approved both Model Candidate A identities with “Leg los broooo” after
+being asked to approve the blue Senda and red Lilt. Later requests to continue
+retain that approval. KX-R's original reference and production image are unchanged.
+
+Clean standalone 1672×941 PNG derivatives were prepared from the approved models,
+removing the review-sheet headings and second panel. These are derived renders,
+not byte-identical crops of the original approval sheet. The Senda retains its
+steel-blue fixed-roof coupe, thin lamps, graphite wheels and modest rear spoiler;
+Lilt retains its red open-top two-seat roadster, tan cockpit and silver five-spoke
+wheels. Both retain the coastal-night Solara showroom and whole-car framing.
+
+| Model | Master | Runtime delivery |
+| --- | --- | --- |
+| Kairo Senda | `src/assets/reference/vehicles/kairo-senda-reference.png` | `src/assets/vehicles/kairo-senda.webp`, 198,236 bytes |
+| Namera Lilt | `src/assets/reference/vehicles/namera-lilt-reference.png` | `src/assets/vehicles/namera-lilt.webp`, 223,762 bytes |
+
+WebP encoding uses ImageMagick quality 88, method 6, with no resizing or visual
+edits during conversion. Masters are not imported into runtime. Presentation keeps
+1672×941 intrinsic dimensions, contain sizing, lazy/async loading, localized alt
+text and separate HTML name/effect/gate/action facts. No art paths enter saves.
+Browser checks decode all three distinct assets at five widths in EN/DE/Villager.

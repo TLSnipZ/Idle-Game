@@ -1,5 +1,9 @@
 # Roadmap
 
+## Current artwork handoff
+
+Tier-1 artwork integration is implemented on `art/tier-one-vehicles`. The user approved the blue Senda and red Lilt with “Leg los broooo” after the explicit model-approval question. Clean standalone derivatives and optimized WebP delivery are included; verification and deployment are tracked in the artwork PR. Heat / Police 2.0 follows this release and is not started here.
+
 Completed: **P1 UI regression restoration** (PR #26), following the whole-game
 audit and Villager overkill (PRs #24–25). All **2,252 tests pass, zero failures or
 skips**; strict build, whitespace checks and all 255 Chromium cases passed.

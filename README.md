@@ -64,7 +64,7 @@ The interface has five sections: **Overview** for your dashboard, **Operations**
 | --- | --- | --- |
 | **$25,000** | Player Level 5 · Dockside Detail Level 5 | **+10% global Business Production**, including offline and after Rebirth |
 
-The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. KX-R has approved artwork; Senda and Lilt are complete text cards pending model-art approval. Later models and tuning remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
+The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. All three vehicles have individual approved-model artwork. Later models and tuning remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
 
 ## Development status
 
@@ -83,7 +83,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. |
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
-| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork awaits approval. Tuning and later catalog tiers remain planned. |
+| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
 | **A deeper city** | Heat/Police expansion, more Business depth, crew and event development, and richer territory progression. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
