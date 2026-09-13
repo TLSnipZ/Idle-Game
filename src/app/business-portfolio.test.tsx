@@ -30,7 +30,12 @@ describe('shared portfolio presentation and accessible states', () => {
     for (const detail of evaluateRequirements(createInitialGameState(), d.requirements).requirements) expect(root.textContent).toContain(`Required — ${detail.description}`);
     const b = root.querySelector('button'); expect(b?.disabled).toBe(true); expect(b?.getAttribute('aria-label')).toBe(`Acquire ${d.name}`);
     expect(root.querySelector('h3')?.textContent).toBe(d.name); expect(root.querySelector('[aria-live]')).toBeNull();
-    expect(root.querySelectorAll('img, svg, canvas')).toHaveLength(0);
+    expect(root.querySelectorAll('img')).toHaveLength(d.id === 'business:neon-laundry' ? 1 : 0);
+    expect(root.querySelectorAll('svg, canvas')).toHaveLength(0);
+    for (const image of root.querySelectorAll('img')) {
+      expect(image.alt).toBe('');
+      expect(image.parentElement?.getAttribute('aria-hidden')).toBe('true');
+    }
   });
   it.each(BUSINESS_CATALOG.slice(1))('$name distinguishes eligible insufficient Cash from a progression lock', d => {
     const initial = autoUpgraderState();
@@ -74,7 +79,6 @@ describe('POST 3C acquisition helpers', () => {
     expect(root.textContent).toContain('Required —');
     expect(root.textContent).toContain('Meet the requirements above to unlock this Business.');
     expect(root.textContent).not.toContain('Build your Cash balance');
-    expect(root.querySelector('button')?.querySelector('[aria-hidden]')).toBeNull();
   });
   it('eligible Laundry uses Cash copy, then removes it when affordable or owned', () => {
     const d = BUSINESS_CATALOG[1]!, s = createInitialGameState();
