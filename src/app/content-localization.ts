@@ -1,9 +1,17 @@
 import type { Locale } from './localization';
 
 interface LocalizedFields { readonly [field: string]: string | undefined }
+// Original English flavor belongs in presentation, not the economy catalogs.
+const EN: Record<string, LocalizedFields> = {
+  'business:dockside-detail': { tagline: 'Clean cars. Dirty money.' },
+  'business:neon-laundry': {
+    tagline: 'Fresh sheets. Questionable receipts.',
+    description: 'Open late. Cash preferred. The spin cycle works wonders on suspiciously healthy profit margins.',
+  },
+};
 const DE: Record<string, LocalizedFields> = {
-  'business:dockside-detail': { subtitle: 'Auto-Aufbereitung', description: 'Eine kompakte Garage am Wasser. Eine Waschbox, ein Neuanfang und erstaunlich wenig Fragen vom Vermieter.' },
-  'business:neon-laundry': { subtitle: 'Cash-Front', description: 'Unauffälliges Bargeldgeschäft für stabiles Einkommen. Die Waschmaschinen sind hauptsächlich fürs Ambiente da.' },
+  'business:dockside-detail': { tagline: 'Saubere Autos. Schmutziges Geld.', subtitle: 'Auto-Aufbereitung', description: 'Eine kompakte Garage am Wasser. Eine Waschbox, ein Neuanfang und erstaunlich wenig Fragen vom Vermieter.' },
+  'business:neon-laundry': { tagline: 'Saubere Wäsche. Fragwürdige Belege.', subtitle: 'Cash-Front', description: 'Bis spät geöffnet. Bargeld bevorzugt. Unser Schleudergang glättet sogar verdächtig gute Bilanzen.' },
   'business:afterdark-customs': { subtitle: 'Performance-Werkstatt', description: 'Performance-Werkstatt für Solaras Street-Szene. Offiziell werden hier nur Autos schneller.' },
   'business:solara-nights': { subtitle: 'Nachtclub', description: 'Premium-Club auf der Neon Mile mit ernsthafter Ertragskraft und einer Buchhaltung, die besser nicht nach 2 Uhr nachts arbeitet.' },
 
@@ -51,8 +59,7 @@ const DE: Record<string, LocalizedFields> = {
 };
 
 export function localizedContent(locale: Locale, id: string, field: string, fallback: string): string {
-  if (locale !== 'de') return fallback;
-  return DE[id]?.[field] ?? fallback;
+  return (locale === 'de' ? DE : EN)[id]?.[field] ?? fallback;
 }
 
 export function localizedSlotName(locale: Locale, name: string): string {
