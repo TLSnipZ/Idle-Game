@@ -111,20 +111,25 @@ Phase 9B accessibility remain preserved contracts.
   Dockside card and authorized the same treatment for the remaining Businesses.
   Source provenance and corrected history:
   [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
-- **Neon Laundry: presentation-code checkpoint on `neon-laundry-card-identity`; not deployed.**
-  Shared BusinessCard now reads optional localized taglines. Neon Laundry has its
-  own English/German tagline and description; Dockside retains its accepted text
-  and artwork. No stylesheet, asset mapping, catalog, GameState or save changes.
-  The 2026-09-13 write retry committed both production source files successfully.
-  A fresh Node 24 dependency install, checked production build and 17 targeted
-  local tests passed, including eight prepared Neon Laundry cases. The attempted
-  upload of the new test file was blocked by a tool safety check; that test file
-  is NOT in the branch. The full suite was not rerun in this retry; the earlier
-  baseline's 64 failing tests have not been resolved. No complete-suite or browser
-  acceptance is claimed for this checkpoint. Own storefront artwork, committed
-  regression coverage and final responsive/live acceptance remain open. Keep this
-  as work in progress, not a completed artwork phase or a released update.
-- **Current sequence:** complete Neon Laundry → Afterdark Customs → Solara Nights,
+- **Neon Laundry: complete storefront + EN/DE identity package implemented in PR #20; live review after release.**
+  Supersedes the earlier text-only draft. Own laundromat storefront WebP is committed
+  (732x188, 23,126 bytes) and mapped to the existing load-safe BusinessArtwork renderer.
+  Optional localized taglines and the Laundry description remain presentation-only.
+  Dockside's accepted asset, all stylesheets, the two/one-column grid, Earnings Details,
+  HUD, section spacing, gameplay, saves and balance are unchanged.
+  Node 24 checked production build and 16 focused tests passed. Regression coverage
+  is now committed in existing test files; the previously blocked standalone test
+  file remains unnecessary and absent. Full baseline: 2,087 passed / 64 failed;
+  full candidate: 2,094 passed / the same 64 failed. No additional failing cases,
+  but the full suite is NOT green. Historical failures remain separate work.
+  Sixteen paired EN/DE Chromium cases at 320–1920px passed against actual production
+  builds, plus purchase/upgrade, Earnings Details, reload, Settings language-switch
+  and blocked-image action checks. German 320px still has the same pre-existing
+  10px document overflow; this pass does not claim to fix it.
+  Consult PR #20's release-verification comment for final merge/Pages status.
+  The new Laundry artwork/card needs its own user visual acceptance before the next
+  Business. Source, checks and authority boundaries: [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
+- **Current sequence:** Neon Laundry release/live review → Afterdark Customs → Solara Nights,
   then **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
@@ -148,7 +153,9 @@ and the shared camera/lighting/showroom language.
 | Deployed / live review pending | Overview / City spacing | PR #18; checked build/deploy passed in run 34723960641; 22 candidate plus 18 production browser cases passed. See SECTION_SPACING.md. |
 | Live review pending | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
 | Live accepted | Dockside Business artwork | PR #19; deployed and explicitly approved as the compact Golden Reference. |
-| In progress | Neon Laundry identity | EN/DE code committed to the working branch; own artwork and complete verification still pending. No deployment. |
+| Implemented / release and live review | Neon Laundry identity | PR #20 now includes own storefront, EN/DE copy and committed regression coverage. See PR for final release status. |
+| Next | Afterdark Customs artwork | Follow the accepted compact renderer after Laundry live review; no redesign of Operations. |
+| Later | Solara Nights artwork | Follow Afterdark; keep existing data and layout. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP and Keep/Lose clarity; no reward/reset change. |
@@ -175,9 +182,10 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Dockside is accepted. Current work is Neon Laundry on its working branch.**
-The committed text/code preparation is not a finished artwork integration. Keep the
-repaired Operations, HUD and section-spacing baseline. All work remains presentation-
-only and must preserve Save v17 / CE1, GameState, economy, balance, gates, automation
-authority, RNG, localization and runtime behavior. No merge, deployment or later
-Business phase is implied by this checkpoint.
+**Dockside is accepted. Neon Laundry's complete artwork/copy package is in PR #20.**
+Confirm successful Pages release, then review its actual in-game card before starting
+Afterdark Customs. Keep the repaired Operations, HUD and section-spacing baseline.
+All work remains presentation-only and preserves Save v17 / CE1, GameState, economy,
+balance, gates, automation authority, RNG, localization and runtime behavior.
+Do not mistake the old text-only draft status for the current package, or a successful
+build for the user's visual acceptance. See PR #20 for the final release checkpoint.
