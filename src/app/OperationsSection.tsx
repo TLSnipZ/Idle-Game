@@ -29,10 +29,11 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
   const { snapshot, runtimeError, runStarterJob, upgradeOwnedBusiness, buyBusiness, buyUpgrade, buyAutomation, toggleAutomation, changeAutoUpgraderTarget, automationEvent } = game;
   const jobs = useRef<HTMLHeadingElement>(null);
   const businesses = useRef<HTMLHeadingElement>(null);
+  const equipment = useRef<HTMLHeadingElement>(null);
   const automation = useRef<HTMLHeadingElement>(null);
 
   function jump(target: HTMLHeadingElement | null) {
-    target?.focus();
+    target?.focus({ preventScroll: true });
     target?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
 
@@ -44,13 +45,15 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
   const totalProduction = dashboardPresentation(snapshot.state).production;
 
   return <div className="operations-page">
-    <nav className="operations-tabs" aria-label={text('Operations sections', 'Bereiche der Operationen')}>
+    <nav className="operations-tabs section-index" aria-label={text('Operations sections', 'Bereiche der Operationen')}>
       <button type="button" onClick={() => jump(jobs.current)}>{text('JOBS', 'JOBS')}</button>
       <button type="button" onClick={() => jump(businesses.current)}>{text('BUSINESSES', 'BUSINESSES')}</button>
+      <button type="button" onClick={() => jump(equipment.current)}>{text('EQUIPMENT', 'AUSRÜSTUNG')}</button>
       <button type="button" onClick={() => jump(automation.current)}>{text('AUTOMATION', 'AUTOMATISIERUNG')}</button>
     </nav>
 
     <section className="operations-block jobs-block" aria-labelledby="starter-heading">
+      <div className="standard-delivery">
       <div className="operations-section-heading">
         <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" ref={jobs} tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
         <span className="operations-kicker">{text('Manual work', 'Handarbeit')}</span>
@@ -69,6 +72,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
         <summary>{text('Reward details', 'Auszahlungsdetails')}</summary>
         <div className="operations-disclosure-body"><p>{text('Base reward:', 'Basis-Auszahlung:')} <strong>{formatReward(reward.base)}</strong></p><ModifierBreakdown modifiers={reward.applied} /><p>{text('Effective reward:', 'Tatsächliche Auszahlung:')} <strong>{formatReward(reward.reward)}</strong></p></div>
       </details>}
+      </div>
       <RiskyDelivery state={snapshot.state} paused={paused} onRun={game.runRiskyDelivery} />
       <DiscreetDelivery state={snapshot.state} paused={paused} onRun={game.runDiscreetDelivery} />
     </section>
@@ -89,7 +93,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
     </section>
 
     <section className="operations-block upgrades-block" aria-labelledby="upgrades-heading">
-      <div className="operations-section-heading"><div><span className="eyebrow">{text('EQUIPMENT', 'EQUIPMENT')}</span><h2 id="upgrades-heading">{text('Business Upgrades', 'Business-Upgrades')}</h2></div></div>
+      <div className="operations-section-heading"><div><span className="eyebrow">{text('EQUIPMENT', 'EQUIPMENT')}</span><h2 id="upgrades-heading" ref={equipment} tabIndex={-1}>{text('Business Upgrades', 'Business-Upgrades')}</h2></div></div>
       <p className="operations-lead">{text('Spend money to make money. Economists hate this one extremely obvious trick.', 'Gib Geld aus, um mehr Geld zu machen. Volkswirte hassen diesen erstaunlich offensichtlichen Trick.')}</p>
       <div className="upgrade-catalog">{UPGRADE_CATALOG.map(upgrade => <UpgradeCard key={upgrade.id} view={selectUpgrade(snapshot.state, upgrade.id)} paused={paused} onPurchase={() => buyUpgrade(upgrade.id)} />)}</div>
     </section>

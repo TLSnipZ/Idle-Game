@@ -9,4 +9,4 @@ export const SECTION = {
 export const PRIMARY_SECTIONS = [SECTION.overview, SECTION.operations, SECTION.city, SECTION.collection, SECTION.empire] as const;
 export type SectionId = typeof PRIMARY_SECTIONS[number]['id'];
 export const DEFAULT_SECTION: SectionId = SECTION.overview.id;
-export type Navigate = (section: SectionId) => void;
+export type Navigate = (section: SectionId, headingId?: string) => void;

@@ -54,6 +54,10 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-game-audit.mjs
+      - name: Verify whole-game layout and direct navigation
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-layout-browser.mjs
       - name: Verify whitespace
         run: git diff --check ba36d2abb3e1e666463d6eae916f8c53fc06b245 HEAD
       - name: Upload verification evidence
