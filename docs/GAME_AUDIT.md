@@ -176,3 +176,7 @@ inspected; previous real-device, alternate-browser, screenreader and zoom review
 limitations remain. The final evidence/status commit changes documentation only.
 P1 is complete. Tier-1 Garage is next; P2 overhaul findings remain tracked and no
 additional content phase was implemented in this PR.
+
+## UX follow-up — PR #34
+
+[UX_POLISH.md](UX_POLISH.md) records the bounded post-Heat pass: jobs-first Operations, cooling disclosures, compact mobile stats/activity and explicit last-save semantics. A 320px save-disclosure overflow found by the new browser check was repaired. The runtime's mixed persistence policies are preserved and explained. Broader localization consolidation, historical CSS cleanup and unifying all action persistence remain separate backlog work; this pass does not mark the entire P2 backlog complete.

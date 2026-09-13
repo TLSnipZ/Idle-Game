@@ -104,8 +104,8 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. |
-| **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
+| **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. Follow-up UX polish brings jobs forward and explains local save status. |
+| **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. Mobile stats wrap, events come first and latest feedback expands on demand. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
 | **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
 | **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V adds Business/Crew/active-car support for decoy costs; more Business depth, crew and event development, and richer territory progression remain planned. |
