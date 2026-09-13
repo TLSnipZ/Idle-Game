@@ -4,7 +4,7 @@
 
 Implemented in [PR #34](https://github.com/TLSnipZ/Idle-Game/pull/34): jobs-first Operations, compact Heat explanations and Activity Center, a wrapping mobile HUD, and clear last-save status. Save **v20 / CE1 unchanged**. See [UX polish](UX_POLISH.md).
 
-Verification is in progress. Next separate phase: **Garage 2.0 / tuning design and implementation**. Heat I–V is complete; earlier records below are historical.
+Build, regression, browser and deployment evidence is tracked in PR #34; user live acceptance remains separate. Next separate phase: **Garage 2.0 / tuning design and implementation**. Heat I–V is complete; earlier records below are historical.
 
 ## Current phase — Heat V: Support network
 
