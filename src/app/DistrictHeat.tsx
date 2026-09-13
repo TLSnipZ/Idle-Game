@@ -5,13 +5,15 @@ import { getHeatTier } from '../features/heat';
 import { heatTierLabel } from './heat-presentation';
 import './DistrictHeat.css';
 
-export function DistrictHeat({ state, paused, onChoose }: {
+export function DistrictHeat({ state, paused, onChoose, nested = false }: {
+  readonly nested?: boolean;
   readonly state: GameState; readonly paused: boolean; readonly onChoose: (id: string) => void;
 }) {
   const text = useLocalizedText(), locale = useLocale();
+  const Heading = nested ? 'h3' : 'h2';
   const blocked = state.events.pendingEventId !== null;
   return <section className="district-heat" aria-labelledby="district-heat-heading">
-    <h3 id="district-heat-heading">{text('DISTRICT HEAT', 'HEAT NACH BEZIRK')}</h3>
+    <Heading id="district-heat-heading">{text('DISTRICT HEAT', 'HEAT NACH BEZIRK')}</Heading>
     <label htmlFor="active-district">{text('Operating district', 'Einsatzbezirk')}</label>
     <select id="active-district" value={getActiveDistrictId(state.city)} disabled={paused || blocked}
       aria-describedby="district-action-scope" onChange={event => onChoose(event.target.value)}>

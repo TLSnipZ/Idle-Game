@@ -71,6 +71,7 @@ try {
     assert.equal(await navigation(page).count(), 5);
     for (let section = 0; section < 5; section++) {
       await navigation(page).nth(section).click();
+      if (section === 1 && stage === 0) assert.equal(await page.locator('#active-district option[value="territory:neon-mile"]').isDisabled(), true);
       const heading = await page.locator('#section-heading').textContent();
       assert.ok(heading?.trim());
       if (locale === 'villager') {
@@ -185,7 +186,9 @@ try {
     assert.ok((await saved(page)).state.city.heat < heat);
     await page.locator('.crew-slots .crew-slot button').first().click();
     assert.equal((await saved(page)).state.crew.assignments.operations, null);
+    assert.equal(await page.locator('#active-district').isDisabled(), true);
     await page.locator('.event-choice button').first().click();
+    assert.equal(await page.locator('#active-district').isDisabled(), false);
     assert.equal((await saved(page)).state.events.pendingEventId, null);
     await navigation(page).nth(4).click();
     const ep = (await saved(page)).state.permanentProgression.empirePoints;

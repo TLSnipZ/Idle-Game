@@ -21,7 +21,7 @@ export function City({ state, paused, onAcquire, onLayLow, onChooseDistrict }: {
     <div className="panel-heading"><h2 id="city-heading">{text(CITY_NAME)}</h2>
       <span>{text('Territories controlled:', 'Kontrollierte Bezirke:')} {city.ownedTerritoryCount} / {city.totalConfiguredTerritories}</span></div>
     <p>{text('Build influence block by block. The city calls it zoning. You call it growth.', 'Bau deinen Einfluss Block für Block aus. Die Stadt nennt es Stadtplanung. Du nennst es Wachstum.')}</p>
-    {onChooseDistrict && <DistrictHeat state={state} paused={paused} onChoose={onChooseDistrict} />}
+    {onChooseDistrict && <DistrictHeat nested state={state} paused={paused} onChoose={onChooseDistrict} />}
     <div className="district-pressure-layout"><div className="district-zone"><h3>{text('Districts', 'Bezirke')}</h3>
     <div className="territory-catalog">{TERRITORY_CATALOG.map(territory => {
       const view = territoryPresentation(state, territory.id, locale);

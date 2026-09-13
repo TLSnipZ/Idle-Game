@@ -48,6 +48,10 @@ describe('v19 to v20 district migration', () => {
     const s = createInitialGameState();
     expect(validateSaveState({ ...s, city: { ...s.city, districts: { activeId: N.id, parked: { heat: 0, heatDecayElapsedMs: 0 } } } })).toBeNull();
     const owned = state();
+    const ids = [W.id, N.id];
+    Object.defineProperty(ids, '1', { enumerable: true, get() { throw Error('ownership getter'); } });
+    expect(validateSaveState({ ...owned, city: { ...owned.city, ownedTerritoryIds: ids,
+      districts: { activeId: N.id, parked: { heat: 0, heatDecayElapsedMs: 0 } } } })).toBeNull();
     expect(validateSaveState({ ...owned, city: { ...owned.city, get districts() { throw Error('getter'); } } })).toBeNull();
     expect(migrateToCurrentSave(envelope(s, 21))).toEqual({ ok: false, error: 'unsupported-version' });
   });

@@ -1,5 +1,5 @@
 .district-heat { margin-block: 1rem; padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); min-width: 0; }
-.district-heat h3 { margin: 0 0 .75rem; }
+.district-heat h2, .district-heat h3 { margin: 0 0 .75rem; }
 .district-heat label { display: block; margin-bottom: .4rem; }
 .district-heat select { width: 100%; min-width: 0; max-width: 100%; min-height: 44px; padding: .6rem; background: var(--color-background); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-control); font: inherit; }
 .district-heat-readings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
