@@ -78,6 +78,9 @@ try {
         if (await page.locator('.objective-expand').getAttribute('aria-expanded') === 'false') await page.locator('.objective-expand').click();
         await assertVillagerOnly(page);
       }
+      const brokenAutomationDescriptions = await page.locator('.automation-card button[aria-describedby]').evaluateAll(buttons =>
+        buttons.flatMap(button => button.getAttribute('aria-describedby').split(/\s+/).filter(id => !document.getElementById(id)?.textContent?.trim())));
+      assert.deepEqual(brokenAutomationDescriptions, [], 'Automation actions reference existing explanatory text');
       const geometry = await page.evaluate(() => ({
         overflow: document.documentElement.scrollWidth - innerWidth,
         chromeHeight: Math.round(document.querySelector('.global-chrome')?.getBoundingClientRect().height ?? 0),

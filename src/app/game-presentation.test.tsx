@@ -63,7 +63,7 @@ describe('business presentation', () => {
     const html = renderToStaticMarkup(<BusinessCard progress={progress} onUpgrade={() => {}} owned canPurchase={false} paused onPurchase={() => {}} />);
     expect(html).toContain('OWNED');
     expect(html).toContain('Production paused');
-    expect(html).toContain('currently inactive');
+    expect(html).toContain('Session paused');
     expect(html).not.toContain('Live production');
     expect(html).not.toContain('production is-live');
   });

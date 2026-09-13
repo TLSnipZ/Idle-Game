@@ -2,7 +2,6 @@
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { NextObjective } from './NextObjective';
@@ -66,13 +65,19 @@ function button(label: string) {
   if (!found) throw Error(`Missing ${label}`); return found;
 }
 async function click(label: string) { await act(() => button(label).click()); }
+async function expandGuidance() {
+  const toggle = container.querySelector<HTMLButtonElement>('.objective-expand');
+  if (toggle?.getAttribute('aria-expanded') === 'false') await act(() => toggle.click());
+}
 async function choose(id: string) {
+  await expandGuidance();
   const details = container.querySelector<HTMLDetailsElement>('.objective-controls details');
   if (details) details.open = true;
   const select = container.querySelector<HTMLSelectElement>('#guidance-goal'); if (!select) throw Error('Goal picker');
   await act(() => { select.value = id; select.dispatchEvent(new Event('change', { bubbles: true })); });
 }
 async function follow() {
+  await expandGuidance();
   const control = container.querySelector<HTMLButtonElement>('.objective-controls button'); if (!control) throw Error('Follow goal');
   await act(() => control.click());
 }
@@ -107,9 +112,11 @@ describe('global guidance presentation and intentional navigation', () => {
     expect(card?.textContent).toContain('Working toward: Afterdark Customs');
     expect(card?.textContent).not.toContain('business:neon-laundry');
   });
-  it('has labeled progress/select controls and no broad live region or automatic-action copy', () => {
-    const markup = renderToStaticMarkup(<NextObjective state={createInitialGameState()} onNavigate={vi.fn()} />);
-    container.innerHTML = markup;
+  it('has labeled progress/select controls and no broad live region or automatic-action copy', async () => {
+    root = createRoot(container);
+    await act(() => root?.render(<NextObjective state={createInitialGameState()} onNavigate={vi.fn()} />));
+    expect(container.querySelector('#guidance-goal')).toBeNull();
+    await expandGuidance();
     const card = container.querySelector('.next-objective');
     expect(card?.querySelectorAll('[aria-live], [role="status"], [role="alert"]')).toHaveLength(0);
     expect(card?.querySelector('label[for="guidance-goal"]')).not.toBeNull();
@@ -163,7 +170,7 @@ describe('global guidance presentation and intentional navigation', () => {
     await follow(); expect(scroll).toHaveBeenCalledOnce(); expect(document.activeElement).toBe(target);
   });
   it('preserves the picker/button and keyboard focus during ticking Cash and goal selection', async () => {
-    const f = await mount(); const select = container.querySelector<HTMLSelectElement>('#guidance-goal'); if (!select) throw Error('Select');
+    const f = await mount(); await expandGuidance(); const select = container.querySelector<HTMLSelectElement>('#guidance-goal'); if (!select) throw Error('Select');
     select.focus(); await choose('business:afterdark-customs');
     const control = container.querySelector('.objective-controls button'); const before = title();
     vi.mocked(window.scrollTo).mockClear();
@@ -195,19 +202,20 @@ describe('global guidance presentation and intentional navigation', () => {
     await click('Review New Game reset'); await input('#reset-confirmation-text', 'RESET'); await click('Reset all progress');
     expect(f.game().getSnapshot().result.state).toEqual(createInitialGameState());
     expect(title()).toBe('Acquire Dockside Detail');
-    expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
     expect(document.activeElement?.id).toBe('section-heading');
+    await expandGuidance();
+    expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
   });
   it('Import clears stale tracking and derives new guidance from the imported state', async () => {
     await mount(); await choose('vehicle:kairo-kx-r'); await click('EMPIRE');
     const backup = exportSaveCode(createInitialGameState(), 1000); if (!backup.ok) throw Error('backup');
     await input('#import-code', backup.code); await click('Validate import'); await click('Confirm import');
-    expect(title()).toBe('Acquire Dockside Detail'); expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
+    expect(title()).toBe('Acquire Dockside Detail'); await expandGuidance(); expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
   });
   it('Rebirth clears optional tracking while preserving the existing permanent retention flow', async () => {
     const base = available(); await mount({ ...base, businesses: { ...base.businesses, owned: { 'business:dockside-detail': { level: 25 } } } });
     await choose('vehicle:kairo-kx-r'); await click('EMPIRE'); await click('Review Rebirth'); await click('Confirm Rebirth');
-    expect(title()).toBe('Acquire Dockside Detail'); expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
+    expect(title()).toBe('Acquire Dockside Detail'); await expandGuidance(); expect(container.querySelector<HTMLSelectElement>('#guidance-goal')?.value).toBe('');
   });
 
   it('a failed New Game write preserves the chosen goal along with the old save', async () => {
@@ -241,7 +249,7 @@ describe('safe presentation ratios and terminology', () => {
   });
   it('keeps mobile controls wrapping and leaves the future sticky HUD untouched', () => {
     const css = readFileSync('src/app/sections.css', 'utf8');
-    const guidanceCss = css.slice(css.indexOf('/* Guidance is shared'));
+    const guidanceCss = css;
     expect(guidanceCss).toContain('@media (max-width: 740px)');
     expect(guidanceCss).toContain('grid-template-columns: minmax(0, 1fr)');
     expect(guidanceCss).toContain('min-height: 44px');

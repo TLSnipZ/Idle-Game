@@ -1,0 +1,11 @@
+import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+const report = JSON.parse(readFileSync('candidate-tests.json', 'utf8'));
+assert.equal(report.success, true, 'The complete suite must pass');
+assert.equal(report.numFailedTests, 0);
+assert.equal(report.numPendingTests, 0, 'Do not skip regressions');
+assert.equal(report.numTodoTests ?? 0, 0);
+assert.equal(report.numRuntimeErrorTestSuites ?? 0, 0);
+assert.ok(report.numTotalTests >= 2252, 'Preserve existing regression coverage');
+assert.equal(report.numPassedTests, report.numTotalTests);
+console.log(JSON.stringify({ total: report.numTotalTests, passed: report.numPassedTests, failed: report.numFailedTests, skipped: report.numPendingTests }));

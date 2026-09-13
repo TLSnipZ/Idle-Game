@@ -59,7 +59,7 @@ describe('shared portfolio presentation and accessible states', () => {
     const root = auto(input), select = root.querySelector('select');
     expect(root.querySelector('label[for="auto-upgrader-target"]')?.textContent).toBe('Target Business');
     expect([...select!.options].map(o => o.textContent)).toEqual(['Dockside Detail', 'Neon Laundry', 'Solara Nights']);
-    expect(select?.querySelector('option[selected]')?.getAttribute('value')).toBe('business:solara-nights'); expect(root.textContent).toContain('TARGET MAXED');
+    expect(select?.querySelector('option[selected]')?.getAttribute('value')).toBe('business:solara-nights'); expect(root.textContent).toContain('MAXED');
     expect(root.querySelectorAll('progress')).toHaveLength(1); expect(root.querySelector('[aria-live]')).toBeNull();
   });
 });
@@ -105,7 +105,7 @@ describe('POST 3C acquisition helpers', () => {
     expect(auto(createInitialGameState()).textContent).toContain('Meet the requirements above');
     const s = autoUpgraderState();
     const unowned = { ...s, automation: { ...s.automation, unlockedIds: [], enabledIds: [] }, economy: { cash: moneyFromMinorUnits('0') } };
-    expect(auto(unowned).textContent).toContain('Build your Cash balance to acquire this automation.');
+    expect(auto(unowned).textContent).toContain('Build your Cash balance to buy this automation.');
   });
 });
 
@@ -115,8 +115,8 @@ it('keeps requirements separate from the shared action/helper group with wrappin
   const area = requirements?.nextElementSibling;
   expect(area?.classList.contains('card-action-area')).toBe(true);
   expect(area?.querySelector('button')?.nextElementSibling?.textContent).toContain('Meet the requirements');
-  const css = readFileSync('src/app/sections.css', 'utf8');
-  expect(css).toMatch(/\.operations-navigation\s*\{[^}]*flex-wrap:\s*wrap/);
+  const css = readFileSync('src/app/App.css', 'utf8') + readFileSync('src/app/Operations.css', 'utf8');
+  expect(css).toMatch(/\.operations-tabs\s*\{[^}]*flex-wrap:\s*wrap/);
   expect(css).toMatch(/\.card-action-area\s*\{[^}]*gap:\s*var\(--space-sm\)[^}]*margin-block-start:\s*var\(--space-md\)/);
-  expect(css).toMatch(/@media[^}]*\.business-grid\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/);
+  expect(css).toMatch(/@media[^}]*\.business-grid[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/);
 });

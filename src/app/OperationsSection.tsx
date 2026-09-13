@@ -29,7 +29,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
 
   function jump(target: HTMLHeadingElement | null) {
     target?.focus();
-    target?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    target?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
 
   const paused = runtimeError !== null;

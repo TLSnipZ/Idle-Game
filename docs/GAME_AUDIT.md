@@ -85,7 +85,7 @@ approval. Safari/Firefox, actual mobile hardware, screen-reader listening,
 
 | Priority | Work | Why / evidence | Acceptance before closing |
 | --- | --- | --- | --- |
-| P1 — next technical step | Restore the inherited UI regression suite | Baseline has 64 failures across 14 presentation files. Many tests still assume expanded Guidance, old selectors/wording, or call hook components as plain functions. This prevents later assertions from exercising the real behavior. The territory diagnostic and periodic-announcement defects are repaired here; remaining failures must be individually checked, not waived as harmless text changes. | Exercise actual expansion/navigation and React mounting; retain money, focus, disabled-action and save assertions; reach zero failures without removing/ignoring tests; replace the temporary baseline comparison with a normal green-suite gate. |
+| P1 — completed in PR #26 | Restore the inherited UI regression suite | Baseline has 64 failures across 14 presentation files. Many tests still assume expanded Guidance, old selectors/wording, or call hook components as plain functions. This prevents later assertions from exercising the real behavior. The territory diagnostic and periodic-announcement defects are repaired here; remaining failures must be individually checked, not waived as harmless text changes. | Exercise actual expansion/navigation and React mounting; retain money, focus, disabled-action and save assertions; reach zero failures without removing/ignoring tests; replace the temporary baseline comparison with a normal green-suite gate. |
 | P2 | Unify localization and requirement presentation | Keyed strings, inline EN/DE pairs and catalog fields remain distributed. Parsing English requirement sentences is fragile. This patch centralizes the repeated helper but does not redesign all messages. | Typed message parameters and requirement discriminants; parity checks for all supported locales; canonical identities and exact amounts remain unchanged. |
 | P2 | Consolidate responsive CSS and clarify Operations metrics | Historical overrides are split across App.css, sections.css and Operations.css. The German mobile overflow was real; rigid columns and nowrap financial values are fragile under long text. | Feature-owned styles, exact prices/rates visible at 320px and zoom, no overflow-hiding workaround; keep browser matrix coverage. |
 | P2 | Make save guarantees clearer per action | Business/Garage/automation configuration uses save-before-publish; some older actions intentionally retain live progress with a warning if saving fails. This is covered by existing persistence tests, not a newly proven rollback defect. | Deliberately choose and document one player-facing policy; clearly distinguish saved success from volatile progress; preserve conflict protection, old saves and offline chronology. |
@@ -99,8 +99,8 @@ against every browser/storage condition.
 ## Handoff
 
 This audit's automated acceptance checks have passed; PR #24 carries the release.
-Next technical priority is
-the inherited UI-test repair above; then resume Tier-1 Garage and Heat/Police 2.0.
+The inherited UI-test repair is now completed in PR #26 (evidence below).
+Next content phase is Tier-1 Garage, followed by Heat/Police 2.0.
 Do not silently start those content phases as part of this audit.
 
 
@@ -129,3 +129,50 @@ Evidence: [test reports, browser results and screenshots](https://github.com/TLS
 Screenshots were generated, not manually inspected. Previous manual/device review
 limitations and the remaining audit backlog still apply. No new gameplay phase
 was started.
+
+
+## P1 UI regression restoration — PR #26
+
+Baseline: merged PR #25, `141b24cbb00109aca34bfb098bd137f47169bd4a`, 2,252 tests with 62
+inherited failures. All existing test cases remain enabled. Guidance tests now
+expand the default compact card before selecting/following goals and after a
+successful replacement; pending consent, write failures, exact costs, focus and
+runtime isolation assertions remain. Hook components mount through React with
+proper cleanup and deterministic runtime fixtures. Updated text and layout checks
+follow the current HUD/Operations surfaces rather than obsolete markup.
+
+Concrete product repairs found while restoring the suite:
+- Auto-Upgrader enable/disable links to spending details. Its purchase action
+  explains opt-in spending and links to description, consent and requirements.
+- Dispatcher purchase links to both requirements and the current helper. Met
+  requirements remain available in collapsed disclosures until purchase.
+- Explicit Operations jumps use instant scrolling as specified, including reduced
+  motion; ordinary actions still preserve local focus and do not navigate.
+- Shared acquisition action spacing is restored between requirements, buttons and
+  helper text; the overwritten stylesheet had lost that contract.
+
+CI now fails directly on any test failure, requires zero skips/TODO/runtime errors
+and preserves a minimum 2,252 cases. The temporary inherited-failure comparison is
+no longer a release gate. Full build/test and 255-case browser verification are
+required; final results will be recorded below. Save v18, CE1, content, balance and
+economy/persistence authority are unchanged. P2 overhaul items remain open.
+
+
+### P1 acceptance results
+
+[Verification run 34764804304](https://github.com/TLSnipZ/Idle-Game/actions/runs/34764804304)
+succeeded against code commit `059a992f2aa8d85e7b38f69a4fc7776fba897aa4`:
+**2,252 / 2,252 tests passed; zero failures, skips, TODOs or runtime-error suites.**
+All 62 inherited failing cases now pass, with no deleted test cases. Strict
+TypeScript/Vite build, the new zero-failure gate and git diff --check passed.
+All **255 Chromium cases** passed, including all locales, five viewport widths,
+three progression states, Garage migration/purchase/reload, language and consent
+switching, advanced commands, Rebirth and full reset. The browser checks also
+resolve automation description links and retain the Villager prose audit.
+
+[Evidence artifact](https://github.com/TLSnipZ/Idle-Game/actions/runs/34764804304/artifacts/10320475162)
+contains reports, browser results and screenshots. Screenshots were not manually
+inspected; previous real-device, alternate-browser, screenreader and zoom review
+limitations remain. The final evidence/status commit changes documentation only.
+P1 is complete. Tier-1 Garage is next; P2 overhaul findings remain tracked and no
+additional content phase was implemented in this PR.

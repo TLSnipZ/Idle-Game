@@ -23,7 +23,7 @@ describe('equipment presentation', () => {
     const view = selectUpgrade(createInitialGameState(), PRESSURE_WASHER.id);
     const html = renderToStaticMarkup(<UpgradeCard view={view} paused={false} onPurchase={() => {}} />);
     expect(html).toContain('Commercial Pressure Washer'); expect(html).toContain('$2,500');
-    expect(html).toContain('+25% Dockside Detail production'); expect(html).toContain('Own Dockside Detail');
+    expect(html).toContain('<strong>+25%</strong><small>Dockside Detail production</small>'); expect(html).toContain('Own Dockside Detail');
     expect(html).toContain('disabled=""'); expect(html).toContain('aria-labelledby="upgrade:commercial-pressure-washer-heading"');
     expect(html).toContain('aria-describedby="upgrade:commercial-pressure-washer-requirement"');
   });
@@ -40,7 +40,7 @@ describe('equipment presentation', () => {
     const result = purchaseUpgrade(owned(), PRESSURE_WASHER.id);
     const view = selectUpgrade(result.state, PRESSURE_WASHER.id);
     const html = renderToStaticMarkup(<UpgradeCard view={view} paused={false} onPurchase={() => {}} />);
-    expect(html).toContain('PURCHASED'); expect(html).toContain('Active'); expect(html).not.toContain('<button');
+    expect(html).toContain('PURCHASED'); expect(html).toContain('ACTIVE'); expect(html).not.toContain('<button');
     expect(describeAction('equipment', result)).toContain('Production bonus is active');
     expect(selectUpgrade(result.state, 'upgrade:missing')).toBeNull();
   });
@@ -73,7 +73,8 @@ it.each(UPGRADE_CATALOG)('catalog card $name exposes readiness, requirement and 
   expect(render(selectUpgrade(purchased, upgrade.id))).toContain('PURCHASED');
   expect(render(selectUpgrade(purchased, upgrade.id))).not.toContain('<button');
   const fresh = render(selectUpgrade(createInitialGameState(), upgrade.id));
-  expect(fresh).toContain(upgrade.requirements.length === 0 ? 'No requirements' : 'Required');
+  if (upgrade.requirements.length === 0) { expect(fresh).not.toContain('LOCKED'); expect(fresh).toContain('INSUFFICIENT CASH'); }
+  else expect(fresh).toContain('Required');
 });
 
 it('explains named production bonuses and the exact combined effective value', () => {

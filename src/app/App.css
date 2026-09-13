@@ -350,3 +350,6 @@ progress::-moz-progress-bar { background: var(--progress-fill); }
 .value-unit { display: inline-flex; max-width: 100%; vertical-align: bottom; }
 .value-unit > :first-child { min-width: 0; overflow-wrap: anywhere; }
 .value-unit > :last-child { flex-shrink: 0; white-space: nowrap; }
+
+/* Shared acquisition actions retain space from requirements and helper copy. */
+.card-action-area { display: grid; gap: var(--space-sm); margin-block-start: var(--space-md); }

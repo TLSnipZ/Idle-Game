@@ -79,7 +79,7 @@ describe('mounted navigation and one live runtime', () => {
     const before = f.game().getSnapshot().result.state, raw = f.raw(), reads = f.reads(), writes = f.writes();
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('OVERVIEW');
     expect(container.querySelector('#business-name')).toBeNull();
-    const mapping = ['ECONOMY','Jobs','LAY LOW','Kairo KX-R','Save & Transfer'];
+    const mapping = ['ECONOMY','Waterfront Delivery','LAY LOW','Kairo KX-R','Save & Transfer'];
     for (let i=0; i<PRIMARY_SECTIONS.length; i++) {
       const section = PRIMARY_SECTIONS[i]; if (!section) throw Error('section');
       await navigate(section.label); expect(content()).toContain(mapping[i]);
@@ -93,16 +93,16 @@ describe('mounted navigation and one live runtime', () => {
   });
   it('Overview shortcuts navigate without commands or resetting active spending', async () => {
     const f = await mount(autoUpgraderState()), before = f.game().getSnapshot().result.state, reads = f.reads();
-    await click('VIEW OPERATIONS'); expect(content()).toContain('BUSINESS AUTO-UPGRADER');
+    await click('VIEW OPERATIONS'); expect(content()).toContain('Business Auto-Upgrader');
     await navigate('OVERVIEW'); await click('VIEW COLLECTION'); expect(content()).toContain('Kairo KX-R');
     expect(f.game().getSnapshot().result.state).toBe(before); expect(f.reads()).toBe(reads);
     expect(container.querySelector('.global-indicators')?.textContent).toContain('AUTO-UPGRADER ACTIVE');
-    await click('AUTO-UPGRADER ACTIVE · SPENDING ENABLED'); expect(content()).toContain('Automatically spends cash');
+    await act(() => container.querySelector<HTMLButtonElement>('.activity-auto')?.click()); expect(content()).toContain('Automatically buys one upgrade');
   });
   it('VIEW CREW changes only presentation and leaves saving and RNG idle', async () => {
     const f = await mount(), before = f.game().getSnapshot().result.state;
     const writes = f.writes(), reads = f.reads(), raw = f.raw();
-    expect(container.querySelector('.save-health')?.textContent).toBe('Autosave on');
+    expect(container.querySelector('.save-health')?.textContent).toContain('Autosave armed');
     expect(container.querySelector('.save-health')?.closest('[aria-live]')).toBeNull();
     await click('VIEW CREW');
     expect(content()).toContain('Active assignments');
@@ -138,9 +138,9 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.random.next).not.toHaveBeenCalled();
     for (const section of PRIMARY_SECTIONS) {
       await navigate(section.label); await f.advance(1000);
-      expect(container.querySelector('.global-indicators')?.textContent).toContain('CITY EVENT ACTIVE · Shakedown');
+      expect(container.querySelector('.global-indicators')?.textContent).toContain('CITY EVENT ACTIVEShakedown');
     }
-    await click('CITY EVENT ACTIVE · Shakedown');
+    await click('CITY EVENT ACTIVEShakedown');
     expect(button('REFUSE').disabled).toBe(false); expect(button('PAY THEM OFF').disabled).toBe(false);
     expect(f.game().getSnapshot().result.state.events).toEqual(state.events); expect(f.random.next).not.toHaveBeenCalled();
   });
@@ -153,7 +153,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.random.next).toHaveBeenCalledTimes(2);
     const before = f.game().getSnapshot().result.state;
     const announcement = [...container.querySelectorAll('.global-feedback span')].find(span => span.textContent?.includes('Hot Tip'));
-    await click('CITY EVENT ACTIVE · Hot Tip');
+    await click('CITY EVENT ACTIVEHot Tip');
     expect(f.game().getSnapshot().result.state).toBe(before);
     expect(f.random.next).toHaveBeenCalledTimes(2);
     expect([...container.querySelectorAll('.global-feedback span')].find(span => span.textContent?.includes('Hot Tip'))).toBe(announcement);
@@ -223,7 +223,7 @@ describe('mounted navigation and one live runtime', () => {
     const f = await mount(autoUpgraderState()), before = f.game().getSnapshot().result.state;
     const reads = f.reads(), writes = f.writes();
     const skip = container.querySelector<HTMLAnchorElement>('.skip-link');
-    expect(skip?.textContent).toBe('Skip to main content'); expect(skip?.getAttribute('href')).toBe('#main');
+    expect(skip?.textContent).toBe('Skip to the profitable part'); expect(skip?.getAttribute('href')).toBe('#main');
     await act(() => { skip?.focus(); skip?.click(); });
     expect(document.activeElement?.tagName).toBe('MAIN'); expect(container.querySelectorAll('main')).toHaveLength(1);
     expect(f.game().getSnapshot().result.state).toBe(before); expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
