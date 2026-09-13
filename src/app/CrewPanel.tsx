@@ -18,7 +18,7 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
   const text = useLocalizedText();
   const crew = selectCrew(state);
   return <section className="crew" aria-labelledby="crew-heading">
-    <div className="panel-heading"><h2 id="crew-heading">CREW</h2>
+    <div className="panel-heading"><h2 id="crew-heading">{text('CREW')}</h2>
       <span>{text('Recruited:', 'Rekrutiert:')} {crew.recruitedCrewCount} / {crew.totalConfiguredCrew} · {text('Active:', 'Aktiv:')} {crew.activeAssignmentCount} / {crew.totalSlots}</span></div>
     <p>{text('Recruit specialists and put them where they matter. Better margins, less Heat, fewer reasons to answer the phone yourself.', 'Rekrutier Spezialisten und setz sie da ein, wo sie wehtun — bessere Margen, weniger Heat und weniger Gründe, selbst ans Telefon zu gehen.')}</p>
     <h3 className="subsection-label">{text('Active assignments', 'Aktive Einsätze')}</h3>
@@ -37,20 +37,20 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
       const requirementsId = `${member.id}-requirements`;
       const description = localizedContent(locale, member.id, 'description', member.description);
       return <article className="panel crew-card" key={member.id} aria-labelledby={`${member.id}-heading`}>
-        <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{member.name}</h4><span className="ownership-badge">{view.status}</span></div>
+        <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{text(member.name)}</h4><span className="ownership-badge">{view.status}</span></div>
         <p className="eyebrow">{view.compatibleSlots.map(slot => localizedSlotName(locale, slot.name)).join(' / ')}</p><p>{description}</p></div><p className="specialist-effect">{view.effect} · {text('Only while assigned', 'Nur solange zugewiesen')}</p>{view.recruited && view.availability && <p>{view.availability}</p>}
         {!view.recruited ? <>
-          <p>{text('Recruitment:', 'Rekrutierung:')} <strong>{formatPrice(member.recruitmentCost)}</strong></p>
+          <p>{text('Recruitment:', 'Rekrutierung:')} <strong>{text(formatPrice(member.recruitmentCost))}</strong></p>
           <RequirementList result={view.requirements} id={requirementsId} />
           <div className="card-action-area">
-          <button className="action-button purchase-button" disabled={paused || !view.canRecruit} aria-label={text(`Recruit ${member.name}`, `${member.name} rekrutieren`)}
+          <button className="action-button purchase-button" disabled={paused || !view.canRecruit} aria-label={text(`Recruit ${text(member.name)}`, `${text(member.name)} rekrutieren`)}
             aria-describedby={requirementsId} onClick={() => onRecruit(member.id)}>{text('Recruit', 'Rekrutieren')}</button>
           {view.availability && <p className="purchase-note">{view.availability}</p>}
           </div>
         </> : view.compatibleSlots.filter(slot => slot.canAssign).map(slot => {
           const slotName = localizedSlotName(locale, slot.name);
           return <button className="action-button" key={slot.id} disabled={paused}
-            aria-label={text(`Assign ${member.name} to ${slotName}${slot.occupant ? `, replacing ${slot.occupant.name}` : ''}`, `${member.name} ${slotName} zuweisen${slot.occupant ? `, ersetzt ${slot.occupant.name}` : ''}`)}
+            aria-label={text(`Assign ${text(member.name)} to ${slotName}${slot.occupant ? `, replacing ${slot.occupant.name}` : ''}`, `${text(member.name)} ${slotName} zuweisen${slot.occupant ? `, ersetzt ${slot.occupant.name}` : ''}`)}
             onClick={() => onAssign(slot.id, member.id)}>
             {text(`Assign to ${slotName}${slot.occupant ? ` · Replace ${slot.occupant.name}` : ''}`, `Zu ${slotName}${slot.occupant ? ` · ${slot.occupant.name} ersetzen` : ''}`)}
           </button>;})}

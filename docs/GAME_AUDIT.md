@@ -11,7 +11,7 @@ It is not a claim of exhaustive absence of bugs.
 ## Third language
 
 Settings now offers **English / Deutsch / Villager · Hrrm**. Villager is an original
-written novelty dialect: Hrrm/Hmm sounds plus readable English glosses, so choices,
+written novelty dialect: Hrrm/Hmm sounds throughout the interface, so choices,
 requirements and destructive confirmations remain understandable. This is text,
 not sampled Minecraft speech or an audio pack.
 

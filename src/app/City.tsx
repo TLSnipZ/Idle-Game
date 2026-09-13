@@ -27,16 +27,16 @@ export function City({ state, paused, onAcquire, onLayLow }: {
       const description = localizedContent(locale, territory.id, 'description', territory.description);
       return <article key={territory.id} className={`panel territory-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
         <p className="eyebrow">{territory.starting ? text('Starting district', 'Startbezirk') : text('Nightlife district', 'Nightlife-Bezirk')}</p>
-        <div className="panel-heading"><h4 id={heading}>{territory.name}</h4>
+        <div className="panel-heading"><h4 id={heading}>{text(territory.name)}</h4>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.status}</span></div>
         <div className="territory-story"><p>{description}</p></div><p className="territory-effect">{view.effect}</p>
         {view.owned ? <p>{view.availability}</p> : <>
           <p className="acquisition-warning">{text(`Acquisition generates +${territory.acquisitionHeat} Heat.`, `Übernahme erzeugt +${territory.acquisitionHeat} Heat. Die Nachbarschaft wird’s merken.`)}</p>
-          <p>{text('Price:', 'Preis:')} <strong>{formatPrice(territory.purchaseCost)}</strong></p>
+          <p>{text('Price:', 'Preis:')} <strong>{text(formatPrice(territory.purchaseCost))}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
           <div className="card-action-area">
           <button className="action-button purchase-button" disabled={paused || !view.canAcquire}
-            aria-label={text(`Take control of ${territory.name}`, `${territory.name} übernehmen`)} aria-describedby={requirements}
+            aria-label={text(`Take control of ${text(territory.name)}`, `${text(territory.name)} übernehmen`)} aria-describedby={requirements}
             onClick={() => onAcquire(territory.id)}>{paused ? text('Session paused', 'Session pausiert') : text('Take control', 'Kontrolle übernehmen')}</button>
           {view.availability && <p className="purchase-note">{view.availability}</p>}
           </div>

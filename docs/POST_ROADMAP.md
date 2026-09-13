@@ -226,3 +226,8 @@ active-only modifier, durable runtime transaction and localized Garage UI.
 Preserve Save v18 / CE1, active ownership invariants and the existing economy,
 Business balance, automation, RNG, offline and Rebirth protections. Tier-1 cars are
 the next separate scope after acceptance; Heat / Police 2.0 follows the Garage block.
+
+
+Villager correction: replace the readable-gloss prototype with complete nonsense
+throughout presentation. This stays within the language/audit priority; no Garage
+or Heat content expansion is included. See SETTINGS_LOCALIZATION.md.

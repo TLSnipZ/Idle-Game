@@ -25,8 +25,8 @@ export function UpgradeCard({ view, paused, onPurchase }: {
     <h3 id={headingId}>{name}</h3>
     <p>{description}</p>
     <div className="upgrade-metrics">
-      <div><span>{text('Effect', 'Effekt')}</span><strong>{formatModifier(view.definition.modifier)}</strong><small>{scope}</small></div>
-      <div><span>{text('Price', 'Preis')}</span><strong>{formatPrice(view.definition.purchaseCost)}</strong></div>
+      <div><span>{text('Effect', 'Effekt')}</span><strong>{text(formatModifier(view.definition.modifier))}</strong><small>{scope}</small></div>
+      <div><span>{text('Price', 'Preis')}</span><strong>{text(formatPrice(view.definition.purchaseCost))}</strong></div>
     </div>
     {!view.purchased && <>
       {!view.requirements.met && <details className="operations-disclosure compact-requirements"><summary>{text('Requirements', 'Voraussetzungen')}</summary><RequirementList result={view.requirements} id={requirementId} /></details>}

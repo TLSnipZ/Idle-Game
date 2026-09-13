@@ -61,8 +61,8 @@ const DE: Record<string, LocalizedFields> = {
 
 export function localizedContent(locale: Locale, id: string, field: string, fallback: string): string {
   const english = EN[id]?.[field] ?? fallback;
-  // Proper names stay recognizable; flavor, effects and choices speak Villager.
-  if (locale === 'villager') return field === 'name' ? english : villagerText(english);
+  // Names are presentation too; canonical IDs and source definitions stay untouched.
+  if (locale === 'villager') return villagerText(english);
   return locale === 'de' ? DE[id]?.[field] ?? fallback : english;
 }
 

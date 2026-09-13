@@ -53,8 +53,8 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
       <p className="operations-lead">{text('Move a package across the waterfront, get paid, and keep HR comfortably fictional.', 'Bring ein Paket über die Waterfront, kassier ab und lass HR weiterhin angenehm fiktiv bleiben.')}</p>
       <dl className="job-metrics">
         <div><dt>{text('Payout', 'Auszahlung')}</dt><dd>{reward.ok ? formatReward(reward.reward) : unavailable}</dd></div>
-        <div><dt>XP</dt><dd>+{xp.ok ? formatXp(xp.reward) : unavailable}</dd></div>
-        <div><dt>Heat</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
+        <div><dt>{text('XP')}</dt><dd>+{xp.ok ? formatXp(xp.reward) : unavailable}</dd></div>
+        <div><dt>{text('Heat')}</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
       </dl>
       <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused}>
         <span>{text('Run waterfront delivery', 'Waterfront-Lieferung fahren')}</span>

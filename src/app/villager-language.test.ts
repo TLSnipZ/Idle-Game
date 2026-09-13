@@ -17,16 +17,18 @@ describe('Villager presentation and localization audit regressions', () => {
   it.each<Locale>(['en', 'de', 'villager'])('reports the concrete missing territory gate in %s', locale => {
     const result = acquireTerritory(createInitialGameState(), 'territory:neon-mile');
     const message = describeTerritoryAcquisition(result, 'territory:neon-mile', locale);
-    expect(message).toContain(locale === 'de' ? 'Spielerlevel 12' : 'Player Level 12');
-    if (locale === 'villager') expect(message).toMatch(/^H[rm]+/);
+    expect(message).toContain(locale === 'de' ? 'Spielerlevel 12' : locale === 'villager' ? villagerText('Player Level 12') : 'Player Level 12');
+    if (locale === 'villager') expect(message).toMatch(/^[HhMmRr]+/);
   });
   it.each(['en', 'de', 'villager'])('accepts supported preference %s', value => expect(isLocale(value)).toBe(true));
   it.each(['fr', '', null, {}, 42])('rejects invalid preference %j', value => expect(isLocale(value)).toBe(false));
-  it('keeps exact numbers, units and confirmation words with readable English glosses', () => {
+  it('replaces every word while keeping exact numbers and punctuation', () => {
     const source = 'Pay $25,000.00 · +10% · 12 XP · Type RESET?';
     const result = villagerText(source);
-    expect(result).toMatch(/^H[rm]+\?/);
-    expect(result).toContain(source);
+    expect(result).not.toMatch(/[a-gi-ln-qs-z]/i);
+    expect(result).toContain('$25,000.00 · +10% · 12');
+    expect(result.endsWith('?')).toBe(true);
+    expect(villagerText(`Buy ${villagerText('Kairo KX-R')} now!`)).toBe(villagerText('Buy Kairo KX-R now!'));
     expect(villagerText(result)).toBe(result);
     expect(villagerText('')).toBe('');
   });
@@ -36,13 +38,13 @@ describe('Villager presentation and localization audit regressions', () => {
     expect(localize('de', 'Run delivery', 'Lieferung fahren')).toBe('Lieferung fahren');
   });
   it('keeps the language exit controls and valid numeric formatting', () => {
-    expect(translate('villager', 'english')).toBe('English');
-    expect(translate('villager', 'german')).toBe('Deutsch');
-    expect(translate('villager', 'villager')).toBe('Villager · Hrrm');
+    expect(translate('villager', 'english')).toBe(villagerText('English'));
+    expect(translate('villager', 'german')).toBe(villagerText('Deutsch'));
+    expect(translate('villager', 'villager')).toBe(villagerText('Villager · Hrrm'));
     expect(new Intl.NumberFormat(localeTag('villager')).format(1234)).toBe('1,234');
   });
   it('adds Villager flavor without changing canonical car identity', () => {
-    expect(localizedContent('villager', 'vehicle:kairo-kx-r', 'name', 'Kairo KX-R')).toBe('Kairo KX-R');
+    expect(localizedContent('villager', 'vehicle:kairo-kx-r', 'name', 'Kairo KX-R')).toBe(villagerText('Kairo KX-R'));
     expect(localizedContent('villager', 'vehicle:kairo-kx-r', 'description', 'Street hatch.')).toBe(villagerText('Street hatch.'));
   });
   it.each([...BUSINESS_CATALOG, ...UPGRADE_CATALOG])('resolves the actual unlock $id before translating', item => {

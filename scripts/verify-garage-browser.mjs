@@ -33,17 +33,19 @@ try {
     await page.goto('http://127.0.0.1:4173');
     await page.locator('button[data-section="collection"]').count().then(async count => {
       if (count) await page.locator('button[data-section="collection"]').click();
-      else await page.locator('.primary-navigation').getByRole('button', { name: locale === 'de' ? /^SAMMLUNG$/i : /COLLECTION$/i }).click();
+      else await page.locator('.primary-navigation button').nth(3).click();
     });
     await page.locator('.garage-active-summary').waitFor();
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
     assert.equal(saved.version, 18);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
     if (!owner) {
-      await page.getByRole('button', { name: locale === 'de' ? /Kairo KX-R kaufen$/ : /Buy Kairo KX-R$/ }).click();
+      await page.locator('.garage .purchase-button').click();
       await page.waitForFunction(() => JSON.parse(localStorage.getItem('crime-empire:save')).state.garage.activeVehicleId === 'vehicle:kairo-kx-r');
     }
-    assert.equal(await page.locator('.garage-active-summary strong').textContent(), 'Kairo KX-R');
+    const carName = await page.locator('.garage-active-summary strong').textContent();
+    if (locale === 'villager') assert.match(carName, /^[hmr -]+$/i);
+    else assert.equal(carName, 'Kairo KX-R');
     assert.equal(await page.locator('.garage button').count(), 0, 'Active car has no redundant selection/purchase button');
     const image = page.locator('.vehicle-artwork');
     await image.scrollIntoViewIfNeeded();
@@ -67,9 +69,9 @@ try {
   const page = await browser.newPage();
   await page.goto('http://127.0.0.1:4173');
   await page.locator('.settings-trigger').click();
-  await page.getByRole('button', { name: 'Deutsch', exact: true }).click();
+  await page.locator('.settings-segment button').nth(1).click();
   assert.equal(await page.locator('html').getAttribute('lang'), 'de');
-  await page.getByRole('button', { name: 'English', exact: true }).click();
+  await page.locator('.settings-segment button').nth(0).click();
   assert.equal(await page.locator('html').getAttribute('lang'), 'en');
   console.log(JSON.stringify({ cases: results.length, results }, null, 2));
 } finally {

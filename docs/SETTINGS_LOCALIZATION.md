@@ -3,7 +3,7 @@
 ## Current extension — Villager and game audit
 
 The 2026-09-13 extension adds a third, written **Villager · Hrrm** option with
-readable English glosses, a native modal Settings dialog, and per-runtime language
+pure Villager gibberish, a native modal Settings dialog, and per-runtime language
 feedback. Preferences remain device-local; current saves are v18 and CE1 is
 unchanged. PR #24 passed strict build, 29 added regression tests and the full
 255-case production Chromium matrix. The 62 inherited UI-test failures and visual
@@ -44,3 +44,16 @@ The translation dictionary is intentionally centralized in `src/app/localization
 Repository-side implementation was performed through the GitHub connector. The execution environment available to this session could not run the project's npm/typecheck/test/build suite, so the pull request should be treated as awaiting GitHub/maintainer CI and live visual acceptance before this phase is marked manually verified.
 
 Manual acceptance should cover desktop and narrow mobile widths, English↔Deutsch switching, persistence after reload, Escape/backdrop close behavior, keyboard focus, reduced-motion behavior, localized navigation/HUD/global indicators, and confirmation that existing save/export/import/offline/Rebirth progression remains unchanged.
+
+
+### Villager overkill correction
+
+At the user's request, Villager now replaces every alphabetic word with written
+Hrrm/Hmm/Mhm sounds, including names, units, headings, tooltips and feedback.
+There are no English glosses. Replacement is deterministic and token-idempotent,
+so composing already translated fragments never reintroduces English.
+Numbers/punctuation remain; canonical IDs, saves and entered/exported data are
+untouched. Language buttons also speak Villager; flag icons provide a way back.
+The literal RESET input token is shown separately as code in its confirmation.
+Browser verification rejects readable prose across every section and Settings,
+including hidden disclosure text, option labels and accessibility descriptions.

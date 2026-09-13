@@ -59,21 +59,21 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
   useEffect(() => { if (interaction.confirming) cancel.current?.focus(); }, [interaction.confirming]);
   const policy = Object.values(REBIRTH_POLICY);
   return <section className="panel rebirth-panel" aria-labelledby="rebirth-heading">
-    <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>Rebirth</h2>
+    <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>{text('Rebirth')}</h2>
       <span className="ownership-badge">{preview.eligible ? text('REBIRTH AVAILABLE', 'REBIRTH VERFÜGBAR') : text('BUILD YOUR LEGACY', 'BAU DEIN VERMÄCHTNIS')}</span></div>
     <div className="rebirth-brief"><p>{text('Restart your temporary operation in exchange for permanent Empire Points. Corporate restructuring, but with more neon.', 'Starte deine temporäre Operation neu und kassier dafür permanente Empire Points. Konzernumbau, nur mit mehr Neon.')}</p>
-    <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{formatInteger(preview.empirePoints)} EP</dd></div>
-      <div><dt>Rebirths</dt><dd>{formatInteger(preview.rebirthCount)}</dd></div></dl>
+    <dl className="permanent-totals"><div><dt>{text('Empire Points')}</dt><dd>{text(formatInteger(preview.empirePoints))} {text('EP')}</dd></div>
+      <div><dt>{text('Rebirths')}</dt><dd>{text(formatInteger(preview.rebirthCount))}</dd></div></dl>
     <p>{text('Invest unspent Empire Points in permanent skills that survive Rebirth.', 'Investiere übrige Empire Points in permanente Skills, die Rebirth überleben. Vermögen vergeht, Skill-Boni bleiben. Irgendwie poetisch.')}</p>
     <RequirementList result={preview.requirements} id="rebirth-requirements" />
-    <p className="production rebirth-reward">{text('Reward:', 'Belohnung:')} {preview.reward === null ? text('Not eligible', 'Nicht berechtigt') : `+${formatInteger(preview.reward)} Empire Points`}</p>
+    <p className="production rebirth-reward">{text('Reward:', 'Belohnung:')} {preview.reward === null ? text('Not eligible', 'Nicht berechtigt') : text(`+${text(formatInteger(preview.reward))} Empire Points`)}</p>
     </div><div id="rebirth-policy" className="rebirth-policy">
       <div className="rebirth-keep"><h3>{text('You keep', 'Du behältst')}</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{policyLabel(label, locale)}</li>)}</ul></div>
       <div className="rebirth-lose"><h3>{text('You lose', 'Du verlierst')}</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{policyLabel(label, locale)}</li>)}</ul></div>
     </div>
     {interaction.confirming ? <div className="save-confirm" role="group" aria-labelledby="rebirth-warning" aria-describedby="rebirth-policy">
       <h3 id="rebirth-warning">{text('Confirm your Rebirth', 'Rebirth bestätigen')}</h3>
-      <p>{preview.reward === null ? text('Requirements are no longer met.', 'Voraussetzungen sind nicht mehr erfüllt.') : text(`Reset the listed temporary progress for +${formatInteger(preview.reward)} Empire Points?`, `Den aufgelisteten temporären Fortschritt für +${formatInteger(preview.reward)} Empire Points zurücksetzen?`)}</p>
+      <p>{preview.reward === null ? text('Requirements are no longer met.', 'Voraussetzungen sind nicht mehr erfüllt.') : text(`Reset the listed temporary progress for +${text(formatInteger(preview.reward))} Empire Points?`, `Den aufgelisteten temporären Fortschritt für +${text(formatInteger(preview.reward))} Empire Points zurücksetzen?`)}</p>
       <p>{text('The reward is recalculated from current progress when confirmed. This replaces your local save.', 'Die Belohnung wird beim Bestätigen aus dem aktuellen Fortschritt neu berechnet. Dein lokaler Save wird ersetzt. Kein Rückgaberecht, kein Kassenbon.')}</p>
       <div className="confirmation-actions"><button ref={cancel} aria-label={text('Cancel Rebirth', 'Rebirth abbrechen')} className="action-button" onClick={() => { controls.cancel(); heading.current?.focus(); }}>{text('Cancel', 'Abbrechen')}</button>
       <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}

@@ -39,11 +39,11 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
     {artwork && <BusinessArtwork key={artwork.src} artwork={artwork} />}
     <div className="business-content">
       <div className="panel-heading business-card-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
-      <div className="business-title-row"><div><h3 id={headingId}>{definition.name}</h3>{tagline && <p className="dockside-tagline business-tagline">{tagline}</p>}</div>{progress && <span className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
+      <div className="business-title-row"><div><h3 id={headingId}>{text(definition.name)}</h3>{tagline && <p className="dockside-tagline business-tagline">{tagline}</p>}</div>{progress && <span className="business-level">{text('Level')} {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
       <p className="business-description">{description}</p>
 
       <div className={`business-stat-grid ${progress ? 'is-three-up' : 'is-acquisition'}`}>
-        {!owned && !progress && <div><span>{text('Purchase price', 'Kaufpreis')}</span><strong>{formatPrice(definition.purchaseCost)}</strong></div>}
+        {!owned && !progress && <div><span>{text('Purchase price', 'Kaufpreis')}</span><strong>{text(formatPrice(definition.purchaseCost))}</strong></div>}
         <div className={view.live ? 'is-live' : ''}><span>{view.productionLabel}</span><strong>{view.live ? '+' : ''}<RateValue text={formatProduction(progress?.production ?? definition.baseProductionCentsPerSecond)} /></strong></div>
         {progress && <div><span>{text('Next level', 'Nächstes Level')}</span><strong>{progress.nextProduction ? <RateValue text={formatProduction(progress.nextProduction)} /> : text('MAX LEVEL', 'MAX-LEVEL')}</strong></div>}
         {progress && <div><span>{text('Upgrade', 'Upgrade')}</span><strong>{progress.upgradeCost ? formatPrice(progress.upgradeCost) : text('MAX', 'MAX')}</strong></div>}
@@ -54,7 +54,7 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
 
       <div className="card-action-area business-card-action">
         <button className="action-button purchase-button" disabled={view.disabled} onClick={progress ? onUpgrade : onPurchase}
-          aria-label={progress ? text(`Upgrade ${definition.name}${progress.upgradeCost === null ? ', maximum level reached' : ` to Level ${progress.level + 1}`}`, `${definition.name} upgraden${progress.upgradeCost === null ? ', Max-Level erreicht' : ` auf Level ${progress.level + 1}`}`) : text(`Acquire ${definition.name}`, `${definition.name} übernehmen`)}
+          aria-label={progress ? text(`Upgrade ${text(definition.name)}${progress.upgradeCost === null ? ', maximum level reached' : ` to Level ${progress.level + 1}`}`, `${text(definition.name)} upgraden${progress.upgradeCost === null ? ', Max-Level erreicht' : ` auf Level ${progress.level + 1}`}`) : text(`Acquire ${text(definition.name)}`, `${text(definition.name)} übernehmen`)}
           aria-describedby={view.note ? noteId : undefined}>
           <span>{view.buttonLabel}</span>{!view.disabled && <span aria-hidden="true">↗</span>}
         </button>

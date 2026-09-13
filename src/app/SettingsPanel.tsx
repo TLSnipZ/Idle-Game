@@ -31,12 +31,12 @@ export function SettingsPanel({ open, settings, t, onClose, onLocale, onReducedM
       const box = event.currentTarget.getBoundingClientRect();
       if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) onClose();
     }}>
-      <div className="settings-heading-row"><div><p className="eyebrow">SOLARA CITY</p><h2 id="settings-heading">{t('settingsTitle')}</h2></div><button className="settings-close" type="button" onClick={onClose} aria-label={t('close')}>×</button></div>
+      <div className="settings-heading-row"><div><p className="eyebrow">{settings.locale === 'villager' ? 'Hrrm Hrrrmm' : 'SOLARA CITY'}</p><h2 id="settings-heading">{t('settingsTitle')}</h2></div><button className="settings-close" type="button" onClick={onClose} aria-label={t('close')}>×</button></div>
       <p className="settings-intro">{t('settingsIntro')}</p>
       <div className="settings-group"><span className="settings-label">{t('language')}</span><div className="settings-segment" role="group" aria-label={t('language')}>
-        <button type="button" aria-pressed={settings.locale === 'en'} onClick={() => onLocale('en')}>{t('english')}</button>
-        <button type="button" aria-pressed={settings.locale === 'de'} onClick={() => onLocale('de')}>{t('german')}</button>
-        <button type="button" aria-pressed={settings.locale === 'villager'} onClick={() => onLocale('villager')}>{t('villager')}</button>
+        <button type="button" aria-pressed={settings.locale === 'en'} onClick={() => onLocale('en')}><span aria-hidden="true">🇬🇧</span> {t('english')}</button>
+        <button type="button" aria-pressed={settings.locale === 'de'} onClick={() => onLocale('de')}><span aria-hidden="true">🇩🇪</span> {t('german')}</button>
+        <button type="button" aria-pressed={settings.locale === 'villager'} onClick={() => onLocale('villager')}><span aria-hidden="true">🟩</span> {t('villager')}</button>
       </div></div>
       <label className="settings-toggle"><span><strong>{t('reducedMotion')}</strong><small>{t('reducedMotionHelp')}</small></span><input type="checkbox" checked={settings.reducedMotion} onChange={event => onReducedMotion(event.target.checked)} /></label>
   </dialog>;

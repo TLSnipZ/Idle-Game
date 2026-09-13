@@ -35,7 +35,7 @@ export function ResetProgress({ unavailable, onReset }: {
       aria-labelledby="reset-warning" aria-describedby="reset-consequences reset-backup"
       onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); controls.cancel(); } }}>
       <h4 id="reset-warning">{text('Permanently reset all progress?', 'Wirklich sämtlichen Fortschritt endgültig löschen?')}</h4>
-      <label htmlFor="reset-confirmation-text">{text(`Type ${RESET_CONFIRMATION_TEXT} to confirm`, `${RESET_CONFIRMATION_TEXT} zum Bestätigen eingeben`)}</label>
+      <label htmlFor="reset-confirmation-text">{text(`Type ${RESET_CONFIRMATION_TEXT} to confirm`, `${RESET_CONFIRMATION_TEXT} zum Bestätigen eingeben`)} {locale === 'villager' && <code>{RESET_CONFIRMATION_TEXT}</code>}</label>
       <input id="reset-confirmation-text" type="text" value={interaction.confirmation}
         autoComplete="off" autoCapitalize="off" spellCheck={false} maxLength={20}
         aria-describedby="reset-confirmation-help" onChange={event => controls.edit(event.target.value)} />
