@@ -1,3 +1,4 @@
+import { setActiveVehicle } from '../game/set-active-vehicle';
 import type { GameState } from '../game/game-state';
 import { performRebirth } from '../game/rebirth';
 import type { RebirthResult } from '../game/rebirth';
@@ -128,6 +129,16 @@ export function createPersistentGame(
     if (succeeded && !durableCommand && runtime.getSnapshot().result.state !== commandInput) saveCurrent();
     return completed;
   }
+  /** Preflight makes a repeated selection an IO-free no-op, before any reconciliation. */
+  function selectActiveVehicle(id: unknown) {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
+      || view.persistence.kind === 'offline-error') return;
+    const state = runtime.getSnapshot().result.state;
+    const prepared = setActiveVehicle(state, id);
+    if (!prepared.ok || prepared.state === state) return prepared;
+    // Revalidate after old-effect reconciliation; execute guards Garage writes before publication.
+    return execute(current => setActiveVehicle(current, id));
+  }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
     return saves.exportCode(runtime.getSnapshot().result.state);
@@ -198,5 +209,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

@@ -12,7 +12,7 @@ export function runtimeLoad(level = 25, cash = '0'): GameState {
   return { ...state,
     crew: crewState({ operations: 'crew:mara-knox', logistics: 'crew:jax-mercer' }).crew,
     upgrades: { purchasedIds: UPGRADE_CATALOG.map(upgrade => upgrade.id) },
-    garage: { ownedVehicleIds: [STARTER_VEHICLE.id] },
+    garage: { ownedVehicleIds: [STARTER_VEHICLE.id], activeVehicleId: STARTER_VEHICLE.id },
     city: { ...state.city, heat: 79, heatDecayElapsedMs: 50000 },
     businesses: { ...state.businesses, productionRemainderMilliCents: 975,
       productionRemainderSubMilliCents: rational(1n, 3n) },

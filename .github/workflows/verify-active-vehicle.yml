@@ -1,0 +1,76 @@
+name: Verify Active Vehicle
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'package*.json'
+      - 'tsconfig.json'
+      - 'vite.config.ts'
+      - '.github/workflows/verify-active-vehicle.yml'
+permissions:
+  contents: read
+concurrency:
+  group: verify-active-vehicle-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOLARA_BROWSER_FIXTURES: /tmp/solara-browser-fixtures.json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install candidate
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck and production build
+        run: npm run build
+      - name: Candidate complete test suite
+        id: candidate
+        continue-on-error: true
+        run: npm run test -- --reporter=json --outputFile=candidate-tests.json > candidate-tests.log 2>&1
+      - name: Check out recorded pre-feature baseline
+        uses: actions/checkout@v7
+        with:
+          ref: 42918734a41964328c512f7d1d6a17741ec44f02
+          path: baseline
+          persist-credentials: false
+      - name: Install baseline
+        working-directory: baseline
+        run: npm ci --no-audit --no-fund
+      - name: Baseline complete test suite
+        continue-on-error: true
+        working-directory: baseline
+        run: npm run test -- --reporter=json --outputFile=../baseline-tests.json > ../baseline-tests.log 2>&1
+      - name: Reject new failures and skipped or removed tests
+        run: node scripts/compare-test-results.mjs baseline-tests.json candidate-tests.json
+      - name: Install isolated browser verifier
+        run: |
+          npm install --prefix "$RUNNER_TEMP/solara-browser" --no-audit --no-fund --package-lock=false playwright@1.58.2
+          node "$RUNNER_TEMP/solara-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Verify production Garage in Chromium
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-garage-browser.mjs
+      - name: Verify whitespace
+        run: git diff --check 42918734a41964328c512f7d1d6a17741ec44f02 HEAD
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: active-vehicle-verification
+          path: |
+            candidate-tests.json
+            candidate-tests.log
+            baseline-tests.json
+            baseline-tests.log
+            browser-evidence/
+          retention-days: 7

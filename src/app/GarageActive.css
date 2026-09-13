@@ -1,0 +1,11 @@
+.garage-active-summary {
+  min-width: 0;
+  padding: 1rem;
+  margin-block: 1rem;
+  border: 1px solid var(--color-border, #344651);
+  border-radius: 0.75rem;
+  background: rgba(120, 228, 220, 0.04);
+  overflow-wrap: anywhere;
+}
+.garage-active-summary p { margin: 0; }
+.garage-active-summary p + p { margin-top: 0.5rem; }

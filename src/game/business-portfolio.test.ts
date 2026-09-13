@@ -101,16 +101,16 @@ describe('approved Business portfolio authority', () => {
     const total = (state: GameState) => { const r = effectiveProductionRates(state); if (!r.ok) throw Error(r.error); return r.rates.reduce(addRational, ZERO_RATIONAL); };
     expect(total(portfolio)).toEqual(rational(6075n));
     expect(total({ ...portfolio, city: createInitialGameState().city })).toEqual(total(portfolio));
-    expect(total({ ...portfolio, garage: { ownedVehicleIds: [STARTER_VEHICLE.id] } })).toEqual(rational(13365n, 2n));
+    expect(total({ ...portfolio, garage: { ownedVehicleIds: [STARTER_VEHICLE.id], activeVehicleId: STARTER_VEHICLE.id } })).toEqual(rational(13365n, 2n));
   });
   it('keeps Dockside equipment scoped and global Skill/vehicle modifiers on all Businesses', () => {
     const s = ready(), enhanced = { ...s, upgrades: { purchasedIds: ['upgrade:commercial-pressure-washer' as const] },
-      garage: { ownedVehicleIds: [STARTER_VEHICLE.id] }, permanentProgression: { ...s.permanentProgression, skills: { 'skill:streetwise-investment': 1 } } };
+      garage: { ownedVehicleIds: [STARTER_VEHICLE.id], activeVehicleId: STARTER_VEHICLE.id }, permanentProgression: { ...s.permanentProgression, skills: { 'skill:streetwise-investment': 1 } } };
     expect(evaluateBusinessProduction(enhanced, packages[0].id, 1)).toMatchObject({ ok: true, effective: rational(1155n, 2n) });
     expect(evaluateBusinessProduction(enhanced, D.id, 1)).toMatchObject({ ok: true, effective: rational(3465n, 32n) });
   });
   it('pools both fractional remainders exactly across partitions, acquisition and upgrade', () => {
-    const s = ready(), fractional = { ...s, businesses: { ...s.businesses, productionRemainderMilliCents: 731, productionRemainderSubMilliCents: rational(1n, 3n) }, garage: { ownedVehicleIds: [STARTER_VEHICLE.id] } };
+    const s = ready(), fractional = { ...s, businesses: { ...s.businesses, productionRemainderMilliCents: 731, productionRemainderSubMilliCents: rational(1n, 3n) }, garage: { ownedVehicleIds: [STARTER_VEHICLE.id], activeVehicleId: STARTER_VEHICLE.id } };
     const before = elapsed(fractional, 333), bought = purchaseBusiness(before, packages[0].id); expect(bought.ok).toBe(true);
     expect(bought.state.businesses.productionRemainderMilliCents).toBe(before.businesses.productionRemainderMilliCents);
     expect(bought.state.businesses.productionRemainderSubMilliCents).toEqual(before.businesses.productionRemainderSubMilliCents);

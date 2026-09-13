@@ -1,3 +1,4 @@
+import './GarageActive.css';
 import { VEHICLE_CATALOG } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
 import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
@@ -8,8 +9,9 @@ import { RequirementList } from './RequirementList';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
 
-export function Garage({ state, paused, onPurchase }: {
+export function Garage({ state, paused, onPurchase, onSelect }: {
   readonly state: GameState; readonly paused: boolean; readonly onPurchase: (id: string) => void;
+  readonly onSelect: (id: string) => void;
 }) {
   const locale = useLocale();
   const text = useLocalizedText();
@@ -17,7 +19,15 @@ export function Garage({ state, paused, onPurchase }: {
   return <section className="garage" aria-labelledby="garage-heading">
     <div className="panel-heading"><h2 id="garage-heading">{text('Garage', 'Garage')}</h2>
       <span>{text('Owned vehicles:', 'Fahrzeuge im Besitz:')} {collection.ownedVehicleCount} / {collection.totalConfiguredVehicles}</span></div>
-    <p>{text('Collect permanent performance bonuses disguised as financially irresponsible machinery.', 'Sammle permanente Performance-Boni, die zufällig wie finanziell unverantwortliche Maschinen aussehen.')}</p>
+    <div className="garage-active-summary">
+      <p className="eyebrow">{text('Active vehicle', 'Aktives Fahrzeug')}</p>
+      <p><strong>{collection.activeVehicle?.name ?? text('No active vehicle', 'Kein aktives Fahrzeug')}</strong></p>
+      <p>{collection.activeVehicle
+        ? text('Only your active vehicle supplies its bonus. Ownership and selection survive Rebirth. Parking the rest is free. For now.',
+          'Nur dein aktives Fahrzeug liefert seinen Bonus. Besitz und Auswahl bleiben bei Rebirth erhalten. Der Rest parkt kostenlos. Noch.')
+        : text('Your first purchase activates automatically. Empty parking spaces have terrible performance.',
+          'Dein erster Kauf wird automatisch aktiv. Leere Parkplätze haben erschreckend wenig Leistung.')}</p>
+    </div>
     <div className="garage-catalog">{VEHICLE_CATALOG.map(vehicle => {
       const view = selectVehicle(state, vehicle.id);
       if (!view) return null;
@@ -29,13 +39,18 @@ export function Garage({ state, paused, onPurchase }: {
       return <article key={vehicle.id} className={`panel vehicle-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
         <header className="showroom-stage"><p className="eyebrow">{text('Performance collection · Permanent ownership', 'Performance-Sammlung · Permanenter Besitz')}</p>
         <div className="panel-heading"><h3 id={heading}><span className="vehicle-manufacturer">{vehicle.manufacturer}</span>{' '}<span>{vehicle.model}</span></h3>
-          <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? text('OWNED', 'IM BESITZ') : view.eligible ? text('AVAILABLE', 'VERFÜGBAR') : text('LOCKED', 'GESPERRT')}</span></div>
+          <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? view.active ? text('OWNED · ACTIVE', 'IM BESITZ · AKTIV') : text('OWNED · INACTIVE', 'IM BESITZ · INAKTIV') : view.eligible ? text('AVAILABLE', 'VERFÜGBAR') : text('LOCKED', 'GESPERRT')}</span></div>
         <p className="eyebrow">{category}</p>
         {artwork && <img className="vehicle-artwork" src={artwork.src} alt={artwork.alt}
           width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />}
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>
-        <p className="production">{formatModifier(vehicle.modifier)} {text('Business Production', 'Business-Produktion')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
+        <p className="production">{formatModifier(vehicle.modifier)} {text('Business Production · while active', 'Business-Produktion · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
+        {view.owned && !view.active && <button type="button" className="action-button"
+          disabled={paused} onClick={() => onSelect(vehicle.id)}
+          aria-label={text(`Activate ${vehicle.name}`, `${vehicle.name} aktivieren`)}>
+          {paused ? text('Session paused', 'Session pausiert') : text('Set active', 'Aktivieren')}
+        </button>}
         {!view.owned && <>
           <p>{text('Price:', 'Preis:')} <strong>{formatPrice(vehicle.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />

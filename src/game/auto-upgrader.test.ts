@@ -142,7 +142,7 @@ describe('chronological paid upgrades and outer batching', () => {
   });
   it('exact Jax/vehicle/skills production matches explicit manual upgrade boundaries and split intervals', () => {
     const s=initial(),c=crewState({operations:null,logistics:'crew:jax-mercer'});
-    const state={...s,crew:c.crew,garage:{ownedVehicleIds:[STARTER_VEHICLE.id]},
+    const state={...s,crew:c.crew,garage:{ ownedVehicleIds: [STARTER_VEHICLE.id], activeVehicleId: STARTER_VEHICLE.id },
       permanentProgression:{...s.permanentProgression,skills:{[ROOT]:2,[SILENT]:1}},
       businesses:{...s.businesses,productionRemainderMilliCents:975,productionRemainderSubMilliCents:rational(1n,3n)}};
     let expected: GameState=state;

@@ -30,11 +30,11 @@ afterEach(() => vi.restoreAllMocks());
 describe('v16 canonical vehicle boundary', () => {
   it.each([false, true])('v15 ownership=%s maps only identity, preserving every unrelated field and timestamp', owner => {
     const state = historical(owner), input = envelope(state), before = structuredClone(input);
-    const expected = { ...state, automation: { ...state.automation, businessAutoUpgradeTargetId: B.id }, garage: { ownedVehicleIds: owner ? [V.id] : [] } };
+    const expected = { ...state, automation: { ...state.automation, businessAutoUpgradeTargetId: B.id }, garage: { ownedVehicleIds: owner ? [V.id] : [], activeVehicleId: owner ? V.id : null } };
     vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('migration clock'); });
     vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('migration RNG'); });
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: envelope(expected, 17) });
+    expect(result).toEqual({ ok: true, envelope: envelope(expected, 18) });
     expect(migrateToCurrentSave(input)).toEqual(result); expect(input).toEqual(before);
     const code = encodeSaveText(JSON.stringify(input)); expect(code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code)).toEqual(result);
@@ -46,8 +46,8 @@ describe('v16 canonical vehicle boundary', () => {
   });
   it('fresh current state has no free vehicle or future Garage fields', () => {
     const state = createInitialGameState(), serialized = serializeSave(state, 0);
-    expect(state.garage).toEqual({ ownedVehicleIds: [] });
-    expect(migrateToCurrentSave(envelope(state, 17))).toEqual({ ok: true, envelope: envelope(state, 17) });
+    expect(state.garage).toEqual({ ownedVehicleIds: [], activeVehicleId: null });
+    expect(migrateToCurrentSave(envelope(state, 18))).toEqual({ ok: true, envelope: envelope(state, 18) });
     expect(serialized.ok).toBe(true); expect(findVehicle(LEGACY)).toBeUndefined();
   });
   it.each([[LEGACY, LEGACY], ['vehicle:unknown'], [V.id], [LEGACY, V.id]].map(ownedVehicleIds => ({ ownedVehicleIds })))('historical validator rejects malformed/future IDs %#', ({ ownedVehicleIds }) => {
@@ -55,13 +55,13 @@ describe('v16 canonical vehicle boundary', () => {
       .toEqual({ ok: false, error: 'invalid-state' });
   });
   it.each([[LEGACY], [LEGACY, V.id], [V.id, V.id], ['vehicle:unknown']].map(ownedVehicleIds => ({ ownedVehicleIds })))('current validator rejects noncanonical IDs %#', ({ ownedVehicleIds }) => {
-    expect(migrateToCurrentSave(envelope({ ...createInitialGameState(), garage: { ownedVehicleIds } }, 17)))
+    expect(migrateToCurrentSave(envelope({ ...createInitialGameState(), garage: { ownedVehicleIds, activeVehicleId: V.id } }, 18)))
       .toEqual({ ok: false, error: 'invalid-state' });
   });
   it('migrated ownership survives Rebirth and grants precisely one current modifier after rebuilding', () => {
     const migrated = migrateToCurrentSave(envelope(historical(true))); if (!migrated.ok) throw Error(migrated.error);
     const reset = performRebirth(migrated.envelope.state); expect(reset.ok).toBe(true);
-    expect(reset.state.garage).toEqual({ ownedVehicleIds: [V.id] });
+    expect(reset.state.garage).toEqual({ ownedVehicleIds: [V.id], activeVehicleId: V.id });
     const vehicleModifiers = collectModifiers(reset.state).filter(m => m.sourceId.startsWith('vehicle:'));
     expect(vehicleModifiers).toEqual([V.modifier]);
     // Separate skill-free fixture isolates the vehicle from permanent skills retained above.

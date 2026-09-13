@@ -34,7 +34,7 @@ describe('Rebirth eligibility and rewards', () => {
   it('requires no cash, vehicles, upgrades or dispatcher', () => {
     const fresh=createInitialGameState();const state={...fresh,progression:{xp:getXpThresholdForLevel(20)},
       businesses:{...fresh.businesses,owned:{[B.id]:{level:25}}}};
-    expect(performRebirth(state)).toMatchObject({ok:true,reward:4,state:{garage:{ownedVehicleIds:[]}}});
+    expect(performRebirth(state)).toMatchObject({ok:true,reward:4,state:{garage:{ ownedVehicleIds: [], activeVehicleId: null }}});
   });
   it.each([[20,25,4],[37,48,7],[100,100,20]])('preview and award agree: %i / %i => %i EP', (player,business,reward) => {
     const state=rebirthState(player,business);
@@ -88,7 +88,7 @@ describe('explicit reset and retention', () => {
   it('fails loudly on corrupt authoritative values without hiding them with a fresh run', () => {
     const state={...rebirthState(),permanentProgression:{ statistics: createInitialStatistics(0), unlockedAchievementIds: [],skills: {}, empirePoints:-1,rebirthCount:0}};
     const before=JSON.stringify(state);expect(()=>performRebirth(state)).toThrow(RangeError);expect(JSON.stringify(state)).toBe(before);
-    expect(()=>performRebirth({...rebirthState(),garage:{ownedVehicleIds:['vehicle:unknown']}})).toThrow(RangeError);
+    expect(()=>performRebirth({...rebirthState(),garage: { ownedVehicleIds: ['vehicle:unknown'], activeVehicleId: null }})).toThrow(RangeError);
     expect(()=>performRebirth({...rebirthState(),businesses:{...rebirthState().businesses,productionRemainderMilliCents:1000}})).toThrow(RangeError);
   });
   it('restores acquisition gates while the retained car automatically boosts a rebuilt Dockside', () => {

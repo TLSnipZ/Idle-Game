@@ -9,6 +9,8 @@ import type { CrewCommandResult } from '../game/crew-commands';
 import type { LayLowResult } from '../game/lay-low';
 import type { AcquireTerritoryResult } from '../game/acquire-territory';
 import type { PurchaseSkillResult } from '../game/purchase-skill-rank';
+import { activeVehicleEffectChanged } from '../game/set-active-vehicle';
+import type { ActiveVehicleResult } from '../game/set-active-vehicle';
 import type { PurchaseVehicleResult } from '../game/purchase-vehicle';
 import { newlyEligibleContent } from '../game/requirements';
 import { getLevelIncrease } from '../features/progression';
@@ -24,7 +26,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state' | 'persistence-failure';
 
@@ -156,6 +158,7 @@ export function createGameRuntime(
         || result.state.businesses.owned !== previous.businesses.owned
         || result.state.city.ownedTerritoryIds !== previous.city.ownedTerritoryIds
         || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds
+        || activeVehicleEffectChanged(previous, result.state)
         || result.state.permanentProgression.skills !== previous.permanentProgression.skills
         || result.state.upgrades !== previous.upgrades
         || result.state.automation.enabledIds !== previous.automation.enabledIds

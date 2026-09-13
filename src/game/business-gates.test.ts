@@ -19,11 +19,11 @@ describe('POST 3D acquisition-only ladder', () => {
       businesses: { ...fresh.businesses, owned: { [id]: { level: 3 } } } };
     const definition = BUSINESS_CATALOG.find(b => b.id === id)!;
     expect(evaluateRequirements(state, definition.requirements).met).toBe(false);
-    expect(CURRENT_SAVE_VERSION).toBe(17);
+    expect(CURRENT_SAVE_VERSION).toBe(18);
     expect(validateSaveState(state)).toEqual(state);
     const code = exportSaveCode(state, 123); if (!code.ok) throw Error(code.error);
     expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 17, state } });
+    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 18, state } });
     expect(purchaseBusiness(state, id)).toMatchObject({ ok: false, error: 'already-owned', state });
     const produced = simulateElapsed(state, 1000); expect(produced.ok).toBe(true);
     expect(produced.state.economy.cash).toBe(String(BigInt(state.economy.cash) + BigInt(definition.baseProductionCentsPerSecond) * 3n));

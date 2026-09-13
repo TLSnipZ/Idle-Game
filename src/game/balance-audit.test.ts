@@ -66,7 +66,7 @@ describe('Phase 9C deterministic progression routes', () => {
         washerMinutes: Number(PRESSURE_WASHER.purchaseCost) / 100 / (productionDollars(washed) - productionDollars(base)) / 60,
         lineAfterWasherMinutes: Number(DETAILING_LINE.purchaseCost) / 100 / (productionDollars(lined) - productionDollars(washed)) / 60,
         fleetAfterLineMinutes: Number(FLEET_LOGISTICS.purchaseCost) / 100 / (productionDollars(equipped) - productionDollars(lined)) / 60,
-        vortexMinutes: Number(V.purchaseCost) / 100 / (productionDollars({ ...equipped, garage: { ownedVehicleIds: [V.id] } }) - productionDollars(equipped)) / 60,
+        vortexMinutes: Number(V.purchaseCost) / 100 / (productionDollars({ ...equipped, garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id } }) - productionDollars(equipped)) / 60,
         jaxMinutes: Number(JAX_MERCER.recruitmentCost) / 100 / (productionDollars({ ...equipped, crew: { recruitedIds: [JAX_MERCER.id], assignments: { operations: null, logistics: JAX_MERCER.id } } }) - productionDollars(equipped)) / 60 };
     });
     expect(rows[0]?.basePerSecond).toBe(.75 * 5);
@@ -106,7 +106,7 @@ describe('Phase 9C deterministic progression routes', () => {
   it('permanent vehicle and Streetwise make an equivalent rebuilt business more productive', () => {
     const s = createInitialGameState();
     const business = { ...s, businesses: { ...s.businesses, owned: { [B.id]: { level: 1 } } } };
-    const retained = { ...business, garage: { ownedVehicleIds: [V.id] },
+    const retained = { ...business, garage: { ownedVehicleIds: [V.id], activeVehicleId: V.id },
       permanentProgression: { ...s.permanentProgression, skills: { 'skill:streetwise-investment': 1 } } };
     expect(productionDollars(retained)).toBeCloseTo(.86625, 8);
     expect(productionDollars(retained)).toBeGreaterThan(productionDollars(business));
@@ -147,10 +147,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(17);
+    expect(CURRENT_SAVE_VERSION).toBe(18);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 17, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 18, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);

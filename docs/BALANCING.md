@@ -5,6 +5,15 @@ this document describes the implemented game only. Feature config and central do
 helpers are the source of truth; UI uses their selectors. Phase 9C evidence and
 before/after comparisons live in [BALANCE_AUDIT.md](BALANCE_AUDIT.md).
 
+## Active Vehicle Foundation
+
+The current branch changes vehicle contribution to active-only; all existing KX-R
+owners automatically retain its +10% global Business Production. Price, gates,
+Business rates, skill effects, Heat and Rebirth rewards are unchanged. Selection is
+free, with no cooldown or deactivation; inactive ownership adds no stacking bonus.
+Only KX-R ships in the production catalog. Verification/live status is recorded in
+ACTIVE_VEHICLE.md.
+
 ## Exact units and evaluation
 
 Cash is a canonical non-negative integer-cent string, at most 100 digits

@@ -34,7 +34,7 @@ describe('vehicle acquisition', () => {
     const state=eligible(); const before=JSON.stringify(state);
     Object.freeze(state.garage.ownedVehicleIds); Object.freeze(state.garage); Object.freeze(state);
     const result=purchaseVehicle(state,V.id); expect(result.ok).toBe(true);
-    expect(result.state.economy.cash).toBe('0'); expect(result.state.garage).toEqual({ownedVehicleIds:[V.id]});
+    expect(result.state.economy.cash).toBe('0'); expect(result.state.garage).toEqual({ ownedVehicleIds: [V.id], activeVehicleId: V.id });
     expect({ ...result.state, economy: state.economy, garage: state.garage }).toEqual(state);
     expect(result.state.progression).toBe(state.progression); expect(result.state.businesses).toBe(state.businesses);
     expect(result.state.automation).toBe(state.automation); expect(JSON.stringify(state)).toBe(before);
@@ -62,11 +62,11 @@ describe('vehicle acquisition', () => {
   });
   it('spends exactly beyond Number precision and derives counts/eligibility', () => {
     const state={...eligible(),economy:{cash:moneyFromMinorUnits('900719925474099312345')}};
-    expect(selectGarage(state)).toEqual({ownedVehicleCount:0,totalConfiguredVehicles:1});
+    expect(selectGarage(state)).toEqual({activeVehicle:null,ownedVehicleCount:0,totalConfiguredVehicles:1});
     expect(selectVehicle(state,V.id)).toMatchObject({eligible:true,affordable:true,canPurchase:true});
     const purchased=purchaseVehicle(state,V.id).state;
     expect(purchased.economy.cash).toBe('900719925474096812345');
-    expect(selectGarage(purchased)).toEqual({ownedVehicleCount:1,totalConfiguredVehicles:1});
+    expect(selectGarage(purchased)).toEqual({activeVehicle:V,ownedVehicleCount:1,totalConfiguredVehicles:1});
     expect(selectVehicle(purchased,V.id)?.canPurchase).toBe(false); expect(selectVehicle(state,'unknown')).toBeNull();
   });
   it('announces newly eligible vehicle at the exact level 5 boundary', () => {
@@ -77,7 +77,7 @@ describe('vehicle acquisition', () => {
 });
 describe('shared vehicle modifiers', () => {
   it('has no effect when unowned and +10% globally when owned, never on jobs', () => {
-    const state=eligible(); const owned={...state,garage:{ownedVehicleIds:[V.id]}};
+    const state=eligible(); const owned={...state,garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id }};
     expect(evaluateBusinessProduction(state,B.id,4)).toMatchObject({ok:true,effective:rational(300n)});
     expect(evaluateBusinessProduction(owned,B.id,4)).toMatchObject({ok:true,effective:rational(330n)});
     expect(evaluateStat(moneyFromMinorUnits('100'),{stat:'business-production',businessId:'business:synthetic'},collectModifiers(owned)))
@@ -85,7 +85,7 @@ describe('shared vehicle modifiers', () => {
     expect(evaluateJobReward(owned)).toMatchObject({ok:true,reward:'2500'});
   });
   it('stacks the canonical all-bonus rate exactly in stable modifier order', () => {
-    const state={...eligible(),garage:{ownedVehicleIds:[V.id]},upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)}};
+    const state={...eligible(),garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id },upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)}};
     const evaluated=evaluateBusinessProduction(state,B.id,4);
     expect(evaluated).toMatchObject({ok:true,effective:rational(5445n,8n)}); // $6.80625/s
     expect(evaluated).toEqual(evaluateBusinessProduction({...state,upgrades:{purchasedIds:[...state.upgrades.purchasedIds].reverse()}},B.id,4));
@@ -95,7 +95,7 @@ describe('shared vehicle modifiers', () => {
     expect(evaluateJobReward(state)).toMatchObject({ok:true,reward:'3600'});
   });
   it('preserves both earned fractions with arbitrary split intervals and serializable state', () => {
-    const initial=eligible(); const state={...initial,garage:{ownedVehicleIds:[V.id]},
+    const initial=eligible(); const state={...initial,garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id },
       businesses:{...initial.businesses,owned:{[B.id]:{level:4}}},upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)}};
     let split: GameState=state;
     for (const ms of [1,2,7,91,100,999,3456]) split=simulateElapsed(split,ms).state;
@@ -104,10 +104,10 @@ describe('shared vehicle modifiers', () => {
     expect(simulateElapsed(state,1).state.businesses.productionRemainderSubMilliCents).not.toEqual(rational(0n));
   });
   it('rolls back money overflow with vehicle bonuses and rejects corrupt owned IDs', () => {
-    const state={...eligible(),garage:{ownedVehicleIds:[V.id]},economy:{cash:moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS))}};
+    const state={...eligible(),garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id },economy:{cash:moneyFromMinorUnits('9'.repeat(MAX_MONEY_DIGITS))}};
     expect(simulateElapsed(state,1000)).toEqual({ok:false,state,error:'overflow'});
     expect(simulateElapsed(state,1000).state).toBe(state);
-    expect(()=>collectModifiers({...state,garage:{ownedVehicleIds:[V.id,V.id]}})).toThrow(RangeError);
-    expect(()=>collectModifiers({...state,garage:{ownedVehicleIds:['vehicle:missing']}})).toThrow(RangeError);
+    expect(()=>collectModifiers({...state,garage: { ownedVehicleIds: [V.id, V.id], activeVehicleId: V.id }})).toThrow(RangeError);
+    expect(()=>collectModifiers({...state,garage: { ownedVehicleIds: ['vehicle:missing'], activeVehicleId: null }})).toThrow(RangeError);
   });
 });
