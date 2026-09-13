@@ -1,4 +1,7 @@
-export type Locale = 'en' | 'de';
+import { villagerText } from './villager-language';
+
+export type Locale = 'en' | 'de' | 'villager';
+export function isLocale(value: unknown): value is Locale { return value === 'en' || value === 'de' || value === 'villager'; }
 
 export const DEFAULT_LOCALE: Locale = 'en';
 
@@ -18,6 +21,7 @@ const messages = {
     language: 'Language',
     english: 'English',
     german: 'Deutsch',
+    villager: 'Villager · Hrrm',
     reducedMotion: 'Reduce motion',
     reducedMotionHelp: 'Cuts non-essential animation. Your empire remains morally flexible at full speed.',
     close: 'Close this totally legitimate menu',
@@ -52,6 +56,7 @@ const messages = {
     language: 'Sprache',
     english: 'English',
     german: 'Deutsch',
+    villager: 'Villager · Hrrm',
     reducedMotion: 'Bewegungen reduzieren',
     reducedMotionHelp: 'Reduziert unnötige Animationen. Dein Imperium bleibt trotzdem moralisch flexibel.',
     close: 'Dieses völlig seriöse Menü schließen',
@@ -74,5 +79,10 @@ const messages = {
 } as const;
 
 export type MessageKey = keyof typeof messages.en;
-export function translate(locale: Locale, key: MessageKey): string { return messages[locale][key]; }
+export function translate(locale: Locale, key: MessageKey): string {
+  if (locale !== 'villager') return messages[locale][key];
+  // Keep the exit from the novelty language recognizable in every locale.
+  if (key === 'english' || key === 'german' || key === 'villager') return messages.en[key];
+  return villagerText(messages.en[key]);
+}
 export function localeTag(locale: Locale): string { return locale === 'de' ? 'de-DE' : 'en-US'; }

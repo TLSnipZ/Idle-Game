@@ -80,10 +80,10 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 
 | Direction | Planned additions |
 | --- | --- |
-| **A clearer, more comfortable game** | Settings and full English/German Solara voice are implemented; further accessibility polish remains planned. |
+| **A clearer, more comfortable game** | English, Deutsch and a playful Villager mode with readable English glosses; whole-game audit precedes new content. |
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
-| **A growing Garage** | Active Vehicle Foundation is in this branch; Tier-1 Kairo Senda / Namera Lilt follow acceptance, then later tuning and catalog tiers. |
+| **A growing Garage** | Active Vehicle Foundation is merged; Tier-1 Kairo Senda / Namera Lilt follow the current game audit, then later tuning and catalog tiers. |
 | **A deeper city** | Heat/Police expansion, more Business depth, crew and event development, and richer territory progression. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.

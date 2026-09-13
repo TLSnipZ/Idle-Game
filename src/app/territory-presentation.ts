@@ -1,3 +1,4 @@
+import { localizedRequirementDescription } from './requirement-localization';
 import { acquisitionPresentation } from './acquisition-presentation';
 import { MAX_HEAT } from '../features/heat';
 import { findTerritory } from '../features/territories';
@@ -33,7 +34,12 @@ export function describeTerritoryAcquisition(result: AcquireTerritoryResult, id:
   if (result.ok) return localize(locale, 'Territory controlled.', 'Bezirk kontrolliert. Besitzverhältnisse erfolgreich kreativ ausgelegt.');
   switch (result.error) {
     case 'statistics-overflow': return localize(locale, 'Lifetime statistics limit reached. The action was not completed.', 'Statistiklimit erreicht. Eroberung vertagt, Excel ist voll.');
-    case 'requirements-not-met': return localize(locale, 'Requirements not met.', 'Voraussetzungen nicht erfüllt. Selbst Machtübernahmen haben Papierkram.');
+    case 'requirements-not-met': {
+      const missing = result.requirements.requirements.filter(detail => !detail.met);
+      return localize(locale,
+        'Requirements not met: ' + missing.map(detail => detail.description).join('; ') + '.',
+        'Voraussetzungen fehlen: ' + missing.map(detail => localizedRequirementDescription(detail.description, 'de')).join('; ') + '.');
+    }
     case 'insufficient-funds': return localize(locale, 'Not enough cash to take control. No acquisition was made.', 'Zu wenig Cash für die Übernahme. Der Bezirk bleibt vorerst demokratisch verwirrt.');
     case 'already-owned': return localize(locale, 'This territory is already controlled.', 'Der Bezirk gehört schon zu deinem Revier. Zweimal übernehmen wäre nur schlechtes Branding.');
     case 'unknown-territory': return localize(locale, 'This territory is unavailable. No acquisition was made.', 'Dieser Bezirk ist nicht verfügbar. Keine Übernahme, kein Geld weg.');

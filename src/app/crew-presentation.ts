@@ -1,3 +1,4 @@
+import { localizedRequirementDescription as requirementText } from './requirement-localization';
 import { acquisitionPresentation } from './acquisition-presentation';
 import { findCrewMember, findCrewSlot } from '../features/crew';
 import type { CrewEffect } from '../features/crew';
@@ -10,13 +11,7 @@ import { DEFAULT_LOCALE } from './localization';
 import type { Locale } from './localization';
 import { localize } from './LocalizationProvider';
 
-function requirementText(description: string, locale: Locale) {
-  if (locale === 'en') return description;
-  if (description.startsWith('Player Level ')) return description.replace('Player Level ', 'Spielerlevel ');
-  if (description.startsWith('Own ')) return description.replace('Own ', 'Besitze ');
-  if (description.startsWith('Control ')) return description.replace('Control ', 'Kontrolliere ');
-  return description;
-}
+
 
 export function describeCrewEffect(effect: CrewEffect, locale: Locale = DEFAULT_LOCALE): string {
   if (effect.type === 'heat-decay-interval') return localize(locale, `Heat cools every ${effect.intervalMs / 1000}s`, `Heat sinkt alle ${effect.intervalMs / 1000}s · die Crew kennt offenbar Abkürzungen im Polizeifunk`);

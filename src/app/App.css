@@ -203,7 +203,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .global-status div { min-width: 0; }
 .global-status dt { color: var(--color-muted); font-size: var(--text-label); }
 .global-status dd { margin: .2rem 0 0; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.primary-navigation { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .4rem; }
+.primary-navigation { display: flex; flex-wrap: wrap; gap: .4rem; }
 .primary-navigation button, .global-indicators button { min-width: 0; min-height: 44px; padding: .6rem; border: 1px solid var(--color-border); border-radius: .5rem; color: var(--color-text); background: transparent; font: inherit; font-size: .85rem; font-weight: 650; cursor: pointer; overflow-wrap: anywhere; }
 .primary-navigation button[aria-current="page"] { background: var(--color-accent-tint); border-color: var(--color-cool); color: var(--color-cool); box-shadow: inset 0 -3px var(--color-cool); }
 .primary-navigation button:focus-visible, .global-indicators button:focus-visible { outline: 2px solid var(--color-cool); outline-offset: 2px; }
@@ -237,7 +237,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
   .edition { display: none; }
   .global-status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .primary-navigation { display: flex; flex-wrap: wrap; }
-  .primary-navigation button { flex: 1 1 7rem; }
+  .primary-navigation button { flex: 1 1 max-content; }
   .automation-grid { grid-template-columns: minmax(0, 1fr); }
   .global-chrome-inner { padding: .5rem 1rem; }
   .section-heading h1 { scroll-margin-top: 21rem; }
@@ -248,7 +248,7 @@ h1 em { color: var(--color-cool); font-style: normal; }
 .primary-navigation button[aria-current="page"] { text-decoration: underline; text-underline-offset: .3em; }
 .primary-navigation button:focus-visible, .global-indicators button:focus-visible,
 .action-button:focus-visible, .save-panel textarea:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.skip-link { position: fixed; min-height: 44px; }
+.skip-link { position: fixed; min-height: 44px; max-width: calc(100vw - 2rem); box-sizing: border-box; overflow-wrap: anywhere; }
 .save-confirm .action-button + .action-button, .crew-card .action-button + .action-button { margin-top: .75rem; }
 .save-confirm { border-inline-start: 3px solid var(--color-accent); }
 .panel-heading { flex-wrap: wrap; }
@@ -345,7 +345,7 @@ progress::-moz-progress-bar { background: var(--progress-fill); }
 .save-panel:has(textarea[aria-invalid="true"]) #save-feedback { color: var(--color-danger); }
 
 /* Whole labels wrap as controls, never as word fragments. */
-.primary-navigation button { white-space: nowrap; overflow-wrap: normal; }
+.primary-navigation button { white-space: nowrap; overflow-wrap: normal; min-width: max-content; flex: 1 1 max-content; }
 .save-health { color: var(--color-muted); font-size: var(--text-label); margin-inline-start: auto; }
 .value-unit { display: inline-flex; max-width: 100%; vertical-align: bottom; }
 .value-unit > :first-child { min-width: 0; overflow-wrap: anywhere; }

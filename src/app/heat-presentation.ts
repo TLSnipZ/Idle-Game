@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import { HEAT_SOURCE_ID, HEAT_TIERS, LAY_LOW_COST, LAY_LOW_REDUCTION } from '../features/heat';
 import type { Modifier } from '../game/modifiers';
 import type { GameState } from '../game/game-state';
@@ -10,6 +11,7 @@ import type { Locale } from './localization';
 import { localize } from './LocalizationProvider';
 
 export function heatTierLabel(label: string, locale: Locale = DEFAULT_LOCALE): string {
+  if (locale === 'villager') return villagerText(label);
   if (locale === 'en') return label;
   switch (label) {
     case 'COLD': return 'EISKALT';

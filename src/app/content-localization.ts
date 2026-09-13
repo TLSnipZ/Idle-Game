@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import type { Locale } from './localization';
 
 interface LocalizedFields { readonly [field: string]: string | undefined }
@@ -59,10 +60,14 @@ const DE: Record<string, LocalizedFields> = {
 };
 
 export function localizedContent(locale: Locale, id: string, field: string, fallback: string): string {
-  return (locale === 'de' ? DE : EN)[id]?.[field] ?? fallback;
+  const english = EN[id]?.[field] ?? fallback;
+  // Proper names stay recognizable; flavor, effects and choices speak Villager.
+  if (locale === 'villager') return field === 'name' ? english : villagerText(english);
+  return locale === 'de' ? DE[id]?.[field] ?? fallback : english;
 }
 
 export function localizedSlotName(locale: Locale, name: string): string {
+  if (locale === 'villager') return villagerText(name);
   if (locale !== 'de') return name;
   if (name === 'Operations') return 'Operationen';
   if (name === 'Logistics') return 'Logistik';

@@ -1,5 +1,15 @@
 # Settings & Localization Foundation
 
+## Current extension — Villager and game audit
+
+The 2026-09-13 extension adds a third, written **Villager · Hrrm** option with
+readable English glosses, a native modal Settings dialog, and per-runtime language
+feedback. Preferences remain device-local; current saves are v18 and CE1 is
+unchanged. PR #24 passed strict build, 29 added regression tests and the full
+255-case production Chromium matrix. The 62 inherited UI-test failures and visual
+acceptance limits are recorded in [GAME_AUDIT.md](GAME_AUDIT.md) for executed verification and remaining
+review work. The sections below record the original foundation.
+
 ## Scope
 
 This post-roadmap phase introduces presentation-only player preferences without changing GameState, Save v17, CE1, economy, runtime, offline progression or Rebirth behavior.
@@ -29,7 +39,7 @@ Settings are presentation state only. A missing, malformed or unavailable settin
 
 The translation dictionary is intentionally centralized in `src/app/localization.ts`. New UI copy should migrate into typed keys as related surfaces are touched instead of introducing a second localization mechanism. Content IDs, gameplay labels used as domain identity and save data must remain locale-neutral.
 
-## Verification
+## Historical foundation verification
 
 Repository-side implementation was performed through the GitHub connector. The execution environment available to this session could not run the project's npm/typecheck/test/build suite, so the pull request should be treated as awaiting GitHub/maintainer CI and live visual acceptance before this phase is marked manually verified.
 

@@ -1,4 +1,4 @@
-name: Verify Active Vehicle
+name: Verify Solara City
 on:
   pull_request:
     branches: [main]
@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 20
     env:
       SOLARA_BROWSER_FIXTURES: /tmp/solara-browser-fixtures.json
+      SOLARA_AUDIT_FIXTURES: /tmp/solara-audit-fixtures.json
     steps:
       - uses: actions/checkout@v7
         with:
@@ -40,7 +41,7 @@ jobs:
       - name: Check out recorded pre-feature baseline
         uses: actions/checkout@v7
         with:
-          ref: 42918734a41964328c512f7d1d6a17741ec44f02
+          ref: d758fbb207d1ecb91dc0971d105391476498266d
           path: baseline
           persist-credentials: false
       - name: Install baseline
@@ -50,6 +51,8 @@ jobs:
         continue-on-error: true
         working-directory: baseline
         run: npm run test -- --reporter=json --outputFile=../baseline-tests.json > ../baseline-tests.log 2>&1
+      - name: Report inherited failures for game audit
+        run: node scripts/report-test-audit.mjs
       - name: Reject new failures and skipped or removed tests
         run: node scripts/compare-test-results.mjs baseline-tests.json candidate-tests.json
       - name: Install isolated browser verifier
@@ -60,13 +63,17 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-garage-browser.mjs
+      - name: Verify all sections, locales and settings in Chromium
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-game-audit.mjs
       - name: Verify whitespace
-        run: git diff --check 42918734a41964328c512f7d1d6a17741ec44f02 HEAD
+        run: git diff --check d758fbb207d1ecb91dc0971d105391476498266d HEAD
       - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: active-vehicle-verification
+          name: solara-game-verification
           path: |
             candidate-tests.json
             candidate-tests.log

@@ -1,6 +1,11 @@
 # Roadmap
 
-Current continuation: **Active Vehicle Foundation / Save v18** is implemented on
+Current priority: **Villager language and whole-game audit**, requested before new
+Garage content. Implemented in PR #24, with the complete audit and prioritized
+follow-ups in [GAME_AUDIT.md](GAME_AUDIT.md). The next technical step is repairing
+62 inherited UI-test failures; the new code adds no regressions.
+
+Previous milestone: **Active Vehicle Foundation / Save v18** is implemented on
 `feat/active-vehicle-complete` in PR #23; executed checks and release state are
 recorded there. Manual live acceptance remains separate.
 The Base Game records below are historical. [POST_ROADMAP.md](POST_ROADMAP.md) and

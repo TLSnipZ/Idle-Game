@@ -1,3 +1,5 @@
+import { villagerText } from './villager-language';
+import type { Locale } from './localization';
 import { selectAchievements } from '../game/achievements';
 import type { GameState } from '../game/game-state';
 import type { RuntimeSnapshot } from '../platform/game-runtime';
@@ -5,7 +7,8 @@ import { ACHIEVEMENT_CATALOG } from '../features/achievements';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
 
-function localizedProgress(progress: string, locale: 'en' | 'de') {
+function localizedProgress(progress: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(progress);
   if (locale === 'en') return progress;
   if (progress === 'Completed') return 'Abgeschlossen · Akte geschlossen';
   if (progress === 'Controlled') return 'Kontrolliert';

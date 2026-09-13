@@ -1,3 +1,5 @@
+import { villagerText } from './villager-language';
+import type { Locale } from './localization';
 import { useState } from 'react';
 import type { GameState } from '../game/game-state';
 import { selectGuidance } from '../game/guidance';
@@ -7,7 +9,8 @@ import { formatInteger } from './number-format';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
 
-function countLabel(label: string, locale: 'en' | 'de') {
+function countLabel(label: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(label);
   if (locale === 'en') return label;
   if (label === 'Player Level') return 'Spielerlevel';
   if (label === 'Business Level') return 'Business-Level';
