@@ -40,17 +40,17 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
         <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{text(member.name)}</h4><span className="ownership-badge">{view.status}</span></div>
         <p className="eyebrow">{view.compatibleSlots.map(slot => localizedSlotName(locale, slot.name)).join(' / ')}</p><p>{description}</p></div><p className="specialist-effect">{view.effect} · {text('Only while assigned', 'Nur solange zugewiesen')}</p>{view.recruited && view.availability && <p>{view.availability}</p>}
         {!view.recruited ? <>
-          <p>{text('Recruitment:', 'Rekrutierung:')} <strong>{text(formatPrice(member.recruitmentCost))}</strong></p>
+          <p>{text('Recruitment:', 'Rekrutierung:')} <strong>{formatPrice(member.recruitmentCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirementsId} />
           <div className="card-action-area">
-          <button className="action-button purchase-button" disabled={paused || !view.canRecruit} aria-label={text(`Recruit ${text(member.name)}`, `${text(member.name)} rekrutieren`)}
+          <button className="action-button purchase-button" disabled={paused || !view.canRecruit} aria-label={text(`Recruit ${member.name}`, `${member.name} rekrutieren`)}
             aria-describedby={requirementsId} onClick={() => onRecruit(member.id)}>{text('Recruit', 'Rekrutieren')}</button>
           {view.availability && <p className="purchase-note">{view.availability}</p>}
           </div>
         </> : view.compatibleSlots.filter(slot => slot.canAssign).map(slot => {
           const slotName = localizedSlotName(locale, slot.name);
           return <button className="action-button" key={slot.id} disabled={paused}
-            aria-label={text(`Assign ${text(member.name)} to ${slotName}${slot.occupant ? `, replacing ${slot.occupant.name}` : ''}`, `${text(member.name)} ${slotName} zuweisen${slot.occupant ? `, ersetzt ${slot.occupant.name}` : ''}`)}
+            aria-label={text(`Assign ${member.name} to ${slotName}${slot.occupant ? `, replacing ${slot.occupant.name}` : ''}`, `${member.name} ${slotName} zuweisen${slot.occupant ? `, ersetzt ${slot.occupant.name}` : ''}`)}
             onClick={() => onAssign(slot.id, member.id)}>
             {text(`Assign to ${slotName}${slot.occupant ? ` · Replace ${slot.occupant.name}` : ''}`, `Zu ${slotName}${slot.occupant ? ` · ${slot.occupant.name} ersetzen` : ''}`)}
           </button>;})}

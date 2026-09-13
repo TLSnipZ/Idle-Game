@@ -45,18 +45,18 @@ export function Garage({ state, paused, onPurchase, onSelect }: {
           width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />}
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>
-        <p className="production">{text(formatModifier(vehicle.modifier))} {text('Business Production · while active', 'Business-Produktion · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
+        <p className="production">{formatModifier(vehicle.modifier)} {text('Business Production · while active', 'Business-Produktion · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
         {view.owned && !view.active && <button type="button" className="action-button"
           disabled={paused} onClick={() => onSelect(vehicle.id)}
           aria-label={text(`Activate ${vehicle.name}`, `${vehicle.name} aktivieren`)}>
           {paused ? text('Session paused', 'Session pausiert') : text('Set active', 'Aktivieren')}
         </button>}
         {!view.owned && <>
-          <p>{text('Price:', 'Preis:')} <strong>{text(formatPrice(vehicle.purchaseCost))}</strong></p>
+          <p>{text('Price:', 'Preis:')} <strong>{formatPrice(vehicle.purchaseCost)}</strong></p>
           <RequirementList result={view.requirements} id={requirements} />
           {view.eligible && <p>{view.affordable ? text('Ready to purchase. The garage already cleared a suspiciously exact space.', 'Kaufbereit. In der Garage wurde auffällig genau Platz gemacht.') : text('INSUFFICIENT CASH', 'ZU WENIG CASH')}</p>}
           <button className="action-button purchase-button" disabled={paused || !view.canPurchase} aria-describedby={requirements}
-            aria-label={text(`Buy ${vehicle.name}`, `${vehicle.name} kaufen`)} onClick={() => onPurchase(vehicle.id)}>{paused ? text('Session paused', 'Session pausiert') : text(`Buy ${text(vehicle.model)}`, `${text(vehicle.model)} kaufen`)}</button>
+            aria-label={text(`Buy ${vehicle.name}`, `${vehicle.name} kaufen`)} onClick={() => onPurchase(vehicle.id)}>{paused ? text('Session paused', 'Session pausiert') : text(`Buy ${vehicle.model}`, `${vehicle.model} kaufen`)}</button>
         </>}
       </div></article>;
     })}</div>

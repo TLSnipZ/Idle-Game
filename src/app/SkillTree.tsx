@@ -14,7 +14,7 @@ export function SkillTree({ state, paused, onPurchase }: {
   const text = useLocalizedText();
   return <section className="skill-tree" aria-labelledby="skill-tree-heading">
     <div className="panel-heading"><h2 id="skill-tree-heading">{localizedContent(locale, EMPIRE_FOUNDATIONS.id, 'name', EMPIRE_FOUNDATIONS.name)}</h2>
-      <span>{text('Empire Points available:', 'Verfügbare Empire Points:')} {text(formatInteger(state.permanentProgression.empirePoints))} {text('EP')}</span></div>
+      <span>{text('Empire Points available:', 'Verfügbare Empire Points:')} {formatInteger(state.permanentProgression.empirePoints)} {text('EP')}</span></div>
     <p>{text('Invest in permanent ranks. Skills survive every Rebirth. Purchases cannot be refunded because personal growth has terrible customer service.', 'Investiere in permanente Ränge. Skills überleben jeden Rebirth. Rückerstattung ausgeschlossen — persönliche Entwicklung hat miserablen Kundenservice.')}</p>
     <div className="skill-nodes">{SKILL_CATALOG.map(skill => {
       const view = selectSkill(state, skill.id);

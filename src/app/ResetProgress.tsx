@@ -50,6 +50,6 @@ export function ResetProgress({ unavailable, onReset }: {
       disabled={unavailable} aria-describedby="reset-consequences reset-backup"
       onClick={controls.request}>{text('Review New Game reset', 'Neues Spiel prüfen')}</button>}
     {unavailable && <p>{text('New Game needs a running session and a valid, unchanged local save. Reload or use the existing Import recovery flow before trying again.', 'Neues Spiel braucht eine laufende Session und einen gültigen, unveränderten lokalen Save. Neu laden oder erst über Import retten, bevor du alles anzündest.')}</p>}
-    <p role="status" aria-live="polite" aria-atomic="true">{interaction.message}</p>
+    <p role="status" aria-live="polite" aria-atomic="true">{text(interaction.message)}</p>
   </section>;
 }

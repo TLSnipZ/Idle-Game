@@ -16,13 +16,13 @@ export function OfflineReturn({ progress, onDismiss }: {
     <div role="status" aria-live="polite">
       <h2 id="offline-heading">{text('Welcome back', 'Willkommen zurück')}</h2>
       <p>{text('While you were away, the empire continued without asking permission.', 'Während du weg warst, hat dein Imperium einfach weitergemacht. Loyalität sieht anders aus, Profit aber gut.')}</p>
-      <p className="offline-income">+{text(formatCash(progress.incomeEarned))}{progress.autoUpgrader?.levelsPurchased ? text(' earned before automatic spending', ' verdient vor automatischen Ausgaben') : ''}</p>
-      {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>{text('Business Auto-Upgrader')}: {text(findBusiness(progress.autoUpgrader.targetId)?.name ?? '')} +{progress.autoUpgrader?.levelsPurchased} {text('levels', 'Level')} · {text('Spent', 'Ausgegeben')} {text(formatCash(progress.autoUpgrader.spent))}</p>}
+      <p className="offline-income">+{formatCash(progress.incomeEarned)}{progress.autoUpgrader?.levelsPurchased ? text(' earned before automatic spending', ' verdient vor automatischen Ausgaben') : ''}</p>
+      {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>{text('Business Auto-Upgrader')}: {text(findBusiness(progress.autoUpgrader.targetId)?.name ?? '')} +{progress.autoUpgrader?.levelsPurchased} {text('levels', 'Level')} · {text('Spent', 'Ausgegeben')} {formatCash(progress.autoUpgrader.spent)}</p>}
       {progress.automation && progress.businessIncome !== undefined && <>
-        <p>{text('Business income:', 'Business-Einnahmen:')} {text(formatCash(progress.businessIncome))}</p>
-        <p>{text('Dispatcher')}: {progress.automation.completedJobs} {progress.automation.completedJobs === 1 ? text('delivery', 'Lieferung') : text('deliveries', 'Lieferungen')} · {text(formatCash(progress.automation.income))}</p>
+        <p>{text('Business income:', 'Business-Einnahmen:')} {formatCash(progress.businessIncome)}</p>
+        <p>{text('Dispatcher')}: {progress.automation.completedJobs} {progress.automation.completedJobs === 1 ? text('delivery', 'Lieferung') : text('deliveries', 'Lieferungen')} · {formatCash(progress.automation.income)}</p>
       </>}
-      {progress.xpEarned > 0 && <p>{text('XP earned:', 'XP verdient:')} +{text(formatXp(progress.xpEarned))} {text('XP')}</p>}
+      {progress.xpEarned > 0 && <p>{text('XP earned:', 'XP verdient:')} +{formatXp(progress.xpEarned)} {text('XP')}</p>}
       {progress.levelIncrease && <p>{describeLevelIncrease(progress.levelIncrease, locale)}</p>}
       <p>{text('Away:', 'Abwesend:')} {text(formatOfflineDuration(progress.actualElapsedMs))}</p>
       <p>{text('Time credited:', 'Angerechnete Zeit:')} {text(formatOfflineDuration(progress.rewardedElapsedMs))}</p>

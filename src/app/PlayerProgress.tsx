@@ -13,9 +13,9 @@ export function PlayerProgress({ xp, event, paused }: {
   const progress = getLevelProgress(xp);
   return <section className="player-progress" aria-labelledby="player-level-heading">
     <div className="panel-heading"><h3 id="player-level-heading">{text('Level')} {progress.currentLevel}</h3>
-      <span>{text('Total XP:', 'Gesamt-XP:')} {text(formatXp(progress.currentXp))}</span></div>
+      <span>{text('Total XP:', 'Gesamt-XP:')} {formatXp(progress.currentXp)}</span></div>
     <label htmlFor="player-xp-progress">{progress.isMaxLevel ? text('MAX LEVEL', 'MAX-LEVEL')
-      : text(`${text(formatXp(progress.xpIntoLevel))} / ${text(formatXp(progress.xpNeededForLevel))} {text('XP')} toward Level ${progress.currentLevel + 1}`, `${text(formatXp(progress.xpIntoLevel))} / ${text(formatXp(progress.xpNeededForLevel))} {text('XP')} bis Level ${progress.currentLevel + 1}`)}</label>
+      : text(`${formatXp(progress.xpIntoLevel)} / ${formatXp(progress.xpNeededForLevel)} {text('XP')} toward Level ${progress.currentLevel + 1}`, `${formatXp(progress.xpIntoLevel)} / ${formatXp(progress.xpNeededForLevel)} {text('XP')} bis Level ${progress.currentLevel + 1}`)}</label>
     <progress id="player-xp-progress" value={progress.isMaxLevel ? 1 : progress.xpIntoLevel} max={progress.isMaxLevel ? 1 : progress.xpNeededForLevel} />
     <p className="is-live" role="status" aria-live="polite" aria-atomic="true">
       <span key={event?.sequence}>{event && !paused ? <>

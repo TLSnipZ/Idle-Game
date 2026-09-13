@@ -13,6 +13,6 @@ export function HudPlayerProgress({ progress }: { readonly progress: ReturnType<
   return <>
     <progress className="hud-xp-progress" value={value} max={progress.xpNeededForLevel}
       aria-label={text(`Player XP progress to Level ${progress.currentLevel + 1}`, `Spieler-XP-Fortschritt zu Level ${progress.currentLevel + 1}`)} />
-    <span className="hud-xp-text">{text(formatInteger(value))} / {text(formatInteger(progress.xpNeededForLevel))} {text('XP')}</span>
+    <span className="hud-xp-text">{formatInteger(value)} / {formatInteger(progress.xpNeededForLevel)} {text('XP')}</span>
   </>;
 }

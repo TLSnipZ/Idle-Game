@@ -21,7 +21,7 @@ export function describeChoiceEffects(choice: EventChoice, locale: Locale = DEFA
   const lines: string[] = [];
   if (choice.cost !== '0') lines.push(`${choice.reward !== '0' ? localize(locale, 'Cost: ', 'Kosten: ') : '-'}${formatReward(choice.cost)}`);
   if (choice.reward !== '0') lines.push(`${choice.cost !== '0' ? localize(locale, 'Return: ', 'Rückfluss: ') : '+'}${formatReward(choice.reward)}`);
-  if (choice.heatChange !== 0) lines.push(`${choice.heatChange > 0 ? '+' : ''}${choice.heatChange} Heat`);
+  if (choice.heatChange !== 0) lines.push(`${choice.heatChange > 0 ? '+' : ''}${choice.heatChange} ${localize(locale, 'Heat', 'Heat')}`);
   return lines.length ? lines : [localize(locale, 'No effect', 'Kein Effekt · seltene Solara-Großzügigkeit')];
 }
 export function eventPresentation(state: GameState, locale: Locale = DEFAULT_LOCALE) {

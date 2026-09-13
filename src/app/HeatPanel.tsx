@@ -22,7 +22,7 @@ export function HeatPanel({ state, paused, onLayLow }: {
     {coolingCrew && <p className="crew-cooling">{text('CREW EFFECT', 'CREW-EFFEKT')} · {text(coolingCrew.name)}</p>}
     {view.countdown !== null ? <p>{view.countdown}{paused && text(' · Session paused', ' · Session pausiert')}</p> : <p>{text('COOL · No active Heat', 'EISKALT · Kein aktives Heat')}</p>}
     <p>{text(`Manual delivery: +${MANUAL_JOB_HEAT} Heat. Dispatcher: +1 per ${DISPATCHER_JOBS_PER_HEAT} deliveries completed together.`, `Manuelle Lieferung: +${MANUAL_JOB_HEAT} Heat. Dispatcher: +1 pro ${DISPATCHER_JOBS_PER_HEAT} gemeinsam abgeschlossene Lieferungen.`)}</p>
-    </div><div className="heat-action"><p>{text(`Lay low · Reduce Heat by ${view.reduction} · Cost: ${text(formatPrice(view.cost))}`, `Untertauchen · Heat um ${view.reduction} senken · Kosten: ${text(formatPrice(view.cost))}`)}</p>
+    </div><div className="heat-action"><p>{text(`Lay low · Reduce Heat by ${view.reduction} · Cost: ${formatPrice(view.cost)}`, `Untertauchen · Heat um ${view.reduction} senken · Kosten: ${formatPrice(view.cost)}`)}</p>
     <p>{view.availability}</p>
     <button className="action-button secondary-button" aria-label={text('Lay low to reduce Heat', 'Untertauchen, um Heat zu reduzieren')}
       disabled={paused || !view.canLayLow} onClick={onLayLow}>{paused ? text('Session paused', 'Session pausiert') : text('LAY LOW', 'UNTERTAUCHEN')}</button></div>
