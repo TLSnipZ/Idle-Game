@@ -16,7 +16,7 @@ import { LocalizationProvider } from './LocalizationProvider';
 import type { Locale } from './localization';
 import { findBusinessArtwork } from './business-artwork';
 
-const artworkIds = [STARTER_BUSINESS.id, 'business:neon-laundry'];
+const artworkIds = BUSINESS_CATALOG.map(business => business.id);
 const locales: readonly Locale[] = ['en', 'de'];
 let container: HTMLDivElement;
 let root: Root | undefined;
@@ -44,14 +44,16 @@ async function mount(businessId: string) {
   return image;
 }
 
-test('Dockside and Laundry use distinct references; later Businesses have no placeholders', () => {
+test('all four canonical Businesses have distinct approved storefronts', () => {
   for (const business of BUSINESS_CATALOG) {
-    expect(findBusinessArtwork(business.id) !== null).toBe(artworkIds.includes(business.id));
+    expect(findBusinessArtwork(business.id)).not.toBeNull();
   }
   expect(findBusinessArtwork('unknown')).toBeNull();
-  expect(findBusinessArtwork(STARTER_BUSINESS.id)).toMatchObject({ width: 564, height: 270 });
+  expect(findBusinessArtwork(STARTER_BUSINESS.id)).toMatchObject({ width: 728, height: 189 });
   expect(findBusinessArtwork('business:neon-laundry')).toMatchObject({ width: 732, height: 188 });
-  expect(findBusinessArtwork('business:neon-laundry')?.src).not.toBe(findBusinessArtwork(STARTER_BUSINESS.id)?.src);
+  expect(findBusinessArtwork('business:afterdark-customs')).toMatchObject({ width: 728, height: 177 });
+  expect(findBusinessArtwork('business:solara-nights')).toMatchObject({ width: 728, height: 177 });
+  expect(new Set(artworkIds.map(id => findBusinessArtwork(id)?.src)).size).toBe(4);
 });
 
 test.each(artworkIds)('%s stays hidden and decorative while its eager image loads', async id => {
@@ -118,3 +120,49 @@ test.each(locales)('Laundry keeps localized copy and purchase/upgrade actions af
   expect(upgrade).toHaveBeenCalledTimes(1);
   expect(JSON.stringify(state)).toBe(original);
 });
+
+// Artwork must never replace or disable a Business action, regardless of locale.
+test.each(BUSINESS_CATALOG.flatMap(definition => locales.map(locale => ({ definition, locale }))))(
+  '$definition.name keeps its purchase/upgrade actions after an image failure in $locale',
+  async ({ definition, locale }) => {
+    const initial = createInitialGameState();
+    const ownership = Object.fromEntries(BUSINESS_CATALOG
+      .filter(business => business.id !== definition.id)
+      .map(business => [business.id, { level: 20 }]));
+    const state: GameState = {
+      ...initial, economy: { cash: moneyFromMinorUnits('100000000') },
+      progression: { xp: getXpThresholdForLevel(20) },
+      city: { ...initial.city, ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] },
+      businesses: { ...initial.businesses, owned: ownership },
+    };
+    const original = JSON.stringify(state);
+    const purchase = vi.fn(), upgrade = vi.fn();
+    function card(game: GameState, paused = false) {
+      return <LocalizationProvider locale={locale}><BusinessCard definition={definition}
+        requirements={evaluateRequirements(game, definition.requirements)}
+        progress={selectBusinessProgress(game, definition.id)} owned={selectOwnsBusiness(game, definition.id)}
+        canPurchase={selectCanPurchaseBusiness(game, definition.id)} paused={paused}
+        onPurchase={purchase} onUpgrade={upgrade} /></LocalizationProvider>;
+    }
+    root = createRoot(container);
+    await act(() => root?.render(card(state)));
+    await act(() => { container.querySelector('img')?.dispatchEvent(new Event('error')); });
+    expect(container.querySelector('.business-artwork')).toBeNull();
+    expect(container.querySelector('h3')?.textContent).toBe(definition.name);
+    expect(container.querySelector('button')?.disabled).toBe(false);
+    await act(() => { container.querySelector('button')?.click(); });
+    expect(purchase).toHaveBeenCalledTimes(1);
+    expect(upgrade).not.toHaveBeenCalled();
+    const owned: GameState = { ...state, businesses: { ...state.businesses,
+      owned: { ...state.businesses.owned, [definition.id]: { level: 1 } } } };
+    await act(() => root?.render(card(owned)));
+    await act(() => { container.querySelector('button')?.click(); });
+    expect(upgrade).toHaveBeenCalledTimes(1);
+    await act(() => root?.render(card(owned, true)));
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    await act(() => root?.render(card({ ...owned, businesses: { ...owned.businesses,
+      owned: { ...owned.businesses.owned, [definition.id]: { level: 100 } } } })));
+    expect(container.querySelector('button')?.disabled).toBe(true);
+    expect(JSON.stringify(state)).toBe(original);
+  },
+);

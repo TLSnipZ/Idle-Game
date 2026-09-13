@@ -94,7 +94,7 @@ Phase 9B accessibility remain preserved contracts.
   `f559bb3486f5710bd82724763f7e6113c624a6bb`. Another 18 cases passed against that
   exact production artifact without injecting fix CSS; compiled JavaScript is
   byte-identical to the previous release. Full Vitest suite was not run.
-- **Dockside storefront reference: merged in PR #19; deployed and explicitly accepted live by the user.**
+- **Historical Dockside storefront reference: PR #19 deployed and live accepted; artwork superseded by the four-preview batch below.**
   User-authorized reintegration uses a storefront-only crop of the approved concept:
   564x270 WebP, 24,454 bytes, verified checksum. The bounded strip is isolated in
   `BusinessArtwork.css`; pending or failed images leave no empty placeholder.
@@ -127,10 +127,23 @@ Phase 9B accessibility remain preserved contracts.
   and blocked-image action checks. German 320px still has the same pre-existing
   10px document overflow; this pass does not claim to fix it.
   Consult PR #20's release-verification comment for final merge/Pages status.
-  The new Laundry artwork/card needs its own user visual acceptance before the next
-  Business. Source, checks and authority boundaries: [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
-- **Current sequence:** Neon Laundry release/live review → Afterdark Customs → Solara Nights,
-  then **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**.
+  The user subsequently approved the full four-business preview and authorized a
+  single batch below, superseding the prior sequential artwork gate. Source, checks and authority boundaries: [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md).
+- **Four approved preview storefronts: implemented on `art/four-approved-business-storefronts`; release/live review checkpoint follows.**
+  Explicit user request: use all four images from the same approved preview, replacing
+  existing artwork where needed. Dockside is replaced; Afterdark Customs and Solara
+  Nights are added; Neon Laundry already uses that exact preview and is preserved.
+  Only the asset lookup and three image files change in production. Every stylesheet,
+  the shared renderer, card controls, EN/DE text, HUD, spacing and gameplay remain
+  unchanged. All four decoded image files match their recorded checksums.
+  Fresh checked production build and 34 targeted tests passed. Full baseline:
+  2,094 passed / 64 failed; candidate: 2,112 passed / the same 64 failed, with no new
+  or removed failing cases. Existing failures remain separate work, not hidden.
+  See [BUSINESS_VISUAL_IDENTITY.md](BUSINESS_VISUAL_IDENTITY.md) and the integration
+  PR for exact crops, responsive checks and final merge/Pages release evidence.
+- **Current sequence:** four-preview artwork batch release/live review →
+  **Active Vehicle + Tier-1 Garage → Heat / Police 2.0**. The previous individual
+  Afterdark/club artwork order is superseded by this explicitly authorized batch.
 - Later separately scoped Active Vehicle architecture, controlled Tier 1 expansion
   (Kairo Senda / Namera Lilt), Garage comparison/usability and Tuning Foundation.
 - Crew / Territory / Event references and later asset batches remain separately
@@ -152,10 +165,10 @@ and the shared camera/lighting/showroom language.
 | Implemented | Solara City Branding | Canonical symbol/lockup/favicon and restrained shell accents; merged PR #10. |
 | Deployed / live review pending | Overview / City spacing | PR #18; checked build/deploy passed in run 34723960641; 22 candidate plus 18 production browser cases passed. See SECTION_SPACING.md. |
 | Live review pending | Operations Page Overhaul | Rebuild Jobs/Businesses/Upgrades/Automation as a compact isolated responsive system; desktop two-Business grid, mobile one-column. |
-| Live accepted | Dockside Business artwork | PR #19; deployed and explicitly approved as the compact Golden Reference. |
+| Live accepted layout / replacement artwork in current batch | Dockside Business artwork | Preserve PR #19 compact layout; use the new approved preview crop. |
 | Implemented / release and live review | Neon Laundry identity | PR #20 now includes own storefront, EN/DE copy and committed regression coverage. See PR for final release status. |
-| Next | Afterdark Customs artwork | Follow the accepted compact renderer after Laundry live review; no redesign of Operations. |
-| Later | Solara Nights artwork | Follow Afterdark; keep existing data and layout. |
+| Implemented in current batch | Afterdark Customs artwork | Approved preview workshop mapped to the unchanged compact renderer. |
+| Implemented in current batch | Solara Nights artwork | Approved preview nightclub mapped to the unchanged compact renderer. |
 | P1 | Long-section navigation | Preserve focus/back behavior and critical information; avoid nested accordions and new gameplay state. |
 | P2 | Purchase Intelligence | Show authoritative impact/payback estimates with explicit assumptions; no balance mutation. |
 | P2 | Rebirth Guidance | Eligibility progress, expected EP and Keep/Lose clarity; no reward/reset change. |
@@ -182,10 +195,10 @@ These surfaces were manually accepted before the later HUD sizing regression;
 see the current hotfix above. Ordinary global feedback belongs to Activity Center;
 critical recovery errors may still render outside it.
 
-**Dockside is accepted. Neon Laundry's complete artwork/copy package is in PR #20.**
-Confirm successful Pages release, then review its actual in-game card before starting
-Afterdark Customs. Keep the repaired Operations, HUD and section-spacing baseline.
-All work remains presentation-only and preserves Save v17 / CE1, GameState, economy,
-balance, gates, automation authority, RNG, localization and runtime behavior.
-Do not mistake the old text-only draft status for the current package, or a successful
-build for the user's visual acceptance. See PR #20 for the final release checkpoint.
+**Current task: the user's approved four-storefront preview, implemented as one batch.**
+Dockside's prior crop is replaced, Laundry's matching preview crop is retained, and
+Afterdark Customs plus Solara Nights are added. No new artwork generation or UI
+redesign. Check the current integration PR for merge/Pages verification, then review
+all four actual in-game cards. Active Vehicle + Tier-1 Garage is the next separately
+authorized phase; do not start it automatically. Preserve Save v17 / CE1, GameState,
+economy, balance, gates, automation authority, RNG, localization and runtime behavior.
