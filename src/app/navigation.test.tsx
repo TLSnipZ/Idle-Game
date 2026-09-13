@@ -50,7 +50,7 @@ function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = 
     runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
     buyAutomation: vi.fn(), changeAutoUpgraderTarget: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), chooseActiveVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
     recruitCrew: vi.fn(), assignCrew: vi.fn(), unassignCrew: vi.fn(), chooseEvent: vi.fn(), buySkill: vi.fn(),
-    rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: {
+    rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: { ...rebirthRuntime(state).game,
       exportCode: () => exportSaveCode(state, 1000), importCode: vi.fn(() => ({ ok: true as const })),
     }, ...overrides };
 }

@@ -55,7 +55,7 @@ describe('POST 1B system compositions', () => {
       expect(panel.textContent).not.toContain('Purchase price');
       if (level === 100) {
         expect(panel.textContent).toContain('MAX LEVEL');
-        expect(panel.textContent).not.toContain('Upgrade');
+        expect(panel.querySelector('.business-stat-grid > div:last-child strong')?.textContent).toBe('MAX');
         expect(button?.disabled).toBe(true);
       } else {
         expect(panel.textContent).toContain('Upgrade');
