@@ -30,7 +30,7 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce
 the MANHUNT decoy cost through exact shared modifiers, down to **$810**.
-Save **v20 / CE1 unchanged**. See [Heat support](docs/HEAT_SUPPORT.md). CI pending.
+Save **v20 / CE1 unchanged**. See [Heat support](docs/HEAT_SUPPORT.md). Verification passed; see [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33).
 The retained Heat / Police 2.0 **I–V sequence is complete** at this scope.
 Further post-roadmap expansions require their own scope. Older records below are historical.
 

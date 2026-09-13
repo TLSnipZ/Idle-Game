@@ -55,7 +55,14 @@ affordability, scoped modifier isolation, saved round trips, Rebirth/offline and
 durable runtime changes. Add 15 Chromium support flows (3 locales × 5 widths)
 to the existing 330. Browser support flows freeze elapsed time to isolate exact
 spending from Business production; other browser/runtime/offline checks retain
-their existing clock coverage. CI evidence pending.
+their existing clock coverage. Verified in [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33):
+[run 34783614823](https://github.com/TLSnipZ/Idle-Game/actions/runs/34783614823)
+on code `fb0c5ade7e4ed52190b6cb088fedd4ffff5fe6fc` passed strict build,
+**2,441/2,441 tests** (28 added; zero failures/skips), **345 Chromium cases**
+(45 Garage, 225 sections, 15 each risk/police/district/MANHUNT/support), and
+whitespace checks. Evidence artifact: `10326270313`.
+This follow-up changes documentation only. Merge/deployment evidence is recorded
+in the PR; manual live acceptance remains separate.
 
 ## Next handoff
 
