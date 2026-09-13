@@ -50,7 +50,7 @@ export function NextObjective({ state, onNavigate }: {
             <p id="objective-count-label">{countLabel(step.count.label, locale)}: <strong>{formatInteger(step.count.current)} / {formatInteger(step.count.required)}</strong></p>
             <progress aria-labelledby="objective-count-label" max={100}
               value={guidancePercent(step.xp?.current ?? step.count.current, step.xp?.required ?? step.count.required)}
-              aria-valuetext={step.xp ? text(`${formatInteger(step.xp.current)} / ${formatInteger(step.xp.required)} total XP for Player Level ${step.count.required}`, `${formatInteger(step.xp.current)} / ${formatInteger(step.xp.required)} {text('XP')} gesamt für Spielerlevel ${step.count.required}`) : `${step.count.current} / ${step.count.required}`} />
+              aria-valuetext={step.xp ? text(`${formatInteger(step.xp.current)} / ${formatInteger(step.xp.required)} total XP for Player Level ${step.count.required}`, `${formatInteger(step.xp.current)} / ${formatInteger(step.xp.required)} XP gesamt für Spielerlevel ${step.count.required}`) : `${step.count.current} / ${step.count.required}`} />
           </div>}
           {step.cash && <div>
             <p id="objective-cash-label">{view.cashLabel}: <strong>{view.cashText}</strong></p>
