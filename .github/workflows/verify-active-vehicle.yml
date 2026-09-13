@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOLARA_BROWSER_FIXTURES: ${{ runner.temp }}/solara-browser-fixtures.json
+      SOLARA_BROWSER_FIXTURES: /tmp/solara-browser-fixtures.json
     steps:
       - uses: actions/checkout@v7
         with:
