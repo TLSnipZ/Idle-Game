@@ -79,6 +79,36 @@ try {
         if (await page.locator('.objective-expand').getAttribute('aria-expanded') === 'false') await page.locator('.objective-expand').click();
         await assertVillagerOnly(page);
       }
+
+      if (section === 1) {
+        assert.equal(await page.locator('.delivery-button').evaluate(button =>
+          Boolean(button.compareDocumentPosition(document.querySelector('.district-heat')) & Node.DOCUMENT_POSITION_FOLLOWING)), true, 'Primary job precedes district management');
+        assert.ok(await page.locator('.delivery-button').isVisible());
+        if (stage === 1) {
+          const summary = page.locator('.activity-news summary');
+          if (await summary.count()) {
+            await summary.focus();
+            await page.keyboard.press('Enter');
+            assert.equal(await summary.locator('..').getAttribute('open'), '');
+            await page.waitForTimeout(550);
+            assert.equal(await summary.evaluate(element => document.activeElement === element), true, 'Ticks preserve disclosure focus');
+            assert.equal(await summary.locator('..').getAttribute('open'), '', 'Ticks preserve expanded feedback');
+            await page.keyboard.press('Enter');
+          }
+          if (await page.locator('.activity-event').count()) {
+            assert.equal(await page.locator('.activity-center-items > :first-child').getAttribute('class'), 'activity-item activity-event');
+          }
+          await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
+          const zoom = await page.evaluate(() => ({
+            overflow: document.documentElement.scrollWidth - innerWidth,
+            clipped: [...document.querySelectorAll('.operations-tabs button, .global-status > div')].some(el => el.scrollWidth > el.clientWidth + 1),
+          }));
+          assert.ok(zoom.overflow <= 1, 'Operations fits with 125% text scaling: ' + JSON.stringify({ locale, width, zoom }));
+          assert.equal(zoom.clipped, false, 'HUD and operation labels wrap at text zoom');
+          await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
+        }
+      }
+
       const brokenAutomationDescriptions = await page.locator('.automation-card button[aria-describedby]').evaluateAll(buttons =>
         buttons.flatMap(button => button.getAttribute('aria-describedby').split(/\s+/).filter(id => !document.getElementById(id)?.textContent?.trim())));
       assert.deepEqual(brokenAutomationDescriptions, [], 'Automation actions reference existing explanatory text');
@@ -118,6 +148,40 @@ try {
     assert.deepEqual(errors, []);
     await context.close();
   }
+
+
+  // Saving errors stay visible while the ordinary delivery remains live; retry clears the warning.
+  const storageContext = await browser.newContext({ viewport: { width: 320, height: 900 } });
+  const storagePage = await storageContext.newPage();
+  await storagePage.goto('http://127.0.0.1:4174');
+  await navigation(storagePage).nth(1).click();
+  await storagePage.locator('.delivery-button').click();
+  const storedBeforeFailure = await saved(storagePage);
+  const cashBeforeFailure = await storagePage.locator('.hud-cash dd').textContent();
+  await storagePage.evaluate(() => {
+    const write = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(key, value) {
+      if (key === 'crime-empire:save' && document.documentElement.dataset.failSave === 'true') throw new Error('Simulated storage failure');
+      return write.call(this, key, value);
+    };
+    document.documentElement.dataset.failSave = 'true';
+  });
+  await storagePage.locator('.delivery-button').click();
+  assert.notEqual(await storagePage.locator('.hud-cash dd').textContent(), cashBeforeFailure, 'Ordinary delivery remains live');
+  assert.deepEqual(await saved(storagePage), storedBeforeFailure, 'Failed write leaves stored progress intact');
+  assert.ok(await storagePage.locator('.save-status-warning summary').isVisible());
+  assert.ok(await storagePage.locator('.runtime-error').isVisible());
+  await storagePage.locator('.save-status summary').click();
+  assert.match(await storagePage.locator('.save-status-details').textContent(), /Saving failed/);
+  assert.ok(await storagePage.locator('.save-status-details').evaluate(el => {
+    const box = el.getBoundingClientRect(); return box.left >= 0 && box.right <= innerWidth;
+  }), 'Save explanation fits mobile width');
+  await storagePage.evaluate(() => { document.documentElement.dataset.failSave = 'false'; });
+  await storagePage.locator('.delivery-button').click();
+  assert.equal(await storagePage.locator('.save-status-warning').count(), 0);
+  assert.equal(await storagePage.locator('.save-status').getAttribute('open'), '', 'Recovery preserves disclosure state');
+  assert.match(await storagePage.locator('.save-status-details').textContent(), /last save result/);
+  await storageContext.close();
 
   // Exercise actual language switching after runtime ticks and while confirmations are open.
   const context = await browser.newContext();
