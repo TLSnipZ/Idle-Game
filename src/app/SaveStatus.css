@@ -5,3 +5,8 @@
 .save-status-details { position: absolute; z-index: 10; right: 0; width: min(26rem, calc(100vw - 3rem)); box-sizing: border-box; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-surface); box-shadow: var(--shadow-standard); line-height: 1.5; overflow-wrap: anywhere; }
 .save-status-details p { margin: 0 0 .6rem; }
 .save-status-details p:last-child { margin-bottom: 0; }
+@media (max-width: 740px) {
+  .app-header { position: relative; }
+  .save-status { position: static; }
+  .save-status-details { left: 1rem; right: 1rem; top: 100%; width: auto; }
+}
