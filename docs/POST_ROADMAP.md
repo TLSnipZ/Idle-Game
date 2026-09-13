@@ -2,16 +2,18 @@
 
 This is the current post-roadmap status and priority source.
 
-## Current priority — P1 UI regression restoration
+## Current priority — Tier-1 Garage (next)
 
-User explicitly moved this ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
+The user moved the whole-game audit and regression repairs ahead of new content. See [GAME_AUDIT.md](GAME_AUDIT.md)
 for implementation, defects, verification and overhaul priorities.
 PR #24 implements Villager and the audit fixes. Verification run 34759819504 passed:
 2,190 tests passing, 62 inherited UI failures (down from 64), no new regressions,
 and 255 production Chromium section/Garage cases plus cross-feature flows.
-Villager overkill is merged and deployed in PR #25. PR #26 restores inherited UI
-coverage and replaces the old failure allowance with a strict green-suite gate.
-Sequence: accept UI regression restoration → Tier-1 Garage
+Villager overkill is merged and deployed in PR #25. PR #26 completes the P1 UI
+regression restoration: **2,252 / 2,252 tests pass, zero failures/skips**, and all
+255 Chromium cases pass. CI now requires a fully passing suite. Verification:
+[run 34764804304](https://github.com/TLSnipZ/Idle-Game/actions/runs/34764804304).
+Next separately scoped phase: Tier-1 Garage
 (Kairo Senda / Namera Lilt) → Heat / Police 2.0.
 
 ## Active Vehicle implementation — merged PR #23
@@ -20,7 +22,7 @@ Active Vehicle Foundation and Save v18 are implemented in PR #23.
 Its verification and release evidence are recorded below and in the PR. Manual live
 acceptance remains separate. PR #22 was a design-only checkpoint.
 The four storefronts were merged in PR #21 and deployed successfully. PR #23 supplies the actual selection/migration/UI patch and CI evidence.
-The current audit and its test-repair follow-up now precede Tier-1 Garage, then Heat / Police 2.0.
+The audit and P1 test-repair acceptance are complete; Tier-1 Garage is next, then Heat / Police 2.0.
 Verification: run [34757750344](https://github.com/TLSnipZ/Idle-Game/actions/runs/34757750344)
 passed typecheck/build, regression comparison (2,159 passed / the same 64 existing
 failures; all 47 new tests passed) and 20 EN/DE production Chromium cases. No baseline
