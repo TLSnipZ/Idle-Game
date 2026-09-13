@@ -79,6 +79,7 @@ describe('POST 3C acquisition helpers', () => {
     expect(root.textContent).toContain('Required —');
     expect(root.textContent).toContain('Meet the requirements above to unlock this Business.');
     expect(root.textContent).not.toContain('Build your Cash balance');
+    expect(root.querySelector('button')?.querySelector('[aria-hidden]')).toBeNull();
   });
   it('eligible Laundry uses Cash copy, then removes it when affordable or owned', () => {
     const d = BUSINESS_CATALOG[1]!, s = createInitialGameState();
