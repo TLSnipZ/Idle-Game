@@ -83,8 +83,9 @@ test.each(artworkIds)('%s never reveals an empty image placeholder', async id =>
 });
 
 test.each(locales)('Laundry keeps localized copy and purchase/upgrade actions after artwork failure in %s', async locale => {
-  const definition = BUSINESS_CATALOG.find(business => business.id === 'business:neon-laundry');
-  if (!definition) throw new Error('Canonical Laundry definition missing');
+  const laundry = BUSINESS_CATALOG.find(business => business.id === 'business:neon-laundry');
+  if (!laundry) throw new Error('Canonical Laundry definition missing');
+  const definition = laundry;
   const initial = createInitialGameState();
   const state: GameState = { ...initial,
     economy: { cash: moneyFromMinorUnits('100000000') },
