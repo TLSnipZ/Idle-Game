@@ -5,7 +5,14 @@
 Implemented on `feat/heat-risk-reward`: optional +50% Cash / +5 Heat delivery,
 available below HOT, exact shared rewards and all three languages. Save v19 / CE1.
 See [HEAT_POLICE_2.md](HEAT_POLICE_2.md) for balance, contracts and acceptance.
-Verification and deployment are pending. PR #28 completed and deployed the Garage.
+Verified in [PR #29](https://github.com/TLSnipZ/Idle-Game/pull/29):
+[run 34775975009](https://github.com/TLSnipZ/Idle-Game/actions/runs/34775975009)
+on code `577881c63554f43bb7a6603fddc4f6646b4c707e` passed strict build,
+**2,315/2,315 tests** (32 added; zero failures/skips), **45 Garage + 225 all-section +
+15 risk delivery Chromium cases**, and whitespace checks. Artifact: `10324165450`.
+This follow-up changes documentation only. Merge and deployment evidence are
+recorded in the PR; manual live acceptance remains separate.
+PR #28 completed and deployed the Garage.
 Next separate phase: II Police Pressure; not started.
 
 The following handoffs are historical.

@@ -64,8 +64,15 @@ as before and keeps lifetime statistics, skills and vehicles.
 Required: strict build, complete suite, exact arithmetic/boundary/overflow tests,
 runtime reconciliation/save-failure tests, v19 and CE1 round trips, localized UI,
 and 15 production Chromium risk flows (3 languages × 5 widths) in addition to the
-existing 45 Garage + 225 all-section checks. Verification and release evidence
-are recorded in the PR; pending until the run completes.
+existing 45 Garage + 225 all-section checks.
+
+Verified in [PR #29](https://github.com/TLSnipZ/Idle-Game/pull/29):
+[run 34775975009](https://github.com/TLSnipZ/Idle-Game/actions/runs/34775975009)
+on code `577881c63554f43bb7a6603fddc4f6646b4c707e` passed strict build,
+**2,315/2,315 tests** (32 added; zero failures/skips), **45 Garage + 225 all-section +
+15 risk delivery Chromium cases**, and whitespace checks. Artifact: `10324165450`.
+This follow-up changes documentation only. Merge and deployment evidence are
+recorded in the PR; manual live acceptance remains separate.
 
 Next separate slice: **II — Police Pressure**. Define consequences and player
 counterplay before adding persistent police state; do not begin it in this release.
