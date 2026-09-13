@@ -1,3 +1,4 @@
+import type { GameState } from '../game/game-state';
 import { describe, expect, it } from 'vitest';
 import { createInitialGameState } from '../game/game-state';
 import { moneyFromMinorUnits } from '../features/economy';
@@ -7,7 +8,7 @@ import { assignCrewMember, unassignCrewSlot } from '../game/crew-commands';
 import { upgradeBusiness } from '../game/upgrade-business';
 import { setActiveDistrict } from '../game/set-active-district';
 
-function state(level = 10) {
+function state(level = 10): GameState {
   const s = createInitialGameState();
   return { ...s, economy: { cash: moneyFromMinorUnits('100000000') },
     city: { ...s.city, heat: 100, ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] },

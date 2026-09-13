@@ -1,5 +1,5 @@
 import { HEAT_SUPPORT_RULES, DECOY_COST } from '../features/heat';
-import { getBusinessLevel } from '../features/businesses';
+import { findBusiness, getBusinessLevel } from '../features/businesses';
 import { activeCrewMembers } from '../features/crew';
 import { assertGarageState } from '../features/vehicles';
 import { getActiveDistrictId, requireCityState } from '../features/territories';
@@ -13,8 +13,10 @@ export function selectHeatSupport(state: GameState) {
   const crew = activeCrewMembers(state.crew);
   return HEAT_SUPPORT_RULES.map(rule => {
     const sourceId = rule.modifier.sourceId;
+    const business = rule.kind === 'local-business' ? findBusiness(sourceId) : undefined;
+    if (rule.kind === 'local-business' && !business) throw new RangeError('Unknown support Business');
     const active = rule.kind === 'local-business'
-      ? districtId === rule.districtId && (getBusinessLevel(state.businesses, sourceId) ?? 0) >= rule.minimumLevel
+      ? districtId === rule.districtId && (business ? getBusinessLevel(state.businesses, business.id) ?? 0 : 0) >= rule.minimumLevel
       : rule.kind === 'assigned-crew' ? crew.some(member => member.id === sourceId)
         : state.garage.activeVehicleId === sourceId;
     return { rule, active };
