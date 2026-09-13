@@ -1,5 +1,9 @@
 # Base Game balance
 
+## KX-R tuning pilot
+
+Fleet gearing: $15,000 for +5% Business Production. Courier ECU: $10,000 for +8% manual Job Cash. One fitted setup, active-car only, permanent through Rebirth. Base vehicle effects remain. Exact assumptions and marginal payback: [GARAGE_TUNING.md](GARAGE_TUNING.md).
+
 ## Current phase — Heat V: Support network
 
 Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce

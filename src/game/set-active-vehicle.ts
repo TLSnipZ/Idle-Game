@@ -1,4 +1,4 @@
-import { assertGarageState, findVehicle } from '../features/vehicles';
+import { activeTuning, assertGarageState, findVehicle } from '../features/vehicles';
 import type { GameState } from './game-state';
 
 export type ActiveVehicleResult = { readonly ok: true; readonly state: GameState }
@@ -17,6 +17,7 @@ export function setActiveVehicle(state: GameState, id: unknown): ActiveVehicleRe
 
 /** Modifier identity alone is not a rate change: equal bonuses keep fractional runtime time. */
 export function activeVehicleEffectChanged(previous: GameState, next: GameState): boolean {
+  if (activeTuning(previous.garage)?.id !== activeTuning(next.garage)?.id) return true;
   if (previous.garage.activeVehicleId === next.garage.activeVehicleId) return false;
   const before = findVehicle(previous.garage.activeVehicleId)?.modifier;
   const after = findVehicle(next.garage.activeVehicleId)?.modifier;

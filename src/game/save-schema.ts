@@ -5,7 +5,7 @@ import { createInitialCrewState, isCrewState } from '../features/crew';
 import { isLegacyCityState, isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
 import { isSkillRanks } from '../features/skills';
 import { isPermanentValue } from '../features/permanent-progression';
-import { findVehicle } from '../features/vehicles';
+import { isVehicleBuilds, cloneVehicleBuilds, findVehicle } from '../features/vehicles';
 import type { VehicleId } from '../features/vehicles';
 import { isXp } from '../features/progression';
 import { createInitialAutomationState, isAutomationState } from '../features/automation';
@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 20;
+export const CURRENT_SAVE_VERSION = 21;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -107,7 +107,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
   const ownedVehicleIds: VehicleId[] = [];
   if (version >= 6) {
-    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds', ...(version >= 18 ? ['activeVehicleId'] : [])]) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
+    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds', ...(version >= 18 ? ['activeVehicleId'] : []), ...(version >= 21 && Object.hasOwn(value.garage, 'builds') ? ['builds'] : [])]) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
     for (const id of value.garage.ownedVehicleIds) {
       const vehicleId = version < 16
         ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
@@ -129,6 +129,9 @@ function validateState(value: unknown, version: number): GameState | null {
       activeVehicleId = vehicle.id;
     }
   }
+  const builds = record(value.garage) && Object.hasOwn(value.garage, 'builds') ? value.garage.builds : undefined;
+  if (record(value.garage) && Object.hasOwn(value.garage, 'builds')
+    && !isVehicleBuilds(builds, ownedVehicleIds)) return null;
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
   if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : []), ...(version >= 13 ? ['unlockedAchievementIds'] : []), ...(version >= 14 ? ['statistics'] : [])])
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
@@ -149,7 +152,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId, ...(builds !== undefined && isVehicleBuilds(builds, ownedVehicleIds) ? { builds: cloneVehicleBuilds(builds) } : {}) }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -295,6 +298,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 18) migrated = validateState(migrated, 18);
   // v19 -> v20: retain old Heat/remainder at Waterfront; implicit Neon Mile starts cold.
   if (value.version <= 19) migrated = validateState(migrated, 19);
+  // v20 -> v21: stock builds remain implicit; no purchase, reward or timestamp changes.
+  if (value.version <= 20) migrated = validateState(migrated, 20);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

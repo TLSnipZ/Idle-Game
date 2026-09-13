@@ -90,7 +90,7 @@ describe('local MANHUNT rules', () => {
   });
   it('v20 and CE1 retain pursuit through existing district Heat without extra fields', () => {
     const s = hunted(100), saved = serializeSave(s, 1000), code = exportSaveCode(s, 1000);
-    expect(CURRENT_SAVE_VERSION).toBe(20);
+    expect(CURRENT_SAVE_VERSION).toBe(21);
     if (!saved.ok || !code.ok) throw Error('fixture');
     const loaded = parseSave(saved.serialized);
     expect(validateSaveCode(code.code)).toEqual(loaded);

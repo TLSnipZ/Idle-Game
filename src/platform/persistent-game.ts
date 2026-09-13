@@ -1,4 +1,5 @@
 import { deployDecoy } from '../game/deploy-decoy';
+import { purchaseTuning, selectTuning } from '../game/vehicle-tuning';
 import { setActiveDistrict } from '../game/set-active-district';
 import { getActiveDistrictId } from '../features/territories';
 import { setActiveVehicle } from '../game/set-active-vehicle';
@@ -134,6 +135,15 @@ export function createPersistentGame(
     return completed;
   }
   /** Preflight makes a repeated selection an IO-free no-op, before any reconciliation. */
+  function configureTuning(id: unknown, purchase: boolean) {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
+      || view.persistence.kind === 'offline-error') return;
+    const state = runtime.getSnapshot().result.state;
+    const command = purchase ? purchaseTuning : selectTuning;
+    const prepared = command(state, id);
+    if ((!prepared.ok && prepared.error !== 'insufficient-funds') || (prepared.ok && prepared.state === state)) return prepared;
+    return execute(current => command(current, id));
+  }
   function selectActiveVehicle(id: unknown) {
     if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
       || view.persistence.kind === 'offline-error') return;
@@ -227,5 +237,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { deployManhuntDecoy, selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { configureTuning, deployManhuntDecoy, selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

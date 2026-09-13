@@ -18,6 +18,6 @@ export function purchaseVehicle(state: GameState, id: unknown): PurchaseVehicleR
   const payment = spendCash(state.economy, vehicle.purchaseCost);
   if (!payment.ok) return { ok: false, state, error: payment.error };
   return { ok: true, state: { ...state, economy: payment.state,
-    garage: { ownedVehicleIds: [...state.garage.ownedVehicleIds, vehicle.id],
+    garage: { ...state.garage, ownedVehicleIds: [...state.garage.ownedVehicleIds, vehicle.id],
       activeVehicleId: state.garage.activeVehicleId ?? vehicle.id } } };
 }

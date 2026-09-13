@@ -147,10 +147,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(20);
+    expect(CURRENT_SAVE_VERSION).toBe(21);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 20, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 21, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);
