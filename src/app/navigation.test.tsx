@@ -47,7 +47,7 @@ function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = 
   return { setPresentationLocale: vi.fn(), replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
     offline: null, feedback: { sequence: 0, message: '' }, achievementEvent: undefined, cityEvent: undefined,
     automationEvent: undefined, levelEvent: undefined, dismissOffline: vi.fn(),
-    runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
+    runRiskyDelivery: vi.fn(), runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
     buyAutomation: vi.fn(), changeAutoUpgraderTarget: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), chooseActiveVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
     recruitCrew: vi.fn(), assignCrew: vi.fn(), unassignCrew: vi.fn(), chooseEvent: vi.fn(), buySkill: vi.fn(),
     rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: { ...rebirthRuntime(state).game,

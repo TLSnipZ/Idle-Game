@@ -47,7 +47,7 @@ Open **Operations** to make your first deliveries and acquire **Dockside Detail*
 | **Business empire** | Acquire four distinct Businesses, develop each through Level 100, and grow their combined passive production. Progression gates make later acquisitions depend on developing the earlier operation. |
 | **Equipment & automation** | Buy production and delivery upgrades, hire a **Delivery Dispatcher**, and enable a **Business Auto-Upgrader** for one selected owned Business. Automatic upgrade spending is opt-in. |
 | **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
-| **Heat & City Events** | Manage rising Heat and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
+| **Heat & City Events** | Choose an optional +50% Cash / +5 Heat delivery below HOT, manage rising Heat and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
 | **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
 | **Garage** | Choose **Kairo KX-R**, **Kairo Senda** or **Namera Lilt** for production, manual delivery Cash or faster Heat cooling. Only the active car supplies its effect. |
 | **Achievements & statistics** | Unlock **six permanent achievements** and track **eight lifetime statistics** across runs. These record progress without adding gameplay bonuses. |
@@ -84,7 +84,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
 | **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
-| **A deeper city** | Heat/Police expansion, more Business depth, crew and event development, and richer territory progression. |
+| **A deeper city** | Heat I Risk & Reward is implemented; Police Pressure, more Business depth, crew and event development, and richer territory progression. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
 

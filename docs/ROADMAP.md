@@ -1,5 +1,23 @@
 # Roadmap
 
+## Current phase — Heat / Police 2.0 I: Risk & Reward
+
+Implemented on `feat/heat-risk-reward`: optional +50% Cash / +5 Heat delivery,
+available below HOT, exact shared rewards and all three languages. Save v19 / CE1.
+See [HEAT_POLICE_2.md](HEAT_POLICE_2.md) for balance, contracts and acceptance.
+Verified in [PR #29](https://github.com/TLSnipZ/Idle-Game/pull/29):
+[run 34775975009](https://github.com/TLSnipZ/Idle-Game/actions/runs/34775975009)
+on code `577881c63554f43bb7a6603fddc4f6646b4c707e` passed strict build,
+**2,315/2,315 tests** (32 added; zero failures/skips), **45 Garage + 225 all-section +
+15 risk delivery Chromium cases**, and whitespace checks. Artifact: `10324165450`.
+This follow-up changes documentation only. Merge and deployment evidence are
+recorded in the PR; manual live acceptance remains separate.
+PR #28 completed and deployed the Garage.
+Next separate phase: II Police Pressure; not started.
+
+The following handoffs are historical.
+
+
 ## Current artwork handoff
 
 Tier-1 artwork is implemented and verified in [PR #28](https://github.com/TLSnipZ/Idle-Game/pull/28). [Run 34774339210](https://github.com/TLSnipZ/Idle-Game/actions/runs/34774339210) verified code commit `298ef28287bfe6f090736698f06861c7b0adb35a`: strict build, 2,283/2,283 tests (zero failures/skips), 45 Garage and 225 whole-game Chromium cases, and whitespace checks passed. Evidence artifact: `10322962950`. This documentation-only follow-up does not change the verified runtime or tests. The PR records merge/deployment separately. Heat / Police 2.0 is the next separate phase and has not started.

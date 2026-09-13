@@ -20,13 +20,13 @@ import type { AutomationSummary } from '../game/simulate-automation';
 import type { PurchaseUpgradeResult } from '../game/purchase-upgrade';
 import type { UpgradeBusinessResult } from '../game/upgrade-business';
 import type { GameState } from '../game/game-state';
-import type { StarterJobResult } from '../game/perform-starter-job';
+import type { RiskyDeliveryResult, StarterJobResult } from '../game/perform-starter-job';
 import type { PurchaseBusinessResult } from '../game/purchase-business';
 import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = RiskyDeliveryResult | ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state' | 'persistence-failure';
 
