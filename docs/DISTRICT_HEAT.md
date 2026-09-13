@@ -40,7 +40,13 @@ Behavioral tests cover travel, events, cooling, rewards, Dispatcher, capped offl
 Auto-Upgrader, Rebirth, v19 migration, malformed saves and failed durable writes.
 The Chromium audit adds 15 district flows across three locales and five widths,
 including keyboard job actions, exact payouts, travel, reload and overflow checks.
-Build/full-suite/browser evidence will be recorded after CI completes.
+Verified in [PR #31](https://github.com/TLSnipZ/Idle-Game/pull/31):
+[run 34780604928](https://github.com/TLSnipZ/Idle-Game/actions/runs/34780604928)
+on code `91749a14e3bf7a00f95abf388f70d371bece984e` passed strict build,
+**2,384/2,384 tests** (30 added, zero failures/skips), **45 Garage + 225 section +
+15 risk + 15 police + 15 district Chromium cases**, and whitespace checks.
+Evidence artifact: `10325411638`. This final follow-up changes documentation only.
+Merge/deployment evidence is recorded in the PR; manual live acceptance remains separate.
 
 ## Next separate phase
 
