@@ -15,6 +15,7 @@ export function HeatPanel({ state, paused, onLayLow }: {
   return <article className={`panel heat-panel heat-${view.tier.id}`} aria-labelledby="heat-heading">
     <div className="panel-heading"><h3 id="heat-heading">{text('HEAT')}</h3>
       <span className="ownership-badge">{view.tier.label}</span></div>
+    <p>{text('Local Heat', 'Lokales Heat')} · {text(view.districtName)}</p>
     <div className="heat-readout"><strong>{view.heat}</strong><span> / {view.maximum} — {view.tier.label}</span></div>
     <div className="heat-details">
     <progress aria-label={text(`Current Heat: ${view.heat} of ${view.maximum}, ${view.tier.label}`, `Aktuelles Heat: ${view.heat} von ${view.maximum}, ${view.tier.label}`)} max={view.maximum} value={view.heat} />

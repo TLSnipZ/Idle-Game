@@ -2,7 +2,7 @@ import { createInitialStatistics, isStatisticsState } from '../features/statisti
 import { isAchievementIds } from '../features/achievements';
 import { createInitialEventState, isEventState } from '../features/events';
 import { createInitialCrewState, isCrewState } from '../features/crew';
-import { isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
+import { isLegacyCityState, isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
 import { isSkillRanks } from '../features/skills';
 import { isPermanentValue } from '../features/permanent-progression';
 import { findVehicle } from '../features/vehicles';
@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 19;
+export const CURRENT_SAVE_VERSION = 20;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -143,12 +143,13 @@ function validateState(value: unknown, version: number): GameState | null {
     if (!isTerritoryOwnership(city)) return null;
     city = { ...city, heat: 0, heatDecayElapsedMs: 0 };
   }
+  if (!(version < 20 ? isLegacyCityState(city) : isCityState(city))) return null;
   if (!isCityState(city)) return null;
   const crew = version >= 11 ? value.crew : createInitialCrewState();
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -292,6 +293,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 17) migrated = migrateV17ToV18(migrated);
   // v18 has the same shape but a frozen one-car identity set. No rewards or timing changes.
   if (value.version <= 18) migrated = validateState(migrated, 18);
+  // v19 -> v20: retain old Heat/remainder at Waterfront; implicit Neon Mile starts cold.
+  if (value.version <= 19) migrated = validateState(migrated, 19);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

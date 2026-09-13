@@ -1,6 +1,6 @@
 import { collectCrewModifiers } from '../features/crew';
 import { DISCREET_DELIVERY_BONUS_BASIS_POINTS, getPolicePressure, collectHeatModifiers } from '../features/heat';
-import { collectTerritoryModifiers } from '../features/territories';
+import { WATERFRONT, getDistrictHeat, collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
 import { assertGarageState, findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
@@ -11,7 +11,7 @@ import type { Modifier } from './modifiers';
 import type { GameState } from './game-state';
 
 /** The only source collector. Future implemented sources append here. */
-export function collectModifiers(state: GameState): readonly Modifier[] {
+export function collectModifiers(state: GameState, context: 'manual' | 'dispatcher' = 'manual'): readonly Modifier[] {
   if (!Array.isArray(state.upgrades.purchasedIds)) throw new RangeError('Invalid authoritative upgrade ownership');
   const seen = new Set<string>();
   const upgrades = state.upgrades.purchasedIds.map(id => {
@@ -23,7 +23,7 @@ export function collectModifiers(state: GameState): readonly Modifier[] {
   assertGarageState(state.garage);
   const activeVehicle = findVehicle(state.garage.activeVehicleId);
   const vehicles = activeVehicle ? [activeVehicle.modifier] : [];
-  return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
+  return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(context === 'dispatcher' ? getDistrictHeat(state.city, WATERFRONT.id) : state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
   const business = findBusiness(id);
@@ -58,6 +58,6 @@ export function evaluateDiscreetJobReward(state: GameState) {
   }]);
 }
 function evaluateDeliveryReward(state: GameState, context: 'manual' | 'dispatcher', extra: readonly Modifier[]) {
-  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, [...collectModifiers(state), ...extra]);
+  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, [...collectModifiers(state, context), ...extra]);
   return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), effective: evaluated.effective, base: evaluated.base, applied: evaluated.applied } : evaluated;
 }

@@ -1,5 +1,12 @@
 # Post-roadmap priorities
 
+## Current phase — Heat III: District Heat
+
+Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
+local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
+See [District Heat](DISTRICT_HEAT.md) for rules and compatibility. CI verification pending.
+Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
+
 ## Current phase — II Police Pressure
 
 Implemented on `feat/police-pressure`: WATCHED reduces risk premium to +25%;

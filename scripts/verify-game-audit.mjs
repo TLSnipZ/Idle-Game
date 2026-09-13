@@ -113,7 +113,7 @@ try {
     assert.equal(await trigger.evaluate(element => element === document.activeElement), true);
     await page.reload();
     assert.equal(await page.locator('html').getAttribute('lang'), locale === 'villager' ? 'en-x-villager' : locale);
-    assert.equal((await saved(page)).version, 19);
+    assert.equal((await saved(page)).version, 20);
     assert.deepEqual(errors, []);
     await context.close();
   }
@@ -312,9 +312,63 @@ try {
     await context.close();
   }
 
+
+  // District Heat: real travel, local jobs, preserved parked Heat and durable reload.
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (sessionStorage.getItem('district-audit')) return;
+      fixture.savedAt = Date.now();
+      fixture.state.city = { heat: 80, heatDecayElapsedMs: 0,
+        ownedTerritoryIds: ['territory:waterfront', 'territory:neon-mile'] };
+      fixture.state.economy.cash = '100000';
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('district-audit', 'true');
+    }, { fixture: fixtures[0], locale });
+    await page.goto('http://127.0.0.1:4174');
+    await navigation(page).nth(1).click();
+    const district = page.locator('#active-district');
+    await district.selectOption('territory:neon-mile');
+    let current = (await saved(page)).state;
+    assert.equal(current.city.heat, 0);
+    assert.equal(current.city.districts.parked.heat, 80);
+    await page.locator('.risky-delivery-button').focus();
+    await page.keyboard.press('Enter');
+    current = (await saved(page)).state;
+    assert.equal(current.city.heat, 5);
+    assert.equal(current.economy.cash, '104125');
+    await page.locator('.discreet-delivery-button').click();
+    current = (await saved(page)).state;
+    assert.equal(current.city.heat, 3);
+    assert.equal(current.city.districts.parked.heat, 80);
+    assert.equal(current.economy.cash, '105500');
+    assert.equal(current.progression.xp, 10);
+    await district.selectOption('territory:waterfront');
+    await page.locator('.delivery-button').click();
+    current = (await saved(page)).state;
+    assert.equal(current.economy.cash, '107562');
+    assert.equal(current.city.heat, 81);
+    assert.equal(current.city.districts.parked.heat, 3);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({ path: 'browser-evidence/district-' + locale + '-' + width + '.png', fullPage: true });
+    await page.reload(); await navigation(page).nth(2).click();
+    current = (await saved(page)).state;
+    assert.equal(current.city.districts.activeId, 'territory:waterfront');
+    assert.equal(current.city.heat, 81); assert.equal(current.city.districts.parked.heat, 3);
+    await page.locator('#active-district').selectOption('territory:neon-mile');
+    assert.equal((await saved(page)).state.city.heat, 3);
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+
   const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
   assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
-  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, localeSwitchAndFeedback: true,
+  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));

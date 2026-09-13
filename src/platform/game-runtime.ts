@@ -1,3 +1,5 @@
+import { getActiveDistrictId } from '../features/territories';
+import type { ActiveDistrictResult } from '../game/set-active-district';
 import type { ToggleAutomationResult } from '../game/set-automation-enabled';
 import { unlockEligibleAchievements } from '../game/achievements';
 import type { AchievementId } from '../features/achievements';
@@ -26,7 +28,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = RiskyDeliveryResult | ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = ActiveDistrictResult | RiskyDeliveryResult | ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state' | 'persistence-failure';
 
@@ -159,6 +161,7 @@ export function createGameRuntime(
         || result.state.city.ownedTerritoryIds !== previous.city.ownedTerritoryIds
         || result.state.garage.ownedVehicleIds !== previous.garage.ownedVehicleIds
         || activeVehicleEffectChanged(previous, result.state)
+        || getActiveDistrictId(previous.city) !== getActiveDistrictId(result.state.city)
         || result.state.permanentProgression.skills !== previous.permanentProgression.skills
         || result.state.upgrades !== previous.upgrades
         || result.state.automation.enabledIds !== previous.automation.enabledIds

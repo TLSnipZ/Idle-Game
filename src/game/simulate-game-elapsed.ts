@@ -6,7 +6,7 @@ import { countStatistic, observePeakHeat } from './statistics';
 import type { StatisticsError } from '../features/statistics';
 import { unlockEligibleAchievements } from './achievements';
 import { getHeatDecayIntervalMs } from './heat-decay-interval';
-import { decayHeat } from '../features/heat';
+import { coolDistricts } from '../features/territories';
 import { isElapsedMs } from '../features/economy';
 import { requireXp } from '../features/progression';
 import { simulateElapsed } from './simulate-elapsed';
@@ -39,7 +39,7 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   if (!automation.ok) return { ...automation, state };
   const income = subtractMoney(business.state.economy.cash, state.economy.cash);
   if (!income.ok) throw new Error('Production must not reduce cash');
-  const city = decayHeat(automation.state.city, elapsedMs, getHeatDecayIntervalMs(state));
+  const city = coolDistricts(automation.state.city, elapsedMs, getHeatDecayIntervalMs(state));
   const candidate = city === automation.state.city ? automation.state : { ...automation.state, city };
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', automation.automation.completedJobs);
   if (!counted.ok) return counted;

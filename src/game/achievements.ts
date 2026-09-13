@@ -1,3 +1,4 @@
+import { maximumDistrictHeat } from '../features/territories';
 import { ACHIEVEMENT_CATALOG, isAchievementIds } from '../features/achievements';
 import type { AchievementCondition, AchievementId } from '../features/achievements';
 import { getBusinessLevel } from '../features/businesses';
@@ -10,7 +11,7 @@ function progress(state: GameState, condition: AchievementCondition) {
     case 'player-level': { const current = getPlayerLevel(state.progression.xp); return { current, target: condition.target, text: `Level ${current} / ${condition.target}` }; }
     case 'business-level': { const current = getBusinessLevel(state.businesses, condition.businessId) ?? 0; return { current, target: condition.target, text: `Dockside Level ${current} / ${condition.target}` }; }
     case 'territory': { const owned = state.city.ownedTerritoryIds.includes(condition.territoryId); return { current: owned ? 1 : 0, target: 1, text: owned ? 'Controlled' : 'Not controlled' }; }
-    case 'heat': return { current: state.city.heat, target: condition.target, text: `Heat ${state.city.heat} / ${condition.target}` };
+    case 'heat': return { current: maximumDistrictHeat(state.city), target: condition.target, text: `Heat ${maximumDistrictHeat(state.city)} / ${condition.target}` };
     case 'crew': { const current = condition.ids.filter(id => state.crew.recruitedIds.includes(id)).length; return { current, target: condition.ids.length, text: `${current} / ${condition.ids.length} recruited` }; }
     case 'rebirth-count': return { current: state.permanentProgression.rebirthCount, target: condition.target, text: `${state.permanentProgression.rebirthCount} / ${condition.target}` };
   }

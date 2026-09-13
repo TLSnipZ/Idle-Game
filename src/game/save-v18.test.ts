@@ -15,7 +15,7 @@ describe('Save v18 active selection', () => {
     const random = vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('random'); });
     try {
       const result = migrateToCurrentSave(input);
-      expect(result).toEqual({ ok: true, envelope: envelope(current, 19) });
+      expect(result).toEqual({ ok: true, envelope: envelope(current, 20) });
       expect(input).toEqual(before); expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
       expect(migrateToCurrentSave(input)).toEqual(result);
     } finally { clock.mockRestore(); random.mockRestore(); }
@@ -52,12 +52,12 @@ describe('Save v18 active selection', () => {
     ]) expect(validateSaveState({ ...state, garage })).toBeNull();
   });
   it('current local saves and CE1 round-trip; unsupported future versions stay protected', () => {
-    expect(CURRENT_SAVE_VERSION).toBe(19);
+    expect(CURRENT_SAVE_VERSION).toBe(20);
     for (const state of [createInitialGameState(), rebirthState()]) {
       const saved = serializeSave(state, 99); if (!saved.ok) throw Error(saved.error);
-      expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 19, savedAt: 99, state } });
+      expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 20, savedAt: 99, state } });
       expect(validateSaveCode(encodeSaveText(saved.serialized))).toEqual(parseSave(saved.serialized));
     }
-    expect(migrateToCurrentSave(envelope(createInitialGameState(), 20))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(migrateToCurrentSave(envelope(createInitialGameState(), 21))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

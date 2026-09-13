@@ -62,16 +62,16 @@ describe('durable full New Game reset', () => {
     expect(f.game.getSnapshot()).toMatchObject({ offline: null, runtimeError: null, persistence: { kind: 'saved' } });
     for (const field of ['achievementEvent', 'levelEvent', 'cityEvent', 'automationEvent'])
       expect(Object.hasOwn(f.game.getSnapshot(), field)).toBe(false);
-    expect(parseSave(f.raw() ?? '')).toMatchObject({ ok: true, envelope: { version: 19, savedAt: 601000 } });
+    expect(parseSave(f.raw() ?? '')).toMatchObject({ ok: true, envelope: { version: 20, savedAt: 601000 } });
     f.game.stop();
   });
   it('preserves current v17 and CE1 after the reset', () => {
     const f = fixture(); f.game.resetProgress('RESET');
-    expect(CURRENT_SAVE_VERSION).toBe(19);
+    expect(CURRENT_SAVE_VERSION).toBe(20);
     const result = f.game.exportCode(); if (!result.ok) throw Error('Export failed');
     expect(result.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(result.code)).toMatchObject({ ok: true,
-      envelope: { version: 19, state: createInitialGameState() } }); f.game.stop();
+      envelope: { version: 20, state: createInitialGameState() } }); f.game.stop();
   });
   it('starts new clocks and exact fractions without carrying old production or automation forward', () => {
     const f = fixture(); f.at(10000.75); f.wall(11000); f.game.resetProgress('RESET');

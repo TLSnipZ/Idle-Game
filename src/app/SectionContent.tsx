@@ -34,7 +34,7 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
     case SECTION.overview.id: return <OverviewSection state={state} paused={paused} onNavigate={onNavigate} />;
     case SECTION.operations.id: return <OperationsSection game={game} />;
     case SECTION.city.id: return <div className="section-stack">
-      <City state={state} paused={paused} onAcquire={game.takeTerritory} onLayLow={game.coolDown} />
+      <City state={state} paused={paused} onAcquire={game.takeTerritory} onLayLow={game.coolDown} onChooseDistrict={game.chooseDistrict} />
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />
       <CityEvents state={state} paused={paused} onChoose={game.chooseEvent} />
     </div>;

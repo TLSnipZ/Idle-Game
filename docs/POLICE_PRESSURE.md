@@ -1,5 +1,12 @@
 # Heat / Police 2.0 II — Police Pressure
 
+## Current phase — Heat III: District Heat
+
+Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
+local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
+See [District Heat](DISTRICT_HEAT.md) for rules and compatibility. CI verification pending.
+Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
+
 ## Scope
 
 Authorized by the next-phase request after PR #29. Police Pressure is derived from

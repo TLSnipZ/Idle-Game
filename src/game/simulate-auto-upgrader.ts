@@ -1,8 +1,9 @@
+import { WATERFRONT, getDistrictHeat, withDistrictHeat, coolDistricts } from '../features/territories';
 import { BUSINESS_AUTO_UPGRADER } from '../features/automation';
 import { getBusinessLevel, MAX_BUSINESS_LEVEL } from '../features/businesses';
 import { addMoney, earnCash, isElapsedMs, moneyFromMinorUnits, subtractMoney } from '../features/economy';
 import { addXp } from '../features/progression';
-import { decayHeat, dispatcherHeatGain, gainHeat } from '../features/heat';
+import { dispatcherHeatGain, gainHeat } from '../features/heat';
 import { unlockEligibleAchievements } from './achievements';
 import { getHeatDecayIntervalMs } from './heat-decay-interval';
 import { planDispatcher } from './simulate-automation';
@@ -87,7 +88,7 @@ export function simulateAutoUpgrader(state: GameState, elapsedMs: number): GameS
       candidate = attempt.state;
     }
   }
-  const city = decayHeat(gainHeat(state.city, dispatcherHeatGain(totalPlan.automation.completedJobs)), elapsedMs, getHeatDecayIntervalMs(state));
+  const city = coolDistricts(withDistrictHeat(state.city, WATERFRONT.id, gainHeat(getDistrictHeat(state.city, WATERFRONT.id), dispatcherHeatGain(totalPlan.automation.completedJobs))), elapsedMs, getHeatDecayIntervalMs(state));
   candidate = { ...candidate, city, automation: { ...candidate.automation,
     starterJobElapsedMs: totalPlan.progress, businessAutoUpgradeElapsedMs: progress } };
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', totalPlan.automation.completedJobs);

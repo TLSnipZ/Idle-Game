@@ -1,3 +1,4 @@
+import { findTerritory, getActiveDistrictId } from '../features/territories';
 import type { EventId, EventChoiceId } from '../features/events';
 import type { GameState } from '../game/game-state';
 import { eventPresentation, describeEventSpawn } from './event-presentation';
@@ -15,6 +16,7 @@ export function CityEvents({ state, paused, announcement, onChoose }: {
   const pending = view.pending;
   return <section className={`panel city-events ${pending ? 'event-pending' : 'event-idle'}`} aria-labelledby="city-events-heading">
     <h2 id="city-events-heading">{text('CITY EVENTS', 'STADTEVENTS')}</h2>
+    <p>{text('Event district', 'Eventbezirk')} · {text(findTerritory(getActiveDistrictId(state.city))?.name ?? '')}</p>
     <div role="status" aria-live="polite" aria-atomic="true">
       {announcement && announcement.id === view.pendingEventId
         && <span key={announcement.sequence}>{describeEventSpawn(announcement.id, locale)}</span>}
