@@ -1,5 +1,11 @@
 # Base Game balance
 
+## Heat / Police 2.0 I — Risk & Reward
+
+Optional manual No-Questions Delivery: +50% exact manual Cash, 10 base XP, +5 Heat;
+available only below 60 Heat. No Dispatcher premium. Normal job values unchanged.
+See [HEAT_POLICE_2.md](HEAT_POLICE_2.md) for marginal costs and opening tradeoffs.
+
 Current Tier-1 expansion: Senda costs **$40,000**, requires Player **6** / owned
 Dockside **7**, and gives **+12% manual Job Cash** only while active. Lilt costs
 **$55,000**, requires Player **7** / owned Dockside **8**, and subtracts **3 seconds**

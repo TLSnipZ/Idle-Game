@@ -1,5 +1,5 @@
 import { collectCrewModifiers } from '../features/crew';
-import { collectHeatModifiers } from '../features/heat';
+import { RISKY_DELIVERY_BONUS_BASIS_POINTS, collectHeatModifiers } from '../features/heat';
 import { collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
 import { assertGarageState, findVehicle } from '../features/vehicles';
@@ -41,6 +41,16 @@ export function effectiveProductionRates(state: GameState) {
   return { ok: true as const, rates };
 }
 export function evaluateJobReward(state: GameState, context: 'manual' | 'dispatcher' = 'manual') {
-  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, collectModifiers(state));
+  return evaluateDeliveryReward(state, context, []);
+}
+export function evaluateRiskyJobReward(state: GameState) {
+  return evaluateDeliveryReward(state, 'manual', [{
+    id: 'modifier:risky-delivery', sourceId: 'heat:risky-delivery',
+    target: { stat: 'job-reward', context: 'manual' },
+    operation: 'multiply-basis-points', bonusBasisPoints: RISKY_DELIVERY_BONUS_BASIS_POINTS,
+  }]);
+}
+function evaluateDeliveryReward(state: GameState, context: 'manual' | 'dispatcher', extra: readonly Modifier[]) {
+  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, [...collectModifiers(state), ...extra]);
   return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), effective: evaluated.effective, base: evaluated.base, applied: evaluated.applied } : evaluated;
 }

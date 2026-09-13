@@ -1,5 +1,11 @@
 # Architecture
 
+## Heat / Police 2.0 I — Risk & Reward
+
+Action-local risky reward modifier and shared atomic manual delivery completion.
+Reconcile before cutoff check; Save v19 / CE1 unchanged. No stored mode or new
+clock/RNG. See [HEAT_POLICE_2.md](HEAT_POLICE_2.md) for exact boundaries.
+
 ## Current implementation
 
 Tier-1 Garage (PR #27, gameplay verified): Save **v19**, unchanged **CE1** transport, three vehicles:

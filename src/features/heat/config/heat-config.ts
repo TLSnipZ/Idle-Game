@@ -18,3 +18,8 @@ export const HEAT_TIERS = Object.freeze([
   Object.freeze({ id: 'hot', label: 'HOT', minimum: 60, bonusBasisPoints: -1000 }),
   Object.freeze({ id: 'manhunt', label: 'MANHUNT', minimum: 80, bonusBasisPoints: -2500 }),
 ] as const);
+
+/** Optional manual risk; the client refuses work once the HOT tier begins. */
+export const RISKY_DELIVERY_HEAT = 5;
+export const RISKY_DELIVERY_HEAT_LIMIT = HEAT_TIERS[3].minimum;
+export const RISKY_DELIVERY_BONUS_BASIS_POINTS = 5_000;
