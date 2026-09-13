@@ -1,7 +1,7 @@
 # Tier-1 Garage
 
 Gameplay implementation and automated verification complete in PR #27, from
-`ba36d2abb3e1e666463d6eae916f8c53fc06b245`. Model artwork approval remains open.
+`ba36d2abb3e1e666463d6eae916f8c53fc06b245`. Model artwork was subsequently approved; see the artwork integration note below.
 Executed evidence and separate release status are recorded below.
 
 | Vehicle | Cost | Acquisition gates | Effect while active |
@@ -51,10 +51,10 @@ CE1 is unchanged; local/import validation and write-before-publication are share
 Three complete, localized vehicle cards explain effects, gates, price and active
 ownership. EN/DE use distinct model descriptions; Villager transforms every word.
 Native purchase/selection controls and existing responsive Garage layout are retained.
-Only KX-R has an approved model image. Senda/Lilt remain complete text cards while
-their visual candidates await explicit model-reference approval under
-ART_DIRECTION.md. No KX-R image is reused as another model, and no unapproved image
-is promoted into production. Artwork acceptance remains open.
+All three models now have individual artwork. The user approved the blue Senda
+and red Lilt after the PR #27 handoff. Clean standalone PNG derivatives are retained
+as production masters; only optimized WebP files are runtime-imported. See
+ART_DIRECTION.md for provenance. Save v19, CE1, balance and switching are unchanged.
 
 ## Balance interpretation
 
@@ -104,6 +104,10 @@ deployment status separately. The final evidence commit changes documentation on
 the code verified above is unchanged.
 
 Model Candidate A review sheet was generated in this task conversation: steel-blue
-Senda fixed-roof coupe and red open-top Lilt. Neither candidate is approved or
+Senda fixed-roof coupe and red open-top Lilt. At that historical checkpoint neither candidate was approved or
 integrated. The next Garage checkpoint is explicit approval/refinement and separate
 production artwork integration. Heat / Police 2.0 is not started.
+
+## Artwork integration
+
+Tier-1 artwork is implemented and verified in [PR #28](https://github.com/TLSnipZ/Idle-Game/pull/28). [Run 34774339210](https://github.com/TLSnipZ/Idle-Game/actions/runs/34774339210) verified code commit `298ef28287bfe6f090736698f06861c7b0adb35a`: strict build, 2,283/2,283 tests (zero failures/skips), 45 Garage and 225 whole-game Chromium cases, and whitespace checks passed. Evidence artifact: `10322962950`. This documentation-only follow-up does not change the verified runtime or tests. The PR records merge/deployment separately. Heat / Police 2.0 is the next separate phase and has not started.

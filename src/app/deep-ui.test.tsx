@@ -116,7 +116,7 @@ describe('POST 1B system compositions', () => {
     const state = owned ? { ...s, garage: { ownedVehicleIds: [vehicle.id], activeVehicleId: vehicle.id } } : s;
     const panel = dom(<Garage state={state} paused={false} onPurchase={noop} onSelect={noop} />);
     expect(panel.querySelectorAll('article')).toHaveLength(3);
-    expect(panel.querySelectorAll('img')).toHaveLength(1);
+    expect(panel.querySelectorAll('img')).toHaveLength(3);
     expect(panel.textContent).toContain('Kairo KX-R');
     expect(panel.textContent).toContain('PERMANENT VEHICLE');
     expect(panel.textContent).toContain('+10% Business Production');
