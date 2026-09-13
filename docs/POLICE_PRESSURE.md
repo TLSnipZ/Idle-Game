@@ -55,7 +55,15 @@ Rebirth still resets Heat; permanent statistics and vehicles retain existing rul
 Strict build, full suite, pressure threshold/rounding/atomic failure/save tests,
 reconciliation and persistence tests, localized UI, and 15 production browser
 pressure flows over all three locales at 320/390/740/1024/1440px. Existing 285
-browser cases remain required. Verification and release pending in the PR.
+browser cases remain required.
+
+Verified in [PR #30](https://github.com/TLSnipZ/Idle-Game/pull/30):
+[run 34777563745](https://github.com/TLSnipZ/Idle-Game/actions/runs/34777563745)
+on `bf28818fd514cc68baf74f6bd90c18dc6b11ae7b`: strict build, **2,354/2,354 tests**
+(39 added, zero failures/skips), **45 Garage + 225 section + 15 risk + 15 police
+Chromium cases**, and whitespace checks passed. Evidence artifact: `10323499963`.
+This final follow-up changes documentation only. Merge/deployment evidence is
+recorded in the PR; manual live acceptance remains separate.
 
 ## Next handoff
 
