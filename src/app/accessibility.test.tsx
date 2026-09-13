@@ -59,7 +59,7 @@ describe('presentation accessibility contracts', () => {
     expect(bar?.getAttribute('aria-label')).toContain('Auto-Upgrader attempt');
     expect(linkedText(root,bar!, 'aria-describedby')).toContain(enabled?'enabled':'disabled');
     expect(button?.getAttribute('aria-label')).toBe(`${enabled?'Disable':'Enable'} Business Auto-Upgrader`);
-    expect(linkedText(root,button!, 'aria-describedby')).toContain('Automatically spends cash');
+    expect(linkedText(root,button!, 'aria-describedby')).toContain('Automatically buys one upgrade');
     expect(bar?.closest('[aria-live], [role="status"]')).toBeNull();
   });
   it('Dispatcher progress names its system; repeated income is not a live announcement', () => {

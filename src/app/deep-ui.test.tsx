@@ -55,10 +55,10 @@ describe('POST 1B system compositions', () => {
       expect(panel.textContent).not.toContain('Purchase price');
       if (level === 100) {
         expect(panel.textContent).toContain('MAX LEVEL');
-        expect(panel.textContent).not.toContain('Next upgrade price');
+        expect(panel.textContent).not.toContain('Upgrade');
         expect(button?.disabled).toBe(true);
       } else {
-        expect(panel.textContent).toContain('Next upgrade price');
+        expect(panel.textContent).toContain('Upgrade');
         expect(button?.getAttribute('aria-label')).toBe('Upgrade Dockside Detail to Level 16');
       }
     }
@@ -72,9 +72,9 @@ describe('POST 1B system compositions', () => {
     expect(panel.textContent).toContain('30s');
     const toggle = panel.querySelector('button');
     expect(toggle?.getAttribute('aria-label')).toBe('Enable Business Auto-Upgrader');
-    expect(toggle?.previousElementSibling?.textContent).toContain('Automatically spends cash');
+    expect(toggle?.previousElementSibling?.textContent).toContain('Automatically buys one upgrade');
     expect(panel.querySelector('progress')?.getAttribute('max')).toBe('30000');
-    if (level === 100) expect(panel.textContent).toContain('No further upgrades available');
+    if (level === 100) expect(panel.textContent).toContain('MAXED');
   });
   it.each([0, 60, 80])('Heat uses explicit tier/penalty and honest cooling state at %i', heat => {
     const s = fresh(), state = { ...s, city: { ...s.city, heat } };

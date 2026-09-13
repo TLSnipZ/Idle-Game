@@ -20,7 +20,7 @@ function upgrade(xp:number) {
 describe('requirements presentation',()=>{
   it('distinguishes a rich but locked player from eligibility and cash shortfall',()=>{
     expect(upgrade(99)).toContain('Required — Player Level 2'); expect(upgrade(99)).toContain('disabled');
-    expect(upgrade(100)).toContain('Met — Player Level 2'); expect(upgrade(100)).not.toContain('disabled');
+    expect(selectUpgrade({...rich(), progression:{xp:100}}, S.id)?.requirements.met).toBe(true); expect(upgrade(100)).toContain('Ready to purchase'); expect(upgrade(100)).not.toContain('disabled');
     const poor={...createInitialGameState(),progression:{xp:100}};
     expect(renderToStaticMarkup(<UpgradeCard view={selectUpgrade(poor,S.id)} paused={false} onPurchase={()=>{}} />)).toContain('INSUFFICIENT CASH');
   });

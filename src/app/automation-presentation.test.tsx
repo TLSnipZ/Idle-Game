@@ -26,10 +26,10 @@ describe('delegation presentation', () => {
     expect(view).toMatchObject({ unlocked: false, eligible: false, canPurchase: false, reward: '2500', intervalMs: 10000, progressMs: 0, remainingMs: 10000 });
     const html = render(state);
     expect(html).toContain('Delivery Dispatcher'); expect(html).toContain('$5,000');
-    expect(html).toContain('Runs every 10s'); expect(html).toContain('$25.00 per delivery');
+    expect(html).toContain('<span>Interval</span><strong>10s</strong>'); expect(html).toContain('<strong>$25.00</strong>');
     expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Required');
     expect(html).toContain('disabled'); expect(html).not.toContain('ACTIVE');
-    expect(html).toContain('aria-describedby="dispatcher-requirement dispatcher-helper"');
+    expect(html).toContain('aria-describedby="dispatcher-requirement"');
   });
   it('distinguishes unaffordable and ready states with semantic buttons', () => {
     expect(render(eligible(moneyFromMinorUnits('499999')))).toContain('INSUFFICIENT CASH');
@@ -41,7 +41,7 @@ describe('delegation presentation', () => {
     const state = { ...bought, automation: { ...bought.automation, starterJobElapsedMs: 4321 }, upgrades: { purchasedIds: [STREET_CONNECTIONS.id, EXPRESS_TIPS.id] } };
     expect(selectDispatcher(state)).toMatchObject({ unlocked: true, reward: '3600', progressMs: 4321, remainingMs: 5679 });
     const html = render(state);
-    expect(html).toContain('ACTIVE'); expect(html).toContain('$36.00 per delivery'); expect(html).toContain('Next delivery in 6s');
+    expect(html).toContain('ACTIVE'); expect(html).toContain('<strong>$36.00</strong>'); expect(html).toContain('Next delivery in <strong>6s</strong>');
     expect(html).toContain('max="10000"'); expect(html).toContain('value="4321"'); expect(html).toContain('for="dispatcher-progress"');
     expect(html).not.toContain('<button'); expect(render(state, true)).toContain('PAUSED');
   });

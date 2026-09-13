@@ -1,7 +1,8 @@
-import { Children, isValidElement } from 'react';
+// @vitest-environment happy-dom
+import { act, Children, isValidElement } from 'react';
 import type { ReactNode } from 'react';
 import { renderToStaticMarkup as render } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GameShell } from './App';
 import type { useGame } from './use-game';
 import { Navigation } from './Navigation';
@@ -17,7 +18,8 @@ import { createRebirthControls } from './rebirth-controls';
 import { createInitialGameState as fresh } from '../game/game-state';
 import type { GameState } from '../game/game-state';
 import { autoUpgraderState } from '../game/test-fixtures/auto-upgrader-state';
-import { createPersistentGame } from '../platform/persistent-game';
+import { createRoot } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
 import { rebirthRuntime } from '../platform/test-fixtures/rebirth-runtime';
 import { simulateOnlineElapsed } from '../game/simulate-online-elapsed';
 import { reconcileOffline } from '../game/offline-progress';
@@ -26,8 +28,20 @@ import { exportSaveCode, validateSaveCode } from '../game/save-code';
 import { performStarterJob } from '../game/perform-starter-job';
 import { DELIVERY_DISPATCHER } from '../features/automation';
 import { STARTER_BUSINESS } from '../features/businesses';
-import { moneyFromMinorUnits, STARTER_JOB } from '../features/economy';
+import { moneyFromMinorUnits } from '../features/economy';
 import { getXpThresholdForLevel } from '../features/progression';
+
+const mounted: { root: Root; container: HTMLDivElement }[] = [];
+beforeEach(() => { vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true); localStorage.clear(); });
+afterEach(async () => {
+  for (const { root, container } of mounted.splice(0)) { await act(() => root.unmount()); container.remove(); }
+  vi.unstubAllGlobals();
+});
+async function mountNode(node: ReactNode) {
+  const container = document.createElement('div'); document.body.append(container);
+  const root = createRoot(container); mounted.push({ root, container });
+  await act(() => root.render(node)); return container;
+}
 
 function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = {}): ReturnType<typeof useGame> {
   return { setPresentationLocale: vi.fn(), replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
@@ -36,7 +50,7 @@ function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = 
     runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
     buyAutomation: vi.fn(), changeAutoUpgraderTarget: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), chooseActiveVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
     recruitCrew: vi.fn(), assignCrew: vi.fn(), unassignCrew: vi.fn(), chooseEvent: vi.fn(), buySkill: vi.fn(),
-    rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: { ...createPersistentGame(() => {}),
+    rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: {
       exportCode: () => exportSaveCode(state, 1000), importCode: vi.fn(() => ({ ok: true as const })),
     }, ...overrides };
 }
@@ -66,10 +80,10 @@ describe('five-section presentation navigation', () => {
     expect(PRIMARY_SECTIONS.map(section => section.label)).toEqual(['OVERVIEW','OPERATIONS','CITY','COLLECTION','EMPIRE']);
     expect(new Set(PRIMARY_SECTIONS.map(s => s.id)).size).toBe(5);
     const html = render(<GameShell game={view()} />);
-    expect(html).toContain('aria-label="Primary sections"');
+    expect(html).toContain('aria-label="Primary money-making departments"');
     expect(html.match(/aria-current="page"/g)).toHaveLength(1);
     expect(html).toContain('aria-controls="section-content">OVERVIEW');
-    expect(html).toContain('Your operation at a glance');
+    expect(html).toContain('Your empire at a glance');
     expect(html).not.toContain('id="import-code"');
     expect(html).not.toContain('id="business-name"');
     expect(html).not.toContain('id="crew-slot-operations"');
@@ -83,7 +97,7 @@ describe('five-section presentation navigation', () => {
     const html = h.render();
     const surfaces = {
       [SECTION.overview.id]: ['ECONOMY','PLAYER','CITY PRESSURE','CREW','EMPIRE','CITY EVENT','VIEW COLLECTION'],
-      [SECTION.operations.id]: ['Jobs',STARTER_JOB.label,'Businesses','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','BUSINESS AUTO-UPGRADER'],
+      [SECTION.operations.id]: ['JOBS','Waterfront Delivery','BUSINESSES','Dockside Detail','Upgrades','Commercial Pressure Washer','Automation','Delivery Dispatcher','Business Auto-Upgrader'],
       [SECTION.city.id]: ['Solara City','Waterfront','Neon Mile','HEAT','LAY LOW','CREW','CITY EVENTS','No active event'],
       [SECTION.collection.id]: ['Garage','Kairo KX-R','Owned vehicles: 0 / 1'],
       [SECTION.empire.id]: ['Rebirth','Empire Points','Empire Foundations','ACHIEVEMENTS','STATISTICS','Save &amp; Transfer','Export save','Validate import'],
@@ -108,13 +122,13 @@ describe('five-section presentation navigation', () => {
     expect(html).toContain('New Game / Reset Progress');
     expect(html.indexOf('id="reset-heading"')).toBeGreaterThan(html.indexOf('id="save-transfer-heading"'));
   });
-  it('Overview summarizes current state without management controls and shortcuts only navigate', () => {
+  it('Overview summarizes current state without management controls and shortcuts only navigate', async () => {
     const s = autoUpgraderState(), before = JSON.stringify(s), navigate = vi.fn();
-    const component = OverviewSection({ state: s, paused: false, onNavigate: navigate });
-    const html = render(component);
+    const component = await mountNode(<OverviewSection state={s} paused={false} onNavigate={navigate} />);
+    const html = component.innerHTML;
     for (const text of ['$1,000,000.00','18.75','Heat 0','Territories controlled: 2 / 2','Recruited: 0 / 3','Active assignments: 0 / 2','Rebirth requirements met']) expect(html).toContain(text);
     expect(html).not.toMatch(/Buy Business|Lay low to|Recruit Rico|Confirm Rebirth|achievement-card|statistics-entry|skill-node|territory-card/);
-    for (const button of buttons(component)) button.onClick();
+    for (const button of component.querySelectorAll('button')) await act(() => button.click());
     expect(navigate.mock.calls.map(call => call[0])).toEqual([SECTION.operations.id, SECTION.city.id, SECTION.empire.id, SECTION.city.id, SECTION.collection.id]);
     expect(JSON.stringify(s)).toBe(before);
   });
@@ -127,26 +141,26 @@ describe('five-section presentation navigation', () => {
     expect(dashboardPresentation(initial).cash).toBe('$0.00');
     expect(render(<OverviewSection state={after} paused={false} onNavigate={() => {}} />)).toContain('$1,234,567.89');
   });
-  it('pending Event indicator navigates only and remains accurate in every section', () => {
+  it('pending Event indicator navigates only and remains accurate in every section', async () => {
     const s = fresh(), state: GameState = { ...s, events: { pendingEventId: 'event:shakedown', opportunityElapsedMs: 123456 } };
     const navigate = vi.fn(), before = JSON.stringify(state);
     for (const section of PRIMARY_SECTIONS) {
-      const status = GlobalStatus({ view: dashboardPresentation(state), active: section.id, onNavigate: navigate, paused: false });
-      expect(render(status)).toContain('CITY EVENT ACTIVE · Shakedown');
-      buttons(status).find(b => render(<>{b.children}</>).includes('CITY EVENT ACTIVE'))?.onClick();
+      const status = await mountNode(<GlobalStatus view={dashboardPresentation(state)} active={section.id} onNavigate={navigate} paused={false} />);
+      expect(status.querySelector('.activity-event')?.textContent).toBe('CITY EVENT ACTIVEShakedown');
+      await act(() => status.querySelector<HTMLButtonElement>('.activity-event')?.click());
     }
     expect(navigate).toHaveBeenCalledTimes(5); expect(navigate).toHaveBeenLastCalledWith(SECTION.city.id);
     expect(JSON.stringify(state)).toBe(before);
     expect(render(<GlobalStatus view={dashboardPresentation(fresh())} active={DEFAULT_SECTION} onNavigate={navigate} paused={false} />)).not.toContain('CITY EVENT ACTIVE');
   });
-  it.each(['unowned','disabled','enabled'] as const)('Auto-Upgrader %s status is informational and never a duplicate toggle', mode => {
+  it.each(['unowned','disabled','enabled'] as const)('Auto-Upgrader %s status is informational and never a duplicate toggle', async mode => {
     const s = autoUpgraderState();
     const state = mode === 'unowned' ? fresh() : mode === 'disabled' ? { ...s, automation: { ...s.automation, enabledIds: [] } } : s;
     const navigate = vi.fn(), before = JSON.stringify(state);
-    const status = GlobalStatus({ view: dashboardPresentation(state), active: DEFAULT_SECTION, onNavigate: navigate, paused: false });
-    expect(render(status).includes('AUTO-UPGRADER ACTIVE')).toBe(mode === 'enabled');
+    const status = await mountNode(<GlobalStatus view={dashboardPresentation(state)} active={DEFAULT_SECTION} onNavigate={navigate} paused={false} />);
+    expect(status.innerHTML.includes('AUTO-UPGRADER ACTIVE')).toBe(mode === 'enabled');
     if (mode === 'enabled') {
-      buttons(status).find(b => render(<>{b.children}</>).includes('AUTO-UPGRADER ACTIVE'))?.onClick();
+      await act(() => status.querySelector<HTMLButtonElement>('.activity-auto')?.click());
       expect(navigate).toHaveBeenCalledWith(SECTION.operations.id);
     }
     expect(JSON.stringify(state)).toBe(before);

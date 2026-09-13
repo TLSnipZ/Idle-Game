@@ -87,8 +87,10 @@ it('reserves readable feedback and compact responsive artwork without crop, fixe
   const card = css.match(/\.vehicle-card \{([^}]+)\}/)?.[1] ?? '';
   expect(card).toContain('max-width:'); expect(card).toContain('minmax(0,'); expect(card).not.toMatch(/height:/);
   expect(css).toMatch(/@media \(max-width: 1000px\)[\s\S]*\.vehicle-card[^}]*grid-template-columns: minmax\(0, 1fr\)/);
-  expect(css).toMatch(/\.global-feedback \{[^}]*block-size:[^}]*overflow: auto/);
-  expect(css).toMatch(/\.rebirth-notice-slot \{[^}]*min-block-size:/);
+  const hud = readFileSync('src/app/Hud2.css', 'utf8');
+  expect(hud).toMatch(/\.activity-center-items \{[^}]*min-height:[^}]*overflow-x: auto/);
+  expect(hud).toMatch(/\.activity-item strong \{[^}]*overflow-wrap: anywhere/);
+  expect(hud).toMatch(/\.legacy-feed-announcer > \.runtime-error \{[^}]*margin-block:/);
   expect(css).toContain('object-fit: contain'); expect(css).toContain('height: auto');
   expect(css).not.toMatch(/scroll-behavior: smooth|overflow-anchor: none|animation:/);
 });

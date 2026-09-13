@@ -26,7 +26,7 @@ describe('Crew presentation and actions',()=>{
     expect(html.match(/class="panel crew-card"/g)).toHaveLength(3);expect(html.match(/class="panel crew-slot"/g)).toHaveLength(2);
     expect(html.indexOf('Rico Vale')).toBeLessThan(html.indexOf('Mara Knox'));expect(html.indexOf('Mara Knox')).toBeLessThan(html.indexOf('Jax Mercer'));
     expect(html.indexOf('OPERATIONS')).toBeLessThan(html.indexOf('LOGISTICS'));expect(html).toContain('No specialist assigned.');expect(html).toContain('crew-catalog');
-    expect(html).toContain('Operations is a choice');expect(html).not.toMatch(/<img|auto.assign|wages|crew-xp/);
+    expect(html).toContain('Recruit or assign a specialist for Operations below.');expect(html).not.toMatch(/<img|auto.assign|wages|crew-xp/);
   });
   it.each([[R,'$20,000','Player Level 8'],[M,'$30,000','Control Neon Mile'],[J,'$40,000','Dockside Detail Level 15']] as const)('shows $0.name price and central requirement text', (member,cost,requirement)=>{
     const html=render();expect(html).toContain(cost);expect(html).toContain(requirement);
@@ -35,7 +35,7 @@ describe('Crew presentation and actions',()=>{
   });
   it.each(CREW_CATALOG)('$name distinguishes unlocked cash shortage from requirement locks and recruitment readiness',member=>{
     const s={...crewState(),crew:createInitialCrewState(),economy:{cash:moneyFromMinorUnits('0')}};
-    expect(crewPresentation(s,member.id)).toMatchObject({status:'INSUFFICIENT CASH',availability:'Build your Cash balance to recruit this specialist.',canRecruit:false});
+    expect(crewPresentation(s,member.id)).toMatchObject({status:'INSUFFICIENT CASH',availability:'Build your Cash balance to recruit this crew member.',canRecruit:false});
     const ready={...s,economy:{cash:member.recruitmentCost}};expect(crewPresentation(ready,member.id)).toMatchObject({canRecruit:true,status:'PURCHASABLE',availability:null});
     const recruited=recruitCrewMember(ready,member.id).state;expect(crewPresentation(recruited,member.id)).toMatchObject({status:'RECRUITED',availability:'Unassigned — effect inactive',activeEffect:null});
   });
