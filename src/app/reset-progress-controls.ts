@@ -26,20 +26,22 @@ export function createResetProgressControls(
   publish: (state: ResetProgressState) => void,
   locale: Locale = DEFAULT_LOCALE,
 ) {
+  let currentLocale = locale;
+  function setLocale(next: Locale) { currentLocale = next; }
   let state = INITIAL_RESET_PROGRESS;
   const update = (next: ResetProgressState) => { state = next; publish(state); };
   function request() { update({ confirming: true, confirmation: '', message: '' }); }
   function edit(confirmation: string) {
     if (state.confirming) update({ ...state, confirmation, message: '' });
   }
-  function cancel() { update({ ...INITIAL_RESET_PROGRESS, message: localize(locale, 'New Game cancelled. Nothing was reset.', 'Neues Spiel abgebrochen. Nichts gelöscht. Vernunft hatte kurz Zugriff.') }); }
+  function cancel() { update({ ...INITIAL_RESET_PROGRESS, message: localize(currentLocale, 'New Game cancelled. Nothing was reset.', 'Neues Spiel abgebrochen. Nichts gelöscht. Vernunft hatte kurz Zugriff.') }); }
   function confirm(): ResetProgressResult | undefined {
     if (!state.confirming || state.confirmation !== RESET_CONFIRMATION_TEXT) return;
     const confirmation = state.confirmation;
     state = INITIAL_RESET_PROGRESS;
     const result = reset(confirmation);
-    update({ ...INITIAL_RESET_PROGRESS, message: describeResetProgress(result, locale) });
+    update({ ...INITIAL_RESET_PROGRESS, message: describeResetProgress(result, currentLocale) });
     return result;
   }
-  return { request, edit, cancel, confirm, getSnapshot: () => state };
+  return { setLocale, request, edit, cancel, confirm, getSnapshot: () => state };
 }

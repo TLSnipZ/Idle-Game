@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { selectRebirth } from '../game/rebirth';
 import { formatInteger } from './number-format';
-import { useLocale, useLocalizedText } from './LocalizationProvider';
+import { localize, useLocale, useLocalizedText } from './LocalizationProvider';
 
 /** Derived guidance only. Reward updates do not repeat the eligibility announcement. */
 export function RebirthNotice({ preview, onReview }: {
@@ -14,9 +14,9 @@ export function RebirthNotice({ preview, onReview }: {
   const [announcement, setAnnouncement] = useState('');
   useEffect(() => {
     if (preview.eligible && !wasEligible.current && preview.reward !== null)
-      setAnnouncement(locale === 'de'
-        ? `Rebirth bereit. Aktuelle Belohnung ${formatInteger(preview.reward)} Empire Points. Dein Imperium hat die Reset-Taste offiziell zur Strategie erklärt.`
-        : `Rebirth ready. Current reward ${formatInteger(preview.reward)} Empire Points.`);
+      setAnnouncement(localize(locale,
+        `Rebirth ready. Current reward ${formatInteger(preview.reward)} Empire Points.`,
+        `Rebirth bereit. Aktuelle Belohnung ${formatInteger(preview.reward)} Empire Points. Dein Imperium hat die Reset-Taste offiziell zur Strategie erklärt.`));
     else if (!preview.eligible) setAnnouncement('');
     wasEligible.current = preview.eligible;
   }, [preview.eligible, preview.reward, locale]);

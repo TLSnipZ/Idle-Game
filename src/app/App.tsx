@@ -3,7 +3,7 @@ import { CITY_NAME } from '../features/territories';
 import { getOfflineCapMs } from '../game/offline-cap';
 import { formatOfflineDuration } from './offline-presentation';
 import { OfflineReturn } from './OfflineReturn';
-import { setGamePresentationLocale, useGame } from './use-game';
+import { useGame } from './use-game';
 import { useSaveManagement } from './SaveManagement';
 import { useRebirthControls } from './RebirthPanel';
 import { DEFAULT_SECTION, PRIMARY_SECTIONS, SECTION } from './navigation';
@@ -52,7 +52,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const handledReview = useRef(0);
   const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
   const handledObjective = useRef(0);
-  useEffect(() => { setGamePresentationLocale(preferences.settings.locale); }, [preferences.settings.locale]);
+  useEffect(() => { game.setPresentationLocale(preferences.settings.locale); }, [game.setPresentationLocale, preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
       const requested = document.getElementById(objectiveRequest.headingId);
@@ -64,11 +64,6 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
     } else if (previous.current !== active) { heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0 }); }
     previous.current = active;
   }, [active, reviewRequest, objectiveRequest]);
-  useEffect(() => {
-    if (!settingsOpen) return;
-    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setSettingsOpen(false); };
-    window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close);
-  }, [settingsOpen]);
   const section = PRIMARY_SECTIONS.find(item => item.id === active) ?? SECTION.overview;
   const [sectionLabelKey, sectionDescriptionKey] = SECTION_COPY[section.id];
   const paused = game.runtimeError !== null;

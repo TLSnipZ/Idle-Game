@@ -1,7 +1,10 @@
+import { villagerText } from './villager-language';
+import type { Locale } from './localization';
 import type { RequirementResult } from '../game/requirement';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 
-function requirementDescription(description: string, locale: 'en' | 'de') {
+function requirementDescription(description: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(description);
   if (locale === 'en') return description;
   if (description === 'Own at least one business') return 'Besitze mindestens ein Business';
   if (description.startsWith('Player Level ')) return description.replace('Player Level ', 'Spielerlevel ');

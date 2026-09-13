@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DEFAULT_LOCALE } from './localization';
+import { DEFAULT_LOCALE, isLocale } from './localization';
 import type { Locale } from './localization';
 
 const SETTINGS_KEY = 'solara-city:settings';
@@ -14,7 +14,7 @@ function readSettings(): PresentationSettings {
     if (typeof parsed !== 'object' || parsed === null) return DEFAULT_SETTINGS;
     const value = parsed as Record<string, unknown>;
     return {
-      locale: value.locale === 'de' || value.locale === 'en' ? value.locale : DEFAULT_LOCALE,
+      locale: isLocale(value.locale) ? value.locale : DEFAULT_LOCALE,
       reducedMotion: typeof value.reducedMotion === 'boolean' ? value.reducedMotion : false,
     };
   } catch { return DEFAULT_SETTINGS; }
@@ -23,7 +23,7 @@ function readSettings(): PresentationSettings {
 export function useSettings() {
   const [settings, setSettings] = useState<PresentationSettings>(readSettings);
   useEffect(() => {
-    document.documentElement.lang = settings.locale;
+    document.documentElement.lang = settings.locale === 'villager' ? 'en-x-villager' : settings.locale;
     document.documentElement.dataset.reducedMotion = settings.reducedMotion ? 'true' : 'false';
     try { window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* Presentation preferences may fail without pausing gameplay. */ }
   }, [settings]);

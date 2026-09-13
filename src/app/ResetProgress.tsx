@@ -13,6 +13,7 @@ export function ResetProgress({ unavailable, onReset }: {
   const text = useLocalizedText();
   const [interaction, setInteraction] = useState(INITIAL_RESET_PROGRESS);
   const [controls] = useState(() => createResetProgressControls(onReset, setInteraction, locale));
+  useEffect(() => { controls.setLocale(locale); }, [controls, locale]);
   const cancel = useRef<HTMLButtonElement>(null);
   const review = useRef<HTMLButtonElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);

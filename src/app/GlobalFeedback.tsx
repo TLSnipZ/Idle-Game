@@ -7,21 +7,7 @@ import { describePersistence } from './game-presentation';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
 
-function localizedUnlock(name: string, locale: 'en' | 'de') {
-  if (locale === 'en') return name;
-  const knownIds = [
-    'business:dockside-detail','business:neon-laundry','business:afterdark-customs','business:solara-nights',
-    'vehicle:kairo-kx-r','crew:rico-vale','crew:mara-knox','crew:jax-mercer','territory:waterfront','territory:neon-mile',
-    'upgrade:commercial-pressure-washer','upgrade:industrial-detailing-line','upgrade:fleet-logistics','upgrade:street-connections','upgrade:express-tips',
-    'automation:delivery-dispatcher','automation:business-auto-upgrader',
-    'skill:streetwise-investment','skill:fast-talker','skill:learn-the-streets','skill:silent-partner','skill:never-sleeps',
-  ];
-  for (const id of knownIds) {
-    const localized = localizedContent(locale, id, 'name', name);
-    if (localized !== name) return localized;
-  }
-  return name;
-}
+import { localizedUnlock } from './unlock-localization';
 
 export function GlobalFeedback({ game, transferMessage, rebirthMessage }: {
   readonly game: ReturnType<typeof useGame>; readonly transferMessage: string; readonly rebirthMessage: string;

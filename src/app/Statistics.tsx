@@ -21,11 +21,11 @@ export function Statistics({ state }: { readonly state: GameState }) {
     <h2 id="statistics-heading">{text('STATISTICS', 'STATISTIKEN')}</h2>
     <p>{text('Lifetime history · Kept through Rebirth · because somebody has to remember the receipts.', 'Lifetime-Historie · Bleibt durch Rebirth erhalten · irgendwer muss die Belege schließlich behalten.')}</p>
     <dl className="statistics-grid">{selectStatistics(state).map(entry => {
-      const localized = locale === 'de' ? DE[entry.key] : undefined;
+      const localized = DE[entry.key];
       const value = `${format.format(entry.value)}${entry.key === 'peakHeat' ? ' / 100' : ''}`;
       return <div className="statistics-entry" key={entry.key}>
-        <dt>{localized?.[0] ?? entry.label}</dt>
-        <dd><strong>{value}</strong><p>{localized?.[1] ?? entry.description}</p></dd>
+        <dt>{text(entry.label, localized?.[0] ?? entry.label)}</dt>
+        <dd><strong>{value}</strong><p>{text(entry.description, localized?.[1] ?? entry.description)}</p></dd>
       </div>;})}</dl>
   </section>;
 }

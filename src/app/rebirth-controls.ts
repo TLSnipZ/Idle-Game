@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import type { RebirthTransactionResult } from '../platform/persistent-game';
 import { DEFAULT_LOCALE } from './localization';
 import type { Locale } from './localization';
@@ -6,6 +7,7 @@ import { localize } from './LocalizationProvider';
 export interface RebirthControlsState { readonly confirming: boolean; readonly message: string }
 export const INITIAL_REBIRTH_CONTROLS: RebirthControlsState = { confirming: false, message: '' };
 function requirementText(description: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(description);
   if (locale === 'en') return description;
   if (description.startsWith('Player Level ')) return description.replace('Player Level ', 'Spielerlevel ');
   return description;

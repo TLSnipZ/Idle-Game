@@ -16,7 +16,7 @@ try {
   }
   assert.ok(ready, 'Production preview starts');
   browser = await chromium.launch({ headless: true });
-  for (const locale of ['en', 'de']) for (const width of [320, 390, 740, 1024, 1440]) for (const owner of [false, true]) {
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) for (const owner of [false, true]) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const errors = [];
     const page = await context.newPage();
@@ -33,14 +33,14 @@ try {
     await page.goto('http://127.0.0.1:4173');
     await page.locator('button[data-section="collection"]').count().then(async count => {
       if (count) await page.locator('button[data-section="collection"]').click();
-      else await page.getByRole('button', { name: locale === 'en' ? /^COLLECTION$/i : /^SAMMLUNG$/i }).click();
+      else await page.getByRole('button', { name: locale === 'de' ? /^SAMMLUNG$/i : /COLLECTION$/i }).click();
     });
     await page.locator('.garage-active-summary').waitFor();
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
     assert.equal(saved.version, 18);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
     if (!owner) {
-      await page.getByRole('button', { name: locale === 'en' ? 'Buy Kairo KX-R' : 'Kairo KX-R kaufen', exact: true }).click();
+      await page.getByRole('button', { name: locale === 'de' ? /Kairo KX-R kaufen$/ : /Buy Kairo KX-R$/ }).click();
       await page.waitForFunction(() => JSON.parse(localStorage.getItem('crime-empire:save')).state.garage.activeVehicleId === 'vehicle:kairo-kx-r');
     }
     assert.equal(await page.locator('.garage-active-summary strong').textContent(), 'Kairo KX-R');

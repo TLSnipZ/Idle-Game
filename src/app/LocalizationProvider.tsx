@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { DEFAULT_LOCALE } from './localization';
@@ -14,9 +15,9 @@ export function useLocale(): Locale { return useContext(LocaleContext); }
 /** Presentation helper for copy that has not yet earned a stable message key. */
 export function useLocalizedText() {
   const locale = useLocale();
-  return (english: string, german: string) => locale === 'de' ? german : english;
+  return (english: string, german: string) => localize(locale, english, german);
 }
 
 export function localize(locale: Locale, english: string, german: string): string {
-  return locale === 'de' ? german : english;
+  return locale === 'de' ? german : locale === 'villager' ? villagerText(english) : english;
 }

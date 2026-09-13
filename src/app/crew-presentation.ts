@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import { acquisitionPresentation } from './acquisition-presentation';
 import { findCrewMember, findCrewSlot } from '../features/crew';
 import type { CrewEffect } from '../features/crew';
@@ -11,6 +12,7 @@ import type { Locale } from './localization';
 import { localize } from './LocalizationProvider';
 
 function requirementText(description: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(description);
   if (locale === 'en') return description;
   if (description.startsWith('Player Level ')) return description.replace('Player Level ', 'Spielerlevel ');
   if (description.startsWith('Own ')) return description.replace('Own ', 'Besitze ');

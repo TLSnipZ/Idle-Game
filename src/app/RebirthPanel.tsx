@@ -1,3 +1,4 @@
+import { villagerText } from './villager-language';
 import { formatInteger } from './number-format';
 import { useEffect, useRef, useState } from 'react';
 import { REBIRTH_POLICY, selectRebirth } from '../game/rebirth';
@@ -13,15 +14,18 @@ import { useLocale, useLocalizedText } from './LocalizationProvider';
 export function RebirthPanel({ state, unavailable, onRebirth }: {
   readonly state: GameState; readonly unavailable: boolean; readonly onRebirth: () => RebirthTransactionResult;
 }) {
-  const { interaction, controls } = useRebirthControls(onRebirth);
+  const locale = useLocale();
+  const { interaction, controls } = useRebirthControls(onRebirth, locale);
   return <RebirthPanelView preview={selectRebirth(state)} unavailable={unavailable} interaction={interaction} controls={controls} />;
 }
 export function useRebirthControls(onRebirth: () => RebirthTransactionResult, locale: Locale = DEFAULT_LOCALE) {
   const [interaction, setInteraction] = useState(INITIAL_REBIRTH_CONTROLS);
   const [controls] = useState(() => createRebirthControls(onRebirth, setInteraction, locale));
+  useEffect(() => { controls.setLocale(locale); }, [controls, locale]);
   return { interaction, controls };
 }
 function policyLabel(label: string, locale: Locale) {
+  if (locale === 'villager') return villagerText(label.replace(' (both fractional remainders)', ''));
   if (locale === 'en') return label.replace(' (both fractional remainders)', '');
   const translated: Record<string, string> = {
     'Active city event and opportunity progress': 'Aktives Stadtevent und Opportunity-Fortschritt',
