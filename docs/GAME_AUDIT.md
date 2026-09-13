@@ -102,3 +102,30 @@ This audit's automated acceptance checks have passed; PR #24 carries the release
 Next technical priority is
 the inherited UI-test repair above; then resume Tier-1 Garage and Heat/Police 2.0.
 Do not silently start those content phases as part of this audit.
+
+
+## Villager overkill verification — PR #25
+
+The user explicitly replaced the readable-gloss contract with intentionally
+incomprehensible Villager copy. Production code commit
+`08a3c494ec443d8a190e58fc73fe88fb49bc79a1` passed [verification run 34763014203](https://github.com/TLSnipZ/Idle-Game/actions/runs/34763014203).
+
+- Strict TypeScript / Vite production build and git diff --check passed.
+- Full suite: 2,252 tests, 2,190 passed, 62 inherited failures; unchanged from
+  PR #24. The regression gate found no new failures, removed baseline tests or
+  increased skips. The obsolete gloss assertion now tests the requested gibberish
+  contract; no test was disabled.
+- All 255 Chromium matrix cases passed (225 section cases plus 30 Garage cases),
+  with no root overflow, clipped checked metrics or page errors.
+- Villager prose audit passed across all five sections, three progression states
+  and five widths, expanded Guidance, collapsed disclosure content, Settings,
+  accessibility descriptions, CSS pseudo-element text and browser title.
+- Real locale switching, repeated delivery feedback, export/invalid import,
+  pending confirmation preservation, advanced actions, Rebirth retention and
+  full New Game/reset/reload checks passed. Backup/input values and the literal
+  RESET confirmation token are deliberately excluded from prose translation.
+
+Evidence: [test reports, browser results and screenshots](https://github.com/TLSnipZ/Idle-Game/actions/runs/34763014203/artifacts/10319487928).
+Screenshots were generated, not manually inspected. Previous manual/device review
+limitations and the remaining audit backlog still apply. No new gameplay phase
+was started.
