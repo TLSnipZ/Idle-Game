@@ -6,6 +6,7 @@ import { OperationsSection } from './OperationsSection';
 import { City } from './City';
 import { CrewPanel } from './CrewPanel';
 import { CityEvents } from './CityEvents';
+import { VehicleTuning } from './VehicleTuning';
 import { Garage } from './Garage';
 import { RebirthPanelView } from './RebirthPanel';
 import type { useRebirthControls } from './RebirthPanel';
@@ -38,7 +39,7 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />
       <CityEvents state={state} paused={paused} onChoose={game.chooseEvent} />
     </div>;
-    case SECTION.collection.id: return <Garage state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} />;
+    case SECTION.collection.id: return <><Garage workshop state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} /><VehicleTuning state={state} paused={paused || game.persistence.kind === 'blocked'} onConfigure={game.configureTuning} /></>;
     case SECTION.empire.id: return <div className="section-stack">
       <RebirthPanelView preview={selectRebirth(state)} unavailable={paused || game.persistence.kind === 'blocked'} interaction={rebirth.interaction} controls={rebirth.controls} />
       <SkillTree state={state} paused={paused} onPurchase={game.buySkill} />

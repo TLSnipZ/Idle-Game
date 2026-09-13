@@ -1,5 +1,12 @@
 # Post-roadmap priorities
 
+## Current phase — Garage 2.0 I: KX-R tuning
+
+Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](GARAGE_TUNING.md) for prices, balance, persistence and verification scope.
+
+This completes the first tuning pilot only. Next separate scope: model-specific Senda/Lilt tuning after reviewing this slice; visual customization and later vehicle tiers remain planned. Release evidence is tracked in the PR; user live acceptance remains separate.
+
+
 ## Current phase — Heat V: Support network
 
 Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce

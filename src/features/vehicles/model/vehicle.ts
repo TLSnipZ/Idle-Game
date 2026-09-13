@@ -2,8 +2,11 @@ import type { Money } from '../../economy';
 import type { Modifier } from '../../../game/modifiers';
 import type { Requirement } from '../../../game/requirement';
 
+import type { VehicleBuilds } from '../config/tuning-config';
+
 export type VehicleId = `vehicle:${string}`;
 export interface GarageState {
+  readonly builds?: VehicleBuilds;
   readonly ownedVehicleIds: readonly VehicleId[];
   readonly activeVehicleId: VehicleId | null;
 }

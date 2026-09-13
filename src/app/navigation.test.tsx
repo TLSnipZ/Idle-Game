@@ -47,7 +47,7 @@ function view(state = fresh(), overrides: Partial<ReturnType<typeof useGame>> = 
   return { setPresentationLocale: vi.fn(), replacementSequence: 0, resetProgress: vi.fn(() => ({ ok: true as const })), snapshot: { ok: true, state }, runtimeError: null, persistence: { kind: 'ready' },
     offline: null, feedback: { sequence: 0, message: '' }, achievementEvent: undefined, cityEvent: undefined,
     automationEvent: undefined, levelEvent: undefined, dismissOffline: vi.fn(),
-    runManhuntDecoy: vi.fn(), chooseDistrict: vi.fn(), runDiscreetDelivery: vi.fn(), runRiskyDelivery: vi.fn(), runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
+    configureTuning: vi.fn(), runManhuntDecoy: vi.fn(), chooseDistrict: vi.fn(), runDiscreetDelivery: vi.fn(), runRiskyDelivery: vi.fn(), runStarterJob: vi.fn(), buyBusiness: vi.fn(), upgradeOwnedBusiness: vi.fn(), buyUpgrade: vi.fn(),
     buyAutomation: vi.fn(), changeAutoUpgraderTarget: vi.fn(), toggleAutomation: vi.fn(), buyVehicle: vi.fn(), chooseActiveVehicle: vi.fn(), coolDown: vi.fn(), takeTerritory: vi.fn(),
     recruitCrew: vi.fn(), assignCrew: vi.fn(), unassignCrew: vi.fn(), chooseEvent: vi.fn(), buySkill: vi.fn(),
     rebirth: vi.fn(() => ({ ok: true as const, reward: 4 })), saveActions: { ...rebirthRuntime(state).game,
@@ -260,8 +260,8 @@ describe('navigation around the unchanged authoritative runtime', () => {
   it('v17 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
     const state = autoUpgraderState(), h = harness(view(state)); h.select(SECTION.empire.id); h.rebirthControls.request();
     const saved = serializeSave(state,1234), code = exportSaveCode(state,1234); if (!saved.ok || !code.ok) throw Error('fixture');
-    expect(CURRENT_SAVE_VERSION).toBe(20); expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 20,state}});
+    expect(CURRENT_SAVE_VERSION).toBe(21); expect(code.code.startsWith('CE1-')).toBe(true);
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 21,state}});
     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
   });
 });

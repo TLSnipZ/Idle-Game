@@ -144,7 +144,7 @@ try {
     assert.equal(await trigger.evaluate(element => element === document.activeElement), true);
     await page.reload();
     assert.equal(await page.locator('html').getAttribute('lang'), locale === 'villager' ? 'en-x-villager' : locale);
-    assert.equal((await saved(page)).version, 20);
+    assert.equal((await saved(page)).version, 21);
     assert.deepEqual(errors, []);
     await context.close();
   }
@@ -543,9 +543,71 @@ try {
     assert.deepEqual(errors, []); await context.close();
   }
 
+
+  // KX-R tuning: v20 migration, durable purchase failure, one active setup, free swaps and reload.
+  for (const locale of ['en', 'de', 'villager']) for (const width of [320, 390, 740, 1024, 1440]) {
+    const fixture = structuredClone(fixtures[0]);
+    fixture.version = 20;
+    fixture.state.economy.cash = '5000000';
+    fixture.state.garage = { ownedVehicleIds: ['vehicle:kairo-kx-r', 'vehicle:kairo-senda'], activeVehicleId: 'vehicle:kairo-kx-r' };
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage(), errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(({ fixture, locale }) => {
+      if (sessionStorage.getItem('tuning-initialized')) return;
+      fixture.savedAt = Date.now();
+      localStorage.setItem('crime-empire:save', JSON.stringify(fixture));
+      localStorage.setItem('solara-city:settings', JSON.stringify({ locale, reducedMotion: true }));
+      sessionStorage.setItem('tuning-initialized', 'true');
+    }, { fixture, locale });
+    await page.goto('http://127.0.0.1:4174');
+    await navigation(page).nth(3).click();
+    const fleet = page.locator('[data-tuning-id="tuning:kxr-fleet-gearing"] button');
+    const courier = page.locator('[data-tuning-id="tuning:kxr-courier-ecu"] button');
+    await page.evaluate(() => {
+      const write = Storage.prototype.setItem;
+      document.documentElement.dataset.failTuningSave = 'true';
+      Storage.prototype.setItem = function(key, value) {
+        if (key === 'crime-empire:save' && document.documentElement.dataset.failTuningSave === 'true') throw Error('quota');
+        return write.call(this, key, value);
+      };
+    });
+    await fleet.click();
+    assert.equal((await saved(page)).state.economy.cash, '5000000');
+    assert.equal((await saved(page)).state.garage.builds, undefined);
+    assert.ok(await page.locator('.save-status-warning').isVisible());
+    await page.evaluate(() => { document.documentElement.dataset.failTuningSave = 'false'; });
+    await fleet.click();
+    assert.equal((await saved(page)).state.economy.cash, '3500000');
+    assert.equal(await fleet.isDisabled(), true);
+    await courier.click();
+    assert.equal((await saved(page)).state.economy.cash, '2500000');
+    assert.equal(await courier.isDisabled(), true);
+    await navigation(page).nth(1).click();
+    await page.locator('.operations-primary-action').click();
+    assert.equal((await saved(page)).state.economy.cash, '2502700');
+    if (locale === 'villager') await assertVillagerOnly(page);
+    else assert.ok((await page.locator('.modifier-breakdown').first().textContent()).includes(locale === 'de' ? 'Kurier-Steuergerät' : 'Courier ECU'));
+    await navigation(page).nth(3).click();
+    await fleet.click();
+    assert.equal((await saved(page)).state.economy.cash, '2502700');
+    assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].purchasedIds.length, 2);
+    await page.locator('.tuning-stock').click();
+    assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, null);
+    await courier.click();
+    await page.reload(); await navigation(page).nth(3).click();
+    assert.equal((await saved(page)).version, 21);
+    assert.equal(await courier.isDisabled(), true);
+    assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, 'tuning:kxr-courier-ecu');
+    if (locale === 'villager') await assertVillagerOnly(page);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({ path: 'browser-evidence/tuning-' + locale + '-' + width + '.png', fullPage: true });
+    assert.deepEqual(errors, []); await context.close();
+  }
+
   const layoutFailures = results.filter(item => item.overflow > 1 || item.clippedMetrics.length);
   assert.deepEqual(layoutFailures, [], 'No page overflow or clipped financial metrics across the full matrix');
-  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, manhuntCases: 15, heatSupportCases: 15, localeSwitchAndFeedback: true,
+  console.log(JSON.stringify({ sectionCases: results.length, riskDeliveryCases: 15, policePressureCases: 15, districtHeatCases: 15, manhuntCases: 15, heatSupportCases: 15, tuningCases: 15, localeSwitchAndFeedback: true,
     keyboardModalAndReload: true, advancedCrossFeatureFlows: 3, exportAndInvalidImport: true, resetConsentSurvivesLocaleSwitch: true, results }, null, 2));
 } finally {
   writeFileSync('browser-evidence/game-audit.json', JSON.stringify(results, null, 2));

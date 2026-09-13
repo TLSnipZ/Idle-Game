@@ -2,7 +2,7 @@ import { collectCrewModifiers } from '../features/crew';
 import { DISCREET_DELIVERY_BONUS_BASIS_POINTS, getPolicePressure, collectHeatModifiers } from '../features/heat';
 import { WATERFRONT, getDistrictHeat, collectTerritoryModifiers } from '../features/territories';
 import { collectSkillModifiers } from '../features/skills';
-import { assertGarageState, findVehicle } from '../features/vehicles';
+import { activeTuning, assertGarageState, findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
 import { findBusiness, getLevelProduction, getOwnedProductionInputs } from '../features/businesses';
 import { STARTER_JOB } from '../features/economy';
@@ -22,7 +22,8 @@ export function collectModifiers(state: GameState, context: 'manual' | 'dispatch
   });
   assertGarageState(state.garage);
   const activeVehicle = findVehicle(state.garage.activeVehicleId);
-  const vehicles = activeVehicle ? [activeVehicle.modifier] : [];
+  const tuning = activeTuning(state.garage);
+  const vehicles = [...(activeVehicle ? [activeVehicle.modifier] : []), ...(tuning ? [tuning.modifier] : [])];
   return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(context === 'dispatcher' ? getDistrictHeat(state.city, WATERFRONT.id) : state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {

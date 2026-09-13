@@ -2,7 +2,7 @@ import { findCrewMember } from '../features/crew';
 import { heatModifierName } from './heat-presentation';
 import { findTerritory } from '../features/territories';
 import { findSkill } from '../features/skills';
-import { findVehicle } from '../features/vehicles';
+import { findTuning, findVehicle } from '../features/vehicles';
 import type { Modifier } from '../game/modifiers';
 import { findUpgrade } from '../features/upgrades';
 import { formatModifier } from './stat-format';
@@ -12,6 +12,7 @@ export function ModifierBreakdown({ modifiers }: { readonly modifiers: readonly 
   const locale = useLocale();
   const text = useLocalizedText();
   return <ul className="modifier-breakdown">{modifiers.map(modifier => {
+    const tuning = findTuning(modifier.sourceId);
     const crew = findCrewMember(modifier.sourceId);
     const upgrade = findUpgrade(modifier.sourceId);
     const vehicle = findVehicle(modifier.sourceId);
@@ -19,7 +20,7 @@ export function ModifierBreakdown({ modifiers }: { readonly modifiers: readonly 
     const territory = findTerritory(modifier.sourceId);
     const raw = crew?.name ?? upgrade?.name ?? vehicle?.name ?? skill?.name ?? territory?.name ?? modifier.sourceId;
     const id = crew?.id ?? upgrade?.id ?? vehicle?.id ?? skill?.id ?? territory?.id;
-    const source = heatModifierName(modifier, locale) ?? (id ? localizedContent(locale, id, 'name', raw) : raw);
+    const source = tuning ? text(tuning.name, tuning.germanName) : heatModifierName(modifier, locale) ?? (id ? localizedContent(locale, id, 'name', raw) : raw);
     return <li key={modifier.id}>{text(source)}: {formatModifier(modifier)}</li>;
   })}</ul>;
 }

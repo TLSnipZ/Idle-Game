@@ -1,5 +1,5 @@
 import './GarageActive.css';
-import { VEHICLE_CATALOG } from '../features/vehicles';
+import { activeTuning, VEHICLE_CATALOG } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
 import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
 import { formatPrice } from './number-format';
@@ -9,13 +9,15 @@ import { RequirementList } from './RequirementList';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
 
-export function Garage({ state, paused, onPurchase, onSelect }: {
+export function Garage({ state, paused, onPurchase, onSelect, workshop = false }: {
+  readonly workshop?: boolean;
   readonly state: GameState; readonly paused: boolean; readonly onPurchase: (id: string) => void;
   readonly onSelect: (id: string) => void;
 }) {
   const locale = useLocale();
   const text = useLocalizedText();
   const collection = selectGarage(state);
+  const fitted = activeTuning(state.garage);
   return <section className="garage" aria-labelledby="garage-heading">
     <div className="panel-heading"><h2 id="garage-heading">{text('Garage', 'Garage')}</h2>
       <span>{text('Owned vehicles:', 'Fahrzeuge im Besitz:')} {collection.ownedVehicleCount} / {collection.totalConfiguredVehicles}</span></div>
@@ -27,6 +29,8 @@ export function Garage({ state, paused, onPurchase, onSelect }: {
           'Nur dein aktives Fahrzeug liefert seinen Bonus. Besitz und Auswahl bleiben bei Rebirth erhalten. Der Rest parkt kostenlos. Noch.')
         : text('Your first purchase activates automatically. Empty parking spaces have terrible performance.',
           'Dein erster Kauf wird automatisch aktiv. Leere Parkplätze haben erschreckend wenig Leistung.')}</p>
+      {fitted && <p>{text('Fitted setup:', 'Eingebautes Setup:')} <strong>{text(fitted.name, fitted.germanName)}</strong></p>}
+      {workshop && <a className="action-button secondary-button garage-workshop-link" href="#tuning-heading">{text('Open KX-R workshop', 'KX-R-Werkstatt öffnen')}</a>}
     </div>
     <div className="garage-catalog">{VEHICLE_CATALOG.map(vehicle => {
       const view = selectVehicle(state, vehicle.id);

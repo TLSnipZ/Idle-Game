@@ -51,6 +51,7 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : localize(locale, `${business?.name ?? 'Business'} acquired. Live production has started.`, `${business?.name ?? 'Business'} übernommen. Produktion läuft. Papierkram angeblich auch.`);
   }
   switch (result.error) {
+    case 'tuning-not-owned': return localize(locale, 'Buy this setup before fitting it.', 'Erst kaufen, dann einbauen. Der Mechaniker arbeitet nicht für Ruhm.');
     case 'no-manhunt': return localize(locale, 'No local MANHUNT. Keep the decoy money.', 'Keine lokale Großfahndung. Das Geld fürs Ablenkungsmanöver bleibt bei dir.');
     case 'district-manhunt': return localize(locale, 'Police roadblocks prevent travel. Clear local MANHUNT first.', 'Polizeisperren verhindern den Wechsel. Erst die lokale Großfahndung abschütteln.');
     case 'district-not-owned': return localize(locale, 'Control that district before moving operations.', 'Erst den Bezirk übernehmen, dann den Standort wechseln. Expansion braucht leider Papierkram.');
