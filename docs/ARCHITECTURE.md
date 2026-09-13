@@ -1,5 +1,11 @@
 # Architecture
 
+## Heat II — Police Pressure
+
+Derived pressure from existing Heat, action-local reward factors, shared atomic
+manual cooling delivery and zero XP. Save v19 / CE1 remain unchanged.
+See [POLICE_PRESSURE.md](POLICE_PRESSURE.md) for boundaries and verification.
+
 ## Heat / Police 2.0 I — Risk & Reward
 
 Action-local risky reward modifier and shared atomic manual delivery completion.

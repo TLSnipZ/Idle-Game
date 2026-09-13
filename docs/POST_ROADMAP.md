@@ -1,5 +1,13 @@
 # Post-roadmap priorities
 
+## Current phase — II Police Pressure
+
+Implemented on `feat/police-pressure`: WATCHED reduces risk premium to +25%;
+discreet delivery pays half normal Cash, zero XP, and cools up to 2 Heat.
+See [POLICE_PRESSURE.md](POLICE_PRESSURE.md). Save v19 / CE1 unchanged.
+Verification and deployment pending. PR #29 completed and deployed Heat I.
+Next separate scope: III District Heat. Earlier handoffs below are historical.
+
 ## Current phase — Heat / Police 2.0 I: Risk & Reward
 
 Implemented on `feat/heat-risk-reward`: optional +50% Cash / +5 Heat delivery,

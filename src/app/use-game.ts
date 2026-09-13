@@ -19,7 +19,7 @@ import { purchaseUpgrade } from '../game/purchase-upgrade';
 import { upgradeBusiness } from '../game/upgrade-business';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createInitialGameState } from '../game/game-state';
-import { performRiskyDelivery, performStarterJob } from '../game/perform-starter-job';
+import { performDiscreetDelivery, performRiskyDelivery, performStarterJob } from '../game/perform-starter-job';
 import { purchaseBusiness } from '../game/purchase-business';
 import { createPersistentGame } from '../platform/persistent-game';
 import { describeAction } from './game-presentation';
@@ -55,6 +55,13 @@ export function useGame() {
       setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('delivery', result, undefined, localeRef.current) }));
       return result;
     });
+  }
+
+  function runDiscreetDelivery() {
+    const result = runtime.execute(performDiscreetDelivery);
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result ? describeAction('delivery', result, undefined, localeRef.current)
+        : localize(localeRef.current, 'Delivery unavailable while paused.', 'Lieferung während der Pause nicht verfügbar.') }));
   }
 
   function runRiskyDelivery() {
@@ -119,5 +126,5 @@ export function useGame() {
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message: result?.ok ? localize(localeRef.current, `Auto-Upgrader target set to ${findBusiness(id)?.name}.`, `Auto-Upgrader-Ziel auf ${findBusiness(id)?.name} gesetzt. Dein Cash kennt jetzt seine nächste Bestimmung.`) : localize(localeRef.current, 'Auto-Upgrader target could not be changed.', 'Auto-Upgrader-Ziel konnte nicht geändert werden. Die Maschine verweigert die Umstrukturierung.') }));
   }
 
-  return { runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { runDiscreetDelivery, runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

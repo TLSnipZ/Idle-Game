@@ -1,5 +1,12 @@
 # Base Game balance
 
+## Heat II — Police Pressure
+
+Risk premium is +50% below 40 Heat, +25% at 40–59, unavailable from 60.
+Discreet delivery: half exact normal manual Cash, 0 XP, up to −2 Heat, positive
+Heat required. Existing normal/Dispatcher penalties remain. Current values supersede
+Heat I below. See [POLICE_PRESSURE.md](POLICE_PRESSURE.md).
+
 ## Heat / Police 2.0 I — Risk & Reward
 
 Optional manual No-Questions Delivery: +50% exact manual Cash, 10 base XP, +5 Heat;

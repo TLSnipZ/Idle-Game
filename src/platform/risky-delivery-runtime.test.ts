@@ -10,7 +10,7 @@ describe('risk delivery runtime boundary', () => {
     const f = rebirthRuntime({ ...base, city: { ...base.city, heat: 60, heatDecayElapsedMs: 59999 } });
     f.at(1);
     const result = f.game.execute(performRiskyDelivery);
-    expect(result).toMatchObject({ ok: true, moneyEarned: '3750' });
+    expect(result).toMatchObject({ ok: true, moneyEarned: '3125' });
     expect(f.game.getSnapshot().result.state.city.heat).toBe(64);
     const decoded = parseSave(f.raw());
     expect(decoded.ok && decoded.envelope.state.city.heat).toBe(64);

@@ -19,7 +19,7 @@ describe('Heat I: optional risk and reward', () => {
     const preview = selectRiskyDelivery(s);
     const result = performRiskyDelivery(s);
     expect(preview.canRun).toBe(true);
-    expect(result).toMatchObject({ ok: true, moneyEarned: '3750', xpEarned: 10 });
+    expect(result).toMatchObject({ ok: true, moneyEarned: heat >= 40 ? '3125' : '3750', xpEarned: 10 });
     expect(result.state.city).toMatchObject({ heat: heat + 5, heatDecayElapsedMs: s.city.heatDecayElapsedMs });
     expect(result.state.permanentProgression.statistics).toMatchObject({ manualJobsCompleted: 1, peakHeat: heat + 5 });
     expect(result.state.progression.xp).toBe(10);
