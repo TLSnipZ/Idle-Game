@@ -22,7 +22,7 @@ async function assertVillagerOnly(page) {
   const leaks = await page.evaluate(() => {
     const found = [];
     const inspect = (value, element, kind) => {
-      if (!value || !/[a-gi-ln-qs-z]/i.test(value)) return;
+      if (!value || !/\p{L}/u.test(value.replace(/[hmr]/gi, ''))) return;
       found.push({ kind, tag: element.tagName, className: element.className, value: value.slice(0, 140) });
     };
     const walker = document.createTreeWalker(document.querySelector('.app-shell'), NodeFilter.SHOW_TEXT);
@@ -34,6 +34,13 @@ async function assertVillagerOnly(page) {
     }
     for (const element of document.querySelectorAll('.app-shell [aria-label], .app-shell [aria-valuetext], .app-shell [title], .app-shell [alt], .app-shell [placeholder]')) {
       for (const attribute of ['aria-label', 'aria-valuetext', 'title', 'alt', 'placeholder']) inspect(element.getAttribute(attribute), element, attribute);
+    }
+    inspect(document.title, document.documentElement, 'title');
+    for (const element of document.querySelectorAll('.app-shell *')) {
+      for (const pseudo of ['::before', '::after']) {
+        const content = getComputedStyle(element, pseudo).content;
+        if (content !== 'none' && content !== 'normal') inspect(content, element, pseudo);
+      }
     }
     return found;
   });

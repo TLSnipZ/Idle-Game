@@ -50,7 +50,7 @@ export function SaveManagementView({ state, controls }: {
           <button className="action-button danger-button" onClick={() => { controls.confirm(); validateButton.current?.focus(); }}>{text('Confirm import', 'Import bestätigen')}</button>
           <button ref={cancelButton} aria-label={text('Cancel import', 'Import abbrechen')} className="action-button" onClick={() => { controls.cancel(); validateButton.current?.focus(); }}>{text('Cancel', 'Abbrechen')}</button>
         </div>}
-        <p id="save-feedback" className={state.invalidInput ? 'save-feedback-error' : undefined} role="status" aria-live="polite" aria-atomic="true">{state.invalidInput && `${'ERROR', 'FEHLER'} · `}{text(state.message)}</p>
+        <p id="save-feedback" className={state.invalidInput ? 'save-feedback-error' : undefined} role="status" aria-live="polite" aria-atomic="true">{state.invalidInput && `${text('ERROR', 'FEHLER')} · `}{text(state.message)}</p>
       </div>
     </div>
   </section>;
