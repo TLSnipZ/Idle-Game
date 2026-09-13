@@ -81,9 +81,9 @@ try {
       }
 
       if (section === 1) {
-        assert.equal(await page.locator('.delivery-button').evaluate(button =>
+        assert.equal(await page.locator('.operations-primary-action').evaluate(button =>
           Boolean(button.compareDocumentPosition(document.querySelector('.district-heat')) & Node.DOCUMENT_POSITION_FOLLOWING)), true, 'Primary job precedes district management');
-        assert.ok(await page.locator('.delivery-button').isVisible());
+        assert.ok(await page.locator('.operations-primary-action').isVisible());
         if (stage === 1) {
           const summary = page.locator('.activity-news summary');
           if (await summary.count()) {
@@ -155,7 +155,7 @@ try {
   const storagePage = await storageContext.newPage();
   await storagePage.goto('http://127.0.0.1:4174');
   await navigation(storagePage).nth(1).click();
-  await storagePage.locator('.delivery-button').click();
+  await storagePage.locator('.operations-primary-action').click();
   const storedBeforeFailure = await saved(storagePage);
   const cashBeforeFailure = await storagePage.locator('.hud-cash dd').textContent();
   await storagePage.evaluate(() => {
@@ -166,7 +166,7 @@ try {
     };
     document.documentElement.dataset.failSave = 'true';
   });
-  await storagePage.locator('.delivery-button').click();
+  await storagePage.locator('.operations-primary-action').click();
   assert.notEqual(await storagePage.locator('.hud-cash dd').textContent(), cashBeforeFailure, 'Ordinary delivery remains live');
   assert.deepEqual(await saved(storagePage), storedBeforeFailure, 'Failed write leaves stored progress intact');
   assert.ok(await storagePage.locator('.save-status-warning summary').isVisible());
@@ -177,7 +177,7 @@ try {
     const box = el.getBoundingClientRect(); return box.left >= 0 && box.right <= innerWidth;
   }), 'Save explanation fits mobile width');
   await storagePage.evaluate(() => { document.documentElement.dataset.failSave = 'false'; });
-  await storagePage.locator('.delivery-button').click();
+  await storagePage.locator('.operations-primary-action').click();
   assert.equal(await storagePage.locator('.save-status-warning').count(), 0);
   assert.equal(await storagePage.locator('.save-status').getAttribute('open'), '', 'Recovery preserves disclosure state');
   assert.match(await storagePage.locator('.save-status-details').textContent(), /last save result/);
@@ -193,7 +193,7 @@ try {
     await settings(page, locale);
     await navigation(page).nth(1).click();
     for (let attempt = 0; attempt < 2; attempt++) {
-      await page.locator('.delivery-button').click();
+      await page.locator('.operations-primary-action').click();
       const feedback = await page.locator('.feedback-command').textContent();
       if (locale !== 'villager') assert.ok(feedback.includes(locale === 'de' ? 'Lieferung erledigt.' : 'Delivery completed.'));
       else assert.doesNotMatch(feedback, /[a-gi-ln-qs-z]/i);
@@ -316,7 +316,7 @@ try {
     assert.equal(BigInt(after.economy.cash) - BigInt(before.economy.cash), 3125n);
     assert.equal(after.permanentProgression.statistics.manualJobsCompleted, before.permanentProgression.statistics.manualJobsCompleted + 1);
     assert.equal(await button.isDisabled(), true);
-    assert.equal(await page.locator('.delivery-button').isDisabled(), false);
+    assert.equal(await page.locator('.operations-primary-action').isDisabled(), false);
     if (locale === 'villager') await assertVillagerOnly(page);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await page.screenshot({ path: 'browser-evidence/risk-' + locale + '-' + width + '.png', fullPage: true });
@@ -414,7 +414,7 @@ try {
     assert.equal(current.economy.cash, '105500');
     assert.equal(current.progression.xp, 10);
     await district.selectOption('territory:waterfront');
-    await page.locator('.delivery-button').click();
+    await page.locator('.operations-primary-action').click();
     current = (await saved(page)).state;
     assert.equal(current.economy.cash, '107975');
     assert.equal(current.city.heat, 80);
@@ -457,7 +457,7 @@ try {
     const travel = page.locator('#active-district'), decoy = page.locator('.manhunt-decoy-button');
     assert.equal(await travel.isDisabled(), true);
     assert.equal(await decoy.isDisabled(), false);
-    assert.equal(await page.locator('.delivery-button').isDisabled(), false);
+    assert.equal(await page.locator('.operations-primary-action').isDisabled(), false);
     assert.equal(await page.locator('.discreet-delivery-button').isDisabled(), false);
     assert.equal(await page.locator('.risky-delivery-button').isDisabled(), true);
     if (locale === 'villager') await assertVillagerOnly(page);

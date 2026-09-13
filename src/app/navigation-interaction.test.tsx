@@ -102,8 +102,8 @@ describe('mounted navigation and one live runtime', () => {
   it('VIEW CREW changes only presentation and leaves saving and RNG idle', async () => {
     const f = await mount(), before = f.game().getSnapshot().result.state;
     const writes = f.writes(), reads = f.reads(), raw = f.raw();
-    expect(container.querySelector('.save-health')?.textContent).toContain('Autosave armed');
-    expect(container.querySelector('.save-health')?.closest('[aria-live]')).toBeNull();
+    expect(container.querySelector('.save-status summary')?.textContent).toContain('LOCAL AUTOSAVE');
+    expect(container.querySelector('.save-status summary')?.closest('[aria-live]')).toBeNull();
     await click('VIEW CREW');
     expect(content()).toContain('Active assignments');
     expect(content()).toContain('No specialist assigned.');
