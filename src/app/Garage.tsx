@@ -30,7 +30,7 @@ export function Garage({ state, paused, onPurchase, onSelect, workshop = false }
         : text('Your first purchase activates automatically. Empty parking spaces have terrible performance.',
           'Dein erster Kauf wird automatisch aktiv. Leere Parkplätze haben erschreckend wenig Leistung.')}</p>
       {fitted && <p>{text('Fitted setup:', 'Eingebautes Setup:')} <strong>{text(fitted.name, fitted.germanName)}</strong></p>}
-      {workshop && <a className="action-button secondary-button" href="#tuning-heading">{text('Open KX-R workshop', 'KX-R-Werkstatt öffnen')}</a>}
+      {workshop && <a className="action-button secondary-button garage-workshop-link" href="#tuning-heading">{text('Open KX-R workshop', 'KX-R-Werkstatt öffnen')}</a>}
     </div>
     <div className="garage-catalog">{VEHICLE_CATALOG.map(vehicle => {
       const view = selectVehicle(state, vehicle.id);

@@ -20,7 +20,7 @@ export function VehicleTuning({ state, paused, onConfigure }: {
     <p>{text('One car, one setup. Buy and fit permanent parts; swap owned setups or restore stock for free. Rebirth keeps the build. Your accountant keeps the nightmares.',
       'Ein Auto, ein Setup. Teile dauerhaft kaufen und einbauen. Gekaufte Setups und Serie kostenlos wechseln. Rebirth behält den Ausbau. Dein Buchhalter behält die Albträume.')}</p>
     <p className="tuning-selection">{text('Fitted:', 'Eingebaut:')} <strong>{selected ? text(selected.name, selected.germanName) : text('Stock', 'Serie')}</strong>
-      {' · '}{active ? text('BONUS ACTIVE', 'BONUS AKTIV') : text('INACTIVE CAR · NO TUNING BONUS', 'AUTO INAKTIV · KEIN TUNING-BONUS')}</p>
+      {' · '}{active ? selected ? text('BONUS ACTIVE', 'BONUS AKTIV') : text('BASE BONUS ONLY', 'NUR BASISBONUS') : text('INACTIVE CAR · NO TUNING BONUS', 'AUTO INAKTIV · KEIN TUNING-BONUS')}</p>
     <p>{text('The base vehicle bonus remains. Only the fitted setup adds its effect while the KX-R is active. Buying both does not stack them.',
       'Der Basisbonus des Autos bleibt. Nur das eingebaute Setup wirkt zusätzlich, solange der KX-R aktiv ist. Beide kaufen stapelt die Boni nicht.')}</p>
     {!owned && <p>{text('Own a Kairo KX-R to unlock this workshop.', 'Kairo KX-R kaufen, um diese Werkstatt freizuschalten.')}</p>}

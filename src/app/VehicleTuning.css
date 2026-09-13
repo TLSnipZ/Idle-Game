@@ -1,4 +1,5 @@
-.vehicle-tuning { margin-top: var(--space-lg); min-width: 0; }
+.vehicle-tuning { margin-top: var(--space-lg); padding: var(--space-md); min-width: 0; }
+.vehicle-tuning > h3 { margin-top: 0; }
 .vehicle-tuning p { overflow-wrap: anywhere; line-height: 1.5; }
 .tuning-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); }
 .tuning-option { min-width: 0; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-control); }
@@ -6,3 +7,5 @@
 .vehicle-tuning .action-button { white-space: normal; overflow-wrap: anywhere; min-height: 44px; }
 .tuning-stock { margin-top: var(--space-md); }
 @media (max-width: 740px) { .tuning-options { grid-template-columns: minmax(0, 1fr); } }
+
+.vehicle-tuning .action-button:enabled, .garage-workshop-link { color: var(--color-cool); background: var(--color-cool-tint); border-color: var(--color-cool); text-decoration: none; }
