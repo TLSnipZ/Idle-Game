@@ -28,6 +28,5 @@ it('production-browser v17 fixtures migrate with unchanged ownership, cash and a
     businesses: { ...fresh.businesses, owned: { [STARTER_BUSINESS.id]: { level: 8 } } },
   } };
   expect(migrateToCurrentSave(tierOne)).toMatchObject({ ok: true, envelope: tierOne });
-  fixtures.push(tierOne);
-  if (process.env.SOLARA_BROWSER_FIXTURES) writeFileSync(process.env.SOLARA_BROWSER_FIXTURES, JSON.stringify(fixtures));
+  if (process.env.SOLARA_BROWSER_FIXTURES) writeFileSync(process.env.SOLARA_BROWSER_FIXTURES, JSON.stringify([...fixtures, tierOne]));
 });
