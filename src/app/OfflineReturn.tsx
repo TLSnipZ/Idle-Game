@@ -13,11 +13,15 @@ export function OfflineReturn({ progress, onDismiss }: {
   const text = useLocalizedText();
   if (!showOfflineReward(progress)) return null;
   return <section className="offline-return panel" aria-labelledby="offline-heading">
-    <div role="status" aria-live="polite">
+    <div className="offline-summary" role="status" aria-live="polite">
       <h2 id="offline-heading">{text('Welcome back', 'Willkommen zurück')}</h2>
-      <p>{text('While you were away, the empire continued without asking permission.', 'Während du weg warst, hat dein Imperium einfach weitergemacht. Loyalität sieht anders aus, Profit aber gut.')}</p>
       <p className="offline-income">+{formatCash(progress.incomeEarned)}{progress.autoUpgrader?.levelsPurchased ? text(' earned before automatic spending', ' verdient vor automatischen Ausgaben') : ''}</p>
       {progress.autoUpgrader && progress.autoUpgrader.levelsPurchased > 0 && <p>{text('Business Auto-Upgrader')}: {text(findBusiness(progress.autoUpgrader.targetId)?.name ?? '')} +{progress.autoUpgrader?.levelsPurchased} {text('levels', 'Level')} · {text('Spent', 'Ausgegeben')} {formatCash(progress.autoUpgrader.spent)}</p>}
+    </div>
+    <button className="action-button offline-continue" onClick={onDismiss}>{text('Continue', 'Weiter ins Geschäft')}</button>
+    <details className="offline-details">
+      <summary>{text('Details', 'Details')}</summary>
+      <p>{text('While you were away, the empire continued without asking permission.', 'Während du weg warst, hat dein Imperium einfach weitergemacht. Loyalität sieht anders aus, Profit aber gut.')}</p>
       {progress.automation && progress.businessIncome !== undefined && <>
         <p>{text('Business income:', 'Business-Einnahmen:')} {formatCash(progress.businessIncome)}</p>
         <p>{text('Dispatcher')}: {progress.automation.completedJobs} {progress.automation.completedJobs === 1 ? text('delivery', 'Lieferung') : text('deliveries', 'Lieferungen')} · {formatCash(progress.automation.income)}</p>
@@ -27,7 +31,6 @@ export function OfflineReturn({ progress, onDismiss }: {
       <p>{text('Away:', 'Abwesend:')} {text(formatOfflineDuration(progress.actualElapsedMs))}</p>
       <p>{text('Time credited:', 'Angerechnete Zeit:')} {text(formatOfflineDuration(progress.rewardedElapsedMs))}</p>
       {progress.capped && <p>{text(`Offline earnings capped at ${text(formatOfflineDuration(progress.capMs))}.`, `Offline-Einnahmen bei ${text(formatOfflineDuration(progress.capMs))} gedeckelt. Selbst passives Einkommen hat in Solara Öffnungszeiten.`)}</p>}
-    </div>
-    <button className="action-button delivery-button" onClick={onDismiss}>{text('Continue', 'Weiter ins Geschäft')}</button>
+    </details>
   </section>;
 }
