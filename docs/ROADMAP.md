@@ -1,5 +1,20 @@
 # Roadmap
 
+## Current phase — Heat III: District Heat
+
+Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
+local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
+See [District Heat](DISTRICT_HEAT.md) for rules and compatibility. Verification passed; see the [PR #31 evidence](https://github.com/TLSnipZ/Idle-Game/pull/31).
+Verified in [PR #31](https://github.com/TLSnipZ/Idle-Game/pull/31):
+[run 34780604928](https://github.com/TLSnipZ/Idle-Game/actions/runs/34780604928)
+on code `91749a14e3bf7a00f95abf388f70d371bece984e` passed strict build,
+**2,384/2,384 tests** (30 added, zero failures/skips), **45 Garage + 225 section +
+15 risk + 15 police + 15 district Chromium cases**, and whitespace checks.
+Evidence artifact: `10325411638`. This final follow-up changes documentation only.
+Merge/deployment evidence is recorded in the PR; manual live acceptance remains separate.
+
+Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
+
 ## Current phase — II Police Pressure
 
 Implemented on `feat/police-pressure`: WATCHED reduces risk premium to +25%;

@@ -51,6 +51,8 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : localize(locale, `${business?.name ?? 'Business'} acquired. Live production has started.`, `${business?.name ?? 'Business'} übernommen. Produktion läuft. Papierkram angeblich auch.`);
   }
   switch (result.error) {
+    case 'district-not-owned': return localize(locale, 'Control that district before moving operations.', 'Erst den Bezirk übernehmen, dann den Standort wechseln. Expansion braucht leider Papierkram.');
+    case 'district-event-pending': return localize(locale, 'Resolve the current City Event before travelling.', 'Erst das aktuelle Stadtevent klären. Wegfahren ersetzt keinen Anwalt.');
     case 'too-hot': return localize(locale, 'Risky delivery refused. Cool down first; your client has developed a sudden respect for the law.', 'Risiko-Lieferung abgelehnt. Erst abkühlen; dein Auftraggeber hat plötzlich Respekt vor dem Gesetz.');
     case 'statistics-overflow': return localize(locale, 'Lifetime statistics limit reached. The action was not completed.', 'Statistiklimit erreicht. Selbst dein Lebenswerk passt irgendwann nicht mehr in eine Zahl.');
     case 'no-pending-event': return localize(locale, 'No active event.', 'Kein aktives Event. Ausnahmsweise brennt gerade nichts.');

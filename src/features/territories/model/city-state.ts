@@ -1,6 +1,6 @@
 import { isHeatProgress } from '../../heat';
 import { findTerritory, TERRITORY_CATALOG } from '../config/territory-config';
-import type { CityState, TerritoryId } from './territory';
+import type { DistrictState, CityState, TerritoryId } from './territory';
 import type { Modifier } from '../../../game/modifiers';
 
 export function createInitialCityState(): CityState {
@@ -29,7 +29,12 @@ export function isCityState(value: unknown): value is CityState {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
   const prototype: unknown = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null) return false;
-  if (Reflect.ownKeys(value).length !== 3) return false;
+  const extended = Object.hasOwn(value, 'districts');
+  if (Reflect.ownKeys(value).length !== (extended ? 4 : 3)) return false;
+  if (extended) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, 'districts');
+    if (!descriptor?.enumerable || !Object.hasOwn(descriptor, 'value') || !isDistrictState(descriptor.value)) return false;
+  }
   for (const key of ['ownedTerritoryIds', 'heat', 'heatDecayElapsedMs']) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (!descriptor?.enumerable || !Object.hasOwn(descriptor, 'value')) return false;
@@ -37,7 +42,9 @@ export function isCityState(value: unknown): value is CityState {
   const heat: unknown = Object.getOwnPropertyDescriptor(value, 'heat')?.value;
   const elapsed: unknown = Object.getOwnPropertyDescriptor(value, 'heatDecayElapsedMs')?.value;
   const ids: unknown = Object.getOwnPropertyDescriptor(value, 'ownedTerritoryIds')?.value;
-  return isHeatProgress(heat, elapsed) && isTerritoryOwnership({ ownedTerritoryIds: ids });
+  const ownership = { ownedTerritoryIds: ids };
+  return isHeatProgress(heat, elapsed) && isTerritoryOwnership(ownership)
+    && (!extended || ownership.ownedTerritoryIds.includes('territory:neon-mile'));
 }
 export function requireCityState(value: unknown): asserts value is CityState {
   if (!isCityState(value)) throw new RangeError('Invalid authoritative city state');
@@ -46,4 +53,23 @@ export function collectTerritoryModifiers(state: CityState): readonly Modifier[]
   requireCityState(state);
   return TERRITORY_CATALOG.filter(territory => state.ownedTerritoryIds.includes(territory.id))
     .flatMap(territory => territory.modifiers);
+}
+
+function dataRecord(value: unknown, expected: readonly string[]): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const prototype: unknown = Object.getPrototypeOf(value);
+  return (prototype === Object.prototype || prototype === null)
+    && Reflect.ownKeys(value).length === expected.length && expected.every(key => {
+      const d = Object.getOwnPropertyDescriptor(value, key);
+      return d?.enumerable && Object.hasOwn(d, 'value');
+    });
+}
+function isDistrictState(value: unknown): value is DistrictState {
+  return dataRecord(value, ['activeId', 'parked']) && findTerritory(value.activeId) !== undefined
+    && dataRecord(value.parked, ['heat', 'heatDecayElapsedMs'])
+    && isHeatProgress(value.parked.heat, value.parked.heatDecayElapsedMs);
+}
+/** Freeze v10–v19 validation; future district fields must never pass old envelopes. */
+export function isLegacyCityState(value: unknown): value is CityState {
+  return isCityState(value) && !Object.hasOwn(value, 'districts');
 }

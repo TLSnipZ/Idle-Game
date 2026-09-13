@@ -1,5 +1,12 @@
 # Architecture
 
+## Current phase — Heat III: District Heat
+
+Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
+local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
+See [District Heat](DISTRICT_HEAT.md) for rules and compatibility. Verification passed; see the [PR #31 evidence](https://github.com/TLSnipZ/Idle-Game/pull/31).
+Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
+
 ## Heat II — Police Pressure
 
 Derived pressure from existing Heat, action-local reward factors, shared atomic

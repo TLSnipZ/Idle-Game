@@ -218,7 +218,7 @@ describe('derived next-objective guidance', () => {
     } finally { clock.mockRestore(); random.mockRestore(); }
     if (!save.ok || !code.ok) throw Error('fixture');
     const parsed = parseSave(save.serialized), restored = validateSaveCode(code.code);
-    expect(parsed.ok && parsed.envelope.version).toBe(19);
+    expect(parsed.ok && parsed.envelope.version).toBe(20);
     expect(restored.ok && selectGuidance(restored.envelope.state)).toEqual(selectGuidance(state));
   });
   it('does not change catalogs or insert guidance into GameState', () => {

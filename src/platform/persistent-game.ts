@@ -1,3 +1,5 @@
+import { setActiveDistrict } from '../game/set-active-district';
+import { getActiveDistrictId } from '../features/territories';
 import { setActiveVehicle } from '../game/set-active-vehicle';
 import type { GameState } from '../game/game-state';
 import { performRebirth } from '../game/rebirth';
@@ -114,7 +116,8 @@ export function createPersistentGame(
       succeeded = result.ok;
       return result;
     }, (candidate, previous) => {
-      const guarded = candidate.garage !== previous.garage
+      const guarded = getActiveDistrictId(candidate.city) !== getActiveDistrictId(previous.city)
+        || candidate.garage !== previous.garage
         || candidate.businesses.owned !== previous.businesses.owned
         || candidate.automation.businessAutoUpgradeTargetId !== previous.automation.businessAutoUpgradeTargetId
         || candidate.automation.enabledIds !== previous.automation.enabledIds
@@ -138,6 +141,14 @@ export function createPersistentGame(
     if (!prepared.ok || prepared.state === state) return prepared;
     // Revalidate after old-effect reconciliation; execute guards Garage writes before publication.
     return execute(current => setActiveVehicle(current, id));
+  }
+  function selectActiveDistrict(id: unknown) {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
+      || view.persistence.kind === 'offline-error') return;
+    const state = runtime.getSnapshot().result.state;
+    const prepared = setActiveDistrict(state, id);
+    if (!prepared.ok || prepared.state === state) return prepared;
+    return execute(current => setActiveDistrict(current, id));
   }
   function exportCode(): ExportResult {
     if (!active || !runtime?.reconcile()) return { ok: false, error: 'runtime-unavailable' };
@@ -209,5 +220,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

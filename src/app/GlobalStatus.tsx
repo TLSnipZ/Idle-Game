@@ -30,7 +30,7 @@ export function GlobalStatus({ view, active, onNavigate, paused, newsMessage = '
         <dl className="global-status" aria-label={t('hudStatus')}>
           <div className="hud-cash"><dt>{t('cash')}</dt><dd>{view.cash}</dd></div>
           <div className="hud-level"><dt>{t('playerLevel')}</dt><dd>{view.player.currentLevel}<HudPlayerProgress progress={view.player} /></dd></div>
-          <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>{t('heat')}</dt><dd>{view.heat.heat} · {heatTierLabel(view.heat.tier.label, locale)}</dd></div>
+          <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>{t('heat')}<small className="hud-district">{text(view.heat.districtName)}</small></dt><dd>{view.heat.heat} · {heatTierLabel(view.heat.tier.label, locale)}</dd></div>
           <div className="hud-empire"><dt>{t('empirePoints')}</dt><dd>{formatInteger(view.empire.empirePoints)} {text('EP')}</dd></div>
         </dl>
         <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>

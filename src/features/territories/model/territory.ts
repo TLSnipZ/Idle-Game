@@ -4,7 +4,13 @@ import type { Modifier } from '../../../game/modifiers';
 import type { Requirement } from '../../../game/requirement';
 
 export type TerritoryId = 'territory:waterfront' | 'territory:neon-mile';
-export interface CityState extends HeatState { readonly ownedTerritoryIds: readonly TerritoryId[] }
+export interface DistrictState { readonly activeId: TerritoryId; readonly parked: HeatState }
+/** Heat fields belong to the active district. Before first travel, Waterfront is active
+ * and Neon Mile has zero Heat; the optional extension stores only the other district. */
+export interface CityState extends HeatState {
+  readonly ownedTerritoryIds: readonly TerritoryId[];
+  readonly districts?: DistrictState;
+}
 export interface TerritoryDefinition {
   readonly id: TerritoryId;
   readonly name: string;

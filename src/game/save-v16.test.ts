@@ -34,7 +34,7 @@ describe('v16 canonical vehicle boundary', () => {
     vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('migration clock'); });
     vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('migration RNG'); });
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: envelope(expected, 19) });
+    expect(result).toEqual({ ok: true, envelope: envelope(expected, 20) });
     expect(migrateToCurrentSave(input)).toEqual(result); expect(input).toEqual(before);
     const code = encodeSaveText(JSON.stringify(input)); expect(code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code)).toEqual(result);
@@ -47,7 +47,7 @@ describe('v16 canonical vehicle boundary', () => {
   it('fresh current state has no free vehicle or future Garage fields', () => {
     const state = createInitialGameState(), serialized = serializeSave(state, 0);
     expect(state.garage).toEqual({ ownedVehicleIds: [], activeVehicleId: null });
-    expect(migrateToCurrentSave(envelope(state, 18))).toEqual({ ok: true, envelope: envelope(state, 19) });
+    expect(migrateToCurrentSave(envelope(state, 18))).toEqual({ ok: true, envelope: envelope(state, 20) });
     expect(serialized.ok).toBe(true); expect(findVehicle(LEGACY)).toBeUndefined();
   });
   it.each([[LEGACY, LEGACY], ['vehicle:unknown'], [V.id], [LEGACY, V.id]].map(ownedVehicleIds => ({ ownedVehicleIds })))('historical validator rejects malformed/future IDs %#', ({ ownedVehicleIds }) => {

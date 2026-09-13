@@ -1,3 +1,4 @@
+import { WATERFRONT, getDistrictHeat, withDistrictHeat } from '../features/territories';
 import { gainHeat, dispatcherHeatGain, requireHeatState } from '../features/heat';
 import { evaluateXpReward } from './xp-reward';
 import { addXp } from '../features/progression';
@@ -55,6 +56,6 @@ export function simulateAutomation(state: GameState, elapsedMs: unknown): Automa
   if (!credit.ok) return { ok: false, state, error: credit.error };
   return { ok: true, automation: plan.automation,
     state: completedJobs === 0 && plan.progress === state.automation.starterJobElapsedMs ? state
-      : { ...state, city: gainHeat(state.city, dispatcherHeatGain(completedJobs)), progression: xp.state, economy: credit.state,
+      : { ...state, city: withDistrictHeat(state.city, WATERFRONT.id, gainHeat(getDistrictHeat(state.city, WATERFRONT.id), dispatcherHeatGain(completedJobs))), progression: xp.state, economy: credit.state,
         automation: { ...state.automation, starterJobElapsedMs: plan.progress } } };
 }

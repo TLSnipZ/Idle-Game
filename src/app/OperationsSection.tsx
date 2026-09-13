@@ -1,3 +1,5 @@
+import { DistrictHeat } from './DistrictHeat';
+import { WATERFRONT, getActiveDistrictId } from '../features/territories';
 import { DiscreetDelivery } from './DiscreetDelivery';
 import { RiskyDelivery } from './RiskyDelivery';
 import { useRef } from 'react';
@@ -35,6 +37,7 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
   }
 
   const paused = runtimeError !== null;
+  const waterfront = getActiveDistrictId(snapshot.state.city) === WATERFRONT.id;
   const reward = evaluateJobReward(snapshot.state);
   const xp = evaluateXpReward(snapshot.state, 'manualJob');
   const unavailable = text('Unavailable', 'Nicht verfügbar');
@@ -47,19 +50,20 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
       <button type="button" onClick={() => jump(automation.current)}>{text('AUTOMATION', 'AUTOMATISIERUNG')}</button>
     </nav>
 
+    <DistrictHeat state={snapshot.state} paused={paused || game.persistence.kind === 'blocked'} onChoose={game.chooseDistrict} />
     <section className="operations-block jobs-block" aria-labelledby="starter-heading">
       <div className="operations-section-heading">
-        <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" ref={jobs} tabIndex={-1}>{text('Waterfront Delivery', 'Waterfront-Lieferung')}</h2></div>
+        <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" ref={jobs} tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
         <span className="operations-kicker">{text('Manual work', 'Handarbeit')}</span>
       </div>
-      <p className="operations-lead">{text('Move a package across the waterfront, get paid, and keep HR comfortably fictional.', 'Bring ein Paket über die Waterfront, kassier ab und lass HR weiterhin angenehm fiktiv bleiben.')}</p>
+      <p className="operations-lead">{text('Move a package across your operating district, get paid, and keep HR comfortably fictional.', 'Bring ein Paket durch deinen Einsatzbezirk, kassier ab und lass HR weiterhin angenehm fiktiv bleiben.')}</p>
       <dl className="job-metrics">
         <div><dt>{text('Payout', 'Auszahlung')}</dt><dd>{reward.ok ? formatReward(reward.reward) : unavailable}</dd></div>
         <div><dt>{text('XP')}</dt><dd>+{xp.ok ? formatXp(xp.reward) : unavailable}</dd></div>
         <div><dt>{text('Heat')}</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
       </dl>
       <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused}>
-        <span>{text('Run waterfront delivery', 'Waterfront-Lieferung fahren')}</span>
+        <span>{waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
         <span className="reward">+{reward.ok ? formatReward(reward.reward) : unavailable} <span aria-hidden="true">↗</span></span>
       </button>
       {reward.ok && reward.applied.length > 0 && <details className="operations-disclosure">

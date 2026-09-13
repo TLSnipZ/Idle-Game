@@ -57,6 +57,19 @@ export function useGame() {
     });
   }
 
+  function chooseDistrict(id: string) {
+    const before = runtime.getSnapshot().result.state;
+    const result = runtime.selectActiveDistrict(id);
+    if (result?.ok && result.state === before) return;
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result?.ok ? localize(localeRef.current,
+        'Operating district changed. Local Heat stays behind; your reputation has a postcode.',
+        'Einsatzbezirk gewechselt. Lokales Heat bleibt zurück; dein Ruf hat eine Postleitzahl.')
+        : result ? describeAction('delivery', result, undefined, localeRef.current)
+          : localize(localeRef.current, 'District change could not be saved. Your location is unchanged.',
+            'Bezirkswechsel konnte nicht gespeichert werden. Dein Standort bleibt unverändert.') }));
+  }
+
   function runDiscreetDelivery() {
     const result = runtime.execute(performDiscreetDelivery);
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
@@ -126,5 +139,5 @@ export function useGame() {
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message: result?.ok ? localize(localeRef.current, `Auto-Upgrader target set to ${findBusiness(id)?.name}.`, `Auto-Upgrader-Ziel auf ${findBusiness(id)?.name} gesetzt. Dein Cash kennt jetzt seine nächste Bestimmung.`) : localize(localeRef.current, 'Auto-Upgrader target could not be changed.', 'Auto-Upgrader-Ziel konnte nicht geändert werden. Die Maschine verweigert die Umstrukturierung.') }));
   }
 
-  return { runDiscreetDelivery, runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { chooseDistrict, runDiscreetDelivery, runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

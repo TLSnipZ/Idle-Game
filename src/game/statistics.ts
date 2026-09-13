@@ -1,10 +1,11 @@
+import { maximumDistrictHeat } from '../features/territories';
 import { incrementStatistic, recordPeakHeat } from '../features/statistics';
 import type { CumulativeStatistic, StatisticsError } from '../features/statistics';
 import type { GameState } from './game-state';
 
 /** Final Heat only. Never call on an intermediate Dispatcher heat-gain slice. */
 export function observePeakHeat(state: GameState): GameState {
-  const statistics = recordPeakHeat(state.permanentProgression.statistics, state.city.heat);
+  const statistics = recordPeakHeat(state.permanentProgression.statistics, maximumDistrictHeat(state.city));
   return statistics === state.permanentProgression.statistics ? state
     : { ...state, permanentProgression: { ...state.permanentProgression, statistics } };
 }

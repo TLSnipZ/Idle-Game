@@ -26,6 +26,14 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
+## Current phase — Heat III: District Heat
+
+Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
+local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
+See [District Heat](docs/DISTRICT_HEAT.md) for rules and compatibility. Verification passed; see the [PR #31 evidence](https://github.com/TLSnipZ/Idle-Game/pull/31).
+Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
+
+
 ---
 
 ## Start small. Build an empire.
@@ -46,7 +54,7 @@ Open **Operations** to make your first deliveries and acquire **Dockside Detail*
 | --- | --- |
 | **Business empire** | Acquire four distinct Businesses, develop each through Level 100, and grow their combined passive production. Progression gates make later acquisitions depend on developing the earlier operation. |
 | **Equipment & automation** | Buy production and delivery upgrades, hire a **Delivery Dispatcher**, and enable a **Business Auto-Upgrader** for one selected owned Business. Automatic upgrade spending is opt-in. |
-| **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
+| **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, switch your operating district with separate local Heat, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
 | **Heat & City Events** | Choose an optional +50% Cash (+25% at WATCHED) / +5 Heat delivery below HOT, cool down with discreet deliveries (half Cash, zero XP, −2 Heat), and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
 | **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
 | **Garage** | Choose **Kairo KX-R**, **Kairo Senda** or **Namera Lilt** for production, manual delivery Cash or faster Heat cooling. Only the active car supplies its effect. |
@@ -70,7 +78,7 @@ The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 /
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v19**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v20**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
@@ -84,7 +92,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
 | **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Tuning and later catalog tiers remain planned. |
-| **A deeper city** | Heat I Risk & Reward and II Police Pressure are implemented; District Heat, more Business depth, crew and event development, and richer territory progression. |
+| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT is next; more Business depth, crew and event development, and richer territory progression remain planned. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
 
