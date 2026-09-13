@@ -129,3 +129,30 @@ Evidence: [test reports, browser results and screenshots](https://github.com/TLS
 Screenshots were generated, not manually inspected. Previous manual/device review
 limitations and the remaining audit backlog still apply. No new gameplay phase
 was started.
+
+
+## P1 UI regression restoration — PR #26
+
+Baseline: merged PR #25, `141b24cbb00109aca34bfb098bd137f47169bd4a`, 2,252 tests with 62
+inherited failures. All existing test cases remain enabled. Guidance tests now
+expand the default compact card before selecting/following goals and after a
+successful replacement; pending consent, write failures, exact costs, focus and
+runtime isolation assertions remain. Hook components mount through React with
+proper cleanup and deterministic runtime fixtures. Updated text and layout checks
+follow the current HUD/Operations surfaces rather than obsolete markup.
+
+Concrete product repairs found while restoring the suite:
+- Auto-Upgrader enable/disable links to spending details. Its purchase action
+  explains opt-in spending and links to description, consent and requirements.
+- Dispatcher purchase links to both requirements and the current helper. Met
+  requirements remain available in collapsed disclosures until purchase.
+- Explicit Operations jumps use instant scrolling as specified, including reduced
+  motion; ordinary actions still preserve local focus and do not navigate.
+- Shared acquisition action spacing is restored between requirements, buttons and
+  helper text; the overwritten stylesheet had lost that contract.
+
+CI now fails directly on any test failure, requires zero skips/TODO/runtime errors
+and preserves a minimum 2,252 cases. The temporary inherited-failure comparison is
+no longer a release gate. Full build/test and 255-case browser verification are
+required; final results will be recorded below. Save v18, CE1, content, balance and
+economy/persistence authority are unchanged. P2 overhaul items remain open.

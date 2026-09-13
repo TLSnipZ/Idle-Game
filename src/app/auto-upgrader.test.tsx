@@ -16,8 +16,8 @@ function render(state=initial(),paused=false) {return renderToStaticMarkup(<Auto
 describe('explicit automatic spending presentation',()=>{
   it('shows a locked card, exact price/gates and spending disclosure',()=>{
     const html=render(createInitialGameState());
-    for(const text of ['Business Auto-Upgrader','$50,000','Player Level 12','Own Dockside Detail','Dockside Detail Level 15','Control Neon Mile','30s','LOCKED'])expect(html).toContain(text);
-    expect(html).toContain('disabled=""');expect(html).toContain('aria-describedby="auto-upgrader-description auto-upgrader-requirements"');
+    for(const text of ['Business Auto-Upgrader','$50,000','Player Level 12','Own Dockside Detail','Dockside Detail Level 15','Control Neon Mile','30s','Starts disabled.','automatically spend Cash','LOCKED'])expect(html).toContain(text);
+    expect(html).toContain('disabled=""');expect(html).toContain('aria-describedby="auto-upgrader-description auto-upgrader-consent auto-upgrader-requirements"');
   });
   it('separates insufficient cash from satisfied requirements; ready purchase remains explicit',()=>{
     const s=initial(),available={...s,automation:createInitialGameState().automation};

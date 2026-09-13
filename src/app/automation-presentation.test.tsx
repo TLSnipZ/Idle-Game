@@ -29,7 +29,7 @@ describe('delegation presentation', () => {
     expect(html).toContain('<span>Interval</span><strong>10s</strong>'); expect(html).toContain('<strong>$25.00</strong>');
     expect(html).toContain('Own Dockside Detail'); expect(html).toContain('Required');
     expect(html).toContain('disabled'); expect(html).not.toContain('ACTIVE');
-    expect(html).toContain('aria-describedby="dispatcher-requirement"');
+    expect(html).toContain('aria-describedby="dispatcher-requirement dispatcher-helper"');
   });
   it('distinguishes unaffordable and ready states with semantic buttons', () => {
     expect(render(eligible(moneyFromMinorUnits('499999')))).toContain('INSUFFICIENT CASH');

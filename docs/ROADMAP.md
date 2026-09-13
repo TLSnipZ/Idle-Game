@@ -1,9 +1,12 @@
 # Roadmap
 
-Current priority: **Villager language and whole-game audit**, requested before new
-Garage content. Implemented in PR #24, with the complete audit and prioritized
-follow-ups in [GAME_AUDIT.md](GAME_AUDIT.md). The next technical step is repairing
-62 inherited UI-test failures; the new code adds no regressions.
+Current priority: **P1 UI regression restoration**, following the whole-game audit
+and Villager overkill mode (PRs #24–25). PR #26 repairs the inherited UI tests,
+automation description links, instant Operations navigation and shared action
+spacing. Strict full-suite and production browser verification must pass before
+completion; evidence is recorded in [GAME_AUDIT.md](GAME_AUDIT.md).
+Next content phase after this acceptance: **Tier-1 Garage — Kairo Senda / Namera
+Lilt**, followed by Heat / Police 2.0. Other P2 audit items remain tracked.
 
 Previous milestone: **Active Vehicle Foundation / Save v18** is implemented on
 `feat/active-vehicle-complete` in PR #23; executed checks and release state are

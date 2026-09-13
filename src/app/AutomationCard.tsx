@@ -37,7 +37,7 @@ export function AutomationCard({ view, paused, onPurchase, event }: {
       <div className="automation-price"><span>{text('Price', 'Preis')}</span><strong>{formatPrice(view.definition.purchaseCost)}</strong></div>
       {view.requirements.requirements.length > 0 && <details className="operations-disclosure compact-requirements"><summary>{text('Requirements', 'Voraussetzungen')}</summary><RequirementList result={view.requirements} id="dispatcher-requirement" /></details>}
       <div className="card-action-area"><button className="action-button purchase-button" disabled={paused || !view.canPurchase}
-        aria-describedby={acquisition.note ? "dispatcher-helper" : undefined} onClick={onPurchase}>{paused ? text('Session paused', 'Session pausiert') : text(`Hire ${name}`, `${name} einstellen`)}</button>{acquisition.note && <p id="dispatcher-helper" className="purchase-note">{acquisition.note}</p>}</div>
+        aria-describedby={acquisition.note ? "dispatcher-requirement dispatcher-helper" : "dispatcher-requirement"} onClick={onPurchase}>{paused ? text('Session paused', 'Session pausiert') : text(`Hire ${name}`, `${name} einstellen`)}</button>{acquisition.note && <p id="dispatcher-helper" className="purchase-note">{acquisition.note}</p>}</div>
     </>}
   </section>;
 }
