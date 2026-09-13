@@ -30,7 +30,7 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
 decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
-See [MANHUNT](docs/MANHUNT.md) for balance, persistence and acceptance. CI pending.
+See [MANHUNT](docs/MANHUNT.md) for balance, persistence and acceptance. Verification passed; see [PR #32](https://github.com/TLSnipZ/Idle-Game/pull/32).
 Next separate phase: **Heat V — deeper cross-system integration**.
 Earlier phase records below are historical.
 

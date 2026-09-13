@@ -58,7 +58,14 @@ Required: strict build; complete suite; boundary, exact payment, atomic failure,
 two-district, offline, v20/CE1, Rebirth and runtime persistence tests. Existing
 315 Chromium cases plus 15 MANHUNT flows across three locales and five widths,
 including keyboard activation, payment, travel, reload and overflow checks.
-CI evidence pending. Manual live acceptance is recorded separately.
+Verified in [PR #32](https://github.com/TLSnipZ/Idle-Game/pull/32):
+[run 34781843741](https://github.com/TLSnipZ/Idle-Game/actions/runs/34781843741)
+on code `4545e8bf32b267f9930cbb3f307d710cbc363abe`: strict build,
+**2,413/2,413 tests** (29 added; zero failures/skips), **330 Chromium cases**
+(45 Garage, 225 sections, 15 each risk/police/district/MANHUNT), and whitespace
+checks passed. Evidence artifact: `10325630553`.
+The final follow-up changes documentation only. Merge and deployment evidence
+are recorded in the PR; manual live acceptance remains separate.
 
 ## Next handoff
 
