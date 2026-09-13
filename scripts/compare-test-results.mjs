@@ -8,15 +8,22 @@ function failed(report) {
     .map(test => ({ id: file.name.slice(file.name.lastIndexOf('/src/')) + ' :: ' + test.fullName,
       messages: test.failureMessages })));
 }
+function testIds(report) {
+  return report.testResults.flatMap(file => file.assertionResults.map(test =>
+    file.name.slice(file.name.lastIndexOf('/src/')) + ' :: ' + test.fullName));
+}
+const currentIds = new Set(testIds(candidate));
+const removedTests = testIds(baseline).filter(id => !currentIds.has(id));
 const oldFailures = new Set(failed(baseline).map(test => test.id));
 const regressions = failed(candidate).filter(test => !oldFailures.has(test.id));
 console.log(JSON.stringify({
   baseline: { total: baseline.numTotalTests, passed: baseline.numPassedTests, failed: baseline.numFailedTests },
   candidate: { total: candidate.numTotalTests, passed: candidate.numPassedTests, failed: candidate.numFailedTests },
   newFailures: regressions,
+  removedTests,
   existingFailures: failed(candidate).filter(test => oldFailures.has(test.id)).map(test => test.id),
 }, null, 2));
-if (regressions.length || candidate.numTotalTests < baseline.numTotalTests
+if (regressions.length || removedTests.length || candidate.numTotalTests < baseline.numTotalTests
   || (candidate.numRuntimeErrorTestSuites ?? 0) > (baseline.numRuntimeErrorTestSuites ?? 0)
   || candidate.numPendingTests > baseline.numPendingTests
   || candidate.numFailedTests !== failed(candidate).length) process.exit(1);

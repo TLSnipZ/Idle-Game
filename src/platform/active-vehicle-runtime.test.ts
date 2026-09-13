@@ -5,6 +5,7 @@ import { rebirthState } from '../game/test-fixtures/rebirth-state';
 import type { GameState } from '../game/game-state';
 import { createInitialGameState } from '../game/game-state';
 import { setActiveVehicle } from '../game/set-active-vehicle';
+import * as vehicles from '../features/vehicles';
 import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { parseSave } from '../game/save-schema';
 import { exportSaveCode, validateSaveCode, encodeSaveText } from '../game/save-code';
@@ -117,4 +118,20 @@ describe('durable active vehicle selection', () => {
       expect(game.selectActiveVehicle(V.id)).toBeUndefined(); expect(now).toHaveBeenCalledTimes(reads); game.stop();
     }
   });
+});
+
+it('a different car with the same effect preserves fractional runtime time', () => {
+  const lookup = vehicles.findVehicle;
+  const spy = vi.spyOn(vehicles, 'findVehicle').mockImplementation(id => {
+    const vehicle = lookup(id);
+    return vehicle?.id === SECOND ? { ...vehicle, modifier: V.modifier } : vehicle;
+  });
+  try {
+    const f = rebirthRuntime(both());
+    f.at(10.75); expect(f.game.selectActiveVehicle(SECOND)?.ok).toBe(true);
+    const selected = f.game.getSnapshot().result.state;
+    f.at(11); f.tick();
+    expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(selected, 1).state);
+    f.game.stop();
+  } finally { spy.mockRestore(); }
 });

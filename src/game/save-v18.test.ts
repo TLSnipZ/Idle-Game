@@ -21,9 +21,19 @@ describe('Save v18 active selection', () => {
     } finally { clock.mockRestore(); random.mockRestore(); }
   });
   it.each([6,7,8,9,10,11,12,13,14,15,16,17])('rejects injected active fields in historical v%i Garage', version => {
-    // Invalid historical shapes must fail even before any normalization; do not use the fixture writer here.
-    const current = createInitialGameState();
-    const input = JSON.parse(stringifySaveFixture(envelope(current, version)));
+    const s = createInitialGameState();
+    const historical = { economy: s.economy, businesses: s.businesses, upgrades: s.upgrades,
+      automation: s.automation, progression: s.progression, garage: s.garage,
+      ...(version >= 7 ? { permanentProgression: { empirePoints: 0, rebirthCount: 0,
+        ...(version >= 8 ? { skills: {} } : {}),
+        ...(version >= 13 ? { unlockedAchievementIds: [] } : {}),
+        ...(version >= 14 ? { statistics: s.permanentProgression.statistics } : {}) } } : {}),
+      ...(version >= 9 ? { city: version === 9 ? { ownedTerritoryIds: s.city.ownedTerritoryIds } : s.city } : {}),
+      ...(version >= 11 ? { crew: s.crew } : {}), ...(version >= 12 ? { events: s.events } : {}),
+    };
+    const input = JSON.parse(stringifySaveFixture(envelope(historical, version)));
+    expect(migrateToCurrentSave(input).ok).toBe(true);
+    // Inject only after constructing a proven-valid historical fixture.
     input.state.garage.activeVehicleId = null;
     expect(migrateToCurrentSave(input)).toEqual({ ok: false, error: 'invalid-state' });
   });
