@@ -1,69 +1,62 @@
 # Business Visual Identity / Artworks
 
-Status: Dockside is deployed through PR #19 and explicitly accepted live as the Golden Reference. PR #20 now contains the complete Neon Laundry storefront and EN/DE identity package, not just the earlier text checkpoint. Local production build, focused tests and browser checks passed. Consult PR #20's release-verification comment for the final merge/deployment status. User visual acceptance of Neon Laundry remains separate. Afterdark Customs and Solara Nights are not integrated by this pass.
+## Current scope: all four approved preview storefronts
 
-## Goal and sequence
+The user explicitly approved the four-business preview and requested **all four storefront images in the game**, including replacing existing images with the preview versions. This supersedes the earlier one-business-at-a-time acceptance order. The source implementation is on `art/four-approved-business-storefronts`, based on main `ed90d82608ad493cf5ede4682b13efc97bd7a1e0` after PR #20. Merge, Pages release and the user's final in-game visual review are separate checkpoints; consult the integration PR for the release result.
 
-Give each Business a recognizable identity in one original Solara City crime/coastal-city art language. Preserve the compact Operations page rather than rebuilding it around an image.
+The task is an artwork batch, not another Operations redesign. Dockside's compact card layout remains the Golden Reference. No new image generation, recolor, stock substitute or recreation of the mock interface is used in this pass.
 
-1. Dockside Detail — deployed and explicitly accepted live; preserve the Golden Reference.
-2. Neon Laundry — complete artwork/copy package in PR #20; live review after release.
-3. Afterdark Customs — next performance-shop identity after Laundry acceptance.
-4. Solara Nights — subsequent nightlife identity.
+## Exact source and provenance
 
-## Recovery history
+All four storefronts come from the same approved generated concept, `a_cinematic_neon_soaked_ui_dashboard_screenshot_w.png`, 1526 x 1030 pixels, supplied in this conversation.
 
-The first full-width Dockside hero and subsequent unfinished image-slot treatment were rejected; PR #16 removed that slot. Dockside reintegration started from main `b2d62718021718c034ea5a25ccf7348f3fe2b853`, after Operations, HUD and section-spacing fixes. PR #19 delivered the actual storefront crop, and the user explicitly approved its live result. The Neon Laundry work preserves the post-PR-19 baseline `a71d70062a9ab6999397c9de9d21fd5b7b4d404c`.
+Source SHA-256: `ecc2d1e830e4fca0a4167090e80812209bdedc50fe60fe481376e49af4e389a3`.
 
-PR #20 initially held only presentation copy. Its missing-artwork checkpoint is superseded by the complete asset integration and verification below. No standalone generated UI mockup replaces the game.
+Crop coordinates below are `(left, top, right, bottom)`, with exclusive right/bottom. Only the illustrated storefront headers are extracted. Generated card labels, mock prices, progress, requirements and buttons are excluded. Physical signage remains part of the original environment. The source is not a live gameplay screenshot.
 
-## Dockside artwork provenance — unchanged
+| Business | Source crop | Runtime pixels | WebP bytes | Integration |
+| --- | --- | --- | --- | --- |
+| Dockside Detail | (22, 16, 750, 205) | 728 x 189 | 21,810 | Replace the previous PR #19 crop with the approved four-business preview version. |
+| Neon Laundry | (776, 16, 1508, 204) | 732 x 188 | 23,126 | Retain PR #20 bytes: this was already the exact laundromat from the same preview. |
+| Afterdark Customs | (22, 569, 750, 746) | 728 x 177 | 14,224 | Add the performance-workshop storefront from the preview. |
+| Solara Nights | (778, 569, 1506, 746) | 728 x 177 | 18,228 | Add the nightclub storefront from the preview. |
 
-Source: the user-approved generated concept `a_polished_cinematic_ui_concept_infographic_layou.png` (1024 x 1536), storefront crop `(460, 170, 1024, 440)`. The source is not a gameplay screenshot. Baked mock statistics and controls are excluded.
+New crops use WebP quality 55, method 6, without resizing. The retained Laundry crop is the existing quality-70 file. These modest source images are suitable for compact card strips; they are not represented as high-resolution hero renders. No extra color grading or generative alteration was applied.
 
-- Runtime path: `src/assets/businesses/dockside-detail-storefront.webp`.
-- Size: 564 x 270, 24,454 bytes, WebP quality 55.
-- SHA-256: `1a11043748570e62bab09bc877b145780e8f1ee0fea144d33e83b398b66d7441`.
-- Git blob: `d521c442360be013a11b1b89f683dfb3c51ec1ec`.
+Runtime paths under `src/assets/businesses/` and SHA-256 digests:
 
-This modest source is for a compact strip, not a high-resolution hero. The legacy `dockside-detail-card.webp` remains unused. Original integration and production-artifact verification are recorded in PR #19; those historical checks are not the Neon Laundry test report.
+- `dockside-detail-storefront.webp`: `1ce07fc9e361000d660e0e38006149c5b25a86bf40aeb0ff21dc04acd2640c1c`
+- `neon-laundry-storefront.webp`: `152fa1bf7ef1329720d7022f067546454610b8f7dff3d405eb695ab35a93dcc5`
+- `afterdark-customs-storefront.webp`: `a2674b40fcd8deab39d937047a347dede07c328954f5c7b5d06b0e8e10489192`
+- `solara-nights-storefront.webp`: `07e86859648a2232541b2c7bec87296902b4b407002560533fe486e0e4ed59e4`
 
-## Neon Laundry artwork provenance
-
-Source: the original generated Solara concept `a_cinematic_neon_soaked_ui_dashboard_screenshot_w.png` (1526 x 1030) from this conversation. Only the upper-right laundromat facade was extracted: `(left=776, top=16, right=1508, bottom=204)`. The rest of that generated concept, including its mock UI and other Business images, is NOT shipped.
-
-The crop contains the physical Neon Laundry sign, washing-machine windows and coastal evening setting. No copied franchise assets, real-world brands, gameplay values, buttons or mock requirements are baked into the runtime strip. Its in-game visual acceptance has not been assumed.
-
-- Runtime path: `src/assets/businesses/neon-laundry-storefront.webp`.
-- Size: 732 x 188, 23,126 bytes, WebP quality 70.
-- SHA-256: `152fa1bf7ef1329720d7022f067546454610b8f7dff3d405eb695ab35a93dcc5`.
-- Git blob: `76faaa7cf11946f41bc37dae50b3bc6f0a6a4739`.
-- Uploaded blob, checked-out image and decoded dimensions were verified against the inspected crop.
+The older unused `dockside-detail-card.webp` remains historical and is not imported. All four active assets were decoded after checkout and matched their expected dimensions, byte counts and digests.
 
 ## Layout and authority contract
 
-`business-artwork.ts` maps the stable Dockside and Neon Laundry IDs to distinct presentation assets. The existing `BusinessArtwork` renderer is reused without modification. Pending images are hidden but loaded eagerly; failed or empty images remove the complete strip, not the card or its controls. The small image reveal on successful load remains the existing tradeoff against reserving a black placeholder.
+Only the presentation lookup in `business-artwork.ts` changes in production TypeScript. It maps the four stable Business IDs to distinct imported images and their actual intrinsic dimensions. Unknown IDs return null. No image path enters GameState or the feature catalog.
 
-All stylesheets are unchanged by PR #20. Both strips therefore use the same bounded height and crop rules. The existing grid retains two Business cards above 900px and one at/below 900px. No full-row span, HUD modification, sticky category bar or new empty slots for later Businesses are introduced.
+`BusinessArtwork.tsx`, `BusinessCard.tsx`, every stylesheet, all existing localized text and all game code remain unchanged by this batch. In particular:
 
-Prices, ownership, Level, production, requirements, Earnings Details and actions remain HTML driven by existing selectors and commands. The optional Business tagline now comes from presentation localization. Dockside's accepted text is unchanged. Laundry uses `Fresh sheets. Questionable receipts.` / `Saubere Wäsche. Fragwürdige Belege.` and its own localized description.
+- Two Business cards remain side by side above 900px; one per row at/below 900px.
+- Every artwork uses the same existing bounded strip height and `object-fit: cover`; narrow screens may crop secondary edge details, never gameplay information.
+- No full-row hero, new fixed height for cards, sticky category navigation or global spacing override is introduced.
+- Pending artwork remains hidden and loads eagerly; a failed/empty image removes only that image slot. Names, requirements, prices and action controls stay usable.
+- Ownership, Level, production, prices, Earnings Details and buttons remain real HTML driven by the existing selectors/commands, not values from the preview.
+- The accepted Dockside/Laundry EN/DE copy stays unchanged. Environmental signs are decorative, not replacement translations for gameplay data.
 
-## Executed Neon Laundry verification
+## Verification and release boundary
 
-A fresh checkout and `npm ci --include=optional --no-audit --no-fund` ran under Node 24.21.0. `npm run build` passed strict TypeScript and production bundling.
+Fresh Node 24 dependency installation and strict production build were executed. The focused artwork/asset/HUD suite passed **34 tests**, including every storefront's load/error/empty state and all four Businesses' EN/DE purchase/upgrade intents after image failure, with paused/max-level protection.
 
-- 16 focused tests passed: both assets' mapping/loading/error behavior, EN/DE Laundry purchase/upgrade intents after an image failure, asset integrity and existing HUD guards. These tests are committed in existing test files, unlike the earlier blocked new-file upload.
-- Full unchanged-main suite: 2,151 tests, 2,087 passed and 64 failed. Candidate: 2,158 tests, 2,094 passed and the same 64 failures. No new failing cases; the complete suite is NOT green, and prior failures remain separate work.
-- 16 paired Chromium cases (32 page renders): EN/DE at 320, 390, 740, 900, 901, 1024, 1440 and 1920px. Real baseline/candidate Vite production builds were served over local HTTP; no simulated component markup or injected candidate CSS.
-- Both decoded storefronts display with equal strip heights; Business column counts/widths, static category navigation, contained HUD XP, Overview/City gaps and navigation through all five sections remain intact.
-- Two EN/DE real-app action flows passed: Laundry purchase, upgrade, Earnings Details, save/reload and changing language through Settings.
-- Two EN/DE blocked-image flows passed: no Laundry image slot remains, and acquisition still works.
-- Known baseline issue retained: German 320px viewport has 10px document overflow both before and after. No new overflow was introduced; do not claim universal zero overflow.
+The full unchanged baseline has 2,158 tests: 2,094 passed / 64 failed. This candidate has 2,176 tests: 2,112 passed / the same 64 failed. Failure names were compared: no new failing cases and none removed. The complete suite is **not green**; this artwork task does not silently fix, skip or delete existing failures.
 
-The browser used disposable, schema-validated test saves. No user save was accessed or modified. Generated screenshots and reports are verification artifacts, not runtime assets. The main-only Pages workflow must independently pass after merge; it does not run Vitest.
+The existing portfolio test's intentional image-count assertion is updated for all three later Businesses while preserving its gameplay/requirements assertions. Image-integrity tests protect all four exact files. Responsive browser and release evidence belongs in the integration PR, including any known baseline overflow; a successful build is not a claim of universal visual acceptance.
 
-## Freeze and handoff
+## History and next step
 
-Presentation only. No GameState, Save v17 / CE1, prices, production, levels, gates, automation, XP, Heat, RNG, offline rules, package manifests or workflow changes. Keep the repaired Operations, HUD and section-spacing baseline.
+PR #19 established the user-accepted compact Dockside card. PR #20 delivered Neon Laundry with its own storefront and localized identity. The user then explicitly requested the entire four-storefront preview as one batch, so Afterdark and Solara Nights no longer wait behind separate illustration tasks.
 
-After PR #20 is successfully released, request live review of the actual Laundry card. Only then continue with Afterdark Customs followed by Solara Nights. Active Vehicle, Tier-1 Garage and Heat / Police 2.0 remain later phases.
+After this batch is successfully published, review the actual four-card result. The next separately authorized roadmap block is Active Vehicle + Tier-1 Garage, followed by Heat / Police 2.0. No gameplay phase starts automatically.
+
+Save v17 / CE1, economy, balance, levels, gates, XP, Heat, RNG, offline progression, automation, dependencies and deployment workflow remain unchanged.

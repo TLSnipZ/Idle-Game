@@ -30,7 +30,7 @@ describe('shared portfolio presentation and accessible states', () => {
     for (const detail of evaluateRequirements(createInitialGameState(), d.requirements).requirements) expect(root.textContent).toContain(`Required — ${detail.description}`);
     const b = root.querySelector('button'); expect(b?.disabled).toBe(true); expect(b?.getAttribute('aria-label')).toBe(`Acquire ${d.name}`);
     expect(root.querySelector('h3')?.textContent).toBe(d.name); expect(root.querySelector('[aria-live]')).toBeNull();
-    expect(root.querySelectorAll('img')).toHaveLength(d.id === 'business:neon-laundry' ? 1 : 0);
+    expect(root.querySelectorAll('img')).toHaveLength(1);
     expect(root.querySelectorAll('svg, canvas')).toHaveLength(0);
     for (const image of root.querySelectorAll('img')) {
       expect(image.alt).toBe('');
