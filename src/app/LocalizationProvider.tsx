@@ -15,7 +15,7 @@ export function useLocale(): Locale { return useContext(LocaleContext); }
 /** Presentation helper for copy that has not yet earned a stable message key. */
 export function useLocalizedText() {
   const locale = useLocale();
-  return (english: string, german: string) => localize(locale, english, german);
+  return (english: string, german: string = english) => localize(locale, english, german);
 }
 
 export function localize(locale: Locale, english: string, german: string): string {

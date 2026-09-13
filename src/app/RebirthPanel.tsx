@@ -59,14 +59,14 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
   useEffect(() => { if (interaction.confirming) cancel.current?.focus(); }, [interaction.confirming]);
   const policy = Object.values(REBIRTH_POLICY);
   return <section className="panel rebirth-panel" aria-labelledby="rebirth-heading">
-    <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>Rebirth</h2>
+    <div className="panel-heading"><h2 id="rebirth-heading" ref={heading} tabIndex={-1}>{text('Rebirth')}</h2>
       <span className="ownership-badge">{preview.eligible ? text('REBIRTH AVAILABLE', 'REBIRTH VERFÜGBAR') : text('BUILD YOUR LEGACY', 'BAU DEIN VERMÄCHTNIS')}</span></div>
     <div className="rebirth-brief"><p>{text('Restart your temporary operation in exchange for permanent Empire Points. Corporate restructuring, but with more neon.', 'Starte deine temporäre Operation neu und kassier dafür permanente Empire Points. Konzernumbau, nur mit mehr Neon.')}</p>
-    <dl className="permanent-totals"><div><dt>Empire Points</dt><dd>{formatInteger(preview.empirePoints)} EP</dd></div>
-      <div><dt>Rebirths</dt><dd>{formatInteger(preview.rebirthCount)}</dd></div></dl>
+    <dl className="permanent-totals"><div><dt>{text('Empire Points')}</dt><dd>{formatInteger(preview.empirePoints)} {text('EP')}</dd></div>
+      <div><dt>{text('Rebirths')}</dt><dd>{formatInteger(preview.rebirthCount)}</dd></div></dl>
     <p>{text('Invest unspent Empire Points in permanent skills that survive Rebirth.', 'Investiere übrige Empire Points in permanente Skills, die Rebirth überleben. Vermögen vergeht, Skill-Boni bleiben. Irgendwie poetisch.')}</p>
     <RequirementList result={preview.requirements} id="rebirth-requirements" />
-    <p className="production rebirth-reward">{text('Reward:', 'Belohnung:')} {preview.reward === null ? text('Not eligible', 'Nicht berechtigt') : `+${formatInteger(preview.reward)} Empire Points`}</p>
+    <p className="production rebirth-reward">{text('Reward:', 'Belohnung:')} {preview.reward === null ? text('Not eligible', 'Nicht berechtigt') : text(`+${formatInteger(preview.reward)} Empire Points`)}</p>
     </div><div id="rebirth-policy" className="rebirth-policy">
       <div className="rebirth-keep"><h3>{text('You keep', 'Du behältst')}</h3><ul>{policy.filter(item => item.action !== 'reset').flatMap(item => item.labels).map(label => <li key={label}>{policyLabel(label, locale)}</li>)}</ul></div>
       <div className="rebirth-lose"><h3>{text('You lose', 'Du verlierst')}</h3><ul>{policy.filter(item => item.action === 'reset').flatMap(item => item.labels).map(label => <li key={label}>{policyLabel(label, locale)}</li>)}</ul></div>
@@ -82,6 +82,6 @@ export function RebirthPanelView({ preview, unavailable, interaction, controls }
     </div> : <button className="action-button rebirth-button" disabled={unavailable || !preview.eligible}
       aria-describedby="rebirth-requirements rebirth-policy" onClick={controls.request}>{text('Review Rebirth', 'Rebirth prüfen')}</button>}
     {unavailable && <p>{text('Rebirth requires a running session with available local saving.', 'Rebirth braucht eine laufende Session mit funktionierendem lokalem Save. Selbst Wiedergeburt benötigt Verwaltung.')}</p>}
-    <p role="status" aria-live="polite" aria-atomic="true">{interaction.message}</p>
+    <p role="status" aria-live="polite" aria-atomic="true">{text(interaction.message)}</p>
   </section>;
 }

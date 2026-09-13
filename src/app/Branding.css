@@ -20,3 +20,5 @@
 }
 @media (max-width: 420px) { .app-header .edition { display: none; } }
 @media (prefers-reduced-motion: reduce) { .solara-symbol, .solara-sun { transition: none; } }
+
+html[lang="en-x-villager"] .app-footer::before { content: 'Hrm'; }

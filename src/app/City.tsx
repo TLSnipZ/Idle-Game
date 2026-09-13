@@ -16,7 +16,7 @@ export function City({ state, paused, onAcquire, onLayLow }: {
   const text = useLocalizedText();
   const city = selectCity(state);
   return <section className="city" aria-labelledby="city-heading">
-    <div className="panel-heading"><h2 id="city-heading">{CITY_NAME}</h2>
+    <div className="panel-heading"><h2 id="city-heading">{text(CITY_NAME)}</h2>
       <span>{text('Territories controlled:', 'Kontrollierte Bezirke:')} {city.ownedTerritoryCount} / {city.totalConfiguredTerritories}</span></div>
     <p>{text('Build influence block by block. The city calls it zoning. You call it growth.', 'Bau deinen Einfluss Block für Block aus. Die Stadt nennt es Stadtplanung. Du nennst es Wachstum.')}</p>
     <div className="district-pressure-layout"><div className="district-zone"><h3>{text('Districts', 'Bezirke')}</h3>
@@ -27,7 +27,7 @@ export function City({ state, paused, onAcquire, onLayLow }: {
       const description = localizedContent(locale, territory.id, 'description', territory.description);
       return <article key={territory.id} className={`panel territory-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
         <p className="eyebrow">{territory.starting ? text('Starting district', 'Startbezirk') : text('Nightlife district', 'Nightlife-Bezirk')}</p>
-        <div className="panel-heading"><h4 id={heading}>{territory.name}</h4>
+        <div className="panel-heading"><h4 id={heading}>{text(territory.name)}</h4>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.status}</span></div>
         <div className="territory-story"><p>{description}</p></div><p className="territory-effect">{view.effect}</p>
         {view.owned ? <p>{view.availability}</p> : <>

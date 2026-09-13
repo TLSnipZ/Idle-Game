@@ -40,9 +40,9 @@ it('keeps each mounted runtime locale across command renders and separates insta
       await act(() => game(1).runStarterJob());
       expect(game(1).feedback.message).toContain('Lieferung erledigt.');
       await act(() => game(2).runStarterJob());
-      expect(game(2).feedback.message).toContain('Delivery completed.');
+      expect(game(2).feedback.message).toContain(villagerText('Delivery completed.'));
       expect(game(2).feedback.message).toBe(villagerText(game(2).feedback.message));
-      expect(game(2).feedback.message).toMatch(/^H[rm]+…/);
+      expect(game(2).feedback.message).toMatch(/^[HhMmRr]+/);
     }
   } finally { await act(() => root.unmount()); container.remove(); }
 });

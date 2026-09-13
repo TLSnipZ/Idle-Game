@@ -23,22 +23,22 @@ export function AutoUpgraderCard({ view, paused, onPurchase, onToggle, onTargetC
     <h3 id="auto-upgrader-heading">{text('Business Auto-Upgrader', 'Business Auto-Upgrader')}</h3>
     <p>{description}</p>
     <div className="automation-metrics">
-      <div><span>{text('Attempt', 'Versuch')}</span><strong>{formatRemainingTime(view.definition.intervalMs)}</strong></div>
-      <div><span>{text('Target', 'Ziel')}</span><strong>{view.owned ? view.target.name : '—'}</strong></div>
+      <div><span>{text('Attempt', 'Versuch')}</span><strong>{text(formatRemainingTime(view.definition.intervalMs))}</strong></div>
+      <div><span>{text('Target', 'Ziel')}</span><strong>{view.owned ? text(view.target.name) : '—'}</strong></div>
     </div>
     {view.owned ? <>
       {view.targets.length > 1 || (view.level === null && view.targets.length > 0) ? <div className="auto-target">
         <label htmlFor="auto-upgrader-target">{text('Target Business', 'Ziel-Business')}</label>
         <select id="auto-upgrader-target" value={view.level === null ? '' : view.target.id} disabled={paused} onChange={event => onTargetChange?.(event.currentTarget.value)}>
           {view.level === null && <option value="" disabled>{text('Choose an owned Business', 'Wähle ein eigenes Business')}</option>}
-          {view.targets.map(target => <option key={target.id} value={target.id}>{target.name}</option>)}
+          {view.targets.map(target => <option key={target.id} value={target.id}>{text(target.name)}</option>)}
         </select>
       </div> : null}
       <div className="automation-next-state">
-        <span>{view.level === null ? text('No owned target', 'Kein eigenes Ziel') : `${view.target.name} · Level ${view.level}`}</span>
+        <span>{view.level === null ? text('No owned target', 'Kein eigenes Ziel') : text(`${view.target.name} · Level ${view.level}`)}</span>
         <strong>{view.maxed ? text('MAXED', 'MAX') : view.nextCost !== null ? formatPrice(view.nextCost) : '—'}</strong>
       </div>
-      <label id="auto-upgrader-timing" htmlFor="auto-upgrader-progress">{text('Next attempt in', 'Nächster Versuch in')} <strong>{formatRemainingTime(view.remainingMs)}</strong>{!view.enabled || paused ? text(' · Progress paused', ' · Fortschritt pausiert') : ''}</label>
+      <label id="auto-upgrader-timing" htmlFor="auto-upgrader-progress">{text('Next attempt in', 'Nächster Versuch in')} <strong>{text(formatRemainingTime(view.remainingMs))}</strong>{!view.enabled || paused ? text(' · Progress paused', ' · Fortschritt pausiert') : ''}</label>
       <progress aria-label={text('Business Auto-Upgrader attempt progress', 'Fortschritt des Business Auto-Upgraders')} aria-describedby="auto-upgrader-timing auto-upgrader-state" id="auto-upgrader-progress" max={view.definition.intervalMs} value={view.progressMs} />
       <p className="sr-only" id="auto-upgrader-state">{text('Automatic spending:', 'Automatische Ausgaben:')} {view.enabled ? text('enabled', 'aktiviert') : text('disabled', 'deaktiviert')}.</p>
       <details className="operations-disclosure"><summary>{text('Spending details', 'Ausgaben-Details')}</summary><div className="operations-disclosure-body"><p>{text('Automatically buys one upgrade for the selected Business every 30s when affordable.', 'Kauft alle 30s automatisch ein Upgrade fürs gewählte Business, wenn genug Cash da ist.')}</p>{!view.maxed && !view.canAffordNextUpgrade && <p>{text('More cash needed for the next upgrade.', 'Für das nächste Upgrade fehlt noch Cash.')}</p>}</div></details>

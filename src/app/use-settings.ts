@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { villagerText } from './villager-language';
 import { DEFAULT_LOCALE, isLocale } from './localization';
 import type { Locale } from './localization';
 
@@ -23,6 +24,7 @@ function readSettings(): PresentationSettings {
 export function useSettings() {
   const [settings, setSettings] = useState<PresentationSettings>(readSettings);
   useEffect(() => {
+    document.title = settings.locale === 'villager' ? villagerText('Solara City — After Dark Empire') : 'Solara City — After Dark Empire';
     document.documentElement.lang = settings.locale === 'villager' ? 'en-x-villager' : settings.locale;
     document.documentElement.dataset.reducedMotion = settings.reducedMotion ? 'true' : 'false';
     try { window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* Presentation preferences may fail without pausing gameplay. */ }

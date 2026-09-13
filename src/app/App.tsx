@@ -19,7 +19,7 @@ import { guidanceDestination } from './guidance-presentation';
 import { SettingsPanel } from './SettingsPanel';
 import { translate } from './localization';
 import type { MessageKey } from './localization';
-import { LocalizationProvider } from './LocalizationProvider';
+import { localize, LocalizationProvider } from './LocalizationProvider';
 import { useSettings } from './use-settings';
 import { BrandLockup } from './BrandLockup';
 import './App.css';
@@ -41,6 +41,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const [active, setActive] = useState<SectionId>(DEFAULT_SECTION);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const preferences = useSettings();
+  const text = (value: string) => localize(preferences.settings.locale, value, value);
   const t = (key: MessageKey) => translate(preferences.settings.locale, key);
   const save = useSaveManagement(game.saveActions, preferences.settings.locale);
   const rebirth = useRebirthControls(game.rebirth, preferences.settings.locale);
@@ -82,9 +83,9 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{t(sectionLabelKey)}</h1><p>{t(sectionDescriptionKey)}</p></div>
         <SectionContent active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={setActive} save={save} rebirth={rebirth} />
       </div>
-      <p className="session-note">{t('localProgress')} <span aria-hidden="true">/</span> {t('awayPrefix')} {formatOfflineDuration(getOfflineCapMs(game.snapshot.state))}.</p>
+      <p className="session-note">{t('localProgress')} <span aria-hidden="true">/</span> {t('awayPrefix')} {text(formatOfflineDuration(getOfflineCapMs(game.snapshot.state)))}.</p>
     </main>
-    <footer className="app-footer"><span>{CITY_NAME} <span aria-hidden="true">/</span> {t('footerGenre')}</span><span>{t('footerTagline')}</span></footer>
+    <footer className="app-footer"><span>{text(CITY_NAME)} <span aria-hidden="true">/</span> {t('footerGenre')}</span><span>{t('footerTagline')}</span></footer>
     <SettingsPanel open={settingsOpen} settings={preferences.settings} t={t} onClose={() => setSettingsOpen(false)} onLocale={preferences.setLocale} onReducedMotion={preferences.setReducedMotion} />
   </div></LocalizationProvider>;
 }

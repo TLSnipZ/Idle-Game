@@ -35,7 +35,7 @@ export function ResetProgress({ unavailable, onReset }: {
       aria-labelledby="reset-warning" aria-describedby="reset-consequences reset-backup"
       onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); controls.cancel(); } }}>
       <h4 id="reset-warning">{text('Permanently reset all progress?', 'Wirklich sämtlichen Fortschritt endgültig löschen?')}</h4>
-      <label htmlFor="reset-confirmation-text">{text(`Type ${RESET_CONFIRMATION_TEXT} to confirm`, `${RESET_CONFIRMATION_TEXT} zum Bestätigen eingeben`)}</label>
+      <label htmlFor="reset-confirmation-text">{text(`Type ${RESET_CONFIRMATION_TEXT} to confirm`, `${RESET_CONFIRMATION_TEXT} zum Bestätigen eingeben`)} {locale === 'villager' && <code>{RESET_CONFIRMATION_TEXT}</code>}</label>
       <input id="reset-confirmation-text" type="text" value={interaction.confirmation}
         autoComplete="off" autoCapitalize="off" spellCheck={false} maxLength={20}
         aria-describedby="reset-confirmation-help" onChange={event => controls.edit(event.target.value)} />
@@ -50,6 +50,6 @@ export function ResetProgress({ unavailable, onReset }: {
       disabled={unavailable} aria-describedby="reset-consequences reset-backup"
       onClick={controls.request}>{text('Review New Game reset', 'Neues Spiel prüfen')}</button>}
     {unavailable && <p>{text('New Game needs a running session and a valid, unchanged local save. Reload or use the existing Import recovery flow before trying again.', 'Neues Spiel braucht eine laufende Session und einen gültigen, unveränderten lokalen Save. Neu laden oder erst über Import retten, bevor du alles anzündest.')}</p>}
-    <p role="status" aria-live="polite" aria-atomic="true">{interaction.message}</p>
+    <p role="status" aria-live="polite" aria-atomic="true">{text(interaction.message)}</p>
   </section>;
 }

@@ -31,15 +31,15 @@ export function GlobalStatus({ view, active, onNavigate, paused, newsMessage = '
           <div className="hud-cash"><dt>{t('cash')}</dt><dd>{view.cash}</dd></div>
           <div className="hud-level"><dt>{t('playerLevel')}</dt><dd>{view.player.currentLevel}<HudPlayerProgress progress={view.player} /></dd></div>
           <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>{t('heat')}</dt><dd>{view.heat.heat} · {heatTierLabel(view.heat.tier.label, locale)}</dd></div>
-          <div className="hud-empire"><dt>{t('empirePoints')}</dt><dd>{formatInteger(view.empire.empirePoints)} EP</dd></div>
+          <div className="hud-empire"><dt>{t('empirePoints')}</dt><dd>{formatInteger(view.empire.empirePoints)} {text('EP')}</dd></div>
         </dl>
         <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
           <div className="activity-center-heading"><span>{text('ACTIVITY CENTER', 'AKTIVITÄTSZENTRALE')}</span><strong>{activities ? text(`${activities} live`, `${activities} aktiv`) : text('ALL QUIET', 'ALLES RUHIG')}</strong></div>
           <div className="activity-center-items">
-            {newsMessage && <div className="activity-item activity-news"><span>{text('LATEST', 'NEUSTES')}</span><strong>{newsMessage}</strong></div>}
+            {newsMessage && <div className="activity-item activity-news"><span>{text('LATEST', 'NEUSTES')}</span><strong>{text(newsMessage)}</strong></div>}
             {view.event.pending && <button type="button" className="activity-item activity-event" onClick={() => onNavigate(SECTION.city.id)}><span>{t('cityEventActive')}</span><strong>{eventName}</strong></button>}
             {view.autoActive && <button type="button" className="activity-item activity-auto" onClick={() => onNavigate(SECTION.operations.id)}><span>{text('AUTOMATION', 'AUTOMATISIERUNG')}</span><strong>{paused ? t('autoPaused') : t('autoActive')}</strong></button>}
-            {view.empire.eligible && view.empire.reward !== null && <button type="button" className="activity-item activity-rebirth" onClick={() => onNavigate(SECTION.empire.id)}><span>{text('REBIRTH READY', 'REBIRTH BEREIT')}</span><strong>+{formatInteger(view.empire.reward)} EP · {text('your empire has discovered reincarnation', 'dein Imperium hat Wiedergeburt entdeckt')}</strong></button>}
+            {view.empire.eligible && view.empire.reward !== null && <button type="button" className="activity-item activity-rebirth" onClick={() => onNavigate(SECTION.empire.id)}><span>{text('REBIRTH READY', 'REBIRTH BEREIT')}</span><strong>+{formatInteger(view.empire.reward)} {text('EP')} · {text('your empire has discovered reincarnation', 'dein Imperium hat Wiedergeburt entdeckt')}</strong></button>}
             {paused && <div className="activity-item activity-paused" role="status"><span>{text('SYSTEM', 'SYSTEM')}</span><strong>{t('sessionPaused')}</strong></div>}
             {!activities && <div className="activity-empty"><span>{text('No fires to put out.', 'Gerade brennt nichts.')}</span> {text('Enjoy it before Solara notices.', 'Genieß es, bevor Solara das mitbekommt.')}</div>}
           </div>

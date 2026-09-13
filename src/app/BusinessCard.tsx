@@ -39,7 +39,7 @@ export function BusinessCard({ definition = STARTER_BUSINESS, requirements, prog
     {artwork && <BusinessArtwork key={artwork.src} artwork={artwork} />}
     <div className="business-content">
       <div className="panel-heading business-card-heading"><span className="eyebrow">{subtitle}</span><span className={`ownership-badge ${owned ? 'is-owned' : ''}`}>{view.status}</span></div>
-      <div className="business-title-row"><div><h3 id={headingId}>{definition.name}</h3>{tagline && <p className="dockside-tagline business-tagline">{tagline}</p>}</div>{progress && <span className="business-level">Level {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
+      <div className="business-title-row"><div><h3 id={headingId}>{text(definition.name)}</h3>{tagline && <p className="dockside-tagline business-tagline">{tagline}</p>}</div>{progress && <span className="business-level">{text('Level')} {progress.level} / {MAX_BUSINESS_LEVEL}</span>}</div>
       <p className="business-description">{description}</p>
 
       <div className={`business-stat-grid ${progress ? 'is-three-up' : 'is-acquisition'}`}>

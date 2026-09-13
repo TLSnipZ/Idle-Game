@@ -21,7 +21,7 @@ export function Garage({ state, paused, onPurchase, onSelect }: {
       <span>{text('Owned vehicles:', 'Fahrzeuge im Besitz:')} {collection.ownedVehicleCount} / {collection.totalConfiguredVehicles}</span></div>
     <div className="garage-active-summary">
       <p className="eyebrow">{text('Active vehicle', 'Aktives Fahrzeug')}</p>
-      <p><strong>{collection.activeVehicle?.name ?? text('No active vehicle', 'Kein aktives Fahrzeug')}</strong></p>
+      <p><strong>{collection.activeVehicle ? text(collection.activeVehicle.name) : text('No active vehicle', 'Kein aktives Fahrzeug')}</strong></p>
       <p>{collection.activeVehicle
         ? text('Only your active vehicle supplies its bonus. Ownership and selection survive Rebirth. Parking the rest is free. For now.',
           'Nur dein aktives Fahrzeug liefert seinen Bonus. Besitz und Auswahl bleiben bei Rebirth erhalten. Der Rest parkt kostenlos. Noch.')
@@ -38,10 +38,10 @@ export function Garage({ state, paused, onPurchase, onSelect }: {
       const description = localizedContent(locale, vehicle.id, 'description', vehicle.description);
       return <article key={vehicle.id} className={`panel vehicle-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
         <header className="showroom-stage"><p className="eyebrow">{text('Performance collection · Permanent ownership', 'Performance-Sammlung · Permanenter Besitz')}</p>
-        <div className="panel-heading"><h3 id={heading}><span className="vehicle-manufacturer">{vehicle.manufacturer}</span>{' '}<span>{vehicle.model}</span></h3>
+        <div className="panel-heading"><h3 id={heading}><span className="vehicle-manufacturer">{text(vehicle.manufacturer)}</span>{' '}<span>{text(vehicle.model)}</span></h3>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? view.active ? text('OWNED · ACTIVE', 'IM BESITZ · AKTIV') : text('OWNED · INACTIVE', 'IM BESITZ · INAKTIV') : view.eligible ? text('AVAILABLE', 'VERFÜGBAR') : text('LOCKED', 'GESPERRT')}</span></div>
         <p className="eyebrow">{category}</p>
-        {artwork && <img className="vehicle-artwork" src={artwork.src} alt={artwork.alt}
+        {artwork && <img className="vehicle-artwork" src={artwork.src} alt={text(artwork.alt)}
           width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />}
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>

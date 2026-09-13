@@ -21,9 +21,9 @@ export function RebirthNotice({ preview, onReview }: {
     wasEligible.current = preview.eligible;
   }, [preview.eligible, preview.reward, locale]);
   return <div className="rebirth-notice-slot">
-    <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</span>
+    <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{text(announcement)}</span>
     {preview.eligible && preview.reward !== null && <div className="rebirth-notice">
-      <span><strong>{text('REBIRTH READY', 'REBIRTH BEREIT')}</strong> · +{formatInteger(preview.reward)} EP</span>
+      <span><strong>{text('REBIRTH READY', 'REBIRTH BEREIT')}</strong> · +{formatInteger(preview.reward)} {text('EP')}</span>
       <button type="button" onClick={onReview} aria-label={text('Review Rebirth in Empire', 'Rebirth im Imperium prüfen')}><span className="rebirth-review-desktop">{text('Review Rebirth', 'Rebirth prüfen')}</span><span className="rebirth-review-mobile" aria-hidden="true">{text('Review →', 'Prüfen →')}</span></button>
     </div>}
   </div>;

@@ -36,7 +36,7 @@ export function CityEvents({ state, paused, announcement, onChoose }: {
         </div>)}</div>
     </> : <>
       <p>{text('No active event', 'Kein aktives Event · die Stadt plant wahrscheinlich schon das nächste Problem')}</p>
-      <p>{text('Next opportunity:', 'Nächste Gelegenheit:')} {view.countdown}</p>
+      <p>{text('Next opportunity:', 'Nächste Gelegenheit:')} {text(view.countdown ?? '')}</p>
       <p>{text('A city situation may appear when the online opportunity timer completes.', 'Wenn der Online-Timer endet, kann Solara dir spontan eine neue schlechte Idee mit zwei Buttons anbieten.')}</p>
     </>}
   </section>;

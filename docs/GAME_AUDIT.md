@@ -11,15 +11,16 @@ It is not a claim of exhaustive absence of bugs.
 ## Third language
 
 Settings now offers **English / Deutsch / Villager · Hrrm**. Villager is an original
-written novelty dialect: Hrrm/Hmm sounds plus readable English glosses, so choices,
-requirements and destructive confirmations remain understandable. This is text,
+written novelty dialect. The initial readable-gloss prototype was superseded at
+the user’s request: every word is now Hrrm/Hmm/Mhm gibberish, intentionally
+incomprehensible even in choices, requirements and confirmations. This is text,
 not sampled Minecraft speech or an audio pack.
 
 Keyed shell copy, inline text, requirements, catalog flavor, actions, Heat and
-statistics share the third locale. Canonical names, exact amounts, identifiers,
-CE1 codes and the RESET token retain their meaning. Preferences are device-local
+statistics share the third locale. Displayed names and units also become gibberish. Exact amounts, canonical data,
+identifiers, CE1 codes and the literal RESET input token remain intact. Preferences are device-local
 under `solara-city:settings`; `html[lang]` uses `en-x-villager` with English number
-formatting. Switching back remains recognizable. Save v18 and CE1 are unchanged.
+formatting. Flag icons provide a non-verbal way to switch back. Save v18 and CE1 are unchanged.
 
 ## Concrete defects addressed
 
@@ -85,7 +86,7 @@ approval. Safari/Firefox, actual mobile hardware, screen-reader listening,
 | Priority | Work | Why / evidence | Acceptance before closing |
 | --- | --- | --- | --- |
 | P1 — next technical step | Restore the inherited UI regression suite | Baseline has 64 failures across 14 presentation files. Many tests still assume expanded Guidance, old selectors/wording, or call hook components as plain functions. This prevents later assertions from exercising the real behavior. The territory diagnostic and periodic-announcement defects are repaired here; remaining failures must be individually checked, not waived as harmless text changes. | Exercise actual expansion/navigation and React mounting; retain money, focus, disabled-action and save assertions; reach zero failures without removing/ignoring tests; replace the temporary baseline comparison with a normal green-suite gate. |
-| P2 | Unify localization and requirement presentation | Keyed strings, inline EN/DE pairs and catalog fields remain distributed. Parsing English requirement sentences is fragile. This patch centralizes the repeated helper but does not redesign all messages. | Typed message parameters and requirement discriminants; parity checks for all supported locales; proper names and exact amounts remain unchanged. |
+| P2 | Unify localization and requirement presentation | Keyed strings, inline EN/DE pairs and catalog fields remain distributed. Parsing English requirement sentences is fragile. This patch centralizes the repeated helper but does not redesign all messages. | Typed message parameters and requirement discriminants; parity checks for all supported locales; canonical identities and exact amounts remain unchanged. |
 | P2 | Consolidate responsive CSS and clarify Operations metrics | Historical overrides are split across App.css, sections.css and Operations.css. The German mobile overflow was real; rigid columns and nowrap financial values are fragile under long text. | Feature-owned styles, exact prices/rates visible at 320px and zoom, no overflow-hiding workaround; keep browser matrix coverage. |
 | P2 | Make save guarantees clearer per action | Business/Garage/automation configuration uses save-before-publish; some older actions intentionally retain live progress with a warning if saving fails. This is covered by existing persistence tests, not a newly proven rollback defect. | Deliberately choose and document one player-facing policy; clearly distinguish saved success from volatile progress; preserve conflict protection, old saves and offline chronology. |
 | P2 | Review Activity Center density and announcements on devices | The measured chrome reaches 494px at 320px width in the Villager advanced-state fixture (900px viewport height). Horizontal scrolling and long translated copy warrant direct mobile/assistive-technology review. Duplicate command status was removed here. | Useful first-screen actions, visible pending events, one intelligible announcement per event and focus retained during ticks. |
@@ -101,3 +102,30 @@ This audit's automated acceptance checks have passed; PR #24 carries the release
 Next technical priority is
 the inherited UI-test repair above; then resume Tier-1 Garage and Heat/Police 2.0.
 Do not silently start those content phases as part of this audit.
+
+
+## Villager overkill verification — PR #25
+
+The user explicitly replaced the readable-gloss contract with intentionally
+incomprehensible Villager copy. Production code commit
+`08a3c494ec443d8a190e58fc73fe88fb49bc79a1` passed [verification run 34763014203](https://github.com/TLSnipZ/Idle-Game/actions/runs/34763014203).
+
+- Strict TypeScript / Vite production build and git diff --check passed.
+- Full suite: 2,252 tests, 2,190 passed, 62 inherited failures; unchanged from
+  PR #24. The regression gate found no new failures, removed baseline tests or
+  increased skips. The obsolete gloss assertion now tests the requested gibberish
+  contract; no test was disabled.
+- All 255 Chromium matrix cases passed (225 section cases plus 30 Garage cases),
+  with no root overflow, clipped checked metrics or page errors.
+- Villager prose audit passed across all five sections, three progression states
+  and five widths, expanded Guidance, collapsed disclosure content, Settings,
+  accessibility descriptions, CSS pseudo-element text and browser title.
+- Real locale switching, repeated delivery feedback, export/invalid import,
+  pending confirmation preservation, advanced actions, Rebirth retention and
+  full New Game/reset/reload checks passed. Backup/input values and the literal
+  RESET confirmation token are deliberately excluded from prose translation.
+
+Evidence: [test reports, browser results and screenshots](https://github.com/TLSnipZ/Idle-Game/actions/runs/34763014203/artifacts/10319487928).
+Screenshots were generated, not manually inspected. Previous manual/device review
+limitations and the remaining audit backlog still apply. No new gameplay phase
+was started.

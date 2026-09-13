@@ -81,8 +81,6 @@ const messages = {
 export type MessageKey = keyof typeof messages.en;
 export function translate(locale: Locale, key: MessageKey): string {
   if (locale !== 'villager') return messages[locale][key];
-  // Keep the exit from the novelty language recognizable in every locale.
-  if (key === 'english' || key === 'german' || key === 'villager') return messages.en[key];
   return villagerText(messages.en[key]);
 }
 export function localeTag(locale: Locale): string { return locale === 'de' ? 'de-DE' : 'en-US'; }

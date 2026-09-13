@@ -1,14 +1,13 @@
-/** Original written villager-inspired sounds. English glosses keep every action playable.
- * Idempotent because presentation strings can be composed more than once.
- * Never transform save codes, IDs, numeric values or user input.
+/** Written Villager sounds only: no translation gloss or recoverable word prefix.
+ * Token-wise replacement is deterministic and idempotent, including composed copy.
+ * This function is presentation-only; never pass IDs, saves or user input to it.
  */
-const GREETING = /^(?:Hrrm|Hrmm|Hmm|Hrr|Hrm)(?:[!?…]| ·)/;
-const SOUNDS = ['Hrrm', 'Hrmm', 'Hmm', 'Hrr', 'Hrm'] as const;
+const SOUNDS = ['Hrrm', 'Hrmm', 'Hmm', 'Hrr', 'Hrm', 'Hrrrmm', 'Mhm', 'Hmmrr'] as const;
 export function villagerText(english: string): string {
-  if (!english.trim() || GREETING.test(english)) return english;
-  let signature = 0;
-  for (const character of english) signature = (signature + character.charCodeAt(0)) % SOUNDS.length;
-  const sound = SOUNDS[signature] ?? 'Hrrm';
-  const inflection = english.trimEnd().endsWith('?') ? '?' : english.trimEnd().endsWith('!') ? '!' : '…';
-  return `${sound}${inflection} · ${english}`;
+  return english.replace(/\p{L}+/gu, word => {
+    if (/^[hmr]+$/i.test(word)) return word;
+    let signature = 0;
+    for (const character of word.toLowerCase()) signature = (signature * 31 + character.charCodeAt(0)) >>> 0;
+    return SOUNDS[signature % SOUNDS.length] ?? 'Hrrm';
+  });
 }

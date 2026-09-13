@@ -12,7 +12,7 @@ export function PlayerProgress({ xp, event, paused }: {
   const text = useLocalizedText();
   const progress = getLevelProgress(xp);
   return <section className="player-progress" aria-labelledby="player-level-heading">
-    <div className="panel-heading"><h3 id="player-level-heading">Level {progress.currentLevel}</h3>
+    <div className="panel-heading"><h3 id="player-level-heading">{text('Level')} {progress.currentLevel}</h3>
       <span>{text('Total XP:', 'Gesamt-XP:')} {formatXp(progress.currentXp)}</span></div>
     <label htmlFor="player-xp-progress">{progress.isMaxLevel ? text('MAX LEVEL', 'MAX-LEVEL')
       : text(`${formatXp(progress.xpIntoLevel)} / ${formatXp(progress.xpNeededForLevel)} XP toward Level ${progress.currentLevel + 1}`, `${formatXp(progress.xpIntoLevel)} / ${formatXp(progress.xpNeededForLevel)} XP bis Level ${progress.currentLevel + 1}`)}</label>
@@ -20,7 +20,7 @@ export function PlayerProgress({ xp, event, paused }: {
     <p className="is-live" role="status" aria-live="polite" aria-atomic="true">
       <span key={event?.sequence}>{event && !paused ? <>
         {describeLevelIncrease(event, locale)}
-        {event.unlocks && <span className="unlock-feedback">{text('New unlock available:', 'Neue Freischaltung:')} {event.unlocks.join(', ')}</span>}
+        {event.unlocks && <span className="unlock-feedback">{text('New unlock available:', 'Neue Freischaltung:')} {text(event.unlocks.join(', '))}</span>}
       </> : ''}</span>
     </p>
   </section>;

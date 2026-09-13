@@ -12,9 +12,41 @@ const saved = page => page.evaluate(() => JSON.parse(localStorage.getItem('crime
 const navigation = page => page.locator('.primary-navigation button');
 async function settings(page, locale) {
   await page.locator('.settings-trigger').click();
-  await page.getByRole('button', { name: locale === 'de' ? 'Deutsch' : locale === 'en' ? 'English' : 'Villager · Hrrm', exact: true }).click();
+  await page.locator('.settings-segment button').nth(['en', 'de', 'villager'].indexOf(locale)).click();
   await page.keyboard.press('Escape');
 }
+
+// Check rendered copy, collapsed details, option labels and accessible descriptions.
+// Editable backup/input data and the separately displayed RESET token are not prose.
+async function assertVillagerOnly(page) {
+  const leaks = await page.evaluate(() => {
+    const found = [];
+    const inspect = (value, element, kind) => {
+      if (!value || !/\p{L}/u.test(value.replace(/[hmr]/gi, ''))) return;
+      found.push({ kind, tag: element.tagName, className: element.className, value: value.slice(0, 140) });
+    };
+    const walker = document.createTreeWalker(document.querySelector('.app-shell'), NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const element = node.parentElement;
+      if (element.closest('textarea, input, code, script, style')) continue;
+      inspect(node.textContent, element, 'text');
+    }
+    for (const element of document.querySelectorAll('.app-shell [aria-label], .app-shell [aria-valuetext], .app-shell [title], .app-shell [alt], .app-shell [placeholder]')) {
+      for (const attribute of ['aria-label', 'aria-valuetext', 'title', 'alt', 'placeholder']) inspect(element.getAttribute(attribute), element, attribute);
+    }
+    inspect(document.title, document.documentElement, 'title');
+    for (const element of document.querySelectorAll('.app-shell *')) {
+      for (const pseudo of ['::before', '::after']) {
+        const content = getComputedStyle(element, pseudo).content;
+        if (content !== 'none' && content !== 'normal') inspect(content, element, pseudo);
+      }
+    }
+    return found;
+  });
+  assert.deepEqual(leaks, [], 'Villager contains no readable prose');
+}
+
 try {
   let ready = false;
   for (let i = 0; i < 100; i++) {
@@ -41,7 +73,11 @@ try {
       await navigation(page).nth(section).click();
       const heading = await page.locator('#section-heading').textContent();
       assert.ok(heading?.trim());
-      if (locale === 'villager') assert.match(heading, /^H[rm]+/);
+      if (locale === 'villager') {
+        assert.match(heading, /^[HhMmRr]+/);
+        if (await page.locator('.objective-expand').getAttribute('aria-expanded') === 'false') await page.locator('.objective-expand').click();
+        await assertVillagerOnly(page);
+      }
       const geometry = await page.evaluate(() => ({
         overflow: document.documentElement.scrollWidth - innerWidth,
         chromeHeight: Math.round(document.querySelector('.global-chrome')?.getBoundingClientRect().height ?? 0),
@@ -63,6 +99,7 @@ try {
     // Real modal keyboard behavior, including focus restoration and locale persistence.
     const trigger = page.locator('.settings-trigger');
     await trigger.click();
+    if (locale === 'villager') await assertVillagerOnly(page);
     assert.equal(await page.locator('dialog').evaluate(dialog => dialog.contains(document.activeElement)), true);
     for (let key = 0; key < 9; key++) {
       await page.keyboard.press(key % 2 ? 'Shift+Tab' : 'Tab');
@@ -90,8 +127,9 @@ try {
     for (let attempt = 0; attempt < 2; attempt++) {
       await page.locator('.delivery-button').click();
       const feedback = await page.locator('.feedback-command').textContent();
-      assert.ok(feedback.includes(locale === 'de' ? 'Lieferung erledigt.' : 'Delivery completed.'));
-      if (locale === 'villager') assert.match(feedback, /^H[rm]+/);
+      if (locale !== 'villager') assert.ok(feedback.includes(locale === 'de' ? 'Lieferung erledigt.' : 'Delivery completed.'));
+      else assert.doesNotMatch(feedback, /[a-gi-ln-qs-z]/i);
+      if (locale === 'villager') assert.match(feedback, /^[HhMmRr]+/);
       await page.waitForTimeout(300);
     }
   }
@@ -107,9 +145,10 @@ try {
   await page.locator('.reset-panel > button').click();
   await page.locator('#reset-confirmation-text').fill('RESET');
   await settings(page, 'villager');
+  await assertVillagerOnly(page);
   assert.equal(await page.locator('#reset-confirmation-text').inputValue(), 'RESET');
   await page.locator('#reset-confirmation .confirmation-actions button').first().click();
-  assert.match(await page.locator('.reset-panel [role="status"]').textContent(), /^H[rm]+/);
+  assert.match(await page.locator('.reset-panel [role="status"]').textContent(), /^[HhMmRr]+/);
   const beforeReload = await saved(page);
   await page.reload();
   assert.deepEqual((await saved(page)).state.garage, beforeReload.state.garage);
@@ -155,7 +194,7 @@ try {
     assert.equal(await page.locator('#rebirth-warning').count(), 1);
     await page.locator('.rebirth-panel .confirmation-actions button').first().click();
     const cancellation = await page.locator('.rebirth-panel > [role="status"]').textContent();
-    if (nextLocale === 'villager') assert.match(cancellation, /^H[rm]+/);
+    if (nextLocale === 'villager') assert.match(cancellation, /^[HhMmRr]+/);
     else assert.ok(cancellation.includes('Rebirth abgebrochen.'));
     const before = (await saved(page)).state;
     await page.locator('.rebirth-panel > .rebirth-button').click();

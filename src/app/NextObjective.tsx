@@ -29,7 +29,7 @@ export function NextObjective({ state, onNavigate }: {
   const guidance = selectGuidance(state, tracked);
   const { step } = guidance;
   const view = guidancePresentation(guidance, locale);
-  const goalName = guidance.goal.id === 'guidance:rebirth' ? 'Rebirth' : localizedContent(locale, guidance.goal.id, 'name', guidance.goal.name);
+  const goalName = guidance.goal.id === 'guidance:rebirth' ? text('Rebirth') : localizedContent(locale, guidance.goal.id, 'name', guidance.goal.name);
   const compactProgress = step.cash ? view.cashText : step.count ? `${formatInteger(step.count.current)} / ${formatInteger(step.count.required)} ${countLabel(step.count.label, locale)}` : text('Ready for trouble.', 'Bereit für Ärger.');
   return <section className={`next-objective ${expanded ? 'is-expanded' : 'is-collapsed'}`} aria-labelledby="next-objective-heading">
     <div className="objective-compact">
@@ -67,7 +67,7 @@ export function NextObjective({ state, onNavigate }: {
           <label htmlFor="guidance-goal">{text('Goal to follow', 'Ziel verfolgen')}</label>
           <select id="guidance-goal" value={guidance.tracked ? guidance.goal.id : ''} onChange={event => setTracked(event.currentTarget.value || null)}>
             <option value="">{text('Suggested path', 'Empfohlener Weg')}</option>
-            {guidance.goals.map(goal => <option key={goal.id} value={goal.id}>{goal.id === 'guidance:rebirth' ? 'Rebirth' : localizedContent(locale, goal.id, 'name', goal.name)}</option>)}
+            {guidance.goals.map(goal => <option key={goal.id} value={goal.id}>{goal.id === 'guidance:rebirth' ? text('Rebirth') : localizedContent(locale, goal.id, 'name', goal.name)}</option>)}
           </select>
           <p>{text('Optional. Tracking is not saved and never purchases anything.', 'Optional. Das Tracking wird nicht gespeichert und kauft niemals etwas. Dein Konto bleibt Herr seiner eigenen Fehlentscheidungen.')}</p>
         </details>
