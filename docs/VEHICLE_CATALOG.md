@@ -1,5 +1,15 @@
 # Solara City Vehicle Catalog
 
+## Current authority — Tier-2 analysis after Garage tuning/paint
+
+Tier-1 models, tuning and finishes are implemented through Save v23 / CE1.
+The old Tier-2 price/gate/effect rows below are superseded by
+[Tier-2 decision](TIER_TWO_GARAGE.md), including explicit opportunity-cost limits.
+Rows 7–14 remain historical proposals and must be rebalanced before release.
+The next implementation is the Serein pilot; no Tier-2 car is playable yet.
+The older status/model-approval/save notes below describe their original checkpoints.
+
+
 ## Status & scope
 
 **POST 2A design complete; POST 2B Model Reference approved; POST 2C integration

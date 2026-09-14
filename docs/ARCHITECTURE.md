@@ -1,5 +1,17 @@
 # Architecture
 
+## Current phase — Garage IV-A: Tier-2 catalog/progression analysis
+
+Completed the isolated comparison of proposed Tier-2 cars against today's stock
+and tuned Tier-1 choices. Serein, Rendan and Canto Club now have revised proposed
+roles and Afterdark-based gates; see [Tier-2 decision](TIER_TWO_GARAGE.md) for numbers,
+opportunity costs, eight executable analysis cases and implementation acceptance.
+This checkpoint adds no playable cars and keeps Save v23 / CE1 unchanged.
+Next bounded phase: **IV-B — Serein model reference and production pilot**;
+then IV-C Rendan/Canto and IV-D model-specific customization.
+The user deferred remaining paint imperfections; PR #41 is not full visual acceptance.
+
+
 ## Patch — KX-R paint mask
 
 Corrected missed bodywork and rear-lamp color leakage with refined contours and
