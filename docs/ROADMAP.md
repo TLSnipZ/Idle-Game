@@ -1,13 +1,15 @@
 # Roadmap
 
-## Current work — Garage IV-D: Tier-2 customization
+## Current phase — Garage IV-D: Tier-2 customization
 
-Implemented locally: two alternative permanent setups and two signature finishes
+Implemented and verified in [PR #49](https://github.com/TLSnipZ/Idle-Game/pull/49):
+two alternative permanent setups and two signature finishes
 plus factory paint for each of Serein, Rendan and Canto Club. Save v26 / CE1
 preserves all existing progress. See [Tier-2 customization](TIER_TWO_CUSTOMIZATION.md)
 for exact prices, scoped effects, paint limitations and verification/release status.
 Six vehicles remain playable; the seventeen-identity wishlist is still planning only.
-Older phase sections below are historical. No merge or deployment is claimed here.
+Older phase sections below are historical. Full CI passed on `aaf5abf`; PR #49
+tracks merge/deployment separately. No further vehicle phase has started.
 
 
 ## Future vehicle wishlist — recorded 2026-09-14

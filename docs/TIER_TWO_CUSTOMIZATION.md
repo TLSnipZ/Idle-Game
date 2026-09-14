@@ -110,7 +110,14 @@ not a claim that every boundary pixel is perfect.
 The initial CI passed build, all tests, Garage, all sections/locales/settings,
 225 layout cases, Tier-1 tuning/paint and the Serein/Rendan/Canto purchase matrices.
 It caught the same Rendan tail-lamp overlap; the follow-up fixes that contour and
-Canto's corresponding boundary. The final full CI remains a release gate.
+Canto's corresponding boundary. Final verification passed on code `aaf5abf8d3d7f5df9ff3d8508ab227e75037f9bd`:
+[run 34890190308](https://github.com/TLSnipZ/Idle-Game/actions/runs/34890190308).
+Production build, all **2,626 tests**, the full existing browser matrix, the new
+**45 IV-D cases / 100 paint comparisons**, Garage/Workshop, Business and City/Empire
+navigation, and whitespace checks passed. Independently, the final local 45-case
+matrix and 100 pixel comparisons also passed with zero failures. Factory and both
+finishes for all three models, plus mobile/desktop screenshots, were reviewed.
+The documentation-only completion commit does not change the tested code.
 Release evidence must name its exact commit; this document does not claim merge,
 deployment or live acceptance.
 The new verifier is `scripts/verify-tier-two-customization.mjs`: three models,
