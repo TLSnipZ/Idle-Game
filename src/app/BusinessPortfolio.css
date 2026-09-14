@@ -31,6 +31,8 @@
 .business-portfolio .business-stat-grid { margin-block: 1rem; }
 .business-portfolio .business-stat-grid strong { font-size: clamp(1rem, 1.7vw, 1.3rem); }
 .business-portfolio .business-stat-grid span { font-size: .7rem; }
+.business-portfolio .business-stat-grid .value-unit,
+.business-portfolio .business-stat-grid .value-unit > span { display: inline-flex; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; margin: 0; }
 .business-portfolio .business-card-action { padding-top: 1.25rem; }
 .business-portfolio .business-level { font-size: .78rem; }
 @media (max-width: 800px) {
