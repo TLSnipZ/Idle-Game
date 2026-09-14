@@ -21,6 +21,12 @@ export type GameSimulationResult = { readonly ok: false; readonly state: GameSta
   | Extract<UpgradeBusinessResult, { ok: false }>
   | Extract<AutomationSimulationResult, { ok: false }>
   | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money; readonly autoUpgrader?: { readonly targetId: BusinessId; readonly levelsPurchased: number; readonly spent: Money } });
+
+function advanceManualReadinessInState(state: GameState, elapsedMs: number): GameState {
+  const manualJobs = advanceManualJobReadiness(state.manualJobs, elapsedMs);
+  return manualJobs === state.manualJobs ? state : { ...state, manualJobs };
+}
+
 /** One transaction: production, start-tier job rewards/XP, batch Heat gain, cooling, then manual readiness. */
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
@@ -33,7 +39,7 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   if (state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) {
     const upgraded = simulateAutoUpgrader(state, elapsedMs);
     if (!upgraded.ok) return upgraded;
-    return { ...upgraded, state: { ...upgraded.state, manualJobs: advanceManualJobReadiness(upgraded.state.manualJobs, elapsedMs) } };
+    return { ...upgraded, state: advanceManualReadinessInState(upgraded.state, elapsedMs) };
   }
   const business = simulateElapsed(state, elapsedMs);
   if (!business.ok) return business;
@@ -47,5 +53,5 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', automation.automation.completedJobs);
   if (!counted.ok) return counted;
   const achieved = unlockEligibleAchievements(observePeakHeat(counted.state)).state;
-  return { ...automation, state: { ...achieved, manualJobs: advanceManualJobReadiness(achieved.manualJobs, elapsedMs) }, businessIncome: income.value };
+  return { ...automation, state: advanceManualReadinessInState(achieved, elapsedMs), businessIncome: income.value };
 }
