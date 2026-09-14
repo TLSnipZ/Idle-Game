@@ -1,3 +1,4 @@
+import { SectionIndex } from './SectionIndex';
 import type { useGame } from './use-game';
 import type { Navigate, SectionId } from './navigation';
 import { SECTION } from './navigation';
@@ -34,13 +35,13 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
   switch (active) {
     case SECTION.overview.id: return <OverviewSection state={state} paused={paused} onNavigate={onNavigate} />;
     case SECTION.operations.id: return <OperationsSection game={game} />;
-    case SECTION.city.id: return <div className="section-stack">
+    case SECTION.city.id: return <div className="section-workspace"><SectionIndex section="city" /><div className="section-stack">
       <City state={state} paused={paused || game.persistence.kind === 'blocked'} onAcquire={game.takeTerritory} onLayLow={game.coolDown} onChooseDistrict={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />
       <CityEvents state={state} paused={paused} onChoose={game.chooseEvent} />
-    </div>;
-    case SECTION.collection.id: return <><Garage workshop state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} /><VehicleTuning state={state} paused={paused || game.persistence.kind === 'blocked'} onConfigure={game.configureTuning} /></>;
-    case SECTION.empire.id: return <div className="section-stack">
+    </div></div>;
+    case SECTION.collection.id: return <div className="section-workspace"><SectionIndex section="collection" /><div className="collection-content"><Garage workshop state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} /><VehicleTuning state={state} paused={paused || game.persistence.kind === 'blocked'} onConfigure={game.configureTuning} /></div></div>;
+    case SECTION.empire.id: return <div className="section-workspace"><SectionIndex section="empire" /><div className="section-stack">
       <RebirthPanelView preview={selectRebirth(state)} unavailable={paused || game.persistence.kind === 'blocked'} interaction={rebirth.interaction} controls={rebirth.controls} />
       <SkillTree state={state} paused={paused} onPurchase={game.buySkill} />
       <Achievements state={state} />
@@ -49,6 +50,6 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
         <SaveManagementView state={save.state} controls={save.controls} />
         <ResetProgress key={game.replacementSequence} unavailable={paused || game.persistence.kind === 'blocked'}
           onReset={game.resetProgress} /></section>
-    </div>;
+    </div></div>;
   }
 }

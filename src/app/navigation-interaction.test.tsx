@@ -442,19 +442,19 @@ describe('POST 3B mounted portfolio continuity', () => {
 
 
 describe('POST 3C local Operations navigation', () => {
-  it('moves focus and viewport to three semantic targets without gameplay or URL changes', async () => {
+  it('moves focus and viewport to four semantic targets without gameplay or URL changes', async () => {
     const f = await mount(autoUpgraderState()); await navigate('OPERATIONS');
     const state = f.game().getSnapshot().result.state, writes = f.writes(), reads = f.reads(), url = location.href;
     f.random.next.mockClear(); vi.mocked(window.scrollTo).mockClear();
     const nav = container.querySelector('nav[aria-label="Operations sections"]');
-    expect([...nav!.querySelectorAll('button')].map(b => b.textContent)).toEqual(['JOBS', 'BUSINESSES', 'AUTOMATION']);
+    expect([...nav!.querySelectorAll('button')].map(b => b.textContent)).toEqual(['JOBS', 'BUSINESSES', 'EQUIPMENT', 'AUTOMATION']);
     expect(nav?.querySelector('[aria-current], [aria-live]')).toBeNull();
-    for (const [label, id] of [['BUSINESSES', 'businesses-heading'], ['AUTOMATION', 'automation-heading'], ['JOBS', 'starter-heading']]) {
+    for (const [label, id] of [['BUSINESSES', 'businesses-heading'], ['EQUIPMENT', 'upgrades-heading'], ['AUTOMATION', 'automation-heading'], ['JOBS', 'starter-heading']]) {
       const target = container.querySelector<HTMLElement>(`#${id}`)!;
       const scroll = vi.spyOn(target, 'scrollIntoView'); const focus = vi.spyOn(target, 'focus');
       await click(label!);
       expect(document.activeElement).toBe(target); expect(target.tabIndex).toBe(-1);
-      expect(focus).toHaveBeenCalledWith(); expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'instant' });
+      expect(focus).toHaveBeenCalledWith({ preventScroll: true }); expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'instant' });
     }
     expect(location.href).toBe(url); expect(f.game().getSnapshot().result.state).toBe(state);
     expect(f.writes()).toBe(writes); expect(f.reads()).toBe(reads); expect(f.random.next).not.toHaveBeenCalled();
@@ -488,4 +488,42 @@ it.each(['Take control of Neon Mile', 'Recruit Rico Vale'])('%s recovers local f
   expect(window.scrollTo).not.toHaveBeenCalled();
   expect(heading.closest('article')).toBe(card);
   expect(container.querySelector('[data-section]')?.getAttribute('data-section')).toBe('city');
+});
+
+describe('whole-game quick access', () => {
+  it('focuses every City, Collection and Empire destination without runtime or storage work', async () => {
+    const f = await mount(autoUpgraderState());
+    const state = f.game().getSnapshot().result.state, writes = f.writes(), reads = f.reads();
+    const cases = [
+      ['CITY', ['city-heading', 'crew-heading', 'city-events-heading']],
+      ['COLLECTION', ['garage-heading', 'tuning-heading']],
+      ['EMPIRE', ['rebirth-heading', 'skill-tree-heading', 'achievements-heading', 'statistics-heading', 'save-transfer-heading']],
+    ] as const;
+    for (const [section, ids] of cases) {
+      await navigate(section);
+      const buttons = container.querySelectorAll<HTMLButtonElement>('.section-index button');
+      expect(buttons).toHaveLength(ids.length);
+      for (let i = 0; i < ids.length; i++) {
+        await act(() => buttons[i]?.click());
+        expect(document.activeElement?.id).toBe(ids[i]);
+      }
+    }
+    expect(f.game().getSnapshot().result.state).toBe(state);
+    expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
+    expect(createPersistentGame).toHaveBeenCalledTimes(1);
+  });
+  it('routes Crew and Event shortcuts to their headings, including repeated same-section requests', async () => {
+    const state = autoUpgraderState();
+    const f = await mount({ ...state, events: { pendingEventId: 'event:hot-tip', opportunityElapsedMs: 0 } });
+    const writes = f.writes(), reads = f.reads();
+    await click('VIEW CREW'); expect(document.activeElement?.id).toBe('crew-heading');
+    for (let i = 0; i < 2; i++) {
+      await act(() => container.querySelector<HTMLButtonElement>('.activity-event')?.click());
+      expect(document.activeElement?.id).toBe('city-events-heading');
+    }
+    await navigate('OVERVIEW'); await click('VIEW EVENT');
+    expect(document.activeElement?.id).toBe('city-events-heading');
+    expect(f.game().getSnapshot().result.state.events.pendingEventId).toBe('event:hot-tip');
+    expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
+  });
 });

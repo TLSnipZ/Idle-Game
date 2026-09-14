@@ -1,5 +1,14 @@
 # Roadmap
 
+## Interlude — whole-game layout and navigation
+
+Implemented: responsive overview, desktop section indexes/mobile quick access,
+comparable delivery cards, slimmer fixed HUD, precise Crew/Event/Automation
+destinations and repaired Rebirth notice. See [Layout review](LAYOUT_REVIEW.md)
+for findings, boundaries and verification. Save v21 / CE1 unchanged.
+This requested UI pass precedes the separate Senda/Lilt tuning phase.
+
+
 ## Interlude — compact Welcome back panel
 
 The offline return panel now shows a compact heading, earnings and Continue action.

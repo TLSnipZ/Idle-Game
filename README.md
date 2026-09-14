@@ -26,6 +26,12 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
+## Latest UI update
+
+A responsive dashboard, quick access menus for each feature area, direct Event/Crew
+links and a slimmer fixed HUD make the existing game easier to navigate. See the
+[layout review](docs/LAYOUT_REVIEW.md). Gameplay and Save v21 / CE1 are unchanged.
+
 ## Current phase — Garage 2.0 I: KX-R tuning
 
 Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](docs/GARAGE_TUNING.md) for prices, balance, persistence and verification scope.

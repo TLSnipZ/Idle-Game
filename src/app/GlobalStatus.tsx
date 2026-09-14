@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { formatInteger } from './number-format';
 import type { dashboardPresentation } from './dashboard-presentation';
 import { Navigation } from './Navigation';
@@ -20,11 +21,25 @@ export function GlobalStatus({ view, active, onNavigate, paused, newsMessage = '
   readonly newsMessage?: string;
   readonly t?: (key: MessageKey) => string;
 }) {
+  const chrome = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = chrome.current;
+    if (!element) return;
+    const update = () => {
+      const height = getComputedStyle(element).position === 'sticky' ? element.getBoundingClientRect().height : 0;
+      document.documentElement.style.setProperty('--hud-offset', height + 'px');
+    };
+    update();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    observer?.observe(element);
+    window.addEventListener('resize', update);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', update); document.documentElement.style.removeProperty('--hud-offset'); };
+  }, []);
   const locale = useLocale();
   const text = useLocalizedText();
   const eventName = view.event.pending ? localizedContent(locale, view.event.pending.id, 'name', view.event.pending.name) : '';
   const activities = Number(Boolean(view.event.pending)) + Number(view.autoActive) + Number(paused) + Number(view.empire.eligible) + Number(Boolean(newsMessage));
-  return <div className="global-chrome">
+  return <><div ref={chrome} className="global-chrome">
     <div className="global-chrome-inner">
       <div className="hud-command-row">
         <dl className="global-status" aria-label={t('hudStatus')}>
@@ -33,19 +48,20 @@ export function GlobalStatus({ view, active, onNavigate, paused, newsMessage = '
           <div className={`hud-heat heat-${view.heat.tier.id}`}><dt>{t('heat')}<small className="hud-district">{text(view.heat.districtName)}</small></dt><dd>{view.heat.heat} · {heatTierLabel(view.heat.tier.label, locale)}</dd></div>
           <div className="hud-empire"><dt>{t('empirePoints')}</dt><dd>{formatInteger(view.empire.empirePoints)} {text('EP')}</dd></div>
         </dl>
-        <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
-          <div className="activity-center-heading"><span>{text('ACTIVITY CENTER', 'AKTIVITÄTSZENTRALE')}</span><strong>{activities ? text(`${activities} live`, `${activities} aktiv`) : text('ALL QUIET', 'ALLES RUHIG')}</strong></div>
-          <div className="activity-center-items">
-            {view.event.pending && <button type="button" className="activity-item activity-event" onClick={() => onNavigate(SECTION.city.id)}><span>{t('cityEventActive')}</span><strong>{eventName}</strong></button>}
-            {newsMessage && <details className="activity-item activity-news"><summary>{text('LATEST', 'NEUSTES')}</summary><p><strong>{text(newsMessage)}</strong></p></details>}
-            {view.autoActive && <button type="button" className="activity-item activity-auto" onClick={() => onNavigate(SECTION.operations.id)}><span>{text('AUTOMATION', 'AUTOMATISIERUNG')}</span><strong>{paused ? t('autoPaused') : t('autoActive')}</strong></button>}
-            {view.empire.eligible && view.empire.reward !== null && <button type="button" className="activity-item activity-rebirth" onClick={() => onNavigate(SECTION.empire.id)}><span>{text('REBIRTH READY', 'REBIRTH BEREIT')}</span><strong>+{formatInteger(view.empire.reward)} {text('EP')}</strong></button>}
-            {paused && <div className="activity-item activity-paused" role="status"><span>{text('SYSTEM', 'SYSTEM')}</span><strong>{t('sessionPaused')}</strong></div>}
-            {!activities && <div className="activity-empty"><span>{text('No fires to put out.', 'Gerade brennt nichts.')}</span> {text('Enjoy it before Solara notices.', 'Genieß es, bevor Solara das mitbekommt.')}</div>}
-          </div>
-        </div>
+
       </div>
       <Navigation active={active} onNavigate={onNavigate} t={t} />
     </div>
-  </div>;
+  </div>
+  <div className="activity-strip">        <div className={`global-indicators activity-center ${activities ? 'has-activity' : 'is-quiet'}`} aria-label={text('Activity Center', 'Aktivitätszentrale')}>
+          <div className="activity-center-heading"><span>{text('ACTIVITY CENTER', 'AKTIVITÄTSZENTRALE')}</span><strong>{activities ? text(`${activities} live`, `${activities} aktiv`) : text('ALL QUIET', 'ALLES RUHIG')}</strong></div>
+          <div className="activity-center-items">
+            {view.event.pending && <button type="button" className="activity-item activity-event" onClick={() => onNavigate(SECTION.city.id, 'city-events-heading')}><span>{t('cityEventActive')}</span><strong>{eventName}</strong></button>}
+            {newsMessage && <details className="activity-item activity-news"><summary>{text('LATEST', 'NEUSTES')}</summary><p><strong>{text(newsMessage)}</strong></p></details>}
+            {view.autoActive && <button type="button" className="activity-item activity-auto" onClick={() => onNavigate(SECTION.operations.id, 'automation-heading')}><span>{text('AUTOMATION', 'AUTOMATISIERUNG')}</span><strong>{paused ? t('autoPaused') : t('autoActive')}</strong></button>}
+            {view.empire.eligible && view.empire.reward !== null && <button type="button" className="activity-item activity-rebirth" onClick={() => onNavigate(SECTION.empire.id, 'rebirth-heading')}><span>{text('REBIRTH READY', 'REBIRTH BEREIT')}</span><strong>+{formatInteger(view.empire.reward)} {text('EP')}</strong></button>}
+            {paused && <div className="activity-item activity-paused" role="status"><span>{text('SYSTEM', 'SYSTEM')}</span><strong>{t('sessionPaused')}</strong></div>}
+            {!activities && <div className="activity-empty"><span>{text('No fires to put out.', 'Gerade brennt nichts.')}</span> {text('Enjoy it before Solara notices.', 'Genieß es, bevor Solara das mitbekommt.')}</div>}
+          </div>
+        </div></div></>;
 }

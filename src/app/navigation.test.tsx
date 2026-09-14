@@ -149,7 +149,7 @@ describe('five-section presentation navigation', () => {
       expect(status.querySelector('.activity-event')?.textContent).toBe('CITY EVENT ACTIVEShakedown');
       await act(() => status.querySelector<HTMLButtonElement>('.activity-event')?.click());
     }
-    expect(navigate).toHaveBeenCalledTimes(5); expect(navigate).toHaveBeenLastCalledWith(SECTION.city.id);
+    expect(navigate).toHaveBeenCalledTimes(5); expect(navigate).toHaveBeenLastCalledWith(SECTION.city.id, 'city-events-heading');
     expect(JSON.stringify(state)).toBe(before);
     expect(render(<GlobalStatus view={dashboardPresentation(fresh())} active={DEFAULT_SECTION} onNavigate={navigate} paused={false} />)).not.toContain('CITY EVENT ACTIVE');
   });
@@ -161,7 +161,7 @@ describe('five-section presentation navigation', () => {
     expect(status.innerHTML.includes('AUTO-UPGRADER ACTIVE')).toBe(mode === 'enabled');
     if (mode === 'enabled') {
       await act(() => status.querySelector<HTMLButtonElement>('.activity-auto')?.click());
-      expect(navigate).toHaveBeenCalledWith(SECTION.operations.id);
+      expect(navigate).toHaveBeenCalledWith(SECTION.operations.id, 'automation-heading');
     }
     expect(JSON.stringify(state)).toBe(before);
   });

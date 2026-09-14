@@ -1,5 +1,12 @@
 # Architecture
 
+## Layout navigation interlude
+
+Presentation navigation accepts an optional heading destination. Runtime and
+confirmation controllers remain above section content; indexes perform focus/scroll
+only. The actual sticky HUD height drives destination scroll margins. See
+[Layout review](LAYOUT_REVIEW.md). Save v21 / CE1 unchanged.
+
 ## Current phase — Garage 2.0 I: KX-R tuning
 
 Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](GARAGE_TUNING.md) for prices, balance, persistence and verification scope.
