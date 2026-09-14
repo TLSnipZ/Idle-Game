@@ -625,3 +625,33 @@ describe('Operations portfolio navigation', () => {
     expect(f.game().getSnapshot().result.state).toBe(before); expect(f.writes()).toBe(writes);
   });
 });
+
+describe('City and Empire workspaces', () => {
+  async function openView(id: string) { await act(() => container.querySelector<HTMLButtonElement>(`[data-workspace-view="${id}"]`)?.click()); }
+  it('keeps import confirmation and input through tabs; return shortcut reveals the pending form', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('EMPIRE'); await openView('save-transfer-heading');
+    const code = exportSaveCode(createInitialGameState(), 0); if (!code.ok) throw Error('code');
+    await fillImport(code.code); await click('Validate import');
+    const input = container.querySelector<HTMLTextAreaElement>('#import-code');
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Cancel import');
+    const before = f.game().getSnapshot().result.state, writes = f.writes();
+    await openView('skill-tree-heading'); expect(input?.closest('[hidden]')).not.toBeNull();
+    await openView('save-transfer-heading'); expect(container.querySelector('#import-code')).toBe(input);
+    expect(input?.value).toBe(code.code); expect(button('Confirm import').closest('[hidden]')).toBeNull();
+    await navigate('CITY');
+    await act(() => container.querySelector<HTMLButtonElement>('main > .section-shortcut')?.click());
+    expect(document.activeElement?.id).toBe('save-transfer-heading');
+    expect(button('Confirm import').closest('[hidden]')).toBeNull();
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.writes()).toBe(writes);
+    await click('Cancel import'); expect(f.game().getSnapshot().result.state).toBe(before);
+  });
+  it('global Rebirth review reveals its hidden tab without confirming or losing the pending review', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('EMPIRE'); await click('Review Rebirth');
+    const before = f.game().getSnapshot().result.state, writes = f.writes();
+    await openView('statistics-heading'); expect(button('Confirm Rebirth').closest('[hidden]')).not.toBeNull();
+    await click('Review Rebirth in Empire');
+    expect(document.activeElement?.id).toBe('rebirth-heading'); expect(button('Confirm Rebirth').closest('[hidden]')).toBeNull();
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.writes()).toBe(writes);
+    await click('Cancel Rebirth'); expect(f.game().getSnapshot().result.state).toBe(before);
+  });
+});

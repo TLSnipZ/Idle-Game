@@ -1,5 +1,16 @@
 # Architecture
 
+## Current phase — Design & UX 2.0, remaining workspaces
+
+Overview now prioritizes income and progression with approved storefront art.
+City has separate Districts/Heat, Crew and Events views; Empire has separate
+Rebirth, Skills, Achievements, Statistics and Save/Transfer views. Pending forms
+survive tab changes; global shortcuts reveal their intended panel before focus.
+See [Design & UX 2.0](DESIGN_UX_2.md) for scope and verification. Save v24 / CE1,
+artwork masters and gameplay are unchanged. PR evidence owns release status.
+The user accepted the first slice (PR #45); this completes the remaining planned
+page composition. Rendan/Canto remains the next separate content phase.
+
 ## Current phase — Design & UX 2.0, first slice
 
 Shared visual hierarchy and the Operations Business portfolio are implemented:

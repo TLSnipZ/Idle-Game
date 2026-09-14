@@ -46,6 +46,7 @@ try {
       for (let i = 0; i < targets[section].length; i++) {
         if (section === 3) await openCollectionView(page, ['garage', 'tuning', 'appearance'][i]);
         else await page.locator('.section-index button').nth(i).click();
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Subview overflow');
         const id = targets[section][i];
         assert.equal(await page.evaluate(() => document.activeElement?.id), id);
         const box = await page.locator('#' + id).boundingBox();

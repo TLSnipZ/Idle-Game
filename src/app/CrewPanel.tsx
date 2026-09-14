@@ -36,7 +36,8 @@ export function CrewPanel({ state, paused, onRecruit, onAssign, onUnassign }: {
       if (!view) return null;
       const requirementsId = `${member.id}-requirements`;
       const description = localizedContent(locale, member.id, 'description', member.description);
-      return <article className="panel crew-card" key={member.id} aria-labelledby={`${member.id}-heading`}>
+      return <article data-crew-status={view.recruited ? 'recruited' : 'available'} className="panel crew-card" key={member.id} aria-labelledby={`${member.id}-heading`}>
+        <div className="crew-monogram" aria-hidden="true">{text(member.name.split(' ').map(part => part[0]).join(''))}</div>
         <div className="crew-identity"><div className="panel-heading"><h4 id={`${member.id}-heading`}>{text(member.name)}</h4><span className="ownership-badge">{view.status}</span></div>
         <p className="eyebrow">{view.compatibleSlots.map(slot => localizedSlotName(locale, slot.name)).join(' / ')}</p><p>{description}</p></div><p className="specialist-effect">{view.effect} · {text('Only while assigned', 'Nur solange zugewiesen')}</p>{view.recruited && view.availability && <p>{view.availability}</p>}
         {!view.recruited ? <>

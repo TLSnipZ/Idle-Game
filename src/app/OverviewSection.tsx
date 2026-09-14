@@ -1,3 +1,6 @@
+import { BusinessArtwork } from './BusinessArtwork';
+import { findBusinessArtwork } from './business-artwork';
+import { BUSINESS_CATALOG } from '../features/businesses';
 import { RateValue } from './RateValue';
 import { formatInteger } from './number-format';
 import type { GameState } from '../game/game-state';
@@ -15,12 +18,14 @@ export function OverviewSection({ state, paused, onNavigate }: {
   const text = useLocalizedText();
   const view = dashboardPresentation(state);
   const heat = heatPresentation(state, locale);
+  const flagship = [...BUSINESS_CATALOG].reverse().find(business => Object.hasOwn(state.businesses.owned, business.id)) ?? BUSINESS_CATALOG[0];
+  const artwork = flagship ? findBusinessArtwork(flagship.id) : null;
   const eventName = view.event.pending ? localizedContent(locale, view.event.pending.id, 'name', view.event.pending.name) : null;
   return <div className="overview-command">
-    <article className="panel summary-card overview-economy"><h2>{text('ECONOMY', 'KOHLE & KONSEQUENZEN')}</h2><p className="summary-value">{view.cash}</p>
+    <article className="panel summary-card overview-economy">{artwork && <BusinessArtwork artwork={artwork} />}<h2>{text('ECONOMY', 'KOHLE & KONSEQUENZEN')}</h2><p className="summary-value">{view.cash}</p>
       <p>{text('Current total business production:', 'Aktuelle Gesamtproduktion deiner völlig seriösen Betriebe:')} <strong><RateValue text={view.production} /></strong>{paused && text(' · Session paused', ' · Session pausiert')}</p>
       <p>{view.autoActive ? text('Auto-Upgrader enabled — automatically spends cash while you pretend this is passive income.', 'Auto-Upgrader aktiv — gibt dein Cash automatisch aus, während du so tust, als wäre das passives Einkommen.') : text('Manage earning and automatic spending in Operations. Your accountant asked for boundaries.', 'Einnahmen und automatische Ausgaben findest du unter Operationen. Die Buchhaltung wollte klare Zuständigkeiten.')}</p>
-      <button className="action-button section-shortcut" onClick={() => onNavigate(SECTION.operations.id)}>{text('VIEW OPERATIONS', 'OPERATIONEN ÖFFNEN')}</button></article>
+      <button className="action-button section-shortcut" onClick={() => onNavigate(SECTION.operations.id, 'businesses-heading')}>{text('VIEW OPERATIONS', 'OPERATIONEN ÖFFNEN')}</button></article>
     <article className="panel summary-card overview-player"><h2>{text('PLAYER', 'KARRIERE')}</h2><PlayerProgress xp={state.progression.xp} event={undefined} paused={paused} />
       <p>{text('Deliveries and paid business upgrades build your XP. Apparently experience can be invoiced.', 'Lieferungen und bezahlte Business-Upgrades bringen XP. Erfahrung ist in Solara offenbar steuerpflichtig.')}</p></article>
     <article className={`panel summary-card overview-pressure heat-${view.heat.tier.id}`}><h2>{text('CITY PRESSURE', 'DRUCK VON OBEN')}</h2><p className="summary-value">{text('Heat')} {view.heat.heat} / {view.heat.maximum} · {heat.tier.label}</p>

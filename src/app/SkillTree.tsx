@@ -26,6 +26,7 @@ export function SkillTree({ state, paused, onPurchase }: {
         <div className="panel-heading"><h3 id={heading}>{name}</h3>
           <span className="ownership-badge">{view.maxed ? text('MAXED · MAX RANK', 'MAX · MAX-RANG') : !view.requirements.met ? text('LOCKED', 'GESPERRT') : view.insufficientEp ? text('AVAILABLE · INSUFFICIENT EP', 'VERFÜGBAR · ZU WENIG EP') : text('READY TO PURCHASE', 'KAUFBEREIT')}</span></div>
         <p className="skill-rank">{text('Rank', 'Rang')} {view.rank} / {view.maxRank}{view.rank > 0 ? text(' · Permanent effect active', ' · Permanenter Effekt aktiv') : ''}</p>
+        <progress className="skill-rank-progress" value={view.rank} max={view.maxRank} aria-label={text(`${name}: Rank ${view.rank} of ${view.maxRank}`, `${name}: Rang ${view.rank} von ${view.maxRank}`)} />
         <p>{description}</p>
         <p>{text('Current:', 'Aktuell:')} {describeSkillEffect(view.currentEffect, locale)}</p>
         {view.nextEffect && <p>{text('Next rank:', 'Nächster Rang:')} {describeSkillEffect(view.nextEffect, locale)}</p>}

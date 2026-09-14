@@ -203,6 +203,7 @@ try {
     }
   }
   await navigation(page).nth(4).click();
+  await page.locator('[data-workspace-view="save-transfer-heading"]').click();
   await page.locator('.export-tools button').first().click();
   const code = await page.locator('#export-code').inputValue();
   assert.match(code, /^CE1-/);
@@ -252,15 +253,21 @@ try {
     const heat = (await saved(page)).state.city.heat;
     await page.locator('.heat-action button').click();
     assert.ok((await saved(page)).state.city.heat < heat);
+    await page.locator('[data-workspace-view="crew-heading"]').click();
     await page.locator('.crew-slots .crew-slot button').first().click();
+    await page.locator('[data-workspace-view="city-heading"]').click();
     assert.equal((await saved(page)).state.crew.assignments.operations, null);
     assert.equal(await page.locator('#active-district').isDisabled(), true);
+    await page.locator('[data-workspace-view="city-events-heading"]').click();
     await page.locator('.event-choice button').first().click();
+    await page.locator('[data-workspace-view="city-heading"]').click();
     assert.equal(await page.locator('#active-district').isDisabled(), false);
     assert.equal((await saved(page)).state.events.pendingEventId, null);
     await navigation(page).nth(4).click();
     const ep = (await saved(page)).state.permanentProgression.empirePoints;
+    await page.locator('[data-workspace-view="skill-tree-heading"]').click();
     await page.locator('.skill-node button:not(:disabled)').first().click();
+    await page.locator('[data-workspace-view="rebirth-heading"]').click();
     assert.ok((await saved(page)).state.permanentProgression.empirePoints < ep);
     await page.locator('.rebirth-panel > .rebirth-button').click();
     const nextLocale = locale === 'de' ? 'villager' : 'de';
@@ -277,6 +284,7 @@ try {
     assert.deepEqual(reborn.garage, before.garage);
     assert.equal(reborn.permanentProgression.rebirthCount, before.permanentProgression.rebirthCount + 1);
     assert.deepEqual(reborn.businesses.owned, {});
+    await page.locator('[data-workspace-view="save-transfer-heading"]').click();
     await page.locator('.reset-panel > button').click();
     await page.locator('#reset-confirmation-text').fill('reset');
     assert.equal(await page.locator('#reset-confirmation .danger-button').isDisabled(), true);
@@ -536,7 +544,9 @@ try {
     if (locale === 'villager') await assertVillagerOnly(page);
     await page.screenshot({ path: 'browser-evidence/support-' + locale + '-' + width + '.png', fullPage: true });
     await navigation(page).nth(2).click();
+    await page.locator('[data-workspace-view="crew-heading"]').click();
     await page.locator('.crew-slots .crew-slot button').first().click();
+    await page.locator('[data-workspace-view="city-heading"]').click();
     assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('900'));
     await page.locator('#active-district').selectOption('territory:neon-mile');
     assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 1);
