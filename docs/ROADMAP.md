@@ -1,5 +1,12 @@
 # Roadmap
 
+## Patch — KX-R paint mask
+
+Corrected missed bodywork and rear-lamp color leakage with refined contours and
+subtractive masking. The browser verifier checks 32 real rendered pixel samples
+for body coverage and protected details. Save v23 / CE1 and gameplay are unchanged.
+See [Vehicle finishes](VEHICLE_APPEARANCE.md); release evidence is in the patch PR.
+
 ## Current phase — Garage 2.0 III: curated vehicle finishes
 
 Implemented: two signature finishes plus factory paint for each current car,

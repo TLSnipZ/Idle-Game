@@ -12,6 +12,7 @@ export function VehicleArtwork({ vehicleId, appearanceId = null }: {
   const id = useId().replace(/:/g, ''), text = useLocalizedText();
   const artwork = vehicleArtwork(vehicleId), look = findAppearance(appearanceId);
   if (!artwork) return null;
+  const [body, ...openings] = (PAINT_MASKS[vehicleId] ?? '').split(/(?=M)/);
   const finish = look?.vehicleId === vehicleId ? FINISH_PALETTE[look.id] : undefined;
   return <div className="vehicle-image" data-appearance={finish ? look?.id : 'factory'}>
     <img className="vehicle-artwork" src={artwork.src}
@@ -19,7 +20,11 @@ export function VehicleArtwork({ vehicleId, appearanceId = null }: {
       width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />
     {finish && <svg className="vehicle-paint" viewBox="0 0 720 405" aria-hidden="true" focusable="false">
       <defs>
-        <clipPath id={`paint-${id}`}><path d={PAINT_MASKS[vehicleId]} clipRule="evenodd" /><path d={PAINT_DETAILS[vehicleId]} /></clipPath>
+        <mask id={`paint-${id}`} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="405" style={{ maskType: 'luminance' }}>
+          <path d={body} fill="white" />
+          <path d={openings.join(' ')} fill="black" />
+          <path d={PAINT_DETAILS[vehicleId]} fill="white" />
+        </mask>
         <filter id={`finish-${id}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
           <feColorMatrix type="matrix" values=".6 .3 .1 0 0 .6 .3 .1 0 0 .6 .3 .1 0 0 0 0 0 1 0" />
           <feComponentTransfer>
@@ -29,7 +34,7 @@ export function VehicleArtwork({ vehicleId, appearanceId = null }: {
           </feComponentTransfer>
         </filter>
       </defs>
-      <g clipPath={`url(#paint-${id})`}>
+      <g mask={`url(#paint-${id})`}>
         <image href={artwork.src} width="720" height="405" preserveAspectRatio="none" filter={`url(#finish-${id})`} />
       </g>
     </svg>}
