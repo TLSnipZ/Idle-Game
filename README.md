@@ -10,7 +10,7 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
   <img src="https://img.shields.io/badge/PLAY_SOLARA_CITY-78e4dc?style=for-the-badge" alt="Play Solara City in your browser" height="36" />
 </a>
 
-**[Play in your browser](https://tlsnipz.github.io/Idle-Game/)** · [What's in the game](#in-the-game-today) · [What's next](#whats-next) · [Developer guide](#development)
+**[Play in your browser](https://tlsnipz.github.io/Idle-Game/)** · [In the game](#in-the-game-today) · [Current work](#current-work--operations-balance-i-analysis-only) · [Development](#development)
 
 ![Browser game](https://img.shields.io/badge/Browser_game-111c2e?style=flat-square)
 ![In development](https://img.shields.io/badge/Status-In_development-f2ca87?style=flat-square)
@@ -20,246 +20,133 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
   <img src="src/assets/vehicles/kairo-kx-r.webp" alt="The pearl-white Kairo KX-R in Solara City's neon-lit waterfront garage" width="860" />
 </a>
 
-*The Kairo KX-R — approved vehicle artwork used in the game, not a gameplay screenshot.*
+*Approved Kairo KX-R vehicle artwork used in the game, not a gameplay screenshot.*
 
 **Single-player · Browser-first · No account required**
 
 </div>
 
+## Current work — Operations Balance I (analysis only)
 
+[PR #51](https://github.com/TLSnipZ/Idle-Game/pull/51) compares current manual and
+Dispatcher earnings with exactly two isolated alternatives. The recommendation,
+assumptions, tradeoffs and implementation boundaries are in
+[Operations balance](docs/OPERATIONS_BALANCE.md).
 
+**This is not a gameplay rebalance.** Candidate rewards and the candidate manual
+cadence exist only in the analysis test. Save **v26 / CE1**, current rewards,
+prices, production, approved artwork and player progress are unchanged.
+The PR records exact verification and review status. Merge, publication and the
+proposed gameplay implementation each require the user's instruction.
 
-## Current phase — Workshop purchase insight
+## Latest published gameplay
 
-Implements the first bounded Purchase Intelligence slice: optional before/after
-comparisons for all twelve Workshop setups. Both columns assume the selected car
-is active; current fitted effects are replaced, never stacked. Shared game rules
-supply Business Production, manual and Dispatcher Cash, cooling and decoy cost.
-See [Workshop purchase insight](docs/WORKSHOP_INSIGHT.md) for assumptions and verification.
-Save v26 / CE1, prices, rewards, approved artwork and all player progress remain
-unchanged. PR #49 (IV-D) and PR #50 (purchase insight) are merged into main
-and published on GitHub Pages. The Workshop insight document records the release
-commit, deployment and live verification. No new cars or economy rebalance are
-included. Older status sections below are historical.
+Garage IV-D ([PR #49](https://github.com/TLSnipZ/Idle-Game/pull/49)) and Workshop
+purchase insight ([PR #50](https://github.com/TLSnipZ/Idle-Game/pull/50)) are merged
+and published. All six cars have two alternative permanent setups and two signature
+finishes plus factory paint. All twelve setups offer optional before/after
+comparisons using actual game evaluators.
 
-## Previous phase — Garage IV-D: Tier-2 customization
-
-Implemented and verified in [PR #49](https://github.com/TLSnipZ/Idle-Game/pull/49):
-two alternative permanent setups and two signature finishes
-plus factory paint for each of Serein, Rendan and Canto Club. Save v26 / CE1
-preserves all existing progress. See [Tier-2 customization](docs/TIER_TWO_CUSTOMIZATION.md)
-for exact prices, scoped effects, paint limitations and verification/release status.
-Six vehicles remain playable; the seventeen-identity wishlist is still planning only.
-Older phase sections below are historical. Full CI passed on `aaf5abf`; PR #49
-tracks merge/deployment separately. No further vehicle phase has started.
-
-## Previous phase — Garage IV-C: Rendan and Canto Club
-
-Implemented with user-approved model artwork: Rendan ($115,000, Player 12 /
-Afterdark 3, +18% manual and Dispatcher Cash) and Canto Club ($165,000, Player 14 /
-Afterdark 5, +18% Business Production and +12% Dispatcher Cash). Only the active
-car contributes; both remain factory-only. Save v25 / CE1 preserves prior progress.
-See [Rendan/Canto](docs/RENDAN_CANTO.md) for approval, migration and verification scope.
-Release evidence belongs in the PR. IV-D customization remains a separate phase.
-
-## UI correction — approved district artwork
-
-The user rejected storefront imagery in Economy and Districts after PR #46.
-Economy is now text/value-led. Waterfront and Neon Mile have separate generated
-district-wide images, displayed uncropped at their original ratio. The user
-approved both images with “Ja passt” on 2026-09-14. Release evidence is in PR #47. See
-[District artwork](docs/DISTRICT_ARTWORK.md) for provenance, review and verification.
-Save v24 / CE1 and gameplay are unchanged.
-
-
-## Current phase — Design & UX 2.0, remaining workspaces
-
-Overview now prioritizes income and progression with approved storefront art.
-City has separate Districts/Heat, Crew and Events views; Empire has separate
-Rebirth, Skills, Achievements, Statistics and Save/Transfer views. Pending forms
-survive tab changes; global shortcuts reveal their intended panel before focus.
-See [Design & UX 2.0](docs/DESIGN_UX_2.md) for scope and verification. Save v24 / CE1,
-artwork masters and gameplay are unchanged. PR evidence owns release status.
-The user accepted the first slice (PR #45); this completes the remaining planned
-page composition. Rendan/Canto remains the next separate content phase.
-
-## Current phase — Design & UX 2.0, first slice
-
-Shared visual hierarchy and the Operations Business portfolio are implemented:
-real Jobs/Businesses/Equipment/Automation views, compact storefront selection and
-one focused detail with mobile Back navigation. Guidance reveals hidden targets.
-See [Design & UX 2.0](docs/DESIGN_UX_2.md) for scope, verification and the remaining whole-game
-sequence. Save v24 / CE1 and gameplay are unchanged. Release evidence is in the PR.
-This user-prioritized redesign precedes IV-C Rendan/Canto.
-
-## Current phase — Garage and workshop UX
-
-Implemented: separate Garage/Workshop views, compact vehicle selection, ownership
-filters, price/name sorting, a focused detail view and shared workshop selection.
-Tuning and Paint are separate services; paint drafts survive their tab changes.
-Save v24 / CE1 and all gameplay contracts are unchanged. See [Garage workspace](docs/GARAGE_WORKSPACE.md)
-for interaction and release checks. This user-requested UX interlude comes before
-IV-C Rendan/Canto; those cars are not part of this update.
-
-## Current phase — Garage IV-B: Serein pilot
-
-Implemented: Namera Serein, $80,000, Player Level 10 and owned Afterdark Customs,
-+26% active manual delivery Cash, Save v24 / CE1 and localized factory-only controls.
-The approved PNG is retained unchanged; the runtime uses its optimized WebP derivative.
-See [Serein pilot](docs/SEREIN_PILOT.md) for artwork provenance and release verification.
-Release status and CI/deployment evidence are tracked in PR #43.
-Next separate scope: IV-C Rendan/Canto; no additional cars or customization ship here.
-
-## Current phase — Garage IV-A: Tier-2 catalog/progression analysis
-
-Completed the isolated comparison of proposed Tier-2 cars against today's stock
-and tuned Tier-1 choices. Serein, Rendan and Canto Club now have revised proposed
-roles and Afterdark-based gates; see [Tier-2 decision](docs/TIER_TWO_GARAGE.md) for numbers,
-opportunity costs, eight executable analysis cases and implementation acceptance.
-This checkpoint adds no playable cars and keeps Save v23 / CE1 unchanged.
-Next bounded phase: **IV-B — Serein model reference and production pilot**;
-then IV-C Rendan/Canto and IV-D model-specific customization.
-The user deferred remaining paint imperfections; PR #41 is not full visual acceptance.
-
-## Current phase — Garage 2.0 III: curated vehicle finishes
-
-Implemented: two signature finishes plus factory paint for each current car,
-explicit preview/apply/discard, free owned-vehicle customization and matching
-Garage presentation. Save **v23 / CE1** preserves prior tuning and progress;
-applied looks survive Rebirth. See [Vehicle finishes](docs/VEHICLE_APPEARANCE.md)
-for rendering, persistence and verification boundaries. Release evidence is in the PR.
-Next separate scope: later vehicle tiers, starting with catalog/progression analysis.
-
-## Latest UI update
-
-KX-R paint coverage and rear-lamp isolation have been corrected. Existing looks
-and saves are retained; see the [paint-studio notes](docs/VEHICLE_APPEARANCE.md).
-
-A responsive dashboard, quick access menus for each feature area, direct Event/Crew
-links and a slimmer fixed HUD make the existing game easier to navigate. See the
-[layout review](docs/LAYOUT_REVIEW.md). Gameplay and Save v21 / CE1 are unchanged.
-
-## Previous phase — Garage 2.0 I: KX-R tuning
-
-Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](docs/GARAGE_TUNING.md) for prices, balance, persistence and verification scope.
-
-This completes the first tuning pilot only. Next separate scope: model-specific Senda/Lilt tuning after reviewing this slice; visual customization and later vehicle tiers remain planned. Release evidence is tracked in the PR; user live acceptance remains separate.
-
-## Previous phase — Heat V: Support network
-
-Implemented: local Level-10 Business cover, assigned Mara and active Lilt reduce
-the MANHUNT decoy cost through exact shared modifiers, down to **$810**.
-Save **v20 / CE1 unchanged**. See [Heat support](docs/HEAT_SUPPORT.md). Verification passed; see [PR #33](https://github.com/TLSnipZ/Idle-Game/pull/33).
-The retained Heat / Police 2.0 **I–V sequence is complete** at this scope.
-Further post-roadmap expansions require their own scope. Older records below are historical.
-
-## Previous phase — Heat IV: MANHUNT
-
-Implemented: local roadblocks from 80 Heat and a voluntary $1,250 / −30 Heat
-decoy, with durable payment and free recovery paths. Save **v20 / CE1 unchanged**.
-See [MANHUNT](docs/MANHUNT.md) for balance, persistence and acceptance. Verification passed; see [PR #32](https://github.com/TLSnipZ/Idle-Game/pull/32).
-Next separate phase: **Heat V — deeper cross-system integration**.
-Earlier phase records below are historical.
-
-## Previous phase — Heat III: District Heat
-
-Implemented: separate Waterfront/Neon Heat, durable owned-district travel,
-local manual actions/events and Waterfront Dispatcher. Save **v20**, CE1 unchanged.
-See [District Heat](docs/DISTRICT_HEAT.md) for rules and compatibility. Verification passed; see the [PR #31 evidence](https://github.com/TLSnipZ/Idle-Game/pull/31).
-Next separate scope: **Heat IV — MANHUNT**. Earlier phase records below are historical.
-
-
----
+Both comparison columns assume the Workshop car is active; the previous setup is
+replaced, not stacked. Fitting or painting an inactive car does not activate it.
+Comparisons are snapshots with current bonuses and Heat, not guaranteed income or
+payback forecasts. See [Tier-2 customization](docs/TIER_TWO_CUSTOMIZATION.md) and
+[Workshop release evidence](docs/WORKSHOP_INSIGHT.md#release--2026-09-14).
+Automated verification is separate from the player's personal acceptance.
 
 ## Start small. Build an empire.
 
-Your first operation is a waterfront detailing business. Your next move might be a quiet cash front, a performance workshop, or a nightclub on Neon Mile.
-
-Run deliveries for immediate Cash, build passive income, recruit specialists and decide when to reinvest. Manage Heat, make choices in City Events, and eventually **Rebirth**: trade the current run for permanent Empire Points and a stronger comeback.
+Run deliveries for immediate Cash, build passive income and recruit specialists.
+Manage Heat, make choices in City Events and eventually **Rebirth**: trade temporary
+run progress for permanent Empire Points and a stronger comeback.
 
 **HUSTLE → BUILD → EXPAND → REBIRTH → REBUILD STRONGER**
 
-Open **Operations** to make your first deliveries and acquire **Dockside Detail**. From there, the Business ladder grows with you:
+Open **Operations** to make your first deliveries and acquire **Dockside Detail**.
+The Business ladder grows with you:
 
 **Dockside Detail → Neon Laundry → Afterdark Customs → Solara Nights**
 
 ## In the game today
 
-| System | What you can do |
+| System | Available gameplay |
 | --- | --- |
-| **Business empire** | Acquire four distinct Businesses, develop each through Level 100, and grow their combined passive production. Progression gates make later acquisitions depend on developing the earlier operation. |
-| **Equipment & automation** | Buy production and delivery upgrades, hire a **Delivery Dispatcher**, and enable a **Business Auto-Upgrader** for one selected owned Business. Automatic upgrade spending is opt-in. |
-| **City & crew** | Start in **Waterfront**, take control of **Neon Mile**, switch your operating district with separate local Heat, and recruit **Rico Vale, Mara Knox and Jax Mercer**. Assign specialists to Operations or Logistics to activate their effects. |
-| **Heat & City Events** | Choose an optional +50% Cash (+25% at WATCHED) / +5 Heat delivery below HOT, cool down with discreet deliveries (half Cash, zero XP, −2 Heat), and use Lay Low. **Hot Tip, Shakedown and Warehouse Opportunity** offer two clearly explained choices each during online play. |
-| **Rebirth & Empire Points** | Reset temporary run progress for Empire Points. Invest in **five permanent ranked skills** and keep your purchased vehicle through Rebirth. |
-| **Garage** | Collect **Kairo KX-R, Kairo Senda, Namera Lilt, Namera Serein, Toseki Rendan and Sevrin Canto Club**. Choose production, delivery or Heat support roles; only the active car and its fitted setup contribute. Customize each model with two alternative setups and two signature finishes plus factory paint. |
-| **Achievements & statistics** | Unlock **six permanent achievements** and track **eight lifetime statistics** across runs. These record progress without adding gameplay bonuses. |
-| **Next Objective** | Follow a suggested progression step with exact Level/Cash requirements, or choose an optional goal. Jump to the relevant card from any section; guidance never purchases or resets anything. |
-| **Offline progress & backups** | Return to credited Business and Dispatcher earnings for up to **8 hours**, extendable to **12 hours** through Never Sleeps. Save locally and transfer progress with **CE1 export/import codes**. |
+| **Business empire** | Acquire four Businesses, develop each through Level 100 and grow passive production. Later acquisitions depend on earlier development. |
+| **Equipment & automation** | Buy production and delivery upgrades, hire a Delivery Dispatcher and optionally enable a Business Auto-Upgrader. Automatic spending is opt-in. |
+| **City & crew** | Waterfront and Neon Mile, local Heat, district travel and three recruitable specialists: Rico Vale, Mara Knox and Jax Mercer. |
+| **Heat & City Events** | Risky and discreet deliveries, Lay Low, MANHUNT roadblocks/decoys, support effects and three online City Events with explicit choices. |
+| **Rebirth & Empire Points** | Restart temporary progression for EP, invest in five ranked permanent skills and retain the Garage. |
+| **Garage & Workshop** | Kairo KX-R, Kairo Senda, Namera Lilt, Namera Serein, Toseki Rendan and Sevrin Canto Club. Only the active car and its fitted setup contribute. Each has two alternative setups and two signature finishes plus factory paint. |
+| **Achievements & statistics** | Six permanent achievements and eight lifetime statistics, without gameplay bonuses. |
+| **Guidance** | Next Objective shows exact requirements and navigation to the relevant view; guidance never purchases or resets anything. |
+| **Offline progress & backups** | Business and Dispatcher earnings for up to eight hours, extendable to twelve through Never Sleeps. Local saves and CE1 export/import. |
+| **Presentation** | English/German Solara satire and fully transformed Villager text; approved vehicle, storefront and district artwork in responsive workspaces. |
 
-The interface has five sections: **Overview** for your dashboard, **Operations** for earning and automation, **City** for territories, Heat, crew and events, **Collection** for the Garage, and **Empire** for Rebirth, skills, milestones and save transfer. Operations also has **Jobs / Businesses / Automation** jump navigation. **Next Objective** is shared across all five sections; its optional goal selection is not saved. See [Guidance](docs/GUIDANCE.md) for its suggested-route policy.
+The five sections are **Overview**, **Operations**, **City**, **Collection** and
+**Empire**. Their workspaces use separate views rather than one long list.
+Next Objective is shared across sections; optional goal selection is not saved.
+See [Guidance](docs/GUIDANCE.md).
 
-## Your first permanent garage investment
-
-**Kairo KX-R** is Solara's lightweight, 1990s-inspired performance hatch. Build the Business portfolio now; keep the car when you start your next run.
-
-| Purchase | Requirements | Ownership bonus |
-| --- | --- | --- |
-| **$25,000** | Player Level 5 · Dockside Detail Level 5 | **+10% global Business Production**, including offline and after Rebirth |
-
-The Garage has **six purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. Serein ($80,000), Rendan ($115,000) and Canto Club ($165,000) extend the Garage into the Afterdark workshop era. All six vehicles have individual approved-model artwork and offer two alternative permanent setups each in the Collection workshop. The paint studio offers two signature finishes plus factory paint per car, with free permanent selection. Later models remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
-
-## Development status
-
-**Playable development build — still growing, not a finished release.**
-
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v26**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
-
-The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
+Your first permanent Garage purchase, **Kairo KX-R**, costs **$25,000**, requires
+Player Level 5 / Dockside Level 5 and provides **+10% Business Production while
+active**, including offline and after Rebirth. The first car purchase activates
+automatically; later purchases do not replace the active selection. Ownership,
+selection, purchased setups and applied finishes survive Rebirth.
 
 ## What's next?
 
-Current implementation and planned follow-ons are distinguished below. Scope and order may evolve as the game is tested.
+**Playable development build — still growing, not a finished release.**
 
-| Direction | Planned additions |
-| --- | --- |
-| **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. Follow-up UX polish brings jobs forward and explains local save status. |
-| **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. Mobile stats wrap, events come first and latest feedback expands on demand. |
-| **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
-| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Performance tuning for all three current models is implemented; curated paint customization is implemented, and later catalog tiers remain planned. |
-| **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V adds Business/Crew/active-car support for decoy costs; more Business depth, crew and event development, and richer territory progression remain planned. |
+The current bounded work is Operations Balance I: analysis and recommendation.
+Its reward/cadence implementation requires a separate instruction. Other purchase
+comparisons, Rebirth guidance, deeper city/crew presentation, Business depth and
+later vehicle tiers remain separately scoped possibilities. The retained vehicle
+catalog contains seventeen identities, six live; the wishlist is not a content-phase
+authorization. No new artwork or vehicle is introduced by the analysis.
 
-The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.
+The longer-term vision connects Businesses, cars, crew and city control through
+rival factions, Operations, Heists and Territory takeovers. See the
+[current roadmap](docs/ROADMAP.md), [future priorities](docs/POST_ROADMAP.md),
+[Business expansion design](docs/BUSINESS_EXPANSION.md) and
+[vehicle catalog](docs/VEHICLE_CATALOG.md).
 
-See [current priorities](docs/POST_ROADMAP.md), the [Business expansion design](docs/BUSINESS_EXPANSION.md) and the [vehicle catalog](docs/VEHICLE_CATALOG.md) for the detailed plans.
+Earlier roadmap files are preserved unchanged in
+[roadmap history](docs/ROADMAP_HISTORY.md) and
+[post-roadmap history](docs/POST_ROADMAP_HISTORY.md). Their historical “next phase”
+labels are not current instructions.
 
 ## Keep your progress safe
 
-Progress is stored **locally in your browser**. There are **no cloud saves or account synchronization**. Clearing site data, changing browser or moving to another device does not carry your save with you automatically.
-
-Before clearing browser data or switching devices, use **Empire → Save & Transfer → Export save** and keep a copy of the `CE1-` code. Import validates the code and asks for confirmation before replacing current progress.
+Progress is stored **locally in your browser**. There are **no cloud saves or account
+synchronization**. Before clearing site data or changing browser/device, open
+**Empire → Save & Transfer → Export save** and keep a copy of the `CE1-` code.
+Import validates the code and asks for confirmation before replacing progress.
 
 <details>
-<summary><strong>Save, offline and import details</strong></summary>
+<summary><strong>Save, offline and reset details</strong></summary>
 
-- The game saves after supported successful actions and periodically every five seconds. Watch for storage errors; do not assume a failed save was stored.
-- Business production and the Delivery Dispatcher use the same capped offline interval. An enabled Auto-Upgrader can spend Cash on its selected owned Business during that interval.
-- City Events do **not** advance or spawn offline. A pending event is retained through normal save/load and export/import.
-- Importing an old code does not award income or XP from its historical timestamp. Offline timing starts from the new local import timestamp.
-- Corrupt or unsupported newer saves are preserved rather than silently replaced. Read the in-game warning before confirming any replacement.
-- CE1 codes are portable backup data, **not encrypted secrets**. They should not be treated as account credentials.
+- Current saves use schema v26 and CE1 transport. Supported older saves migrate sequentially without resetting progress or granting purchases.
+- Successful supported actions and periodic five-second saves preserve progress. A storage error means saving may have failed.
+- Offline Businesses and Dispatcher share a capped interval. An enabled Auto-Upgrader may spend Cash on its selected Business during that interval.
+- City Events do not spawn or advance offline; pending events survive ordinary save/load and export/import.
+- Importing an old code does not award income or XP from its historical timestamp. Local timing starts anew.
+- Corrupt or unsupported newer saves are preserved rather than silently replaced. CE1 backups are portable data, not encrypted credentials.
 
-Rebirth is **not** a full New Game reset: it keeps the permanent progression listed in the in-game review. Always read the Keep/Lose summary before confirming.
-
-For a complete restart, open **Empire → Save & Transfer → New Game / Reset Progress**. Export and copy a backup first. Review the warning, type `RESET`, and explicitly confirm. This erases **all run and permanent progress**, including vehicles, EP, skills, achievements and statistics, without awarding EP. The new game is published only after saving succeeds; corrupt, newer or conflicting saves are not silently overwritten. See the [New Game safety contract](docs/RESET_PROGRESS.md).
+Rebirth is not a full New Game reset. Read the in-game Keep/Lose review.
+For a complete restart, use **Empire → Save & Transfer → New Game / Reset Progress**,
+export a backup, review the warning, type `RESET` and explicitly confirm. This erases
+run and permanent progress without awarding EP. The fresh game is published only
+after saving succeeds. See the [reset safety contract](docs/RESET_PROGRESS.md).
 
 </details>
 
 ## Development
 
-Built with **React, strict TypeScript, Vite, Vitest and modern CSS**. Gameplay rules are separated from rendering, with exact Money arithmetic, deterministic elapsed-time simulation, versioned saves and sequential migrations. The browser build is client-side; no backend or account service is required.
-
-Use **Node.js 24**, as pinned in [`.nvmrc`](.nvmrc). The package requires Node.js 22.12 or newer.
+React, strict TypeScript, Vite, Vitest and modern CSS; exact Money arithmetic,
+pure game rules, elapsed-time simulation and versioned saves. The browser build
+requires no backend. Read [AGENTS.md](AGENTS.md), README, architecture and current
+roadmap before editing. Use **Node.js 24**, pinned in `.nvmrc`; the package requires
+Node.js 22.12 or newer.
 
 ```sh
 git clone https://github.com/TLSnipZ/Idle-Game.git
@@ -268,8 +155,6 @@ npm ci
 npm run dev
 ```
 
-### Checks and production preview
-
 ```sh
 npm run typecheck
 npm run test
@@ -277,35 +162,38 @@ npm run build
 npm run preview
 ```
 
-`build` includes the TypeScript check and emits the static application to `dist/`. Automated coverage includes economy rules, purchase failures, save migrations, CE1, offline chronology, automation, Rebirth and UI interactions. Browser, keyboard and responsive reviews complement those tests; they are not interchangeable.
+Reproduce the isolated experiment:
 
-<details>
-<summary><strong>Project structure</strong></summary>
-
-```text
-src/
-  app/        Application composition, sections and navigation
-  features/   Feature configuration, domain rules and presentation
-  game/       Shared state contracts and cross-feature integration
-  platform/   Browser clock, storage and runtime adapters
-  shared/     Reusable UI and utilities
-  assets/     Approved reference artwork and production assets
-  styles/     Global styles and presentation tokens
-docs/         Architecture, balance, art direction and roadmaps
-.github/
-  workflows/  GitHub Pages build and deployment
+```sh
+npx vitest run src/game/operations-balance-analysis.test.ts --reporter=verbose
 ```
 
-</details>
+The experiment prints exact-cent records and is not imported by the game. Full CI
+retains the complete test suite and existing browser matrices. PR #51 records the
+verified source commit separately from documentation follow-ups. `build` includes
+TypeScript checking and emits `dist/`. Tests, browser reviews and personal visual
+acceptance are distinct forms of evidence.
 
 <details>
-<summary><strong>GitHub Pages deployment</strong></summary>
+<summary><strong>Structure and deployment</strong></summary>
 
-The existing [Deploy to GitHub Pages workflow](.github/workflows/deploy-pages.yml) runs on pushes to `main` and can also be started manually from Actions. It installs dependencies, runs the checked production build and deploys **only `dist/`**.
+```text
+src/app/       UI composition and navigation
+src/features/  Feature configuration, rules and presentation
+src/game/      Shared contracts and cross-feature integration
+src/platform/  Browser clock, storage and runtime adapters
+src/shared/    Reusable helpers and UI
+src/assets/    Approved artwork
+src/styles/    Global presentation
+docs/          Architecture, decisions and roadmaps
+.github/       Verification and Pages workflows
+```
 
-For this repository, **Settings → Pages → Build and deployment → Source** must be **GitHub Actions**. The application uses Vite's relative base so built assets resolve beneath `/Idle-Game/`.
-
-The deployment badge above reports the workflow status. It is not a live gameplay or accessibility certification.
+[Deploy to GitHub Pages](.github/workflows/deploy-pages.yml) runs on pushes to `main`
+and may be started manually. It builds and deploys only `dist/`. Pages uses GitHub
+Actions as its source; Vite's relative base resolves assets beneath `/Idle-Game/`.
+A deployment badge is not a gameplay or accessibility certification. Publication
+requires the user's instruction; an analysis PR does not authorize deployment.
 
 </details>
 
@@ -313,17 +201,18 @@ The deployment badge above reports the workflow status. It is not a live gamepla
 
 | Document | Purpose |
 | --- | --- |
-| [Development rules](AGENTS.md) | Scope, conventions, architecture boundaries and safe handoffs. |
-| [Architecture](docs/ARCHITECTURE.md) | Domain/UI separation, runtime, state, persistence and migrations. |
-| [Current balance](docs/BALANCING.md) | Implemented prices, requirements, effects and formulas. |
-| [Business expansion](docs/BUSINESS_EXPANSION.md) | The four-Business economy, model assumptions and progression rationale. |
-| [Vehicle catalog](docs/VEHICLE_CATALOG.md) | Implemented vehicle identity and future Garage planning. |
-| [Art direction](docs/ART_DIRECTION.md) | Solara's visual language and approved reference-asset workflow. |
-| [Base Game roadmap](docs/ROADMAP.md) | Original phase history, kept separate from expansion priorities. |
-| [Post-roadmap priorities](docs/POST_ROADMAP.md) | Current expansion status, next steps and deferred systems. |
-| [Release audit](docs/BASE_GAME_RELEASE.md) | Base Game verification evidence and review limitations. |
+| [Development rules](AGENTS.md) | Scope, conventions and safe handoffs. |
+| [Architecture](docs/ARCHITECTURE.md) | Domain/UI boundaries, runtime and save contracts; numbered phase records retain their historical meaning. |
+| [Current balance](docs/BALANCING.md) | Implemented formulas and values. |
+| [Operations experiment](docs/OPERATIONS_BALANCE.md) | Proposed reward/pacing decision, assumptions and limitations. |
+| [Art direction](docs/ART_DIRECTION.md) | Solara identity and approved reference workflow. |
+| [Current roadmap](docs/ROADMAP.md) | Active scope, released work and stopping conditions. |
+| [Future priorities](docs/POST_ROADMAP.md) | Separately scoped directions and retained plans. |
+| [Workshop release](docs/WORKSHOP_INSIGHT.md) | IV-D / purchase-insight release and verification evidence. |
 
-Found something broken? [Open an issue](https://github.com/TLSnipZ/Idle-Game/issues) with the steps to reproduce, your browser/device and a screenshot when useful. Avoid posting backup codes publicly unless you intend to share your saved progress.
+Found something broken? [Open an issue](https://github.com/TLSnipZ/Idle-Game/issues)
+with reproduction steps and browser/device details. Do not post backup codes publicly
+unless you intend to share that progress.
 
 ---
 
