@@ -43,7 +43,7 @@ describe('Tier-1 purchases and permanent selection', () => {
     let state = rebirthState();
     for (const car of [S, L]) { const result = purchaseVehicle(state, car.id); expect(result.ok).toBe(true); state = result.state; }
     expect(state.garage).toEqual({ ownedVehicleIds: [K.id, S.id, L.id], activeVehicleId: K.id });
-    for (const car of VEHICLE_CATALOG) {
+    for (const car of [K, S, L]) {
       const selected = setActiveVehicle(state, car.id).state;
       expect(collectModifiers(selected).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual([car.modifier]);
       expect(selected.businesses).toBe(state.businesses);
@@ -115,7 +115,7 @@ describe('Save v19 identity boundary', () => {
     const state = owner ? rebirthState() : createInitialGameState();
     const input = { format: 'crime-empire-save', version: 18, savedAt: 123, state }, before = structuredClone(input);
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: { ...input, version: 23 } });
+    expect(result).toEqual({ ok: true, envelope: { ...input, version: 24 } });
     expect(input).toEqual(before);
     expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
   });
@@ -132,7 +132,7 @@ describe('Save v19 identity boundary', () => {
   it.each(VEHICLE_CATALOG.map(v => v.id))('current selection %s round-trips in local save and CE1', id => {
     const state = owned(id), encoded = serializeSave(state, 123);
     if (!encoded.ok) throw Error(encoded.error);
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 23, savedAt: 123, state } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 24, savedAt: 123, state } });
     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toEqual(parseSave(encoded.serialized));
   });
 });

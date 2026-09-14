@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 const { chromium } = await import(pathToFileURL(process.env.SOLARA_PLAYWRIGHT_MODULE).href);
 const fixtures = JSON.parse(readFileSync(process.env.SOLARA_AUDIT_FIXTURES, 'utf8'));
-const server = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4178'], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4178'], { stdio: 'inherit' });
 const K = 'vehicle:kairo-kx-r', S = 'vehicle:kairo-senda', L = 'vehicle:namera-lilt';
 const catalog = [[K, ['appearance:kxr-coastal', 'appearance:kxr-graphite']],
   [S, ['appearance:senda-champagne', 'appearance:senda-amethyst']], [L, ['appearance:lilt-ivory', 'appearance:lilt-lagoon']]];
@@ -141,7 +141,7 @@ try {
     assert.deepEqual(result.garage.builds, original.garage.builds);
     await page.reload(); await page.locator('.primary-navigation button').nth(3).click();
     assert.deepEqual((await saved(page)).state.garage.appearances, applied);
-    assert.equal((await saved(page)).version, 23);
+    assert.equal((await saved(page)).version, 24);
     await page.locator('#appearance-vehicle').selectOption(K);
     await studio(page).locator('.finish-option').first().click();
     await studio(page).locator('.discard-appearance').click();

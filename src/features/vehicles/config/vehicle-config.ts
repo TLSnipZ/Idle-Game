@@ -49,8 +49,23 @@ export const NAMERA_LILT: VehicleDefinition = Object.freeze({
     operation: 'reduce-interval', reductionMs: 3000,
   }),
 });
+export const NAMERA_SEREIN: VehicleDefinition = Object.freeze({
+  id: 'vehicle:namera-serein', name: 'Namera Serein', manufacturer: 'Namera', model: 'Serein', category: 'Workshop-era street coupe',
+  description: 'A low-slung street coupe. The delivery is express. The explanation to your accountant is not.',
+  purchaseCost: moneyFromMinorUnits('8000000'),
+  requirements: Object.freeze<Requirement[]>([
+    { type: 'player-level', minimumLevel: 10 },
+    { type: 'business-owned', businessId: 'business:afterdark-customs' },
+    { type: 'business-level', businessId: 'business:afterdark-customs', minimumLevel: 1 },
+  ]),
+  modifier: Object.freeze({
+    id: 'modifier:namera-serein-manual-cash', sourceId: 'vehicle:namera-serein',
+    target: Object.freeze({ stat: 'job-reward', context: 'manual' }),
+    operation: 'multiply-basis-points', bonusBasisPoints: 2600,
+  }),
+});
 /** Explicit presentation order, independent of modifier evaluation order. */
-export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT]);
+export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, NAMERA_SEREIN]);
 export function findVehicle(id: unknown): VehicleDefinition | undefined {
   return VEHICLE_CATALOG.find(vehicle => vehicle.id === id);
 }

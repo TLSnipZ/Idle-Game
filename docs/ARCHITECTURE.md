@@ -1,5 +1,14 @@
 # Architecture
 
+## Current phase — Garage IV-B: Serein pilot
+
+Implemented: Namera Serein, $80,000, Player Level 10 and owned Afterdark Customs,
++26% active manual delivery Cash, Save v24 / CE1 and localized factory-only controls.
+The approved PNG is retained unchanged; the runtime uses its optimized WebP derivative.
+See [Serein pilot](SEREIN_PILOT.md) for artwork provenance and release verification.
+Release status and CI/deployment evidence are tracked in PR #43.
+Next separate scope: IV-C Rendan/Canto; no additional cars or customization ship here.
+
 ## Current phase — Garage IV-A: Tier-2 catalog/progression analysis
 
 Completed the isolated comparison of proposed Tier-2 cars against today's stock

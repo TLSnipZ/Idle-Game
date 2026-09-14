@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { KAIRO_SENDA as S, NAMERA_LILT as L, STARTER_VEHICLE as K, VEHICLE_CATALOG } from '../features/vehicles';
+import { KAIRO_SENDA as S, NAMERA_LILT as L, NAMERA_SEREIN as N, STARTER_VEHICLE as K, VEHICLE_CATALOG } from '../features/vehicles';
 import type { VehicleId } from '../features/vehicles';
 import { rebirthRuntime } from './test-fixtures/rebirth-runtime';
 import { rebirthState } from '../game/test-fixtures/rebirth-state';
@@ -16,7 +16,7 @@ function state(id: VehicleId = K.id) {
   return { ...initial, city: { ...initial.city, heat: 50, heatDecayElapsedMs: 56000 },
     garage: { ownedVehicleIds: VEHICLE_CATALOG.map(v => v.id), activeVehicleId: id } };
 }
-it.each([S.id, L.id])('real %s reconciles old effects, saves before publication and applies future effects', id => {
+it.each([S.id, L.id, N.id])('real %s reconciles old effects, saves before publication and applies future effects', id => {
   const f = rebirthRuntime(state()), before = f.game.getSnapshot().result.state;
   f.at(1000); const result = f.game.selectActiveVehicle(id);
   const expected = setActiveVehicle(onlineElapsed(before, 1000).state, id).state;
@@ -36,7 +36,7 @@ it.each(['quota', 'conflict'] as const)('%s never publishes Lilt or consumes its
   expect(f.raw()).toBe(raw); expect(f.events.some(e => e.state.garage.activeVehicleId === L.id)).toBe(false);
   f.game.stop();
 });
-it.each([S.id, L.id])('%s saved effects govern offline credit once, reload and CE1', id => {
+it.each([S.id, L.id, N.id])('%s saved effects govern offline credit once, reload and CE1', id => {
   const f = rebirthRuntime(state(id)); f.game.stop(); f.wall(58000);
   const loaded = f.make(); loaded.start();
   const expected = simulateGameElapsed(state(id), 57000).state;
@@ -46,7 +46,7 @@ it.each([S.id, L.id])('%s saved effects govern offline credit once, reload and C
   loaded.stop(); const again = f.make(); again.start();
   expect(again.getSnapshot().result.state).toEqual(expected); again.stop();
 });
-it.each([S.id, L.id])('%s survives Rebirth below purchase gates; New Game clears all vehicles', id => {
+it.each([S.id, L.id, N.id])('%s survives Rebirth below purchase gates; New Game clears all vehicles', id => {
   const f = rebirthRuntime(state(id));
   expect(f.game.rebirth().ok).toBe(true);
   const reborn = f.game.getSnapshot().result.state;

@@ -210,7 +210,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 23,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 24,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);

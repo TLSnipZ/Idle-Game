@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 const { chromium } = await import(pathToFileURL(process.env.SOLARA_PLAYWRIGHT_MODULE).href);
 const fixtures = JSON.parse(readFileSync(process.env.SOLARA_AUDIT_FIXTURES, 'utf8'));
-const server = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4177'], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4177'], { stdio: 'inherit' });
 const K = 'vehicle:kairo-kx-r', S = 'vehicle:kairo-senda', L = 'vehicle:namera-lilt';
 const E = 'tuning:senda-express-ecu', F = 'tuning:senda-fleet-gearing', Q = 'tuning:lilt-quiet-running', D = 'tuning:lilt-decoy-kit';
 const saved = page => page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
@@ -87,7 +87,7 @@ try {
     await part(page, D).click();
     await page.reload(); await nav(page, 3); await page.locator('#tuning-vehicle').selectOption(L);
     const current = await saved(page);
-    assert.equal(current.version, 23);
+    assert.equal(current.version, 24);
     assert.equal(current.state.economy.cash, '93603024');
     assert.deepEqual(current.state.garage.builds[S].purchasedIds, [E, F]);
     assert.deepEqual(current.state.garage.builds[L].purchasedIds, [Q, D]);

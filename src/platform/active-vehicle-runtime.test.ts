@@ -74,7 +74,7 @@ describe('durable active vehicle selection', () => {
     const saves = createLocalSave(() => ({ getItem: () => raw, setItem: (_key, value) => { raw = value; } }), () => 26000);
     const loaded = saves.bootstrap(), expected = simulateGameElapsed(state, 25000).state;
     expect(loaded).toMatchObject({ kind: 'loaded', state: expected });
-    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 23, savedAt: 26000, state: expected } });
+    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 24, savedAt: 26000, state: expected } });
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { incomeEarned: '0' } });
   });
   it('offline credit uses the saved car before a later switch; reload and CE1 retain selection', () => {

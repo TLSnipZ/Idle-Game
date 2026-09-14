@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 const { chromium } = await import(pathToFileURL(process.env.SOLARA_PLAYWRIGHT_MODULE).href);
 const fixtures = JSON.parse(readFileSync(process.env.SOLARA_AUDIT_FIXTURES, 'utf8'));
-const server = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4174'], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4174'], { stdio: 'inherit' });
 const results = [];
 let browser;
 mkdirSync('browser-evidence', { recursive: true });
@@ -144,7 +144,7 @@ try {
     assert.equal(await trigger.evaluate(element => element === document.activeElement), true);
     await page.reload();
     assert.equal(await page.locator('html').getAttribute('lang'), locale === 'villager' ? 'en-x-villager' : locale);
-    assert.equal((await saved(page)).version, 23);
+    assert.equal((await saved(page)).version, 24);
     assert.deepEqual(errors, []);
     await context.close();
   }
@@ -596,7 +596,7 @@ try {
     assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, null);
     await courier.click();
     await page.reload(); await navigation(page).nth(3).click();
-    assert.equal((await saved(page)).version, 23);
+    assert.equal((await saved(page)).version, 24);
     assert.equal(await courier.isDisabled(), true);
     assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, 'tuning:kxr-courier-ecu');
     if (locale === 'villager') await assertVillagerOnly(page);
