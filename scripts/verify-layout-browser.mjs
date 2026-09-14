@@ -49,8 +49,8 @@ try {
         const id = targets[section][i];
         assert.equal(await page.evaluate(() => document.activeElement?.id), id);
         const box = await page.locator('#' + id).boundingBox();
-        const hudBottom = await page.locator('.global-chrome').evaluate(el => el.getBoundingClientRect().bottom);
-        assert.ok(box.y >= hudBottom - 1, 'Target clears sticky HUD: ' + JSON.stringify({ locale, width, id, box, hudBottom }));
+        const hudBottom = await page.locator(section === 3 ? i === 0 ? '.collection-navigation' : '.workshop-navigation' : '.global-chrome').evaluate(el => el.getBoundingClientRect().bottom);
+        assert.ok(box.y >= hudBottom - 1, 'Target clears sticky navigation: ' + JSON.stringify({ locale, width, id, box, hudBottom }));
       }
       if (section === 2 && stage === 2) {
         await page.locator('.activity-event').click();

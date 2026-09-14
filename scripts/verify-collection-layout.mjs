@@ -49,6 +49,9 @@ try {
     if(width<=740) { assert.equal(await page.locator('.garage-rail').isVisible(),false);await page.locator('.garage-back').click();assert.equal(await page.locator('.garage-rail').isVisible(),true);await openGarageVehicle(page,S); }
     await card.locator('.garage-workshop-link').click();
     assert.equal(await page.locator('#tuning-vehicle').inputValue(),S);
+    const controls = await page.locator('#tuning-vehicle').boundingBox();
+    const navigationBottom = await page.locator('.workshop-navigation').evaluate(element=>element.getBoundingClientRect().bottom);
+    assert.ok(controls.y >= navigationBottom, 'Workshop selector clears both sticky navigation rows');
     assert.equal(await page.locator('.garage').isVisible(),false);
     assert.equal(await page.locator('.vehicle-tuning').isVisible(),true);
     assert.equal(await page.locator('.vehicle-appearance').isVisible(),false);

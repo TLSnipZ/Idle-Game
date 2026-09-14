@@ -51,7 +51,7 @@
 .workshop-help { margin: .8rem 0 1.25rem; color: var(--color-secondary); }
 .workshop-help summary { padding: .7rem 0; cursor: pointer; color: var(--color-cool); }
 .collection-navigation { position: sticky; top: calc(var(--hud-offset, 170px) + .5rem); z-index: 8; }
-.workshop-navigation { position: sticky; top: calc(var(--hud-offset, 170px) + 5rem); z-index: 7; padding: .4rem; background: var(--color-background); border-radius: .8rem; }
+.workshop-navigation { position: sticky; top: calc(var(--hud-offset, 170px) + var(--collection-nav-height, 66px) + 1rem); z-index: 7; padding: .4rem; background: var(--color-background); border-radius: .8rem; }
 .collection-workspace #garage-heading, .garage-detail { scroll-margin-top: calc(var(--hud-offset, 170px) + 6rem); }
 .collection-workspace #tuning-heading, .collection-workspace #appearance-heading { scroll-margin-top: calc(var(--hud-offset, 170px) + 10rem); }
 .garage .garage-back { display: none; }
@@ -60,4 +60,14 @@
 @media (max-width: 740px) {
   .garage .garage-back { display: inline-flex; }
   .garage-tile { display: block; }
+}
+/* Override the later global #main scroll rule for these additional sticky rows. */
+.collection-workspace { --collection-scroll-offset: calc(var(--hud-offset, 170px) + var(--collection-nav-height, 66px) + 1.5rem); }
+.workshop-workspace { --collection-scroll-offset: calc(var(--hud-offset, 170px) + var(--collection-nav-height, 66px) + var(--workshop-nav-height, 64px) + 2rem); }
+#main .collection-workspace [id], #main .collection-workspace button,
+#main .collection-workspace select, #main .collection-workspace summary,
+#main .collection-workspace .garage-detail { scroll-margin-block-start: var(--collection-scroll-offset); }
+@media (max-height: 650px) {
+  .collection-navigation, .workshop-navigation { position: static; }
+  .collection-workspace, .workshop-workspace { --collection-scroll-offset: calc(var(--hud-offset, 170px) + 1rem); }
 }

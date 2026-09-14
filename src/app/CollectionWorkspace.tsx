@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { VehicleId } from '../features/vehicles';
 import { findVehicle, STARTER_VEHICLE } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
@@ -18,12 +18,27 @@ export function CollectionWorkspace({ state, paused, onPurchase, onSelect, onCon
   readonly onApply: (vehicleId: string, id: string | null) => void;
 }) {
   const text = useLocalizedText();
+  const workspace = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>('garage');
   const [inspected, setInspected] = useState<VehicleId>(state.garage.activeVehicleId ?? STARTER_VEHICLE.id);
   const [workshopVehicle, setWorkshopVehicle] = useState<VehicleId>(state.garage.activeVehicleId ?? STARTER_VEHICLE.id);
   const [focusRequest, setFocusRequest] = useState(0);
   const handled = useRef(0);
   const focusTarget = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const root = workspace.current;
+    const navigation = root?.querySelector<HTMLElement>('.collection-navigation');
+    const services = root?.querySelector<HTMLElement>('.workshop-navigation');
+    if (!root || !navigation || !services) return;
+    const measure = () => {
+      root.style.setProperty('--collection-nav-height', `${navigation.getBoundingClientRect().height}px`);
+      root.style.setProperty('--workshop-nav-height', `${services.getBoundingClientRect().height}px`);
+    };
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(navigation); observer?.observe(services);
+    return () => observer?.disconnect();
+  }, [view]);
   function open(next: View, target?: string) { focusTarget.current = target ?? null; setView(next); setFocusRequest(n => n + 1); }
   useEffect(() => {
     if (handled.current === focusRequest) return;
@@ -42,7 +57,7 @@ export function CollectionWorkspace({ state, paused, onPurchase, onSelect, onCon
     const next = destination.headingId === 'tuning-heading' ? 'tuning' : destination.headingId === 'appearance-heading' ? 'appearance' : 'garage';
     open(next, destination.headingId);
   }, [destination]);
-  return <div className="collection-workspace">
+  return <div className="collection-workspace" ref={workspace}>
     <nav className="collection-navigation" aria-label={text('Collection views', 'Sammlungsansichten')}>
       <button type="button" className="collection-tab" data-collection-view="garage" aria-pressed={view === 'garage'} onClick={() => open('garage')}>{text('Garage', 'Garage')}</button>
       <button type="button" className="collection-tab" data-collection-view="workshop" aria-pressed={view !== 'garage'} onClick={() => open('tuning')}>{text('Workshop', 'Werkstatt')}</button>
