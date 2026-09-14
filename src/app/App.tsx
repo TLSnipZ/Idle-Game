@@ -32,6 +32,7 @@ import './Operations.css';
 import './Layout.css';
 import './DesignSystem.css';
 import './BusinessPortfolio.css';
+import './WorldWorkspace.css';
 
 /** Exactly one runtime hook, outside all navigation-dependent presentation. */
 export function App() { return <GameShell game={useGame()} />; }
@@ -53,23 +54,19 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   const main = useRef<HTMLElement>(null);
   const captureAction = useActionFocus();
   const previous = useRef(active);
-  const [reviewRequest, setReviewRequest] = useState(0);
-  const handledReview = useRef(0);
   const [objectiveRequest, setObjectiveRequest] = useState<{ sequence: number; headingId: string; section: SectionId } | null>(null);
   const handledObjective = useRef(0);
   useEffect(() => { game.setPresentationLocale(preferences.settings.locale); }, [game.setPresentationLocale, preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
-      if (active === SECTION.collection.id || active === SECTION.operations.id) { handledObjective.current = objectiveRequest.sequence; previous.current = active; return; }
+      if (active !== SECTION.overview.id) { handledObjective.current = objectiveRequest.sequence; previous.current = active; return; }
       const requested = document.getElementById(objectiveRequest.headingId);
       const target = requested && main.current?.contains(requested) ? requested : heading.current;
       if (target) { target.tabIndex = -1; target.classList.add('guidance-destination'); target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'start', behavior: 'instant' }); }
       handledObjective.current = objectiveRequest.sequence;
-    } else if (reviewRequest !== handledReview.current && active === SECTION.empire.id) {
-      const target = main.current?.querySelector<HTMLElement>('#rebirth-heading'); target?.focus({ preventScroll: true }); target?.scrollIntoView({ block: 'start', behavior: 'instant' }); handledReview.current = reviewRequest;
     } else if (previous.current !== active) { heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0 }); }
     previous.current = active;
-  }, [active, reviewRequest, objectiveRequest]);
+  }, [active, objectiveRequest]);
   function navigate(section: SectionId, headingId?: string) {
     setActive(section);
     if (headingId) setObjectiveRequest(request => ({ section, headingId, sequence: (request?.sequence ?? 0) + 1 }));
@@ -83,14 +80,14 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
     <header className="app-header"><BrandLockup /><span className="edition">{t('tagline')}</span><div className="header-actions"><SaveStatus status={game.persistence} /><button className="settings-trigger" type="button" onClick={() => setSettingsOpen(true)} aria-haspopup="dialog">⚙ <span>{t('settings')}</span></button></div></header>
     <GlobalStatus view={dashboard} active={active} onNavigate={navigate} paused={paused} newsMessage={game.feedback.message} t={t} />
     <main ref={main} id="main" className="foundation" tabIndex={-1}>
-      <RebirthNotice preview={dashboard.empire} onReview={() => { setActive(SECTION.empire.id); setReviewRequest(request => request + 1); }} />
+      <RebirthNotice preview={dashboard.empire} onReview={() => navigate(SECTION.empire.id, 'rebirth-heading')} />
       <GlobalFeedback game={game} transferMessage={active === SECTION.empire.id ? '' : save.state.message} rebirthMessage={active === SECTION.empire.id ? '' : rebirth.interaction.message} />
-      {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => setActive(SECTION.empire.id)}>{t('returnEmpire')}</button>}
+      {(save.state.confirming || rebirth.interaction.confirming) && active !== SECTION.empire.id && <button className="action-button section-shortcut" onClick={() => navigate(SECTION.empire.id, save.state.confirming ? 'save-transfer-heading' : 'rebirth-heading')}>{t('returnEmpire')}</button>}
       <OfflineReturn progress={game.offline} onDismiss={game.dismissOffline} />
       <NextObjective key={game.replacementSequence} state={game.snapshot.state} onNavigate={destination => { const target = guidanceDestination(destination); setActive(target.section); setObjectiveRequest(request => ({ ...target, sequence: (request?.sequence ?? 0) + 1 })); }} />
       <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{t(sectionLabelKey)}</h1><p>{t(sectionDescriptionKey)}</p></div>
-        <SectionContent operationsDestination={objectiveRequest?.section === SECTION.operations.id && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} collectionDestination={objectiveRequest?.section === SECTION.collection.id && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
+        <SectionContent workspaceDestination={objectiveRequest?.section === active && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} operationsDestination={objectiveRequest?.section === SECTION.operations.id && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} collectionDestination={objectiveRequest?.section === SECTION.collection.id && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
       </div>
       <p className="session-note">{t('localProgress')} <span aria-hidden="true">/</span> {t('awayPrefix')} {text(formatOfflineDuration(getOfflineCapMs(game.snapshot.state)))}.</p>
     </main>

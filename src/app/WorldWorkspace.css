@@ -1,0 +1,105 @@
+/* Design 2.0, remaining workspaces. Presentation only; all values are selectors. */
+.focused-workspace.section-workspace { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+.focused-workspace [hidden] { display: none !important; }
+.workspace-panels, .workspace-panels > div { min-width: 0; }
+.focused-workspace .workspace-navigation { position: static; display: flex; flex-direction: row; align-items: stretch; }
+.focused-workspace .workspace-navigation button { flex: 1 1 8rem; width: auto; text-align: center; }
+.focused-workspace .workspace-navigation button[aria-pressed="true"] { color: var(--color-accent); border-color: var(--color-accent); background: var(--color-accent-tint); box-shadow: inset 0 -2px var(--color-accent); }
+.empire-workspace .workspace-navigation button[aria-pressed="true"] { color: var(--color-warm); border-color: var(--color-warm); background: var(--color-warm-tint); box-shadow: inset 0 -2px var(--color-warm); }
+.workspace-pending { display: inline-block; margin-inline-start: .5rem; padding: .05rem .4rem; border-radius: .3rem; background: var(--color-accent-tint); color: var(--color-accent); font-size: .72rem; }
+.focused-workspace h2 { font-size: clamp(1.5rem, 2.8vw, 2rem); letter-spacing: -.025em; }
+.focused-workspace .panel-heading { gap: 1rem; flex-wrap: wrap; }
+.focused-workspace .panel-heading > span { color: var(--color-secondary); font-size: .8rem; }
+
+/* A working dashboard: income and progression lead; decisions follow. */
+#section-content[data-section="overview"] > .overview-command { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.25rem; }
+.overview-command > article { grid-column: span 4; min-width: 0; }
+.overview-command > .overview-economy { grid-column: span 8; position: relative; overflow: hidden; }
+.overview-command > .overview-player { grid-column: span 4; background: var(--gradient-surface); }
+.overview-command > .overview-crew, .overview-command > .overview-collection { grid-column: span 6; }
+.overview-command .summary-card { display: flex; flex-direction: column; }
+.overview-command .overview-economy > .business-artwork { margin: -1.8rem -1.8rem 1.4rem; overflow: hidden; aspect-ratio: 728 / 189; }
+.overview-economy > .business-artwork img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.overview-command .overview-economy .summary-value { font-size: clamp(2rem, 4vw, 3.5rem); color: var(--color-cool); }
+.overview-command .overview-player .player-progress { border: 0; background: transparent; padding: 0; }
+.overview-command .overview-player .player-level { font-size: 2rem; }
+.overview-command .overview-pressure .summary-value { font-size: clamp(1.3rem, 2vw, 1.8rem); }
+.overview-command .overview-event.is-pending { background: linear-gradient(130deg, var(--color-accent-tint), var(--color-surface)); box-shadow: inset 0 3px var(--color-accent); }
+.overview-command .overview-empire { background: linear-gradient(130deg, var(--color-warm-tint), var(--color-surface)); }
+.overview-command .overview-empire .summary-value { color: var(--color-warm); }
+.overview-command .summary-card h2 { color: var(--color-secondary); font-size: .8rem; }
+.overview-command .summary-card > p { font-size: .95rem; line-height: 1.6; }
+
+/* District identities reuse approved local storefronts, never a fictitious map. */
+.city-workspace .city > .panel-heading, .city-workspace .crew > .panel-heading { padding-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
+.city-workspace .district-pressure-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr); gap: 1.5rem; align-items: start; }
+.city-workspace .territory-catalog { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+.city-workspace .territory-card { overflow: hidden; padding: 1.5rem; }
+.city-workspace .territory-card .business-artwork { margin: -1.5rem -1.5rem 1.2rem; aspect-ratio: 728 / 189; overflow: hidden; }
+.city-workspace .territory-card .business-artwork img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.city-workspace .territory-card h4 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin-block: .25rem; }
+.city-workspace .territory-card .territory-effect { padding: .8rem; border-inline-start: 3px solid var(--color-cool); background: var(--color-cool-tint); }
+.city-workspace .district-heat { margin-bottom: 1.5rem; padding: 1.25rem; border-radius: var(--radius-card); border: 1px solid var(--color-border); background: var(--color-surface); }
+.city-workspace .district-heat > h3 { margin-top: 0; }
+.city-workspace .district-heat-readings { gap: .75rem; }
+.city-workspace .district-heat-readings > div { background: var(--color-background); padding: .8rem; border-radius: var(--radius-control); }
+.city-workspace .heat-panel { margin: 0; padding: 1.5rem; }
+.city-workspace .heat-readout strong { font-size: clamp(3rem, 5vw, 4.5rem); letter-spacing: -.06em; }
+.city-workspace .heat-details progress { height: .7rem; }
+.city-workspace .heat-action { border-top: 1px solid var(--color-border); padding-top: 1rem; }
+.city-workspace .heat-action button { width: 100%; }
+
+/* Specialist dossiers: role and assignment are legible without invented portraits. */
+.city-workspace .crew-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.city-workspace .crew-slot { padding: 1.25rem; background: linear-gradient(120deg, var(--color-cool-tint), var(--color-surface)); border-top: 2px solid var(--color-cool); }
+.city-workspace .slot-occupant { font-size: 1.1rem; font-weight: 700; }
+.city-workspace .crew-catalog { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.city-workspace .crew-card { display: flex; flex-direction: column; padding: 1.25rem; overflow: hidden; }
+.city-workspace .crew-identity h4 { font-size: 1.4rem; margin-block: .4rem; }
+.city-workspace .crew-identity .panel-heading { align-items: start; }
+.crew-monogram { display: grid; place-content: center; align-self: start; width: 4rem; height: 4rem; margin-bottom: 1rem; border: 1px solid var(--color-accent); border-radius: var(--radius-card); font-size: 1.4rem; font-weight: 800; letter-spacing: .08em; color: var(--color-accent); background: var(--color-accent-tint); }
+.city-workspace .specialist-effect { padding: .85rem; border-radius: var(--radius-control); background: var(--color-background); color: var(--color-cool); }
+.city-workspace .crew-card .card-action-area, .city-workspace .crew-card > .action-button { margin-top: auto; }
+.city-workspace .subsection-label { margin-block: 1.5rem .75rem; color: var(--color-secondary); }
+.city-workspace .city-events { padding: clamp(1rem, 3vw, 2rem); }
+.city-workspace .event-story { padding: 1.5rem; background: var(--color-accent-tint); border-inline-start: 3px solid var(--color-accent); border-radius: var(--radius-control); }
+.city-workspace .event-story h3 { font-size: clamp(1.5rem, 3vw, 2.4rem); line-height: 1.2; }
+.city-workspace .event-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.city-workspace .event-choice { display: flex; flex-direction: column; padding: 1.25rem; background: var(--color-background); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+.city-workspace .event-choice .action-button { margin-top: auto; }
+
+/* Permanent progression and records have distinct work surfaces. */
+.empire-workspace .rebirth-panel { padding: clamp(1rem, 3vw, 2rem); background: linear-gradient(145deg, var(--color-warm-tint), var(--color-surface)); }
+.empire-workspace .rebirth-reward { padding: 1rem; background: var(--color-background); border-inline-start: 3px solid var(--color-warm); border-radius: var(--radius-control); }
+.empire-workspace .rebirth-policy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.empire-workspace .rebirth-policy > div { padding: 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+.empire-workspace .rebirth-keep { background: var(--color-cool-tint); }
+.empire-workspace .rebirth-lose { background: var(--color-danger-surface); }
+.empire-workspace .skill-nodes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.empire-workspace .skill-node { display: flex; flex-direction: column; margin: 0; padding: 1.5rem; border-top: 2px solid var(--color-warm); }
+.empire-workspace .skill-node h3 { font-size: 1.25rem; }
+.empire-workspace .skill-node .purchase-button { margin-top: auto; }
+.skill-rank-progress { width: 100%; height: .5rem; accent-color: var(--color-warm); }
+.empire-workspace .achievement-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.empire-workspace .achievement-card { padding: 1.25rem; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
+.empire-workspace .achievement-card.is-unlocked { border-color: var(--color-warm); background: var(--color-warm-tint); }
+.empire-workspace .achievement-progress { padding-top: .75rem; border-top: 1px solid var(--color-border); color: var(--color-warm); }
+.empire-workspace .statistics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.empire-workspace .statistics-entry { padding: 1.25rem; background: var(--color-background); border-radius: var(--radius-card); }
+.empire-workspace .statistics-entry strong { font-size: clamp(1.6rem, 3vw, 2.3rem); color: var(--color-warm); }
+.empire-workspace .save-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.empire-workspace .reset-panel { margin-top: 1.5rem; }
+@media (max-width: 1050px) {
+  .overview-command > article, .overview-command > .overview-economy, .overview-command > .overview-player { grid-column: span 6; }
+  .city-workspace .district-pressure-layout { grid-template-columns: minmax(0, 1fr); }
+  .city-workspace .crew-catalog { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 740px) {
+  #section-content[data-section="overview"] > .overview-command { grid-template-columns: minmax(0, 1fr); }
+  .overview-command > article, .overview-command > .overview-economy, .overview-command > .overview-player, .overview-command > .overview-crew, .overview-command > .overview-collection { grid-column: 1; }
+  .overview-command .overview-economy > .business-artwork { margin: -1.1rem -1.1rem 1rem; }
+  .focused-workspace .workspace-navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .focused-workspace .workspace-navigation button { padding: .75rem .4rem; font-size: .85rem; }
+  .city-workspace .crew-slots, .city-workspace .event-choices, .empire-workspace .rebirth-policy, .empire-workspace .skill-nodes, .empire-workspace .achievement-grid, .empire-workspace .statistics-grid, .empire-workspace .save-grid { grid-template-columns: minmax(0, 1fr); }
+  .city-workspace .event-story { padding: 1rem; }
+}
