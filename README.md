@@ -37,6 +37,9 @@ Next separate scope: later vehicle tiers, starting with catalog/progression anal
 
 ## Latest UI update
 
+KX-R paint coverage and rear-lamp isolation have been corrected. Existing looks
+and saves are retained; see the [paint-studio notes](docs/VEHICLE_APPEARANCE.md).
+
 A responsive dashboard, quick access menus for each feature area, direct Event/Crew
 links and a slimmer fixed HUD make the existing game easier to navigate. See the
 [layout review](docs/LAYOUT_REVIEW.md). Gameplay and Save v21 / CE1 are unchanged.

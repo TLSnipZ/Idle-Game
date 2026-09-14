@@ -10,6 +10,43 @@ const catalog = [[K, ['appearance:kxr-coastal', 'appearance:kxr-graphite']],
   [S, ['appearance:senda-champagne', 'appearance:senda-amethyst']], [L, ['appearance:lilt-ivory', 'appearance:lilt-lagoon']]];
 const saved = page => page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
 const studio = page => page.locator('.vehicle-appearance');
+
+async function verifyKxrPaintEdges(page) {
+  // These source-image locations cover the user's missed bodywork and protected lamp/glass/tyre.
+  const body = [[241,157], [544,111], [603,241], [354,217], [348,222], [125,276], [123,268]];
+  const protectedPoints = [[595,173], [597,179], [599,191], [600,197], [280,222], [402,214], [365,266], [370,143], [620,185]];
+  await page.locator('#appearance-vehicle').selectOption(K);
+  const style = await page.addStyleTag({ content: '.paint-studio-layout{display:block}.paint-preview{width:720px}.paint-preview .vehicle-image{width:720px;height:405px;aspect-ratio:auto}.global-chrome{position:static!important}' });
+  async function sample(name) {
+    const target = page.locator('.paint-preview .vehicle-image');
+    await target.locator('img').evaluate(img => img.decode());
+    await target.scrollIntoViewIfNeeded();
+    const shot = await target.screenshot({ path: 'browser-evidence/kxr-mask-' + name + '.png' });
+    return page.evaluate(async ({ png, points }) => {
+      const image = new Image(); image.src = 'data:image/png;base64,' + png; await image.decode();
+      const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
+      const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+      return points.map(([x,y]) => [...context.getImageData(x,y,1,1).data].slice(0,3));
+    }, { png: shot.toString('base64'), points: [...body, ...protectedPoints] });
+  }
+  await studio(page).locator('.finish-option').first().click();
+  const original = await sample('factory');
+  for (const look of ['appearance:kxr-coastal','appearance:kxr-graphite']) {
+    await studio(page).locator('[data-look-id="' + look + '"]').click();
+    const pixels = await sample(look.split(':')[1]);
+    for (let i = 0; i < body.length; i++) {
+      assert.ok(Math.max(...pixels[i].map((c,k) => Math.abs(c-original[i][k]))) > 45,
+        'Bodywork still has factory paint at ' + body[i] + ' for ' + look);
+    }
+    for (let i = body.length; i < pixels.length; i++) {
+      assert.ok(Math.max(...pixels[i].map((c,k) => Math.abs(c-original[i][k]))) <= 2,
+        'Paint leaked into protected artwork at ' + protectedPoints[i-body.length] + ' for ' + look);
+    }
+  }
+  await style.evaluate(el => el.remove());
+  console.log(JSON.stringify({ kxrPaintPixelChecks: 2 * (body.length + protectedPoints.length), failures: 0 }));
+}
+
 let browser, count = 0;
 mkdirSync('browser-evidence', { recursive: true });
 try {
@@ -95,6 +132,7 @@ try {
     await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), '125% text overflow');
     if (locale === 'villager') assert.equal(((await studio(page).textContent()) ?? '').replace(/[hmr\W\d]/gi, ''), '');
+    if (locale === 'en' && width === 1440) await verifyKxrPaintEdges(page);
     assert.deepEqual(errors, []);
     count++; await context.close();
   }

@@ -1,5 +1,24 @@
 # Garage 2.0 III — curated vehicle finishes
 
+## Patch — KX-R paint coverage and lamp isolation
+
+User screenshots exposed missed factory-white bodywork around the wheel arches,
+bumpers, spoiler and far-side mirror, plus paint entering the rear lamp.
+The KX-R contours now follow these edges more closely. Paint rendering uses a
+subtractive luminance mask: the first closed contour is body coverage, subsequent
+closed contours remove openings, and explicit mirror details restore paint locally.
+Unlike an even-odd compound clip, a cutout crossing the body outline cannot add
+paint outside that outline.
+
+The appearance browser verifier now compares 32 rendered pixel samples across
+Mint and Graphite: seven formerly missed body positions must change substantially,
+while nine protected lamp, indicator, glass, tyre and background positions must
+retain their original colors. It also stores factory/Mint/Graphite screenshots.
+The normal 15 appearance flows and existing release gates still run. This corrects
+the earlier visual-review oversight; it is not a claim of pixel-perfect artwork.
+Save v23 / CE1, finish identities, selections and gameplay are unchanged.
+Release evidence is recorded in the patch PR. Later vehicle tiers remain separate.
+
 ## Player scope
 
 Collection → Paint studio offers factory paint plus two signature finishes per car:
