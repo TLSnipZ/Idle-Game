@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -562,6 +563,7 @@ try {
     }, { fixture, locale });
     await page.goto('http://127.0.0.1:4174');
     await navigation(page).nth(3).click();
+    await openCollectionView(page, 'tuning');
     const fleet = page.locator('[data-tuning-id="tuning:kxr-fleet-gearing"] button');
     const courier = page.locator('[data-tuning-id="tuning:kxr-courier-ecu"] button');
     await page.evaluate(() => {
@@ -588,14 +590,14 @@ try {
     assert.equal((await saved(page)).state.economy.cash, '2502700');
     if (locale === 'villager') await assertVillagerOnly(page);
     else assert.ok((await page.locator('.modifier-breakdown').first().textContent()).includes(locale === 'de' ? 'Kurier-Steuergerät' : 'Courier ECU'));
-    await navigation(page).nth(3).click();
+    await navigation(page).nth(3).click(); await openCollectionView(page, 'tuning');
     await fleet.click();
     assert.equal((await saved(page)).state.economy.cash, '2502700');
     assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].purchasedIds.length, 2);
     await page.locator('.tuning-stock').click();
     assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, null);
     await courier.click();
-    await page.reload(); await navigation(page).nth(3).click();
+    await page.reload(); await navigation(page).nth(3).click(); await openCollectionView(page, 'tuning');
     assert.equal((await saved(page)).version, 24);
     assert.equal(await courier.isDisabled(), true);
     assert.equal((await saved(page)).state.garage.builds['vehicle:kairo-kx-r'].selectedId, 'tuning:kxr-courier-ecu');

@@ -58,6 +58,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
   useEffect(() => { game.setPresentationLocale(preferences.settings.locale); }, [game.setPresentationLocale, preferences.settings.locale]);
   useEffect(() => {
     if (objectiveRequest && objectiveRequest.sequence !== handledObjective.current && active === objectiveRequest.section) {
+      if (active === SECTION.collection.id) { handledObjective.current = objectiveRequest.sequence; previous.current = active; return; }
       const requested = document.getElementById(objectiveRequest.headingId);
       const target = requested && main.current?.contains(requested) ? requested : heading.current;
       if (target) { target.tabIndex = -1; target.classList.add('guidance-destination'); target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'start', behavior: 'instant' }); }
@@ -87,7 +88,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
       <NextObjective key={game.replacementSequence} state={game.snapshot.state} onNavigate={destination => { const target = guidanceDestination(destination); setActive(target.section); setObjectiveRequest(request => ({ ...target, sequence: (request?.sequence ?? 0) + 1 })); }} />
       <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{t(sectionLabelKey)}</h1><p>{t(sectionDescriptionKey)}</p></div>
-        <SectionContent active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
+        <SectionContent collectionDestination={objectiveRequest?.section === SECTION.collection.id ? objectiveRequest : null} active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
       </div>
       <p className="session-note">{t('localProgress')} <span aria-hidden="true">/</span> {t('awayPrefix')} {text(formatOfflineDuration(getOfflineCapMs(game.snapshot.state)))}.</p>
     </main>

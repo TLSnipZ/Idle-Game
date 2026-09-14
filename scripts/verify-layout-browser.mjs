@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -43,7 +44,8 @@ try {
       assert.equal(geometry.clipped, false);
       assert.ok(Math.abs(geometry.hud - geometry.offset) <= 1, 'Measured HUD offset tracks text zoom');
       for (let i = 0; i < targets[section].length; i++) {
-        await page.locator('.section-index button').nth(i).click();
+        if (section === 3) await openCollectionView(page, ['garage', 'tuning', 'appearance'][i]);
+        else await page.locator('.section-index button').nth(i).click();
         const id = targets[section][i];
         assert.equal(await page.evaluate(() => document.activeElement?.id), id);
         const box = await page.locator('#' + id).boundingBox();

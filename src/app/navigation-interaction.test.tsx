@@ -501,7 +501,7 @@ describe('whole-game quick access', () => {
     ] as const;
     for (const [section, ids] of cases) {
       await navigate(section);
-      const buttons = container.querySelectorAll<HTMLButtonElement>('.section-index button');
+      const buttons = container.querySelectorAll<HTMLButtonElement>(section === 'COLLECTION' ? '[data-collection-view="garage"], [data-workshop-view]' : '.section-index button');
       expect(buttons).toHaveLength(ids.length);
       for (let i = 0; i < ids.length; i++) {
         await act(() => buttons[i]?.click());

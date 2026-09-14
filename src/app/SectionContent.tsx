@@ -1,4 +1,5 @@
-import { VehicleAppearance } from './VehicleAppearance';
+import type { CollectionDestination } from './CollectionWorkspace';
+import { CollectionWorkspace } from './CollectionWorkspace';
 import { SectionIndex } from './SectionIndex';
 import type { useGame } from './use-game';
 import type { Navigate, SectionId } from './navigation';
@@ -8,8 +9,6 @@ import { OperationsSection } from './OperationsSection';
 import { City } from './City';
 import { CrewPanel } from './CrewPanel';
 import { CityEvents } from './CityEvents';
-import { VehicleTuning } from './VehicleTuning';
-import { Garage } from './Garage';
 import { RebirthPanelView } from './RebirthPanel';
 import type { useRebirthControls } from './RebirthPanel';
 import { selectRebirth } from '../game/rebirth';
@@ -22,6 +21,7 @@ import type { useSaveManagement } from './SaveManagement';
 import { useLocalizedText } from './LocalizationProvider';
 
 export interface SectionContentProps {
+  readonly collectionDestination?: CollectionDestination | null;
   readonly active: SectionId;
   readonly game: ReturnType<typeof useGame>;
   readonly onNavigate: Navigate;
@@ -29,7 +29,7 @@ export interface SectionContentProps {
   readonly rebirth: ReturnType<typeof useRebirthControls>;
 }
 /** One active presentation tree. Runtime and confirmation controllers live above it. */
-export function SectionContent({ active, game, onNavigate, save, rebirth }: SectionContentProps) {
+export function SectionContent({ active, game, onNavigate, save, rebirth, collectionDestination }: SectionContentProps) {
   const text = useLocalizedText();
   const state = game.snapshot.state;
   const paused = game.runtimeError !== null;
@@ -41,7 +41,7 @@ export function SectionContent({ active, game, onNavigate, save, rebirth }: Sect
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />
       <CityEvents state={state} paused={paused} onChoose={game.chooseEvent} />
     </div></div>;
-    case SECTION.collection.id: return <div className="section-workspace"><SectionIndex section="collection" /><div className="collection-content"><Garage workshop state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} /><VehicleTuning state={state} paused={paused || game.persistence.kind === 'blocked'} onConfigure={game.configureTuning} /><VehicleAppearance state={state} paused={paused || game.persistence.kind === 'blocked'} onApply={game.configureAppearance} /></div></div>;
+    case SECTION.collection.id: return <CollectionWorkspace destination={collectionDestination ?? null} key={game.replacementSequence} state={state} paused={paused || game.persistence.kind === 'blocked'} onPurchase={game.buyVehicle} onSelect={game.chooseActiveVehicle} onConfigure={game.configureTuning} onApply={game.configureAppearance} />;
     case SECTION.empire.id: return <div className="section-workspace"><SectionIndex section="empire" /><div className="section-stack">
       <RebirthPanelView preview={selectRebirth(state)} unavailable={paused || game.persistence.kind === 'blocked'} interaction={rebirth.interaction} controls={rebirth.controls} />
       <SkillTree state={state} paused={paused} onPurchase={game.buySkill} />

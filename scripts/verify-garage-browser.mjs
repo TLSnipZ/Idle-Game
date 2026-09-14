@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -8,7 +9,9 @@ const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'previe
 let browser;
 const results = [];
 async function verifyArtwork(page, width, locale) {
-  const pictures = page.locator('.garage .vehicle-artwork');
+  await openCollectionView(page, 'garage');
+  if (await page.locator('.garage-back').isVisible()) await page.locator('.garage-back').click();
+  const pictures = page.locator('.garage-rail .vehicle-artwork');
   assert.equal(await pictures.count(), 4, 'Every configured vehicle has its own image');
   const sources = [];
   for (const picture of await pictures.all()) {
@@ -65,6 +68,7 @@ try {
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
     assert.equal(saved.version, 24);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
+    await openGarageVehicle(page, 'vehicle:kairo-kx-r');
     if (!owner) {
       await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] .purchase-button').click();
       await page.waitForFunction(() => JSON.parse(localStorage.getItem('crime-empire:save')).state.garage.activeVehicleId === 'vehicle:kairo-kx-r');
@@ -72,7 +76,7 @@ try {
     const carName = await page.locator('.garage-active-summary strong').textContent();
     if (locale === 'villager') assert.match(carName, /^[hmr -]+$/i);
     else assert.equal(carName, 'Kairo KX-R');
-    assert.equal(await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button').count(), 0, 'Active car has no redundant selection/purchase button');
+    assert.equal(await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button:not(.garage-workshop-link)').count(), 0, 'Active car has no redundant selection/purchase button');
     await verifyArtwork(page, width, locale);
     const geometry = await page.locator('.garage-active-summary').evaluate(element => {
       const box = element.getBoundingClientRect();
@@ -106,6 +110,7 @@ try {
     await verifyArtwork(page, width, locale);
     const ids = ['vehicle:kairo-senda', 'vehicle:namera-lilt', 'vehicle:kairo-kx-r'];
     for (const id of ids) {
+      await openGarageVehicle(page, id);
       const card = page.locator('article[aria-labelledby="' + id + '-heading"]');
       await card.locator('.purchase-button').click();
       const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
@@ -113,13 +118,14 @@ try {
       assert.equal(saved.state.garage.activeVehicleId, ids[0], 'Later purchase preserves first activation');
     }
     for (const id of [ids[1], ids[2], ids[0]]) {
+      await openGarageVehicle(page, id);
       const card = page.locator('article[aria-labelledby="' + id + '-heading"]');
-      const select = card.locator('button');
+      const select = card.locator('button:not(.garage-workshop-link)');
       await select.focus(); await page.keyboard.press('Enter');
       const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
       assert.equal(saved.version, 24); assert.equal(saved.state.garage.activeVehicleId, id);
-      assert.equal(await card.locator('button').count(), 0);
-      assert.equal(await page.locator('.garage button').count(), 3);
+      assert.equal(await card.locator('button:not(.garage-workshop-link)').count(), 0);
+      assert.equal(await page.locator('.vehicle-specification button:not(.garage-workshop-link)').count(), 3);
       assert.equal(saved.state.garage.ownedVehicleIds.length, 3);
     }
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Three-car Garage fits viewport');

@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -34,8 +35,8 @@ async function verifyPaintEdges(page) {
     }
   };
   const { body, protected: protectedPoints } = cases[car];
-  await page.locator('#appearance-vehicle').selectOption(car);
-  const style = await page.addStyleTag({ content: '.paint-studio-layout{display:block}.paint-preview{width:720px}.paint-preview .vehicle-image{width:720px;height:405px;aspect-ratio:auto}.global-chrome{position:static!important}' });
+  await openCollectionView(page, 'appearance'); await page.locator('#appearance-vehicle').selectOption(car);
+  const style = await page.addStyleTag({ content: '.paint-studio-layout{display:block}.paint-preview{width:720px}.paint-preview .vehicle-image{width:720px;height:405px;aspect-ratio:auto}.global-chrome,.collection-navigation,.workshop-navigation{position:static!important}' });
   async function sample(name) {
     const target = page.locator('.paint-preview .vehicle-image');
     await target.locator('img').evaluate(img => img.decode());
@@ -95,12 +96,12 @@ try {
     }, { fixture, locale });
     await page.goto('http://127.0.0.1:4178');
     await page.locator('.primary-navigation button').nth(3).click();
-    await page.locator('.section-index button').nth(2).click();
+    await openCollectionView(page, 'appearance');
     assert.equal(await page.evaluate(() => document.activeElement.id), 'appearance-heading');
     const original = (await saved(page)).state;
     const applied = {};
     for (const [car, looks] of catalog) {
-      await page.locator('#appearance-vehicle').selectOption(car);
+      await openCollectionView(page, 'appearance'); await page.locator('#appearance-vehicle').selectOption(car);
       for (const look of looks) {
         const before = (await saved(page)).state.garage;
         await studio(page).locator('[data-look-id="' + look + '"]').click();
@@ -142,7 +143,7 @@ try {
     await page.reload(); await page.locator('.primary-navigation button').nth(3).click();
     assert.deepEqual((await saved(page)).state.garage.appearances, applied);
     assert.equal((await saved(page)).version, 24);
-    await page.locator('#appearance-vehicle').selectOption(K);
+    await openCollectionView(page, 'appearance'); await page.locator('#appearance-vehicle').selectOption(K);
     await studio(page).locator('.finish-option').first().click();
     await studio(page).locator('.discard-appearance').click();
     assert.equal(await studio(page).locator('.vehicle-image').getAttribute('data-appearance'), applied[K]);
