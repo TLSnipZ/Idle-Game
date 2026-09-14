@@ -1,5 +1,4 @@
-import { BusinessArtwork } from './BusinessArtwork';
-import { findBusinessArtwork } from './business-artwork';
+import { TerritoryArtwork } from './TerritoryArtwork';
 import { DistrictHeat } from './DistrictHeat';
 import { HeatPanel } from './HeatPanel';
 import { CITY_NAME, TERRITORY_CATALOG } from '../features/territories';
@@ -30,10 +29,9 @@ export function City({ state, paused, onAcquire, onLayLow, onChooseDistrict, onD
       const view = territoryPresentation(state, territory.id, locale);
       if (!view) return null;
       const heading = `${territory.id}-heading`, requirements = `${territory.id}-requirements`;
-      const artwork = findBusinessArtwork(territory.starting ? 'business:dockside-detail' : 'business:solara-nights');
       const description = localizedContent(locale, territory.id, 'description', territory.description);
       return <article key={territory.id} className={`panel territory-card ${view.owned ? 'is-owned' : ''}`} aria-labelledby={heading}>
-        {artwork && <BusinessArtwork artwork={artwork} />}
+        <TerritoryArtwork territoryId={territory.id} />
         <p className="eyebrow">{territory.starting ? text('Starting district', 'Startbezirk') : text('Nightlife district', 'Nightlife-Bezirk')}</p>
         <div className="panel-heading"><h4 id={heading}>{text(territory.name)}</h4>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.status}</span></div>

@@ -15,6 +15,17 @@ async function geometry(page) {
   const bad = await page.locator('.workspace-navigation button').evaluateAll(es => es.some(e => e.scrollWidth > e.clientWidth + 1));
   assert.equal(bad, false, 'Navigation labels fit');
 }
+async function districtArtwork(page) {
+  const images = page.locator('.territory-artwork img');
+  assert.equal(await images.count(), 2);
+  for (const image of await images.all()) {
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate(img => img.decode());
+    assert.ok(await image.evaluate(img => img.naturalWidth > 0 && Math.abs(img.clientWidth / img.clientHeight - img.naturalWidth / img.naturalHeight) < .02), 'District composition is decoded and uncropped');
+  }
+  assert.equal(new Set(await images.evaluateAll(es => es.map(e => e.currentSrc))).size, 2, 'Each district has its own artwork');
+  assert.equal(await page.locator('.territory-card .business-artwork').count(), 0);
+}
 let browser, cases = 0;
 try {
   for (let i = 0; i < 100; i++) { try { if ((await fetch(baseUrl)).ok) break; } catch {} await new Promise(r => setTimeout(r, 100)); }
@@ -29,13 +40,14 @@ try {
     }, { fixture: fixtures[2], locale });
     await page.goto(baseUrl);
     if (await page.locator('.offline-continue').count()) await page.locator('.offline-continue').click();
-    await page.locator('.overview-economy .business-artwork img').waitFor({ state: 'visible' });
-    assert.ok(await page.locator('.overview-economy .business-artwork img').evaluate(img => img.naturalWidth > 0));
+    assert.equal(await page.locator('.overview-economy img').count(), 0, 'Economy summarizes all income without a storefront');
     for (const [index, section] of [2, 4].entries()) {
       await page.locator('.primary-navigation button').nth(section).click();
       for (const id of views[index]) {
         await open(page, id); assert.equal(await page.evaluate(() => document.activeElement?.id), id);
+        if (id === 'city-heading') await districtArtwork(page);
         await geometry(page); await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
+        if (id === 'city-heading') await districtArtwork(page);
         await geometry(page); await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
       }
     }
@@ -58,7 +70,7 @@ try {
     // Repeated global shortcuts must reveal the correct City panel.
     for (let i = 0; i < 2; i++) { await page.locator('.activity-event').click(); assert.ok(await page.locator('.city-events').isVisible()); await open(page, 'crew-heading'); }
     if (locale === 'de' && [390, 1440].includes(width)) {
-      for (const id of views[0]) { await open(page, id); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-${id}-${width}.png`, fullPage: true }); }
+      for (const id of views[0]) { await open(page, id); if (id === 'city-heading') await districtArtwork(page); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-${id}-${width}.png`, fullPage: true }); }
       await page.locator('.primary-navigation button').nth(0).click(); await page.screenshot({ path: `browser-evidence/world-overview-${width}.png`, fullPage: true });
       await page.locator('.primary-navigation button').nth(4).click(); await open(page, 'skill-tree-heading'); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-skills-${width}.png`, fullPage: true });
     }
