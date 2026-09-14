@@ -26,6 +26,15 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
+## Current phase — Design & UX 2.0, first slice
+
+Shared visual hierarchy and the Operations Business portfolio are implemented:
+real Jobs/Businesses/Equipment/Automation views, compact storefront selection and
+one focused detail with mobile Back navigation. Guidance reveals hidden targets.
+See [Design & UX 2.0](docs/DESIGN_UX_2.md) for scope, verification and the remaining whole-game
+sequence. Save v24 / CE1 and gameplay are unchanged. Release evidence is in the PR.
+This user-prioritized redesign precedes IV-C Rendan/Canto.
+
 ## Current phase — Garage and workshop UX
 
 Implemented: separate Garage/Workshop views, compact vehicle selection, ownership

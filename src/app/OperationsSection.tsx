@@ -2,19 +2,17 @@ import { DistrictHeat } from './DistrictHeat';
 import { WATERFRONT, getActiveDistrictId } from '../features/territories';
 import { DiscreetDelivery } from './DiscreetDelivery';
 import { RiskyDelivery } from './RiskyDelivery';
-import { useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { BusinessPortfolio } from './BusinessPortfolio';
 import type { useGame } from './use-game';
 import { RateValue } from './RateValue';
 import { dashboardPresentation } from './dashboard-presentation';
-import { evaluateRequirements } from '../game/requirements';
-import { BUSINESS_CATALOG } from '../features/businesses';
 import { formatReward } from './number-format';
-import { selectBusinessProgress, selectOwnsBusiness, selectCanPurchaseBusiness, selectUpgrade } from '../game/selectors';
+import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { evaluateXpReward } from '../game/xp-reward';
 import { MANUAL_JOB_HEAT } from '../features/heat';
 import { formatXp } from './progression-presentation';
-import { BusinessCard } from './BusinessCard';
 import { ModifierBreakdown } from './ModifierBreakdown';
 import { UpgradeCard } from './UpgradeCard';
 import { UPGRADE_CATALOG } from '../features/upgrades';
@@ -24,18 +22,29 @@ import { selectDispatcher, selectAutoUpgrader } from '../game/automation-selecto
 import { DELIVERY_DISPATCHER, BUSINESS_AUTO_UPGRADER } from '../features/automation';
 import { useLocalizedText } from './LocalizationProvider';
 
-export function OperationsSection({ game }: { readonly game: ReturnType<typeof useGame> }) {
+export function OperationsSection({ game, destination }: { readonly game: ReturnType<typeof useGame>; readonly destination?: { readonly sequence: number; readonly headingId: string } | null }) {
   const text = useLocalizedText();
-  const { snapshot, runtimeError, runStarterJob, upgradeOwnedBusiness, buyBusiness, buyUpgrade, buyAutomation, toggleAutomation, changeAutoUpgraderTarget, automationEvent } = game;
-  const jobs = useRef<HTMLHeadingElement>(null);
-  const businesses = useRef<HTMLHeadingElement>(null);
-  const equipment = useRef<HTMLHeadingElement>(null);
-  const automation = useRef<HTMLHeadingElement>(null);
-
-  function jump(target: HTMLHeadingElement | null) {
-    target?.focus({ preventScroll: true });
-    target?.scrollIntoView({ block: 'start', behavior: 'instant' });
-  }
+  const { snapshot, runtimeError, runStarterJob, buyUpgrade, buyAutomation, toggleAutomation, changeAutoUpgraderTarget, automationEvent } = game;
+  const workspace = useRef<HTMLDivElement>(null);
+  const [view, setView] = useState('starter-heading');
+  const [focusRequest, setFocusRequest] = useState(0);
+  const focusTarget = useRef('starter-heading');
+  const handled = useRef(0);
+  function open(id: string) { focusTarget.current = id; setView(id); setFocusRequest(n => n + 1); }
+  useLayoutEffect(() => {
+    if (!destination) return;
+    const id = destination.headingId;
+    const next = id === 'business-name' || id.startsWith('business:') || id === 'businesses-heading' ? 'businesses-heading'
+      : UPGRADE_CATALOG.some(upgrade => `${upgrade.id}-heading` === id) || id === 'upgrades-heading' ? 'upgrades-heading'
+      : ['automation-heading', 'delegation-heading', 'auto-upgrader-heading'].includes(id) ? 'automation-heading' : 'starter-heading';
+    focusTarget.current = id; setView(next); setFocusRequest(n => n + 1);
+  }, [destination]);
+  useLayoutEffect(() => {
+    if (handled.current === focusRequest) return;
+    handled.current = focusRequest;
+    const target = document.getElementById(focusTarget.current);
+    if (target && workspace.current?.contains(target)) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'start', behavior: 'instant' }); }
+  }, [focusRequest, view]);
 
   const paused = runtimeError !== null;
   const waterfront = getActiveDistrictId(snapshot.state.city) === WATERFRONT.id;
@@ -44,18 +53,19 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
   const unavailable = text('Unavailable', 'Nicht verfügbar');
   const totalProduction = dashboardPresentation(snapshot.state).production;
 
-  return <div className="operations-page">
+  return <div className="operations-page operations-workspace" ref={workspace}>
     <nav className="operations-tabs section-index" aria-label={text('Operations sections', 'Bereiche der Operationen')}>
-      <button type="button" onClick={() => jump(jobs.current)}>{text('JOBS', 'JOBS')}</button>
-      <button type="button" onClick={() => jump(businesses.current)}>{text('BUSINESSES', 'BUSINESSES')}</button>
-      <button type="button" onClick={() => jump(equipment.current)}>{text('EQUIPMENT', 'AUSRÜSTUNG')}</button>
-      <button type="button" onClick={() => jump(automation.current)}>{text('AUTOMATION', 'AUTOMATISIERUNG')}</button>
+      <button type="button" data-operations-view="jobs" aria-pressed={view === 'starter-heading'} onClick={() => open('starter-heading')}>{text('JOBS', 'JOBS')}</button>
+      <button type="button" data-operations-view="businesses" aria-pressed={view === 'businesses-heading'} onClick={() => open('businesses-heading')}>{text('BUSINESSES', 'BUSINESSES')}</button>
+      <button type="button" data-operations-view="equipment" aria-pressed={view === 'upgrades-heading'} onClick={() => open('upgrades-heading')}>{text('EQUIPMENT', 'AUSRÜSTUNG')}</button>
+      <button type="button" data-operations-view="automation" aria-pressed={view === 'automation-heading'} onClick={() => open('automation-heading')}>{text('AUTOMATION', 'AUTOMATISIERUNG')}</button>
     </nav>
 
+    <div hidden={view !== 'starter-heading'} className="operations-view">
     <section className="operations-block jobs-block" aria-labelledby="starter-heading">
       <div className="standard-delivery">
       <div className="operations-section-heading">
-        <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" ref={jobs} tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
+        <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
         <span className="operations-kicker">{text('Manual work', 'Handarbeit')}</span>
       </div>
       <p className="operations-lead">{text('Move a package across your operating district, get paid, and keep HR comfortably fictional.', 'Bring ein Paket durch deinen Einsatzbezirk, kassier ab und lass HR weiterhin angenehm fiktiv bleiben.')}</p>
@@ -79,27 +89,24 @@ export function OperationsSection({ game }: { readonly game: ReturnType<typeof u
 
     <DistrictHeat state={snapshot.state} paused={paused || game.persistence.kind === 'blocked'} onChoose={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
 
-    <section className="operations-block businesses-block" aria-labelledby="businesses-heading">
+    </div>
+    <section hidden={view !== 'businesses-heading'} className="operations-block businesses-block" aria-labelledby="businesses-heading">
       <div className="operations-section-heading business-heading-row">
-        <div><span className="eyebrow">{text('YOUR EMPIRE', 'DEIN IMPERIUM')}</span><h2 id="businesses-heading" className="operations-target" ref={businesses} tabIndex={-1}>{text('Businesses', 'Businesses')}</h2></div>
+        <div><span className="eyebrow">{text('YOUR EMPIRE', 'DEIN IMPERIUM')}</span><h2 id="businesses-heading" className="operations-target" tabIndex={-1}>{text('Businesses', 'Businesses')}</h2></div>
         <div className="business-total-compact"><span>{text('Total production', 'Gesamtproduktion')}</span><strong><RateValue text={totalProduction} /></strong></div>
       </div>
       <p className="operations-lead">{text('Own the block, upgrade the paperwork, and pretend recurring revenue is a personality.', 'Übernimm den Block, upgrade den Papierkram und tu so, als wäre passives Einkommen eine Persönlichkeit.')}</p>
-      <div className="business-grid">{BUSINESS_CATALOG.map(definition => <BusinessCard key={definition.id} definition={definition}
-        requirements={evaluateRequirements(snapshot.state, definition.requirements)}
-        progress={selectBusinessProgress(snapshot.state, definition.id)} owned={selectOwnsBusiness(snapshot.state, definition.id)}
-        canPurchase={selectCanPurchaseBusiness(snapshot.state, definition.id)} paused={paused}
-        onUpgrade={() => upgradeOwnedBusiness(definition.id)} onPurchase={() => buyBusiness(definition.id)} />)}</div>
+      <BusinessPortfolio game={game} destination={destination ?? null} />
     </section>
 
-    <section className="operations-block upgrades-block" aria-labelledby="upgrades-heading">
-      <div className="operations-section-heading"><div><span className="eyebrow">{text('EQUIPMENT', 'EQUIPMENT')}</span><h2 id="upgrades-heading" ref={equipment} tabIndex={-1}>{text('Business Upgrades', 'Business-Upgrades')}</h2></div></div>
+    <section hidden={view !== 'upgrades-heading'} className="operations-block upgrades-block" aria-labelledby="upgrades-heading">
+      <div className="operations-section-heading"><div><span className="eyebrow">{text('EQUIPMENT', 'EQUIPMENT')}</span><h2 id="upgrades-heading" tabIndex={-1}>{text('Business Upgrades', 'Business-Upgrades')}</h2></div></div>
       <p className="operations-lead">{text('Spend money to make money. Economists hate this one extremely obvious trick.', 'Gib Geld aus, um mehr Geld zu machen. Volkswirte hassen diesen erstaunlich offensichtlichen Trick.')}</p>
       <div className="upgrade-catalog">{UPGRADE_CATALOG.map(upgrade => <UpgradeCard key={upgrade.id} view={selectUpgrade(snapshot.state, upgrade.id)} paused={paused} onPurchase={() => buyUpgrade(upgrade.id)} />)}</div>
     </section>
 
-    <section className="operations-block automation-block" aria-labelledby="automation-heading">
-      <div className="operations-section-heading"><div><span className="eyebrow">{text('DELEGATE THE BORING PART', 'DELEGIER DEN LANGWEILIGEN TEIL')}</span><h2 id="automation-heading" className="operations-target" ref={automation} tabIndex={-1}>{text('Automation', 'Automatisierung')}</h2></div></div>
+    <section hidden={view !== 'automation-heading'} className="operations-block automation-block" aria-labelledby="automation-heading">
+      <div className="operations-section-heading"><div><span className="eyebrow">{text('DELEGATE THE BORING PART', 'DELEGIER DEN LANGWEILIGEN TEIL')}</span><h2 id="automation-heading" className="operations-target" tabIndex={-1}>{text('Automation', 'Automatisierung')}</h2></div></div>
       <p className="operations-lead">{text('Let the machinery earn money while you focus on making increasingly expensive decisions.', 'Lass die Maschinen Geld verdienen, während du dich auf zunehmend teure Fehlentscheidungen konzentrierst.')}</p>
       <div className="automation-grid">
         <AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} />

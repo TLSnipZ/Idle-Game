@@ -1,5 +1,13 @@
 # Solara City Art Direction
 
+## Design & UX 2.0 refinement
+
+The shared foundation now uses a quieter charcoal/navy surface, larger section
+headings, stronger numeric hierarchy and consistent selected navigation. Tokens
+remain centralized. Business artwork is retained at its original wide ratio in
+the focused portfolio detail; no approval is implied for new assets. See
+[Design & UX 2.0](DESIGN_UX_2.md) for the staged whole-game overhaul.
+
 ## Identity and scope
 
 Solara City is a premium crime-empire game set in a dark tropical coastal city at
@@ -16,10 +24,10 @@ these roles to the frozen five-section layout. Values are presentation-only.
 
 | Role / token | Value | Use |
 | --- | --- | --- |
-| `--color-background` | `#080e1b` | Calm near-black navy page and inset tracks |
-| `--color-surface` | `#111c2e` | HUD, standard cards, forms |
-| `--color-surface-elevated` | `#20253d` | Violet/navy feature elevation |
-| `--color-border` | `#3c4963` | Quiet separators; never the sole state signal |
+| `--color-background` | `#090e17` | Calm near-black navy page and inset tracks |
+| `--color-surface` | `#141e2c` | HUD, standard cards, forms |
+| `--color-surface-elevated` | `#202b3e` | Violet/navy feature elevation |
+| `--color-border` | `#39485c` | Quiet separators; never the sole state signal |
 | `--color-text` | `#f4f3fa` | Primary readable copy |
 | `--color-secondary` | `#c7cede` | Supporting descriptions |
 | `--color-muted` | `#abb6cc` | Labels and unavailable controls; never low-opacity copy |
@@ -57,8 +65,8 @@ fallbacks provide a sturdy display stack. No remote font request or font binary.
 
 Spacing: xs .25rem, sm .5rem, md 1rem, lg 1.5rem, xl 2rem, 2xl 3rem.
 Existing numbered spacing aliases remain compatible. Use the scale for new work;
-responsive clamps may remain where useful. Radii: control .5rem, card .75rem,
-feature 1rem. Avoid bubble-like pills and arbitrary new radii.
+responsive clamps may remain where useful. Radii: control .5rem, card .9rem,
+feature 1.2rem. Avoid bubble-like pills and arbitrary new radii.
 
 Quiet cool borders organize surfaces. Active navigation adds a magenta inset edge,
 background and underline. Standard/elevated shadows convey depth; accent glow is

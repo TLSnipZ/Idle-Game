@@ -1,10 +1,10 @@
 /* Solara City presentation only. Never import these values into gameplay. */
 :root {
   color-scheme: dark;
-  --color-background: #080e1b;
-  --color-surface: #111c2e;
-  --color-surface-elevated: #20253d;
-  --color-border: #3c4963;
+  --color-background: #090e17;
+  --color-surface: #141e2c;
+  --color-surface-elevated: #202b3e;
+  --color-border: #39485c;
   --color-text: #f4f3fa;
   --color-secondary: #c7cede;
   --color-muted: #abb6cc;
@@ -35,8 +35,8 @@
   --text-stat: clamp(1.3rem, 2.5vw, 1.8rem);
   --tracking-label: .12em;
   --radius-control: .5rem;
-  --radius-card: .75rem;
-  --radius-feature: 1rem;
+  --radius-card: .9rem;
+  --radius-feature: 1.2rem;
   --radius-panel: var(--radius-card);
   --space-xs: .25rem;
   --space-sm: .5rem;
@@ -49,7 +49,7 @@
   --space-3: var(--space-lg);
   --space-4: var(--space-xl);
   --space-5: var(--space-2xl);
-  --shadow-standard: 0 8px 24px #00000024;
+  --shadow-standard: 0 10px 30px #00000026;
   --shadow-elevated: 0 16px 40px #00000038;
   --shadow-accent: 0 0 14px #ff91c418;
   --shadow-focus: 0 0 0 2px var(--color-background);
