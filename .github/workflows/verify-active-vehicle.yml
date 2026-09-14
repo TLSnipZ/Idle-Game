@@ -105,4 +105,11 @@ jobs:
             candidate-tests.json
             candidate-tests.log
             browser-evidence/
+            src/
+            scripts/
+            package.json
+            package-lock.json
+            tsconfig.json
+            vite.config.ts
+            .nvmrc
           retention-days: 7
