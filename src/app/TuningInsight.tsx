@@ -9,7 +9,7 @@ export function TuningInsight({ state, partId }: { readonly state: GameState; re
   if (!insight) return null;
   const { before, after } = insight;
   const rows = [
-    [text('Business Production', 'Business-Produktion'), formatRate(before.production), formatRate(after.production)],
+    [text('Business Production', 'Business-Produktion'), text(formatRate(before.production)), text(formatRate(after.production))],
     [text('Standard delivery · Cash/job', 'Standardlieferung · Cash/Job'), formatReward(before.manual), formatReward(after.manual)],
     [text('Dispatcher · Cash/job', 'Dispatcher · Cash/Job'), formatReward(before.dispatcher), formatReward(after.dispatcher)],
   ];

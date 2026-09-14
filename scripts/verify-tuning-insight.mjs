@@ -43,8 +43,9 @@ try {
     assert.notEqual(await insight.getAttribute('open'), null);
     assert.equal(await insight.locator('dl > div').count(), 3);
     assert.ok(await insight.locator('.tuning-insight-notice').isVisible());
+    if (locale === 'villager') assert.ok(!/\p{L}/u.test((await insight.textContent()).replace(/[hmr]/gi, '')), 'Villager insight has no readable prose');
     const values = await insight.locator('dd').allTextContents();
-    assert.match(values[0], /\$7\.88\/sec.*\$7\.50\/sec/);
+    assert.match(values[0], /\$7\.88\/.*\$7\.50\//);
     assert.match(values[1], /\$31\.50.*\$34\.02/);
     assert.deepEqual((await saved(page)).garage, garage);
     await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
