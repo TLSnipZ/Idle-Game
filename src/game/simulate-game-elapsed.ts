@@ -24,7 +24,12 @@ export type GameSimulationResult = { readonly ok: false; readonly state: GameSta
 
 function advanceManualReadinessInState(state: GameState, elapsedMs: number): GameState {
   const manualJobs = advanceManualJobReadiness(state.manualJobs, elapsedMs);
-  return manualJobs === state.manualJobs ? state : { ...state, manualJobs };
+  if (manualJobs === state.manualJobs) return state;
+  if (manualJobs === undefined) {
+    const { manualJobs: _manualJobs, ...ready } = state;
+    return ready;
+  }
+  return { ...state, manualJobs };
 }
 
 /** One transaction: production, start-tier job rewards/XP, batch Heat gain, cooling, then manual readiness. */
