@@ -8,16 +8,18 @@ facade gives the wrong meaning. District cards describe neighborhoods, not venue
 Remove Economy imagery and replace the two district facades with dedicated views.
 No gameplay, save, balance, navigation, Business artwork or vehicle changes.
 
-## Candidate contract — pending user selection
+## Approved district contract
 
 Both candidates were generated with the built-in Imagegen tool on 2026-09-14.
 They are original environment images, not edits of the user's review screenshots.
-They are NOT approved Golden References. The source PNGs are the generated images
-displayed in the conversation; no file is promoted into `assets/reference`.
-The user must select the territory reference candidates before publication,
-following `ART_DIRECTION.md`'s new-category review process.
+The user explicitly approved both displayed images with “Ja passt” on 2026-09-14.
+This satisfies the new-category selection gate in `ART_DIRECTION.md`. The source
+PNGs are the generated images displayed in the conversation. The exact runtime
+WebPs below are the approved, repository-backed visual references; their existing
+`-candidate` filenames are retained to avoid changing the tested asset imports.
+Use these images and this framing/lighting contract for future district work.
 
-| District | Source generation identifier | Review runtime asset |
+| District | Source generation identifier | Approved runtime asset |
 | --- | --- | --- |
 | Waterfront | `exec-9d28abf9-7c59-459e-8c95-91ce0dea1d6c.png` | `src/assets/territories/waterfront-candidate.webp` |
 | Neon Mile | `exec-3743f3c0-571a-4b2b-a320-11c7e39aaded.png` | `src/assets/territories/neon-mile-candidate.webp` |
@@ -51,4 +53,6 @@ The existing world-workspace browser matrix checks that Economy has no image,
 both district images decode, have distinct sources and keep their intrinsic
 ratio at five viewport widths in EN/DE/Villager. Existing navigation, 125% text,
 draft preservation and confirmation checks remain. Build/test/browser evidence
-and the outstanding user artwork selection are recorded in the draft PR.
+and user artwork approval are recorded in PR #47. All 2,550 tests and full CI
+passed on 46eb88f; the subsequent approval commit changes documentation only.
+Deployment and live verification evidence are recorded in the PR.

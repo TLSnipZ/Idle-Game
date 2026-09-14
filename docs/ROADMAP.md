@@ -1,11 +1,11 @@
 # Roadmap
 
-## UI correction — district artwork review
+## UI correction — approved district artwork
 
 The user rejected storefront imagery in Economy and Districts after PR #46.
 Economy is now text/value-led. Waterfront and Neon Mile have separate generated
-district-wide candidates, displayed uncropped at their original ratio. This is a
-review draft; the new territory category is not approved or released yet. See
+district-wide images, displayed uncropped at their original ratio. The user
+approved both images with “Ja passt” on 2026-09-14. Release evidence is in PR #47. See
 [District artwork](DISTRICT_ARTWORK.md) for provenance, review and verification.
 Save v24 / CE1 and gameplay are unchanged.
 

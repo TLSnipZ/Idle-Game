@@ -64,8 +64,8 @@ displays a Business storefront: its figures describe the whole operation.
 No fabricated history, projected income or additional gameplay is introduced.
 
 City has Districts & Heat / Crew / Events panels. The user rejected the reused
-Business facades in district cards. Dedicated elevated district-view candidates
-now replace them in the review draft; see [District artwork](DISTRICT_ARTWORK.md). Crew uses monograms, explicit compatible roles, current assignments and
+Business facades in district cards. Dedicated elevated district views,
+explicitly approved by the user on 2026-09-14, now replace them; see [District artwork](DISTRICT_ARTWORK.md). Crew uses monograms, explicit compatible roles, current assignments and
 existing recruitment/assignment controls. Monograms also obey Villager localization.
 Events keep outcome and affordability information next to their actions.
 
@@ -85,7 +85,7 @@ selectors and confirmation controllers remain above this navigation.
 
 WorldWorkspace.css scopes the remaining page compositions; no new dependency,
 external font. The subsequent district-art review adds two dedicated image
-candidates. Garage and Operations retain the accepted layouts.
+assets. Garage and Operations retain the accepted layouts.
 
 Verification adds focused draft/destination/confirmation interaction tests and a
 15-case browser matrix across EN/DE/Villager and five widths. Each City/Empire view
