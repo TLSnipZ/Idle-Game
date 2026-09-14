@@ -18,8 +18,6 @@
 .overview-command > .overview-player { grid-column: span 4; background: var(--gradient-surface); }
 .overview-command > .overview-crew, .overview-command > .overview-collection { grid-column: span 6; }
 .overview-command .summary-card { display: flex; flex-direction: column; }
-.overview-command .overview-economy > .business-artwork { margin: -1.8rem -1.8rem 1.4rem; overflow: hidden; aspect-ratio: 728 / 189; }
-.overview-economy > .business-artwork img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .overview-command .overview-economy .summary-value { font-size: clamp(2rem, 4vw, 3.5rem); color: var(--color-cool); }
 .overview-command .overview-player .player-progress { border: 0; background: transparent; padding: 0; }
 .overview-command .overview-player .player-level { font-size: 2rem; }
@@ -30,13 +28,13 @@
 .overview-command .summary-card h2 { color: var(--color-secondary); font-size: .8rem; }
 .overview-command .summary-card > p { font-size: .95rem; line-height: 1.6; }
 
-/* District identities reuse approved local storefronts, never a fictitious map. */
+/* District-wide views retain their whole composition; gameplay facts stay in HTML. */
 .city-workspace .city > .panel-heading, .city-workspace .crew > .panel-heading { padding-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
 .city-workspace .district-pressure-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 1fr); gap: 1.5rem; align-items: start; }
 .city-workspace .territory-catalog { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
 .city-workspace .territory-card { overflow: hidden; padding: 1.5rem; }
-.city-workspace .territory-card .business-artwork { margin: -1.5rem -1.5rem 1.2rem; aspect-ratio: 728 / 189; overflow: hidden; }
-.city-workspace .territory-card .business-artwork img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.city-workspace .territory-card .territory-artwork { margin: -1.5rem -1.5rem 1.2rem; overflow: hidden; }
+.city-workspace .territory-card .territory-artwork img { width: 100%; height: auto; display: block; }
 .city-workspace .territory-card h4 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin-block: .25rem; }
 .city-workspace .territory-card .territory-effect { padding: .8rem; border-inline-start: 3px solid var(--color-cool); background: var(--color-cool-tint); }
 .city-workspace .district-heat { margin-bottom: 1.5rem; padding: 1.25rem; border-radius: var(--radius-card); border: 1px solid var(--color-border); background: var(--color-surface); }
@@ -97,7 +95,6 @@
 @media (max-width: 740px) {
   #section-content[data-section="overview"] > .overview-command { grid-template-columns: minmax(0, 1fr); }
   .overview-command > article, .overview-command > .overview-economy, .overview-command > .overview-player, .overview-command > .overview-crew, .overview-command > .overview-collection { grid-column: 1; }
-  .overview-command .overview-economy > .business-artwork { margin: -1.1rem -1.1rem 1rem; }
   .focused-workspace .workspace-navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .focused-workspace .workspace-navigation button { padding: .75rem .4rem; font-size: .85rem; }
   .city-workspace .crew-slots, .city-workspace .event-choices, .empire-workspace .rebirth-policy, .empire-workspace .skill-nodes, .empire-workspace .achievement-grid, .empire-workspace .statistics-grid, .empire-workspace .save-grid { grid-template-columns: minmax(0, 1fr); }

@@ -1,5 +1,15 @@
 # Post-roadmap priorities
 
+## UI correction — district artwork review
+
+The user rejected storefront imagery in Economy and Districts after PR #46.
+Economy is now text/value-led. Waterfront and Neon Mile have separate generated
+district-wide candidates, displayed uncropped at their original ratio. This is a
+review draft; the new territory category is not approved or released yet. See
+[District artwork](DISTRICT_ARTWORK.md) for provenance, review and verification.
+Save v24 / CE1 and gameplay are unchanged.
+
+
 ## Current phase — Design & UX 2.0, remaining workspaces
 
 Overview now prioritizes income and progression with approved storefront art.

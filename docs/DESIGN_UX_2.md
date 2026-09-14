@@ -58,14 +58,14 @@ do not navigate or remount the detailed card.
 
 ## Remaining workspaces: implementation
 
-Overview uses a 12-column desktop composition: income and the highest owned
-Business storefront (Dockside for a new game), career progress, local pressure,
-Empire Points and decisions. It reuses approved art and existing selectors.
+Overview uses a 12-column desktop composition: income, career progress, local
+pressure, Empire Points and decisions. After user review, Economy no longer
+displays a Business storefront: its figures describe the whole operation.
 No fabricated history, projected income or additional gameplay is introduced.
 
-City has Districts & Heat / Crew / Events panels. District identities reuse the
-approved Dockside and Solara Nights venue artworks as atmosphere, not a geographic
-map. Crew uses monograms, explicit compatible roles, current assignments and
+City has Districts & Heat / Crew / Events panels. The user rejected the reused
+Business facades in district cards. Dedicated elevated district-view candidates
+now replace them in the review draft; see [District artwork](DISTRICT_ARTWORK.md). Crew uses monograms, explicit compatible roles, current assignments and
 existing recruitment/assignment controls. Monograms also obey Villager localization.
 Events keep outcome and affordability information next to their actions.
 
@@ -84,7 +84,8 @@ Rebirth review through the same one-shot destination path. Runtime, persistence,
 selectors and confirmation controllers remain above this navigation.
 
 WorldWorkspace.css scopes the remaining page compositions; no new dependency,
-external font or generated art. Garage and Operations retain the accepted layouts.
+external font. The subsequent district-art review adds two dedicated image
+candidates. Garage and Operations retain the accepted layouts.
 
 Verification adds focused draft/destination/confirmation interaction tests and a
 15-case browser matrix across EN/DE/Villager and five widths. Each City/Empire view
