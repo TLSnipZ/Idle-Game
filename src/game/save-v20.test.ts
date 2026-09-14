@@ -13,7 +13,7 @@ describe('v19 to v20 district migration', () => {
   it.each([false, true])('retains the complete legacy state and timestamp, Neon owned=%s', owned => {
     const s = owned ? state() : createInitialGameState(), input = envelope(s, 19), before = JSON.stringify(input);
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: envelope(s, 25) });
+    expect(result).toEqual({ ok: true, envelope: envelope(s, 26) });
     expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
     expect(JSON.stringify(input)).toBe(before);
     if (!result.ok) throw Error('migration');
@@ -24,7 +24,7 @@ describe('v19 to v20 district migration', () => {
     const s = state(), value = { ...s, city: switchCityDistrict(s.city, N.id) };
     const saved = serializeSave(value, 123456), code = exportSaveCode(value, 123456);
     if (!saved.ok || !code.ok) throw Error('fixture');
-    expect(parseSave(saved.serialized)).toEqual({ ok: true, envelope: envelope(value, 25) });
+    expect(parseSave(saved.serialized)).toEqual({ ok: true, envelope: envelope(value, 26) });
     expect(validateSaveCode(code.code)).toEqual(parseSave(saved.serialized));
     const valid = validateSaveState(value);
     expect(valid?.city.districts).not.toBe(value.city.districts);
@@ -53,6 +53,6 @@ describe('v19 to v20 district migration', () => {
     expect(validateSaveState({ ...owned, city: { ...owned.city, ownedTerritoryIds: ids,
       districts: { activeId: N.id, parked: { heat: 0, heatDecayElapsedMs: 0 } } } })).toBeNull();
     expect(validateSaveState({ ...owned, city: { ...owned.city, get districts() { throw Error('getter'); } } })).toBeNull();
-    expect(migrateToCurrentSave(envelope(s, 26))).toEqual({ ok: false, error: 'unsupported-version' });
+    expect(migrateToCurrentSave(envelope(s, 27))).toEqual({ ok: false, error: 'unsupported-version' });
   });
 });

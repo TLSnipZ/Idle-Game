@@ -51,7 +51,9 @@ export function VehicleTuning({ state, paused, onConfigure, selectedVehicle, onC
           ? text('Decoy cost · stacks with active support', 'Ablenkungskosten · mit aktiver Unterstützung kombinierbar')
           : part.modifier.target.stat === 'business-production'
             ? text('Business Production', 'Business-Produktion')
-            : text('Manual Job Cash · no Dispatcher bonus', 'Manueller Job-Cash · kein Dispatcher-Bonus');
+            : part.modifier.target.stat === 'job-reward' && part.modifier.target.context === 'dispatcher'
+              ? text('Dispatcher Cash · no manual bonus', 'Dispatcher-Cash · kein manueller Bonus')
+              : text('Manual Job Cash · no Dispatcher bonus', 'Manueller Job-Cash · kein Dispatcher-Bonus');
       return <article className="tuning-option" key={part.id} data-tuning-id={part.id}>
         <p className="eyebrow">{text(part.category, part.germanCategory)}</p>
         <h4>{text(part.name, part.germanName)}</h4>

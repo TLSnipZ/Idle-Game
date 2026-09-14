@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 25;
+export const CURRENT_SAVE_VERSION = 26;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -141,6 +141,13 @@ function validateState(value: unknown, version: number): GameState | null {
   const appearances = record(value.garage) && Object.hasOwn(value.garage, 'appearances') ? value.garage.appearances : undefined;
   if (record(value.garage) && Object.hasOwn(value.garage, 'appearances')
     && !isVehicleAppearances(appearances, ownedVehicleIds)) return null;
+  // v25 and earlier only support customization for the three Tier-1 models.
+  // Freeze this boundary before the current catalogs gain Tier-2 parts/finishes.
+  if (version <= 25) {
+    const tierOne = [KXR_VEHICLE_ID, 'vehicle:kairo-senda', 'vehicle:namera-lilt'];
+    if (record(builds) && Object.keys(builds).some(id => !tierOne.includes(id))) return null;
+    if (record(appearances) && Object.keys(appearances).some(id => !tierOne.includes(id))) return null;
+  }
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
   if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : []), ...(version >= 13 ? ['unlockedAchievementIds'] : []), ...(version >= 14 ? ['statistics'] : [])])
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
@@ -317,6 +324,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 23) migrated = validateState(migrated, 23);
   // v24 -> v25: preserve four-car saves before accepting Rendan and Canto.
   if (value.version <= 24) migrated = validateState(migrated, 24);
+  // v25 -> v26: retain all six cars and existing Tier-1 builds/looks; grant nothing.
+  if (value.version <= 25) migrated = validateState(migrated, 25);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

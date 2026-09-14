@@ -66,7 +66,7 @@ try {
     });
     await page.locator('.garage-active-summary').waitFor();
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-    assert.equal(saved.version, 25);
+    assert.equal(saved.version, 26);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
     await openGarageVehicle(page, 'vehicle:kairo-kx-r');
     if (!owner) {
@@ -123,7 +123,7 @@ try {
       const select = card.locator('button:not(.garage-workshop-link)');
       await select.focus(); await page.keyboard.press('Enter');
       const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-      assert.equal(saved.version, 25); assert.equal(saved.state.garage.activeVehicleId, id);
+      assert.equal(saved.version, 26); assert.equal(saved.state.garage.activeVehicleId, id);
       assert.equal(await card.locator('button:not(.garage-workshop-link)').count(), 0);
       assert.equal(await page.locator('.vehicle-specification button:not(.garage-workshop-link)').count(), 5);
       assert.equal(saved.state.garage.ownedVehicleIds.length, 3);

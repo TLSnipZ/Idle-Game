@@ -61,10 +61,10 @@ it('migrates v23 exactly without grants and preserves current CE1 Serein ownersh
     builds:{[K.id]:{purchasedIds:['tuning:kxr-courier-ecu' as const],selectedId:'tuning:kxr-courier-ecu' as const}},
     appearances:{[K.id]:'appearance:kxr-coastal' as const}}};
   expect(migrateToCurrentSave({format:SAVE_FORMAT,version:23,savedAt:1234,state:old}))
-    .toEqual({ok:true,envelope:{format:SAVE_FORMAT,version: 25,savedAt:1234,state:old}});
+    .toEqual({ok:true,envelope:{format:SAVE_FORMAT,version: 26,savedAt:1234,state:old}});
   const bought=purchaseVehicle(old,N.id).state;
   const saved=serializeSave(bought,5678);if(!saved.ok)throw Error(saved.error);
-  expect(parseSave(saved.serialized)).toMatchObject({ok:true,envelope:{version: 25,state:bought,savedAt:5678}});
+  expect(parseSave(saved.serialized)).toMatchObject({ok:true,envelope:{version: 26,state:bought,savedAt:5678}});
   const code=exportSaveCode(bought,5678);if(!code.ok)throw Error(code.error);
   expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{state:bought}});
 });
@@ -73,6 +73,6 @@ it('rejects foreign finishes/parts and unowned selection for the factory-only mo
   expect(selectVehicleAppearance(state,N.id,'appearance:kxr-coastal').ok).toBe(false);
   expect(purchaseTuning(state,'tuning:kxr-courier-ecu').ok).toBe(false);
   expect(setActiveVehicle(createInitialGameState(),N.id)).toMatchObject({ok:false,error:'vehicle-not-owned'});
-  expect(migrateToCurrentSave({format:SAVE_FORMAT,version: 25,savedAt:0,state:{
+  expect(migrateToCurrentSave({format:SAVE_FORMAT,version: 26,savedAt:0,state:{
     ...state,garage:{...state.garage,appearances:{[N.id]:'appearance:kxr-coastal'}}}}).ok).toBe(false);
 });

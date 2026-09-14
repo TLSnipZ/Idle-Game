@@ -260,8 +260,8 @@ describe('navigation around the unchanged authoritative runtime', () => {
   it('v17 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
     const state = autoUpgraderState(), h = harness(view(state)); h.select(SECTION.empire.id); h.rebirthControls.request();
     const saved = serializeSave(state,1234), code = exportSaveCode(state,1234); if (!saved.ok || !code.ok) throw Error('fixture');
-    expect(CURRENT_SAVE_VERSION).toBe(25); expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 25,state}});
+    expect(CURRENT_SAVE_VERSION).toBe(26); expect(code.code.startsWith('CE1-')).toBe(true);
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 26,state}});
     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
   });
 });
