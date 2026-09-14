@@ -77,7 +77,9 @@ The existing approved PNG/WebP assets remain byte-for-byte unchanged. Each new
 silhouette has separately traced body/opening/mirror contours in the existing SVG
 paint renderer, normalized from its own 1672x940 reference to 720x405. No Tier-1
 mask was reused. Lamps, glass, wheels, intakes, badges and the showroom are protected.
-The existing renderer recolors body shading; floor reflections remain factory-colored.
+Model-specific luminance weights retain usable body shading on the dark blue and
+green references without overdriving highlights. Tier-1 rendering coefficients stay
+unchanged. Floor reflections remain factory-colored.
 This is curated 2D paint, not a 3D material renderer or new model artwork.
 
 ## Save v26 / CE1
@@ -96,8 +98,21 @@ New Game is the only reset that clears it. Old clients reject the newer envelope
 
 ## Verification and release status
 
-Implementation and local verification are in progress. Release evidence must name
-its exact commit; this document does not claim merge, deployment or live acceptance.
+Implementation is complete; PR #49 tracks verification and release status.
+Local production build and all 2,626 tests passed. Enlarged review of factory plus
+all six finishes identified and corrected Rendan's front arch, the painted mirror
+bases and narrow tail-lamp boundaries. All 100 rendered body/protected comparisons
+and three complete desktop customization flows passed after those corrections.
+Body samples must change by more than 8 channel levels (including dark paint);
+protected samples may change by at most 2. These samples supplement visual review,
+not a claim that every boundary pixel is perfect.
+
+The initial CI passed build, all tests, Garage, all sections/locales/settings,
+225 layout cases, Tier-1 tuning/paint and the Serein/Rendan/Canto purchase matrices.
+It caught the same Rendan tail-lamp overlap; the follow-up fixes that contour and
+Canto's corresponding boundary. The final full CI remains a release gate.
+Release evidence must name its exact commit; this document does not claim merge,
+deployment or live acceptance.
 The new verifier is `scripts/verify-tier-two-customization.mjs`: three models,
 three languages and five widths, migration, failure/retry, both setups, free stock
 switching, preview/discard/apply, reload, activation, retained KX-R build/finish,

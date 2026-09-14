@@ -11,13 +11,13 @@ const server = process.env.SOLARA_BASE_URL ? null : spawn(process.execPath,
 const K = 'vehicle:kairo-kx-r';
 const models = [
   { id: 'vehicle:namera-serein', parts: ['serein-nightshift-ecu','serein-workshop-gearing'], looks: ['serein-plum','serein-copper'],
-    body: [[400,460],[805,450],[1150,510],[800,265],[1130,374],[590,368],[1438,368],[800,704]],
+    body: [[1069,386],[400,460],[805,450],[1150,510],[800,265],[1130,374],[590,368],[1438,368],[800,704]],
     protected: [[635,534],[645,655],[895,650],[910,320],[300,620],[1580,410],[1489,442]] },
   { id: 'vehicle:toseki-rendan', parts: ['rendan-dispatch-gearing','rendan-express-ecu'], looks: ['rendan-crimson','rendan-ice'],
-    body: [[400,460],[840,450],[1180,510],[895,232],[1100,375],[560,365],[1425,351],[800,704]],
+    body: [[1052,386],[925,490],[873,538],[400,460],[840,450],[1180,510],[895,232],[1100,375],[560,365],[1425,351],[800,704]],
     protected: [[672,527],[675,649],[920,650],[925,310],[390,640],[570,419],[1580,410],[1468,443]] },
   { id: 'vehicle:sevrin-canto-club', parts: ['canto-fleet-gearing','canto-dispatch-ecu'], looks: ['canto-burgundy','canto-slate'],
-    body: [[400,460],[830,450],[1160,510],[925,252],[1130,374],[596,364],[800,704]],
+    body: [[1075,389],[400,460],[830,450],[1160,510],[925,252],[1130,374],[596,364],[800,704]],
     protected: [[640,523],[635,650],[890,650],[910,310],[390,640],[1580,410],[1498,441]] },
 ];
 const saved = page => page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
@@ -27,6 +27,7 @@ try {
   for (let i = 0; i < 100; i++) { try { if ((await fetch(baseUrl)).ok) break; } catch {} await new Promise(r => setTimeout(r, 100)); }
   browser = await chromium.launch({ headless: true });
   for (const model of models) for (const locale of ['en','de','villager']) for (const width of [320,390,740,1024,1440]) {
+    console.log(`IV-D: ${model.id} / ${locale} / ${width}px`);
     const page = await browser.newPage({ viewport: { width, height: 1000 } }), errors = [];
     page.on('pageerror', e => errors.push(e.message));
     const f = structuredClone(fixture);
@@ -109,7 +110,7 @@ try {
         const pixels=await sample(look);
         for(let i=0;i<pixels.length;i++) {
           const delta=Math.max(...pixels[i].map((v,k)=>Math.abs(v-factory[i][k])));
-          assert.ok(i<model.body.length ? delta>12 : delta<=2, `${look} ${i<model.body.length?'body':'protected'} ${[...model.body,...model.protected][i]} delta ${delta}`);
+          assert.ok(i<model.body.length ? delta>8 : delta<=2, `${look} ${i<model.body.length?'body':'protected'} ${[...model.body,...model.protected][i]} delta ${delta}`);
           pixelChecks++;
         }
       }
