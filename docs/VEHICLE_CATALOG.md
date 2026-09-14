@@ -1,5 +1,39 @@
 # Solara City Vehicle Catalog
 
+## Future vehicle wishlist — user request, 2026-09-14
+
+The user requested Lancer Evo IX, Silvia S15, Nissan GT-R, Skyline R34,
+Nissan 180SX and Honda NSX for the future collection, explicitly retaining
+Solara's fictional lore. Preserve existing identities rather than adding duplicates.
+This updates planning only: six live models, seventeen total catalog identities
+(fourteen original plus three new proposals). Older counts below describe the
+original catalog checkpoint.
+
+| Internal real-world reference | Solara identity | Planning status / personality |
+| --- | --- | --- |
+| Lancer Evolution IX | **Toseki Raizan** | Existing planned identity, reaffirmed; purposeful AWD rally sedan, distinct from the already released Rendan |
+| Silvia S15 | **Namera Serein** | Already live; fulfills this request, retain its approved model reference |
+| Nissan GT-R | **Toseki Kazan** (proposed name) | New modern technical AWD flagship coupe; interpret this request as the R35 generation because the R34 is separately requested |
+| Nissan Skyline R34 | **Toseki Arashi** | Existing planned identity, reaffirmed; angular heritage AWD coupe, separate from Kazan |
+| Nissan 180SX | **Namera Shiore** (proposed name) | New 1990s FR fastback with pop-up-headlight character; approachable coastal drift/build platform, distinct from Serein and Luma |
+| Honda NSX | **Kairo Reika** (proposed name) | New lightweight mid-engine precision sports car; provisionally use the classic first-generation archetype, extending Kairo's performance heritage |
+
+Kazan belongs to Toseki's established technical GT division. Shiore extends
+Namera's light FR specialist family. Reika is Kairo's aspirational engineering
+halo above its accessible enthusiast range; no additional manufacturer is needed.
+The three new names and the provisional GT-R/NSX generation interpretations are
+planning proposals, not user-approved model artwork or locked production IDs.
+
+Real-world names stay internal. Future player-facing names, badges, descriptions
+and model artwork must use Solara's own manufacturers and distinct designs under
+the fictionalization rules below. Keep recognizable broad body/era character,
+with original lights, openings, surfacing, aero and details.
+
+Prices, tiers, unlock gates, bonuses, implementation order and artwork remain
+deferred to a dedicated balance/design pass. The existing Raizan/Arashi historical
+numeric proposals are not newly approved by this request. This wishlist does not
+start implementation or replace the separately planned IV-D customization phase.
+
 ## Current phase — Garage IV-C: Rendan and Canto Club
 
 Implemented with user-approved model artwork: Rendan ($115,000, Player 12 /

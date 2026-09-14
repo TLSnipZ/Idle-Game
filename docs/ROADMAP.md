@@ -1,5 +1,16 @@
 # Roadmap
 
+## Future vehicle wishlist — recorded 2026-09-14
+
+Recorded the user's six requested automotive inspirations in
+[Vehicle catalog](VEHICLE_CATALOG.md#future-vehicle-wishlist--user-request-2026-09-14).
+Serein already covers S15; retain planned Raizan (Evo IX) and Arashi (R34).
+Add proposed Toseki Kazan (modern GT-R/R35), Namera Shiore (180SX) and
+Kairo Reika (classic NSX): seventeen planned/live identities in total, six live.
+Use fictional Solara branding and distinct model designs. New names and generation
+interpretations are proposals; pricing, bonuses, artwork and release order remain
+future work. This records the wishlist without starting a content phase.
+
 ## Current phase — Garage IV-C: Rendan and Canto Club
 
 Implemented with user-approved model artwork: Rendan ($115,000, Player 12 /
