@@ -31,10 +31,10 @@ export type RiskyDeliveryResult = StarterJobResult
   | { readonly ok: false; readonly state: GameState; readonly error: 'too-hot' };
 
 export function performRiskyDelivery(state: GameState): RiskyDeliveryResult {
-  const blocked = readinessFailure(state);
-  if (blocked) return blocked;
   const view = selectRiskyDelivery(state);
   if (view.tooHot) return { ok: false, state, error: 'too-hot' };
+  const blocked = readinessFailure(state);
+  if (blocked) return blocked;
   return completeDelivery(state, view.reward, view.heatGain);
 }
 
@@ -42,10 +42,10 @@ export type DiscreetDeliveryResult = StarterJobResult
   | { readonly ok: false; readonly state: GameState; readonly error: 'already-cold' };
 
 export function performDiscreetDelivery(state: GameState): DiscreetDeliveryResult {
-  const blocked = readinessFailure(state);
-  if (blocked) return blocked;
   const view = selectDiscreetDelivery(state);
   if (view.reduction === 0) return { ok: false, state, error: 'already-cold' };
+  const blocked = readinessFailure(state);
+  if (blocked) return blocked;
   return completeDelivery(state, view.reward, -view.reduction, false);
 }
 
