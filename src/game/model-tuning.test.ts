@@ -95,7 +95,7 @@ describe('model-specific permanent builds', () => {
   it('migrates v21 KX-R builds without grants and keeps the timestamp', () => {
     const s = buy(base(), 'tuning:kxr-courier-ecu');
     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 21, savedAt: 1234, state: s });
-    expect(r).toMatchObject({ ok: true, envelope: { version: 23, savedAt: 1234, state: s } });
+    expect(r).toMatchObject({ ok: true, envelope: { version: 24, savedAt: 1234, state: s } });
     if (!r.ok) throw Error('fixture');
     expect(r.envelope.state.garage.builds?.[K.id]?.purchasedIds).not.toBe(s.garage.builds?.[K.id]?.purchasedIds);
     expect(r.envelope.state.garage.builds?.[S.id]).toBeUndefined();
@@ -104,7 +104,7 @@ describe('model-specific permanent builds', () => {
   it('round-trips every new build through v22 and CE1 and rejects incompatible saved parts', () => {
     const s = [E, F, Q, D].reduce(buy, base()), encoded = serializeSave(s, 1234);
     if (!encoded.ok) throw Error('fixture');
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 23, state: s } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 24, state: s } });
     const code = exportSaveCode(s, 1234); if (!code.ok) throw Error('fixture');
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: s } });
     expect(validateSaveState({ ...s, garage: { ...s.garage, builds: { [S.id]: { purchasedIds: [Q], selectedId: Q } } } })).toBeNull();

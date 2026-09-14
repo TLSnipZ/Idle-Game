@@ -87,7 +87,7 @@ try {
     await part(page, D).click();
     await page.reload(); await nav(page, 3); await page.locator('#tuning-vehicle').selectOption(L);
     const current = await saved(page);
-    assert.equal(current.version, 23);
+    assert.equal(current.version, 24);
     assert.equal(current.state.economy.cash, '93603024');
     assert.deepEqual(current.state.garage.builds[S].purchasedIds, [E, F]);
     assert.deepEqual(current.state.garage.builds[L].purchasedIds, [Q, D]);

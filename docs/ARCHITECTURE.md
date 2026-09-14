@@ -1,5 +1,16 @@
 # Architecture
 
+## Current phase — Garage IV-B: Serein pilot (draft)
+
+Serein purchase, active manual bonus, Save v24 migration and localized factory-only
+customization are prepared. The exact vehicle design is user-approved, but its
+image bytes could not be transferred to the build environment. **Not live and not
+ready to merge until the approved artwork is integrated.**
+See [Serein pilot](SEREIN_PILOT.md) for implemented behavior, verification and the precise
+remaining steps. No new design approval is needed; an attachment of the approved
+image is needed to finish the existing task.
+
+
 ## Current phase — Garage IV-A: Tier-2 catalog/progression analysis
 
 Completed the isolated comparison of proposed Tier-2 cars against today's stock

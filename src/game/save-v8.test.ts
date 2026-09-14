@@ -15,8 +15,8 @@ describe('shared v8 skill schema', () => {
   it('migrates realistic v7 by adding only empty skills; no EP spending, reset or timestamp change', () => {
     const old = legacy(), before = stringifySaveFixture(old);
     const result = parseSave(before);
-    expect(CURRENT_SAVE_VERSION).toBe(23);
-    expect(result).toEqual({ ok: true, envelope: { ...old, version: 23, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
+    expect(CURRENT_SAVE_VERSION).toBe(24);
+    expect(result).toEqual({ ok: true, envelope: { ...old, version: 24, state: { ...old.state, events: { opportunityElapsedMs: 0, pendingEventId: null }, crew: { recruitedIds: [], assignments: { operations: null, logistics: null } }, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: ['territory:waterfront'] },
       permanentProgression: { ...old.state.permanentProgression, statistics: createInitialStatistics(4), skills: {}, unlockedAchievementIds: [] } } } });
     expect(validateSaveCode(encodeSaveText(before))).toEqual(result); expect(stringifySaveFixture(old)).toBe(before);
   });
@@ -25,7 +25,7 @@ describe('shared v8 skill schema', () => {
     const serialized = serializeSave(state, 42), exported = exportSaveCode(state, 42);
     if (!serialized.ok || !exported.ok) throw Error('fixture');
     expect(exported.code.startsWith('CE1-')).toBe(true);
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 23, savedAt: 42, state } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 24, savedAt: 42, state } });
     expect(validateSaveCode(exported.code)).toEqual(parseSave(serialized.serialized));
     expect(serialized.serialized).not.toMatch(/capMs|nextCost|prerequisites|currentEffect|lifetime|skillPoints/);
   });

@@ -18,21 +18,24 @@ function eligible() {
     businesses:{...state.businesses,owned:{[B.id]:{level:10}}}};
 }
 describe('Garage presentation',()=>{
-  it('shows 0/3, scoped effect, accessible unmet requirements and disabled purchase',()=>{
-    const html=render(createInitialGameState());expect(html).toContain('Owned vehicles: 0 / 3');
+  it('shows 0/4, scoped effect, accessible unmet requirements and disabled purchase',()=>{
+    const html=render(createInitialGameState());expect(html).toContain('Owned vehicles: 0 / 4');
     expect(html).toContain('Required — Player Level 5');expect(html).toContain('Required — Own Dockside Detail');
     expect(html).toContain('Required — Dockside Detail Level 5');expect(html).toContain('LOCKED');
     expect(html).toContain('+10% Business Production');expect(html).toContain('$25,000');
     expect(html).toContain('aria-label="Buy Kairo KX-R"');expect(html).toContain('aria-describedby');expect(html).toContain('disabled');
   });
   it('distinguishes readiness, insufficient cash and paused session',()=>{
-    expect(render(eligible())).toContain('Ready to purchase');expect(render(eligible())).not.toContain('disabled');
+    expect(render(eligible())).toContain('Ready to purchase');const cards = render(eligible()).match(/<article[^>]*>[\s\S]*?<\/article>/g) ?? [];
+    expect(cards).toHaveLength(4);
+    for (const card of cards.slice(0,3)) expect(card).not.toContain('disabled');
+    expect(cards[3]).toContain('disabled');
     expect(render({...eligible(),economy:{cash:moneyFromMinorUnits('0')}})).toContain('INSUFFICIENT CASH');
     expect(render(eligible(),true)).toContain('Session paused');expect(render(eligible(),true)).toContain('disabled');
   });
   it('shows grandfathered ownership active with no locks or repurchase button',()=>{
     const html=render({...createInitialGameState(),garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id }});
-    expect(html).toContain('Owned vehicles: 1 / 3');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).toContain('Active vehicle'); expect(html).toContain('OWNED · ACTIVE');
+    expect(html).toContain('Owned vehicles: 1 / 4');expect(html).toContain('OWNED');expect(html).toContain('PERMANENT');expect(html).toContain('Active vehicle'); expect(html).toContain('OWNED · ACTIVE');
     const starterCard = html.match(/<article[^>]*>[\s\S]*?<\/article>/)?.[0] ?? '';
     expect(starterCard).not.toContain('LOCKED');expect(starterCard).not.toContain('<button');
     expect(html).toContain('Buy Kairo Senda'); expect(html).toContain('Buy Namera Lilt');

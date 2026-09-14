@@ -18,6 +18,7 @@ export function VehicleTuning({ state, paused, onConfigure }: {
   const owned = state.garage.ownedVehicleIds.includes(vehicle.id);
   const build = state.garage.builds?.[vehicle.id];
   const selected = findTuning(build?.selectedId);
+  const parts = TUNING_CATALOG.filter(part => part.vehicleId === vehicle.id);
   const active = state.garage.activeVehicleId === vehicle.id;
   return <section className="vehicle-tuning panel" aria-labelledby="tuning-heading">
     <h3 id="tuning-heading" tabIndex={-1}>{text(`${vehicle.model} Workshop`, `${vehicle.model}-Werkstatt`)}</h3>
@@ -26,6 +27,8 @@ export function VehicleTuning({ state, paused, onConfigure }: {
       const chosen = findVehicle(event.target.value);
       if (chosen) setVehicleId(chosen.id);
     }}>{VEHICLE_CATALOG.map(car => <option key={car.id} value={car.id}>{text(car.name)} · {state.garage.ownedVehicleIds.includes(car.id) ? text('Owned', 'Im Besitz') : text('Not owned', 'Nicht im Besitz')}</option>)}</select>
+    {parts.length === 0 ? <p className="stock-only-notice">{text('Factory setup only. This model has no tuning parts yet. The accountant calls that restraint.',
+      'Nur Serienausstattung. Für dieses Modell gibt es noch keine Tuningteile. Der Buchhalter nennt das Zurückhaltung.')}</p> : <>
     <p>{text('One setup per car. Buy permanent parts, switch owned setups or restore stock for free. Rebirth keeps every build. Your accountant keeps every nightmare.',
       'Ein Setup pro Auto. Teile dauerhaft kaufen, gekaufte Setups oder Serie kostenlos wechseln. Rebirth behält jeden Ausbau. Dein Buchhalter behält jeden Albtraum.')}</p>
     <p className="tuning-selection">{text('Fitted:', 'Eingebaut:')} <strong>{selected ? text(selected.name, selected.germanName) : text('Stock', 'Serie')}</strong>
@@ -33,7 +36,7 @@ export function VehicleTuning({ state, paused, onConfigure }: {
     <p>{text('The base vehicle bonus remains. Only one fitted setup adds its effect while that car is active. Choosing a workshop or fitting parts does not activate the car.',
       'Der Basisbonus bleibt. Nur ein eingebautes Setup wirkt zusätzlich, solange dieses Auto aktiv ist. Werkstatt-Auswahl und Einbau aktivieren das Auto nicht.')}</p>
     {!owned && <p>{text(`Own a ${vehicle.name} to unlock this workshop.`, `${vehicle.name} kaufen, um diese Werkstatt freizuschalten.`)}</p>}
-    <div className="tuning-options">{TUNING_CATALOG.filter(part => part.vehicleId === vehicle.id).map(part => {
+    <div className="tuning-options">{parts.map(part => {
       const purchased = build?.purchasedIds.includes(part.id) ?? false;
       const fitted = selected?.id === part.id;
       const canBuy = owned && purchaseTuning(state, part.id).ok;
@@ -58,5 +61,6 @@ export function VehicleTuning({ state, paused, onConfigure }: {
     })}</div>
     <button className="action-button secondary-button tuning-stock" disabled={paused || !selected}
       onClick={() => onConfigure(vehicle.id, null, false)}>{text('Restore stock · keep purchased parts', 'Zur Serie wechseln · gekaufte Teile behalten')}</button>
+    </>}
   </section>;
 }

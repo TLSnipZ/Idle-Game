@@ -18,7 +18,7 @@ it.each(['en', 'de', 'villager'] as const)('%s renders real role differences and
     onPurchase={() => { throw Error('Owned vehicles cannot be purchased'); }} onSelect={onSelect} /></LocalizationProvider>));
   try {
     await render();
-    expect(container.querySelectorAll('.vehicle-card')).toHaveLength(3);
+    expect(container.querySelectorAll('.vehicle-card')).toHaveLength(4);
     expect(container.textContent).toContain('+12%');
     expect(container.textContent).toContain('−3');
     expect(container.textContent).toContain(localize(locale, 'Manual Job Cash · while active', 'Manueller Job-Cash · wenn aktiv'));
@@ -26,7 +26,7 @@ it.each(['en', 'de', 'villager'] as const)('%s renders real role differences and
     expect(button?.disabled).toBe(false); await act(() => button?.click()); await render();
     expect(onSelect).toHaveBeenCalledExactlyOnceWith(L.id);
     expect(container.querySelector('.garage-active-summary strong')?.textContent).toBe(localize(locale, L.name, L.name));
-    expect(container.querySelectorAll('button')).toHaveLength(2);
+    expect(container.querySelectorAll('button')).toHaveLength(3);
     if (locale === 'villager') expect(container.textContent?.match(/\p{L}+/gu)?.every(word => /^[hmr]+$/i.test(word))).toBe(true);
   } finally { await act(() => root.unmount()); vi.unstubAllGlobals(); }
 });
