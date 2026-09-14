@@ -66,5 +66,20 @@ Lilt tradeoffs, unowned model handling, reload and 125% text containment.
 The shared CI also retains all existing regression/browser matrices. Its trigger
 includes the IV-D branch so the dependent PR receives the same checks.
 
-Verification is in progress; the PR records exact checks and release status.
-This document does not claim merge, deployment or live acceptance.
+Implemented in [PR #50](https://github.com/TLSnipZ/Idle-Game/pull/50).
+Final full CI passed on `16458e9d26214c41e2eecb6babd9f6b8ade66993`:
+[run 34895241848](https://github.com/TLSnipZ/Idle-Game/actions/runs/34895241848).
+Strict production build, all **2,643 tests** (zero failures/skips), every existing
+browser matrix and the new **15 purchase-insight cases** passed. This includes
+225 layout cases and the IV-D 45-case / 100-pixel-comparison regression.
+
+Local build and all 17 focused behavior cases passed. The local compact-layout
+matrix passed 15 cases, and German mobile/desktop screenshots were reviewed.
+Initial full CI caught the unconverted `/sec` unit in Villager. The fix routes
+formatted rates through the existing language transformer and adds a readable-prose
+assertion to the new browser matrix; the complete rerun above passed. The final
+completion commit updates this document only, without changing verified code.
+
+PR #49 remained open at kickoff; PR #50 is its dependent follow-up, not a release.
+Neither merge, deployment nor live acceptance is claimed here. Merge #49 first,
+retarget #50 to main and verify integration checks before merging #50.
