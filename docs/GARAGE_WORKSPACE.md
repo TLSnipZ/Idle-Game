@@ -37,3 +37,8 @@ Existing domain/runtime/CE1 coverage is retained. Existing browser scripts now u
 explicit view navigation before acting; purchase, rollback, fitted effects, reload,
 paint pixel checks and all previous behavioral assertions remain release gates.
 Full build, suite, browser and publication evidence is recorded in the release PR.
+
+The paint pixel harness retains the raster phase of PR #43's source samples
+(fractional origin 0.1875, 0.984375 CSS pixels) and excludes sticky navigation from
+its isolated 720x405 image capture. This stabilizes existing edge coordinates across
+layout changes without altering paint masks, sample points or pass thresholds.

@@ -514,12 +514,14 @@ try {
     assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('810'));
     if (locale === 'villager') await assertVillagerOnly(page);
     await navigation(page).nth(3).click();
-    await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button').click();
+    await openGarageVehicle(page, 'vehicle:kairo-kx-r');
+    await page.locator('article[aria-labelledby="vehicle:kairo-kx-r-heading"] button:not(.garage-workshop-link)').click();
     await navigation(page).nth(1).click();
     assert.ok((await page.locator('.manhunt-decoy-button').textContent()).includes('900'));
     assert.equal(await page.locator('.heat-support [data-support-active="true"]').count(), 2);
     await navigation(page).nth(3).click();
-    await page.locator('article[aria-labelledby="vehicle:namera-lilt-heading"] button').click();
+    await openGarageVehicle(page, 'vehicle:namera-lilt');
+    await page.locator('article[aria-labelledby="vehicle:namera-lilt-heading"] button:not(.garage-workshop-link)').click();
     await navigation(page).nth(1).click();
     const decoy = page.locator('.manhunt-decoy-button');
     assert.ok((await decoy.textContent()).includes('810'));

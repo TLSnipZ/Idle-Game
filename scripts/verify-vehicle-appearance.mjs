@@ -41,6 +41,13 @@ async function verifyPaintEdges(page) {
     const target = page.locator('.paint-preview .vehicle-image');
     await target.locator('img').evaluate(img => img.decode());
     await target.scrollIntoViewIfNeeded();
+    // Preserve the raster phase used to record these 720x405 sample points in PR #43.
+    // Otherwise a new card offset shifts edge samples into the neighbouring source pixel.
+    await target.evaluate(element => {
+      element.style.transform = 'none';
+      const box = element.getBoundingClientRect();
+      element.style.transform = `translate(${Math.floor(box.left) + 0.1875 - box.left}px, ${Math.floor(box.top) + 0.984375 - box.top}px)`;
+    });
     const shot = await target.screenshot({ path: 'browser-evidence/' + car.split(':')[1] + '-mask-' + await page.evaluate(() => devicePixelRatio) + '-' + name + '.png' });
     return page.evaluate(async ({ png, points }) => {
       const image = new Image(); image.src = 'data:image/png;base64,' + png; await image.decode();
@@ -63,6 +70,7 @@ async function verifyPaintEdges(page) {
         'Paint leaked into protected artwork at ' + protectedPoints[i-body.length] + ' for ' + look);
     }
   }
+  await page.locator('.paint-preview .vehicle-image').evaluate(element => { element.style.transform = ''; });
   await style.evaluate(el => el.remove());
   checks += 2 * (body.length + protectedPoints.length);
   }
