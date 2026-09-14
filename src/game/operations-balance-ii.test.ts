@@ -22,6 +22,7 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
 
   it('starts a new game ready and retains the $25 floor before the portfolio can beat it', () => {
     const fresh = createInitialGameState();
+    expect(fresh.manualJobs).toBeUndefined();
     expect(isManualJobReady(fresh.manualJobs)).toBe(true);
     expect(manualJobRemainingMs(fresh.manualJobs)).toBe(0);
     expect(evaluateDeliveryRewardBase(fresh, 'manual')).toEqual({ ok: true, base: STARTER_JOB.reward });
@@ -29,7 +30,7 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
   });
 
   it('uses owned unmodified Business production for separate manual and Dispatcher bases', () => {
-    const state = portfolio(); // P = 7*$0.75 + 10*$5 + 1*$15 = $70.25/s.
+    const state = portfolio();
     expect(evaluateDeliveryRewardBase(state, 'manual')).toEqual({ ok: true, base: '56200' });
     expect(evaluateDeliveryRewardBase(state, 'dispatcher')).toEqual({ ok: true, base: '7025' });
     const reward = evaluateJobReward(state);
@@ -40,12 +41,12 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
     const fresh = createInitialGameState();
     const coldFailure = performDiscreetDelivery(fresh);
     expect(coldFailure).toMatchObject({ ok: false, error: 'already-cold' });
-    expect(coldFailure.state.manualJobs.elapsedMs).toBe(MANUAL_JOB_INTERVAL_MS);
+    expect(coldFailure.state.manualJobs).toBeUndefined();
 
     const first = performStarterJob(fresh);
     expect(first.ok).toBe(true);
     if (!first.ok) return;
-    expect(first.state.manualJobs.elapsedMs).toBe(0);
+    expect(first.state.manualJobs).toEqual({ elapsedMs: 0 });
     const second = performRiskyDelivery(first.state);
     expect(second).toMatchObject({ ok: false, error: 'manual-job-not-ready', remainingMs: MANUAL_JOB_INTERVAL_MS });
     expect(second.state).toBe(first.state);
@@ -62,7 +63,7 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
     const ready = simulateGameElapsed(almost.state, 60_000);
     expect(ready.ok).toBe(true);
     if (!ready.ok) return;
-    expect(ready.state.manualJobs.elapsedMs).toBe(MANUAL_JOB_INTERVAL_MS);
+    expect(ready.state.manualJobs).toBeUndefined();
     const one = performStarterJob(ready.state);
     expect(one.ok).toBe(true);
     if (!one.ok) return;
@@ -78,11 +79,15 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
     expect(migrated.envelope.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.envelope.state.economy).toEqual(current.economy);
     expect(migrated.envelope.state.progression).toEqual(current.progression);
-    expect(migrated.envelope.state.manualJobs).toEqual({ elapsedMs: MANUAL_JOB_INTERVAL_MS });
+    expect(migrated.envelope.state.manualJobs).toBeUndefined();
 
-    const invalid = { ...migrated.envelope.state, manualJobs: { elapsedMs: MANUAL_JOB_INTERVAL_MS + 1 } };
-    expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: 1234, state: invalid }))
-      .toEqual({ ok: false, error: 'invalid-state' });
+    for (const elapsedMs of [MANUAL_JOB_INTERVAL_MS, MANUAL_JOB_INTERVAL_MS + 1]) {
+      const invalid = { ...migrated.envelope.state, manualJobs: { elapsedMs } };
+      expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: 1234, state: invalid }))
+        .toEqual({ ok: false, error: 'invalid-state' });
+    }
+    expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 26, savedAt: 1234,
+      state: { ...v26, manualJobs: { elapsedMs: 1 } } })).toEqual({ ok: false, error: 'invalid-state' });
   });
 
   it('round-trips a pending delay through JSON and CE1 export/import', () => {
@@ -96,12 +101,12 @@ describe('Operations Balance II — portfolio-paced rewards and shared readiness
     expect(saved.ok).toBe(true);
     if (!saved.ok) return;
     const parsed = parseSave(saved.serialized);
-    expect(parsed.ok && parsed.envelope.state.manualJobs.elapsedMs).toBe(4000);
+    expect(parsed.ok && parsed.envelope.state.manualJobs?.elapsedMs).toBe(4000);
     const code = exportSaveCode(progressed.state, 5000);
     expect(code.ok).toBe(true);
     if (!code.ok) return;
     const imported = validateSaveCode(code.code);
-    expect(imported.ok && imported.envelope.state.manualJobs.elapsedMs).toBe(4000);
+    expect(imported.ok && imported.envelope.state.manualJobs?.elapsedMs).toBe(4000);
   });
 
   it('retains a pending manual delay through Rebirth instead of manufacturing readiness', () => {
