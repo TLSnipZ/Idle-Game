@@ -5,7 +5,7 @@ import { createInitialCrewState, isCrewState } from '../features/crew';
 import { isLegacyCityState, isTerritoryOwnership, createInitialCityState, isCityState } from '../features/territories';
 import { isSkillRanks } from '../features/skills';
 import { isPermanentValue } from '../features/permanent-progression';
-import { isVehicleBuilds, cloneVehicleBuilds, findVehicle } from '../features/vehicles';
+import { isVehicleAppearances, isVehicleBuilds, cloneVehicleBuilds, findVehicle } from '../features/vehicles';
 import type { VehicleId } from '../features/vehicles';
 import { isXp } from '../features/progression';
 import { createInitialAutomationState, isAutomationState } from '../features/automation';
@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 22;
+export const CURRENT_SAVE_VERSION = 23;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -107,7 +107,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!record(progression) || !keys(progression, ['xp']) || !isXp(progression.xp)) return null;
   const ownedVehicleIds: VehicleId[] = [];
   if (version >= 6) {
-    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds', ...(version >= 18 ? ['activeVehicleId'] : []), ...(version >= 21 && Object.hasOwn(value.garage, 'builds') ? ['builds'] : [])]) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
+    if (!record(value.garage) || !keys(value.garage, ['ownedVehicleIds', ...(version >= 18 ? ['activeVehicleId'] : []), ...(version >= 21 && Object.hasOwn(value.garage, 'builds') ? ['builds'] : []), ...(version >= 23 && Object.hasOwn(value.garage, 'appearances') ? ['appearances'] : [])]) || !Array.isArray(value.garage.ownedVehicleIds)) return null;
     for (const id of value.garage.ownedVehicleIds) {
       const vehicleId = version < 16
         ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
@@ -133,6 +133,9 @@ function validateState(value: unknown, version: number): GameState | null {
   if (record(value.garage) && Object.hasOwn(value.garage, 'builds')
     && !isVehicleBuilds(builds, ownedVehicleIds)) return null;
   if (version < 22 && record(builds) && Object.keys(builds).some(id => id !== KXR_VEHICLE_ID)) return null;
+  const appearances = record(value.garage) && Object.hasOwn(value.garage, 'appearances') ? value.garage.appearances : undefined;
+  if (record(value.garage) && Object.hasOwn(value.garage, 'appearances')
+    && !isVehicleAppearances(appearances, ownedVehicleIds)) return null;
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
   if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : []), ...(version >= 13 ? ['unlockedAchievementIds'] : []), ...(version >= 14 ? ['statistics'] : [])])
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
@@ -153,7 +156,7 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId, ...(builds !== undefined && isVehicleBuilds(builds, ownedVehicleIds) ? { builds: cloneVehicleBuilds(builds) } : {}) }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
+  return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId, ...(appearances !== undefined && isVehicleAppearances(appearances, ownedVehicleIds) ? { appearances: { ...appearances } } : {}), ...(builds !== undefined && isVehicleBuilds(builds, ownedVehicleIds) ? { builds: cloneVehicleBuilds(builds) } : {}) }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
     productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
@@ -303,6 +306,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 20) migrated = validateState(migrated, 20);
   // v21 -> v22: preserve KX-R builds and validate before accepting new model parts.
   if (value.version <= 21) migrated = validateState(migrated, 21);
+  // v22 -> v23: keep factory looks implicit and preserve every existing build.
+  if (value.version <= 22) migrated = validateState(migrated, 22);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

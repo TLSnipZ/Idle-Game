@@ -4,7 +4,7 @@ import type { GameState } from '../game/game-state';
 import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
 import { formatPrice } from './number-format';
 import { formatModifier } from './stat-format';
-import { vehicleArtwork } from './vehicle-artwork';
+import { VehicleArtwork } from './VehicleArtwork';
 import { RequirementList } from './RequirementList';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
 import { localizedContent } from './content-localization';
@@ -35,7 +35,6 @@ export function Garage({ state, paused, onPurchase, onSelect, workshop = false }
     <div className="garage-catalog">{VEHICLE_CATALOG.map(vehicle => {
       const view = selectVehicle(state, vehicle.id);
       if (!view) return null;
-      const artwork = vehicleArtwork(vehicle.id);
       const heading = `${vehicle.id}-heading`;
       const requirements = `${vehicle.id}-requirements`;
       const category = localizedContent(locale, vehicle.id, 'category', vehicle.category);
@@ -45,8 +44,7 @@ export function Garage({ state, paused, onPurchase, onSelect, workshop = false }
         <div className="panel-heading"><h3 id={heading}><span className="vehicle-manufacturer">{text(vehicle.manufacturer)}</span>{' '}<span>{text(vehicle.model)}</span></h3>
           <span className={`ownership-badge ${view.owned ? 'is-owned' : ''}`}>{view.owned ? view.active ? text('OWNED · ACTIVE', 'IM BESITZ · AKTIV') : text('OWNED · INACTIVE', 'IM BESITZ · INAKTIV') : view.eligible ? text('AVAILABLE', 'VERFÜGBAR') : text('LOCKED', 'GESPERRT')}</span></div>
         <p className="eyebrow">{category}</p>
-        {artwork && <img className="vehicle-artwork" src={artwork.src} alt={text(artwork.alt)}
-          width={artwork.width} height={artwork.height} loading="lazy" decoding="async" />}
+        <VehicleArtwork vehicleId={vehicle.id} appearanceId={state.garage.appearances?.[vehicle.id] ?? null} />
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>
         <p className="production">{formatModifier(vehicle.modifier)} {vehicle.modifier.target.stat === 'business-production'

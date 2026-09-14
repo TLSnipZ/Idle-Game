@@ -26,14 +26,14 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 </div>
 
-## Current phase — Garage 2.0 II: model-specific tuning
+## Current phase — Garage 2.0 III: curated vehicle finishes
 
-Implemented: two permanent setups each for Senda and Lilt, per-model workshop
-selection, independent stock/fit commands, cooling and decoy integration.
-Save **v22 / CE1** preserves existing KX-R builds without grants.
-See [Model tuning](docs/MODEL_TUNING.md) for prices, exact balance, save boundaries
-and verification. Release evidence is tracked in the PR.
-Next separate scope: curated visual customization; later car tiers remain planned.
+Implemented: two signature finishes plus factory paint for each current car,
+explicit preview/apply/discard, free owned-vehicle customization and matching
+Garage presentation. Save **v23 / CE1** preserves prior tuning and progress;
+applied looks survive Rebirth. See [Vehicle finishes](docs/VEHICLE_APPEARANCE.md)
+for rendering, persistence and verification boundaries. Release evidence is in the PR.
+Next separate scope: later vehicle tiers, starting with catalog/progression analysis.
 
 ## Latest UI update
 
@@ -109,13 +109,13 @@ The interface has five sections: **Overview** for your dashboard, **Operations**
 | --- | --- | --- |
 | **$25,000** | Player Level 5 · Dockside Detail Level 5 | **+10% global Business Production**, including offline and after Rebirth |
 
-The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. All three vehicles have individual approved-model artwork. All three cars now offer two permanent setups each in the Collection workshop. Later models and visual tuning remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
+The Garage has **three purchasable vehicles**. Senda costs $40,000 at Player 6 / Dockside 7 and gives +12% manual Job Cash. Lilt costs $55,000 at Player 7 / Dockside 8 and reduces the Heat cooling interval by 3 seconds (57s, or 42s with assigned Mara). The first purchase activates automatically, and only the active vehicle supplies its bonus. Ownership and selection survive Rebirth. All three vehicles have individual approved-model artwork. All three cars now offer two permanent setups each in the Collection workshop. The paint studio offers two signature finishes plus factory paint per car, with free permanent selection. Later models remain planned. See the [Tier-1 notes](docs/TIER_ONE_GARAGE.md).
 
 ## Development status
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v22**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v23**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
@@ -128,7 +128,7 @@ Current implementation and planned follow-ons are distinguished below. Scope and
 | **A clearer, more comfortable game** | English, Deutsch and pure Villager gibberish are implemented. The whole-game audit and P1 regression repairs are complete. Follow-up UX polish brings jobs forward and explains local save status. |
 | **Global HUD & activity** | Global HUD 2.0 and Activity Center are implemented, with Cash, Level/XP, Heat, EP and City Event access. Mobile stats wrap, events come first and latest feedback expands on demand. |
 | **A stronger Solara identity** | Logo, favicon and all four Business storefronts are integrated; richer city presentation remains planned. |
-| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Performance tuning for all three current models is implemented; visual tuning and later catalog tiers remain planned. |
+| **A growing Garage** | Tier-1 Kairo Senda / Namera Lilt add specialized active effects; their model artwork is integrated. Performance tuning for all three current models is implemented; curated paint customization is implemented, and later catalog tiers remain planned. |
 | **A deeper city** | Heat I Risk & Reward, II Police Pressure and III District Heat are implemented. IV MANHUNT adds local roadblocks and paid decoys. V adds Business/Crew/active-car support for decoy costs; more Business depth, crew and event development, and richer territory progression remain planned. |
 
 The longer-term vision connects Businesses, cars, crew and city control through rival factions, Operations, Heists and Territory takeovers. New content should strengthen existing systems rather than become an isolated menu.

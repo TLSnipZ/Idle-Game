@@ -115,7 +115,7 @@ describe('Save v19 identity boundary', () => {
     const state = owner ? rebirthState() : createInitialGameState();
     const input = { format: 'crime-empire-save', version: 18, savedAt: 123, state }, before = structuredClone(input);
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: { ...input, version: 22 } });
+    expect(result).toEqual({ ok: true, envelope: { ...input, version: 23 } });
     expect(input).toEqual(before);
     expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
   });
@@ -132,7 +132,7 @@ describe('Save v19 identity boundary', () => {
   it.each(VEHICLE_CATALOG.map(v => v.id))('current selection %s round-trips in local save and CE1', id => {
     const state = owned(id), encoded = serializeSave(state, 123);
     if (!encoded.ok) throw Error(encoded.error);
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 22, savedAt: 123, state } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 23, savedAt: 123, state } });
     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toEqual(parseSave(encoded.serialized));
   });
 });

@@ -21,7 +21,7 @@ describe('v14 lifetime statistics and CE1', () => {
   it('v13 migration preserves every old field and initializes only exact Rebirth history', () => {
     const s = rich(), { statistics: _statistics, ...permanentProgression } = s.permanentProgression;
     const old = { ...s, permanentProgression }, raw = stringifySaveFixture(envelope(old, 13));
-    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(22); expect(result.ok).toBe(true);
+    const result = parseSave(raw); expect(CURRENT_SAVE_VERSION).toBe(23); expect(result.ok).toBe(true);
     if (!result.ok) throw Error('fixture');
     const { statistics, ...previous } = result.envelope.state.permanentProgression;
     expect(statistics).toEqual({ manualJobsCompleted: 0, automatedJobsCompleted: 0, businessLevelsPurchased: 0,
@@ -76,7 +76,7 @@ describe('v14 lifetime statistics and CE1', () => {
       ...(version >= 9 ? { city: version === 9 ? { ownedTerritoryIds: s.city.ownedTerritoryIds } : s.city } : {}),
       ...(version >= 11 ? { crew: s.crew } : {}), ...(version >= 12 ? { events: s.events } : {}) };
     const r = validateSaveCode(encodeSaveText(stringifySaveFixture(envelope(state, version))));
-    expect(r).toMatchObject({ ok: true, envelope: { version: 22, savedAt: 123456789, state: {
+    expect(r).toMatchObject({ ok: true, envelope: { version: 23, savedAt: 123456789, state: {
       economy: s.economy, permanentProgression: { statistics: createInitialStatistics(version >= 7 ? 4 : 0) } } } });
   });
   it('v14 empty state roundtrip adds no fields, history, or timestamps', () => {

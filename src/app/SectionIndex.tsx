@@ -3,7 +3,7 @@ import { useLocalizedText } from './LocalizationProvider';
 
 const LINKS = {
   city: [['city-heading', 'Districts & Heat', 'Bezirke & Heat'], ['crew-heading', 'Crew', 'Crew'], ['city-events-heading', 'Events', 'Events']],
-  collection: [['garage-heading', 'Garage', 'Garage'], ['tuning-heading', 'Tuning workshop', 'Tuning-Werkstatt']],
+  collection: [['garage-heading', 'Garage', 'Garage'], ['tuning-heading', 'Tuning workshop', 'Tuning-Werkstatt'], ['appearance-heading', 'Paint studio', 'Lackstudio']],
   empire: [['rebirth-heading', 'Rebirth', 'Rebirth'], ['skill-tree-heading', 'Skills', 'Skills'], ['achievements-heading', 'Achievements', 'Achievements'], ['statistics-heading', 'Statistics', 'Statistiken'], ['save-transfer-heading', 'Save & Transfer', 'Speichern & Transfer']],
 } as const;
 

@@ -1,5 +1,14 @@
 # Roadmap
 
+## Current phase — Garage 2.0 III: curated vehicle finishes
+
+Implemented: two signature finishes plus factory paint for each current car,
+explicit preview/apply/discard, free owned-vehicle customization and matching
+Garage presentation. Save **v23 / CE1** preserves prior tuning and progress;
+applied looks survive Rebirth. See [Vehicle finishes](VEHICLE_APPEARANCE.md)
+for rendering, persistence and verification boundaries. Release evidence is in the PR.
+Next separate scope: later vehicle tiers, starting with catalog/progression analysis.
+
 ## Current phase — Garage 2.0 II: model-specific tuning
 
 Implemented: two permanent setups each for Senda and Lilt, per-model workshop

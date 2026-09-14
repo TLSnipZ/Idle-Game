@@ -210,7 +210,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 22,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 23,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);
@@ -496,7 +496,7 @@ describe('whole-game quick access', () => {
     const state = f.game().getSnapshot().result.state, writes = f.writes(), reads = f.reads();
     const cases = [
       ['CITY', ['city-heading', 'crew-heading', 'city-events-heading']],
-      ['COLLECTION', ['garage-heading', 'tuning-heading']],
+      ['COLLECTION', ['garage-heading', 'tuning-heading', 'appearance-heading']],
       ['EMPIRE', ['rebirth-heading', 'skill-tree-heading', 'achievements-heading', 'statistics-heading', 'save-transfer-heading']],
     ] as const;
     for (const [section, ids] of cases) {
@@ -552,4 +552,31 @@ it('workshop selection is UI-only and stock targets the displayed car', async ()
   expect(f.game().getSnapshot().result.state.garage.builds?.['vehicle:kairo-senda'])
     .toEqual({ purchasedIds: ['tuning:senda-express-ecu'], selectedId: null });
   expect(f.game().getSnapshot().result.state.garage.builds?.['vehicle:kairo-kx-r']).toBeUndefined();
+});
+
+it('previews paint without IO, applies explicitly and keeps independent car drafts', async () => {
+  const initial = createInitialGameState();
+  const K = 'vehicle:kairo-kx-r', L = 'vehicle:namera-lilt';
+  const f = await mount({ ...initial, garage: { ownedVehicleIds: [K], activeVehicleId: K } });
+  await navigate('COLLECTION');
+  const before = f.game().getSnapshot().result.state, writes = f.writes(), reads = f.reads();
+  await click('Coastal Mint');
+  expect(f.writes()).toBe(writes); expect(f.reads()).toBe(reads);
+  expect(f.game().getSnapshot().result.state).toBe(before);
+  expect(container.querySelector('.paint-preview .vehicle-image')?.getAttribute('data-appearance')).toBe('appearance:kxr-coastal');
+  expect(container.querySelector('.garage .vehicle-image')?.getAttribute('data-appearance')).toBe('factory');
+  await click('Discard preview');
+  expect(container.querySelector('.paint-preview .vehicle-image')?.getAttribute('data-appearance')).toBe('factory');
+  await click('Coastal Mint'); await click('Apply look · free');
+  expect(f.game().getSnapshot().result.state.garage.appearances?.[K]).toBe('appearance:kxr-coastal');
+  expect(container.querySelector('.garage .vehicle-image')?.getAttribute('data-appearance')).toBe('appearance:kxr-coastal');
+  const selector = container.querySelector('#appearance-vehicle');
+  if (!(selector instanceof HTMLSelectElement)) throw Error('selector');
+  await act(() => { selector.value = L; selector.dispatchEvent(new Event('change', { bubbles: true })); });
+  await click('Ivory Alibi');
+  expect(button('Vehicle required').disabled).toBe(true);
+  expect(f.game().getSnapshot().result.state.garage.activeVehicleId).toBe(K);
+  await act(() => { selector.value = K; selector.dispatchEvent(new Event('change', { bubbles: true })); });
+  await click('Factory finish'); await click('Apply look · free');
+  expect(f.game().getSnapshot().result.state.garage.appearances?.[K]).toBeUndefined();
 });
