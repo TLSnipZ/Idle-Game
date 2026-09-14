@@ -6,9 +6,9 @@ First implementation slice of the retained Purchase Intelligence priority in
 POST_ROADMAP.md, selected after the user authorized one further phase.
 Baseline: PR #49, `53f07fcf35bea65e7f02b8896e1fbecee00910a9`.
 At kickoff PR #49 was open, not merged; main remained `d96067ec`.
-This separate follow-up targets `feat/tier-two-customization`; merge IV-D before
-retargeting/merging this work into main. Never merge this into the IV-D branch as
-a substitute for reviewing the two scopes separately.
+The follow-up initially targeted `feat/tier-two-customization`. Release integration
+merged #49 first, retargeted #50 to main and verified the resulting tree before
+merging #50. The two review scopes remain separate in Git history.
 
 ## Player behavior
 
@@ -80,6 +80,21 @@ formatted rates through the existing language transformer and adds a readable-pr
 assertion to the new browser matrix; the complete rerun above passed. The final
 completion commit updates this document only, without changing verified code.
 
-PR #49 remained open at kickoff; PR #50 is its dependent follow-up, not a release.
-Neither merge, deployment nor live acceptance is claimed here. Merge #49 first,
-retarget #50 to main and verify integration checks before merging #50.
+## Release — 2026-09-14
+
+The user requested completion through publication. PR #49 merged at
+`8f81486dba9e19f3ab6bec64361a35e6b67e1704`; PR #50 then merged into main at
+`505fac717ade2d5b9191818fa4a109887f21513b`.
+The retargeted merge tree exactly matched the reviewed PR tree. Compared with the
+full-CI code commit, only this handoff document differed; no gameplay integration
+change required another full test run.
+
+[Pages deployment 34897797976](https://github.com/TLSnipZ/Idle-Game/actions/runs/34897797976)
+succeeded for merge `505fac7`. The live JavaScript and stylesheet matched the local
+verified production build byte-for-byte. All **15 live purchase-insight browser cases**
+passed on https://tlsnipz.github.io/Idle-Game/: three locales by five widths,
+keyboard, comparisons, purchase, inactive-car retention, reload, Lilt tradeoffs,
+unowned cars, 125% text containment and Villager-only prose. Test saves were seeded
+in isolated browser contexts; no player's own browser storage was used.
+The release documentation follow-up changes no runtime files. Manual player
+acceptance remains separate from automated verification.

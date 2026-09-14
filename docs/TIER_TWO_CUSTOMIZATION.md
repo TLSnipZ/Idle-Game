@@ -1,5 +1,12 @@
 # Garage IV-D — Tier-2 tuning and finishes
 
+## Release status — 2026-09-14
+
+PR #49 is merged and published together with follow-up PR #50. See
+[Workshop insight release](WORKSHOP_INSIGHT.md#release--2026-09-14) for exact merge,
+deployment and live verification evidence. Historical verification notes below
+remain evidence for their named commits, not the current merge status.
+
 ## Scope and baseline
 
 Requested after the IV-D handoff: `d96067ec6e855fb24f80edcf7c768ad23e46ed70`,
