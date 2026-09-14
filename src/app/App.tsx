@@ -88,7 +88,7 @@ export function GameShell({ game }: { readonly game: ReturnType<typeof useGame> 
       <NextObjective key={game.replacementSequence} state={game.snapshot.state} onNavigate={destination => { const target = guidanceDestination(destination); setActive(target.section); setObjectiveRequest(request => ({ ...target, sequence: (request?.sequence ?? 0) + 1 })); }} />
       <div onClickCapture={captureAction} id="section-content" data-section={active} aria-labelledby="section-heading">
         <div className="section-heading"><h1 id="section-heading" ref={heading} tabIndex={-1}>{t(sectionLabelKey)}</h1><p>{t(sectionDescriptionKey)}</p></div>
-        <SectionContent collectionDestination={objectiveRequest?.section === SECTION.collection.id ? objectiveRequest : null} active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
+        <SectionContent collectionDestination={objectiveRequest?.section === SECTION.collection.id && objectiveRequest.sequence !== handledObjective.current ? objectiveRequest : null} active={active} game={{ ...game, resetProgress: confirmation => { const result = game.resetProgress(confirmation); if (result.ok) { save.controls.clear(); rebirth.controls.clear(); setActive(DEFAULT_SECTION); } return result; } }} onNavigate={navigate} save={save} rebirth={rebirth} />
       </div>
       <p className="session-note">{t('localProgress')} <span aria-hidden="true">/</span> {t('awayPrefix')} {text(formatOfflineDuration(getOfflineCapMs(game.snapshot.state)))}.</p>
     </main>
