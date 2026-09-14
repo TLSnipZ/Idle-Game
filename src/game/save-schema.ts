@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 21;
+export const CURRENT_SAVE_VERSION = 22;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -132,6 +132,7 @@ function validateState(value: unknown, version: number): GameState | null {
   const builds = record(value.garage) && Object.hasOwn(value.garage, 'builds') ? value.garage.builds : undefined;
   if (record(value.garage) && Object.hasOwn(value.garage, 'builds')
     && !isVehicleBuilds(builds, ownedVehicleIds)) return null;
+  if (version < 22 && record(builds) && Object.keys(builds).some(id => id !== KXR_VEHICLE_ID)) return null;
   const permanent = version >= 7 ? value.permanentProgression : { empirePoints: 0, rebirthCount: 0 };
   if (!record(permanent) || !keys(permanent, ['empirePoints', 'rebirthCount', ...(version >= 8 ? ['skills'] : []), ...(version >= 13 ? ['unlockedAchievementIds'] : []), ...(version >= 14 ? ['statistics'] : [])])
       || !isPermanentValue(permanent.empirePoints) || !isPermanentValue(permanent.rebirthCount)) return null;
@@ -300,6 +301,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 19) migrated = validateState(migrated, 19);
   // v20 -> v21: stock builds remain implicit; no purchase, reward or timestamp changes.
   if (value.version <= 20) migrated = validateState(migrated, 20);
+  // v21 -> v22: preserve KX-R builds and validate before accepting new model parts.
+  if (value.version <= 21) migrated = validateState(migrated, 21);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

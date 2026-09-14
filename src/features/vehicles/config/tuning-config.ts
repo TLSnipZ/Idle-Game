@@ -2,9 +2,11 @@ import type { Money } from '../../economy';
 import { moneyFromMinorUnits } from '../../economy';
 import type { Modifier } from '../../../game/modifiers';
 import type { GarageState, VehicleId } from '../model/vehicle';
-import { STARTER_VEHICLE, VEHICLE_CATALOG } from './vehicle-config';
+import { STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, VEHICLE_CATALOG } from './vehicle-config';
 
-export type TuningId = 'tuning:kxr-fleet-gearing' | 'tuning:kxr-courier-ecu';
+export type TuningId = 'tuning:kxr-fleet-gearing' | 'tuning:kxr-courier-ecu'
+  | 'tuning:senda-express-ecu' | 'tuning:senda-fleet-gearing'
+  | 'tuning:lilt-quiet-running' | 'tuning:lilt-decoy-kit';
 export interface VehicleBuild {
   readonly purchasedIds: readonly TuningId[];
   readonly selectedId: TuningId | null;
@@ -31,6 +33,26 @@ export const TUNING_CATALOG: readonly TuningDefinition[] = [
     cost: moneyFromMinorUnits('1000000'),
     modifier: { id: 'modifier:kxr-courier-ecu', sourceId: 'tuning:kxr-courier-ecu',
       target: { stat: 'job-reward', context: 'manual' }, operation: 'multiply-basis-points', bonusBasisPoints: 800 } },
+  { id: 'tuning:senda-express-ecu', vehicleId: KAIRO_SENDA.id,
+    name: 'Express ECU', germanName: 'Express-Steuergerät', category: 'Engine', germanCategory: 'Motor',
+    cost: moneyFromMinorUnits('1800000'),
+    modifier: { id: 'modifier:senda-express-ecu', sourceId: 'tuning:senda-express-ecu',
+      target: { stat: 'job-reward', context: 'manual' }, operation: 'multiply-basis-points', bonusBasisPoints: 800 } },
+  { id: 'tuning:senda-fleet-gearing', vehicleId: KAIRO_SENDA.id,
+    name: 'Fleet support gearing', germanName: 'Fuhrparkgetriebe', category: 'Drivetrain', germanCategory: 'Antrieb',
+    cost: moneyFromMinorUnits('1400000'),
+    modifier: { id: 'modifier:senda-fleet-gearing', sourceId: 'tuning:senda-fleet-gearing',
+      target: { stat: 'business-production', businessId: null }, operation: 'multiply-basis-points', bonusBasisPoints: 400 } },
+  { id: 'tuning:lilt-quiet-running', vehicleId: NAMERA_LILT.id,
+    name: 'Quiet running kit', germanName: 'Leisetreter-Paket', category: 'Cooling', germanCategory: 'Abkühlung',
+    cost: moneyFromMinorUnits('2000000'),
+    modifier: { id: 'modifier:lilt-quiet-running', sourceId: 'tuning:lilt-quiet-running',
+      target: { stat: 'heat-decay-interval' }, operation: 'reduce-interval', reductionMs: 3000 } },
+  { id: 'tuning:lilt-decoy-kit', vehicleId: NAMERA_LILT.id,
+    name: 'Decoy logistics kit', germanName: 'Ablenkungslogistik', category: 'Support', germanCategory: 'Unterstützung',
+    cost: moneyFromMinorUnits('1200000'),
+    modifier: { id: 'modifier:lilt-decoy-kit', sourceId: 'tuning:lilt-decoy-kit',
+      target: { stat: 'heat-response-cost' }, operation: 'multiply-basis-points', bonusBasisPoints: -1000 } },
 ];
 export function findTuning(id: unknown) { return TUNING_CATALOG.find(item => item.id === id); }
 function plain(value: unknown): value is Record<string, unknown> {

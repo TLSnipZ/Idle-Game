@@ -393,3 +393,12 @@ Nights may therefore be acquired after first eligibility, intentionally. The sec
 Fast Talker and Learn the Streets, reaches Afterdark 3:09, Nights 5:00, Rebirth 4:36.
 Preserve the separate enabled offline Dockside Auto-Upgrader higher-Level/higher-EP
 behavior; neither those formulas nor that spending policy changed in POST 3D.
+
+
+## Garage 2.0 II
+
+See [Model tuning](MODEL_TUNING.md) for exact Senda/Lilt setup prices,
+stacking and static marginal checks. Senda Express reaches +20.96% manual Cash;
+Senda Fleet trades that tuning increment for +4% production. Lilt can choose
+54s cooling (39s with Mara) or a further 10% decoy discount ($729 with all support).
+Existing KX-R and base-car bonuses are unchanged.

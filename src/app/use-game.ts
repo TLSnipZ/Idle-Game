@@ -143,8 +143,8 @@ export function useGame() {
     if (result.ok) { setReplacementSequence(previous => previous + 1); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'success', message: localize(localeRef.current, 'NEW GAME · All progress has been reset and saved. Start with your first delivery in Operations.', 'NEUES SPIEL · Alles gelöscht und gespeichert. Deine erste Lieferung wartet unter Operationen. Willkommen zurück am unteren Ende der Nahrungskette.') })); }
     return result;
   }
-  function configureTuning(id: string | null, purchase: boolean) {
-    const result = runtime.configureTuning(id, purchase);
+  function configureTuning(vehicleId: string, id: string | null, purchase: boolean) {
+    const result = runtime.configureTuning(vehicleId, id, purchase);
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
       message: result?.ok
         ? localize(localeRef.current, 'Garage setup ready. Only the active car puts it to work. The mechanic has deleted the invoice.',

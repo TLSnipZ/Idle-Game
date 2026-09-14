@@ -1,5 +1,8 @@
 # Garage 2.0 I — KX-R tuning pilot
 
+The pilot below is historical. [Garage 2.0 II](MODEL_TUNING.md) now adds Senda/Lilt
+setups and Save v22; the KX-R prices/effects and permanent-build contract remain.
+
 The first tuning slice extends the existing Collection surface with a KX-R workshop. This is the bounded pilot from VEHICLE_CATALOG.md, not completion of the full Garage backlog.
 
 ## Parts and balance

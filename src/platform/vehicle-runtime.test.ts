@@ -70,7 +70,7 @@ describe('vehicle runtime and durable progression',()=>{
     f.at(250);f.wall(1250);f.tick();expect(f.writes()).toBe(writes);
     f.at(5000);f.wall(6000);const exported=game.exportCode();if(!exported.ok)throw Error('export');
     const expected=onlineElapsed(initial(true),5000).state;
-    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 21,savedAt:6000,state:expected}});
+    expect(validateSaveCode(exported.code)).toMatchObject({ok:true,envelope:{version: 22,savedAt:6000,state:expected}});
     f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state:expected}});
     game.stop();game.start();game.start();expect(f.timers()).toBe(2);game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(expected);
@@ -126,7 +126,7 @@ it('v5 local migration consumes its saved timestamp without losing offline time'
   const save=createLocalSave(()=>({getItem:()=>raw,setItem:(_key:string,value:string)=>{raw=value;}}),()=>26000);
   const expected=simulateGameElapsed(state,25000).state;
   expect(save.bootstrap()).toMatchObject({kind:'loaded',state:expected});
-  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 21,savedAt:26000,state:expected}});
+  expect(parseSave(raw)).toMatchObject({ok:true,envelope:{version: 22,savedAt:26000,state:expected}});
   expect(save.bootstrap()).toMatchObject({kind:'loaded',offline:{incomeEarned:'0',xpEarned:0}});
 });
 
@@ -168,7 +168,7 @@ it.each([false, true])('historical v15 CE1 owner=%s imports atomically without h
   const f = fixture(); const game = f.make(); game.start(); f.wall(1000000);
   expect(game.importCode(code)).toEqual({ ok: true }); expect(game.getSnapshot().result.state).toEqual(state);
   const exported = game.exportCode(); if (!exported.ok) throw Error('fixture');
-  expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 21, savedAt: 1000000, state } });
+  expect(validateSaveCode(exported.code)).toMatchObject({ ok: true, envelope: { version: 22, savedAt: 1000000, state } });
   expect(f.raw()).not.toContain('vehicle:starter-sport-sedan'); game.stop();
 });
 

@@ -82,7 +82,7 @@ describe('Heat V support network', () => {
     const loaded = parseSave(save.serialized);
     expect(validateSaveCode(code.code)).toEqual(loaded);
     if (!loaded.ok) throw Error('fixture');
-    expect(loaded.envelope.version).toBe(21);
+    expect(loaded.envelope.version).toBe(22);
     expect(evaluateDecoyCost(loaded.envelope.state)).toEqual(evaluateDecoyCost(s));
     expect(save.serialized).not.toMatch(/support|discount|baseCost|decoy/i);
   });

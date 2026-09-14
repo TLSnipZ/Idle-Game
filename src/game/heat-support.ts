@@ -1,7 +1,7 @@
 import { HEAT_SUPPORT_RULES, DECOY_COST } from '../features/heat';
 import { findBusiness, getBusinessLevel } from '../features/businesses';
 import { activeCrewMembers } from '../features/crew';
-import { assertGarageState } from '../features/vehicles';
+import { activeTuning, assertGarageState } from '../features/vehicles';
 import { getActiveDistrictId, requireCityState } from '../features/territories';
 import { evaluateStat, wholeStatValue } from './modifiers';
 import type { GameState } from './game-state';
@@ -24,9 +24,11 @@ export function selectHeatSupport(state: GameState) {
 }
 export function evaluateDecoyCost(state: GameState) {
   const support = selectHeatSupport(state);
+  const selected = activeTuning(state.garage);
+  const tuning = selected?.modifier.target.stat === 'heat-response-cost' ? selected : undefined;
   const evaluated = evaluateStat(DECOY_COST, { stat: 'heat-response-cost' },
-    support.filter(item => item.active).map(item => item.rule.modifier));
+    [...support.filter(item => item.active).map(item => item.rule.modifier), ...(tuning ? [tuning.modifier] : [])]);
   if (!evaluated.ok) throw new RangeError('Configured decoy cost exceeds range');
   return { cost: wholeStatValue(evaluated.effective), baseCost: DECOY_COST,
-    effective: evaluated.effective, applied: evaluated.applied, support };
+    effective: evaluated.effective, applied: evaluated.applied, support, tuning };
 }

@@ -36,7 +36,7 @@ describe('KX-R permanent tuning', () => {
     expect(purchaseTuning(createInitialGameState(), F.id)).toMatchObject({ ok: false, error: 'vehicle-not-owned' });
     const poor = { ...state(), economy: { cash: moneyFromMinorUnits('1499999') } };
     expect(purchaseTuning(poor, F.id)).toMatchObject({ ok: false, error: 'insufficient-funds', state: poor });
-    expect(selectTuning(state(), C.id)).toMatchObject({ ok: false, error: 'tuning-not-owned' });
+    expect(selectTuning(state(), K.id, C.id)).toMatchObject({ ok: false, error: 'tuning-not-owned' });
   });
   it('uses exact active-only effects and keeps manual tuning out of Dispatcher rewards', () => {
     const fleet = buy(state()), courier = buy(fleet, C.id);
@@ -50,13 +50,13 @@ describe('KX-R permanent tuning', () => {
     expect(inactive.state.garage.builds).toBe(courier.garage.builds);
   });
   it('free stock/owned swaps keep purchased parts and detect active rate changes', () => {
-    const tuned = buy(state()), stock = selectTuning(tuned, null); if (!stock.ok) throw Error('fixture');
+    const tuned = buy(state()), stock = selectTuning(tuned, K.id, null); if (!stock.ok) throw Error('fixture');
     expect(stock.state.economy).toBe(tuned.economy);
     expect(stock.state.garage.builds?.[K.id]?.purchasedIds).toEqual([F.id]);
     expect(activeVehicleEffectChanged(tuned, stock.state)).toBe(true);
-    expect(selectTuning(stock.state, null)).toEqual({ ok: true, state: stock.state });
+    expect(selectTuning(stock.state, K.id, null)).toEqual({ ok: true, state: stock.state });
     const inactive = { ...stock.state, garage: { ...stock.state.garage, activeVehicleId: S.id } };
-    const fit = selectTuning(inactive, F.id); if (!fit.ok) throw Error('fixture');
+    const fit = selectTuning(inactive, K.id, F.id); if (!fit.ok) throw Error('fixture');
     expect(activeVehicleEffectChanged(inactive, fit.state)).toBe(false);
   });
   it('keeps builds through another car purchase and Rebirth', () => {
@@ -67,12 +67,12 @@ describe('KX-R permanent tuning', () => {
     expect(reborn.state.garage).toEqual(tuned.garage);
     expect(createInitialGameState().garage.builds).toBeUndefined();
   });
-  it('migrates v20 stock unchanged and round-trips tuned v21 through CE1', () => {
+  it('migrates v20 stock unchanged and round-trips tuned saves through CE1', () => {
     const s = state();
     const old = migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: s });
-    expect(old).toMatchObject({ ok: true, envelope: { version: 21, savedAt: 1234, state: s } });
+    expect(old).toMatchObject({ ok: true, envelope: { version: 22, savedAt: 1234, state: s } });
     const tuned = buy(s), encoded = serializeSave(tuned, 1234); if (!encoded.ok) throw Error('fixture');
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 21, state: tuned } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 22, state: tuned } });
     const code = exportSaveCode(tuned, 1234); if (!code.ok) throw Error('fixture');
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: tuned } });
     expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: tuned }).ok).toBe(false);
