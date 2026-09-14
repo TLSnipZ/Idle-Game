@@ -6,7 +6,10 @@ import { STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, VEHICLE_CATALOG } from './ve
 
 export type TuningId = 'tuning:kxr-fleet-gearing' | 'tuning:kxr-courier-ecu'
   | 'tuning:senda-express-ecu' | 'tuning:senda-fleet-gearing'
-  | 'tuning:lilt-quiet-running' | 'tuning:lilt-decoy-kit';
+  | 'tuning:lilt-quiet-running' | 'tuning:lilt-decoy-kit'
+  | 'tuning:serein-nightshift-ecu' | 'tuning:serein-workshop-gearing'
+  | 'tuning:rendan-dispatch-gearing' | 'tuning:rendan-express-ecu'
+  | 'tuning:canto-fleet-gearing' | 'tuning:canto-dispatch-ecu';
 export interface VehicleBuild {
   readonly purchasedIds: readonly TuningId[];
   readonly selectedId: TuningId | null;
@@ -53,6 +56,36 @@ export const TUNING_CATALOG: readonly TuningDefinition[] = [
     cost: moneyFromMinorUnits('1200000'),
     modifier: { id: 'modifier:lilt-decoy-kit', sourceId: 'tuning:lilt-decoy-kit',
       target: { stat: 'heat-response-cost' }, operation: 'multiply-basis-points', bonusBasisPoints: -1000 } },
+  { id: 'tuning:serein-nightshift-ecu', vehicleId: 'vehicle:namera-serein',
+    name: 'Nightshift ECU', germanName: 'Nachtschicht-Steuergerät', category: 'Engine', germanCategory: 'Motor',
+    cost: moneyFromMinorUnits('2400000'),
+    modifier: { id: 'modifier:serein-nightshift-ecu', sourceId: 'tuning:serein-nightshift-ecu',
+      target: { stat: 'job-reward', context: 'manual' }, operation: 'multiply-basis-points', bonusBasisPoints: 800 } },
+  { id: 'tuning:serein-workshop-gearing', vehicleId: 'vehicle:namera-serein',
+    name: 'Workshop support gearing', germanName: 'Werkstattgetriebe', category: 'Drivetrain', germanCategory: 'Antrieb',
+    cost: moneyFromMinorUnits('2200000'),
+    modifier: { id: 'modifier:serein-workshop-gearing', sourceId: 'tuning:serein-workshop-gearing',
+      target: { stat: 'business-production', businessId: null }, operation: 'multiply-basis-points', bonusBasisPoints: 500 } },
+  { id: 'tuning:rendan-dispatch-gearing', vehicleId: 'vehicle:toseki-rendan',
+    name: 'Dispatch gearing', germanName: 'Disponentengetriebe', category: 'Drivetrain', germanCategory: 'Antrieb',
+    cost: moneyFromMinorUnits('2800000'),
+    modifier: { id: 'modifier:rendan-dispatch-gearing', sourceId: 'tuning:rendan-dispatch-gearing',
+      target: { stat: 'job-reward', context: 'dispatcher' }, operation: 'multiply-basis-points', bonusBasisPoints: 1200 } },
+  { id: 'tuning:rendan-express-ecu', vehicleId: 'vehicle:toseki-rendan',
+    name: 'Express route ECU', germanName: 'Expressrouten-Steuergerät', category: 'Engine', germanCategory: 'Motor',
+    cost: moneyFromMinorUnits('2500000'),
+    modifier: { id: 'modifier:rendan-express-ecu', sourceId: 'tuning:rendan-express-ecu',
+      target: { stat: 'job-reward', context: 'manual' }, operation: 'multiply-basis-points', bonusBasisPoints: 600 } },
+  { id: 'tuning:canto-fleet-gearing', vehicleId: 'vehicle:sevrin-canto-club',
+    name: 'Boardroom gearing', germanName: 'Vorstandsgetriebe', category: 'Drivetrain', germanCategory: 'Antrieb',
+    cost: moneyFromMinorUnits('4000000'),
+    modifier: { id: 'modifier:canto-fleet-gearing', sourceId: 'tuning:canto-fleet-gearing',
+      target: { stat: 'business-production', businessId: null }, operation: 'multiply-basis-points', bonusBasisPoints: 500 } },
+  { id: 'tuning:canto-dispatch-ecu', vehicleId: 'vehicle:sevrin-canto-club',
+    name: 'Night manager ECU', germanName: 'Nachtmanager-Steuergerät', category: 'Engine', germanCategory: 'Motor',
+    cost: moneyFromMinorUnits('3000000'),
+    modifier: { id: 'modifier:canto-dispatch-ecu', sourceId: 'tuning:canto-dispatch-ecu',
+      target: { stat: 'job-reward', context: 'dispatcher' }, operation: 'multiply-basis-points', bonusBasisPoints: 800 } },
 ];
 export function findTuning(id: unknown) { return TUNING_CATALOG.find(item => item.id === id); }
 function plain(value: unknown): value is Record<string, unknown> {

@@ -1,5 +1,15 @@
 # Solara City Vehicle Catalog
 
+## Current work — Garage IV-D: Tier-2 customization
+
+Implemented locally: two alternative permanent setups and two signature finishes
+plus factory paint for each of Serein, Rendan and Canto Club. Save v26 / CE1
+preserves all existing progress. See [Tier-2 customization](TIER_TWO_CUSTOMIZATION.md)
+for exact prices, scoped effects, paint limitations and verification/release status.
+Six vehicles remain playable; the seventeen-identity wishlist is still planning only.
+Older phase sections below are historical. No merge or deployment is claimed here.
+
+
 ## Future vehicle wishlist — user request, 2026-09-14
 
 The user requested Lancer Evo IX, Silvia S15, Nissan GT-R, Skyline R34,

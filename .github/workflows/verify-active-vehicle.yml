@@ -74,6 +74,10 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-rendan-canto.mjs
+      - name: Verify Tier-2 tuning, finishes and migration
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-tier-two-customization.mjs
       - name: Verify Garage and Workshop navigation
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs

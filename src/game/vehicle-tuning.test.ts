@@ -70,9 +70,9 @@ describe('KX-R permanent tuning', () => {
   it('migrates v20 stock unchanged and round-trips tuned saves through CE1', () => {
     const s = state();
     const old = migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: s });
-    expect(old).toMatchObject({ ok: true, envelope: { version: 25, savedAt: 1234, state: s } });
+    expect(old).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 1234, state: s } });
     const tuned = buy(s), encoded = serializeSave(tuned, 1234); if (!encoded.ok) throw Error('fixture');
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 25, state: tuned } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 26, state: tuned } });
     const code = exportSaveCode(tuned, 1234); if (!code.ok) throw Error('fixture');
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: tuned } });
     expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: tuned }).ok).toBe(false);

@@ -51,7 +51,7 @@ try {
     assert.deepEqual((await saved(page)).state.garage.ownedVehicleIds, [K, N]);
     await card.locator('.purchase-button').click();
     let snapshot = await saved(page);
-    assert.equal(snapshot.version, 25);
+    assert.equal(snapshot.version, 26);
     assert.deepEqual(snapshot.state.garage.ownedVehicleIds, [K, N, id]);
     assert.equal(snapshot.state.garage.activeVehicleId, K, 'Buying does not activate a later car');
     assert.deepEqual(snapshot.state.garage.builds, f.state.garage.builds);
@@ -60,8 +60,8 @@ try {
     assert.equal((await saved(page)).state.garage.activeVehicleId, id);
     await openCollectionView(page, 'tuning'); await page.locator('#tuning-vehicle').selectOption(id);
     await openCollectionView(page, 'appearance'); await page.locator('#appearance-vehicle').selectOption(id);
-    assert.equal(await page.locator('.stock-only-notice').count(), 2);
-    assert.equal(await page.locator('.vehicle-tuning button,.vehicle-appearance button').count(), 0);
+    assert.equal(await page.locator('.stock-only-notice').count(), 0);
+    assert.equal(await page.locator('.vehicle-tuning [data-tuning-id]').count(), 2);
     await page.reload(); await page.locator('.primary-navigation button').nth(3).click();
     snapshot = await saved(page); assert.equal(snapshot.state.garage.activeVehicleId, id);
     assert.deepEqual(snapshot.state.garage.builds, f.state.garage.builds);

@@ -67,8 +67,8 @@ try {
     assert.deepEqual(await garage(page),original);
     await page.locator('.vehicle-appearance').screenshot({path:`browser-evidence/collection-paint-${locale}-${width}.png`});
     await page.locator('.discard-appearance').click();assert.equal(await page.locator('.paint-preview .vehicle-image').getAttribute('data-appearance'),'factory');
-    await page.locator('#appearance-vehicle').selectOption(N);assert.equal(await page.locator('.vehicle-appearance .stock-only-notice').isVisible(),true);
-    await openCollectionView(page,'tuning');assert.equal(await page.locator('#tuning-vehicle').inputValue(),N);assert.equal(await page.locator('.vehicle-tuning .stock-only-notice').isVisible(),true);
+    await page.locator('#appearance-vehicle').selectOption(N);assert.equal(await page.locator('.vehicle-appearance [data-look-id]').count(),2);
+    await openCollectionView(page,'tuning');assert.equal(await page.locator('#tuning-vehicle').inputValue(),N);assert.equal(await page.locator('.vehicle-tuning [data-tuning-id]').count(),2);
     await page.evaluate(()=>{document.documentElement.style.fontSize='20px';});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'125% text stays inside viewport');
     await openCollectionView(page,'garage');

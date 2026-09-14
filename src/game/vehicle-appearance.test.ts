@@ -20,7 +20,7 @@ function paint(s: GameState, car: string, look: string | null) {
 }
 describe('permanent vehicle appearance', () => {
   it.each(APPEARANCE_CATALOG)('$id changes only its owned car appearance for free', look => {
-    const before = state(), after = paint(before, look.vehicleId, look.id);
+    const before = { ...state(), garage: { ...state().garage, ownedVehicleIds: VEHICLE_CATALOG.map(car => car.id) } }, after = paint(before, look.vehicleId, look.id);
     expect(after).toEqual({ ...before, garage: { ...before.garage, appearances: { [look.vehicleId]: look.id } } });
     expect(after.economy).toBe(before.economy);
     expect(after.permanentProgression).toBe(before.permanentProgression);
@@ -45,7 +45,7 @@ describe('permanent vehicle appearance', () => {
   });
   it('does not change production, job rewards, cooling or decoy cost for any active car', () => {
     for (const car of VEHICLE_CATALOG) for (const look of APPEARANCE_CATALOG.filter(item => item.vehicleId === car.id)) {
-      const s = { ...state(), garage: { ...state().garage, activeVehicleId: car.id } }, after = paint(s, car.id, look.id);
+      const s = { ...state(), garage: { ...state().garage, ownedVehicleIds: VEHICLE_CATALOG.map(item => item.id), activeVehicleId: car.id } }, after = paint(s, car.id, look.id);
       expect(evaluateJobReward(after)).toEqual(evaluateJobReward(s));
       expect(evaluateBusinessProduction(after, 'business:dockside-detail', 25)).toEqual(evaluateBusinessProduction(s, 'business:dockside-detail', 25));
       expect(getHeatDecayIntervalMs(after)).toBe(getHeatDecayIntervalMs(s));
@@ -55,7 +55,7 @@ describe('permanent vehicle appearance', () => {
   it('migrates v22 with all model builds, exact cash and timestamp, without selecting cosmetics', () => {
     const bought = purchaseTuning(state(), 'tuning:lilt-quiet-running'); if (!bought.ok) throw Error(bought.error);
     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 22, savedAt: 4321, state: bought.state });
-    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 25, savedAt: 4321, state: bought.state } });
+    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 4321, state: bought.state } });
     if (!r.ok) throw Error(r.error);
     expect(r.envelope.state.garage).not.toBe(bought.state.garage);
     expect(r.envelope.state.garage.appearances).toBeUndefined();
@@ -65,7 +65,7 @@ describe('permanent vehicle appearance', () => {
   it('round-trips every saved finish in v23 and CE1 and retains them through Rebirth', () => {
     const s = paint(paint(paint(state(), K.id, 'appearance:kxr-coastal'), S.id, 'appearance:senda-amethyst'), L.id, 'appearance:lilt-lagoon');
     const saved = serializeSave(s, 1234); if (!saved.ok) throw Error(saved.error);
-    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 25, state: s } });
+    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 26, state: s } });
     const code = exportSaveCode(s, 1234); if (!code.ok) throw Error(code.error);
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: s } });
     const r = performRebirth(s); if (!r.ok) throw Error(r.error);

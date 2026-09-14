@@ -28,7 +28,17 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 
 
-## Current phase — Garage IV-C: Rendan and Canto Club
+
+## Current work — Garage IV-D: Tier-2 customization
+
+Implemented locally: two alternative permanent setups and two signature finishes
+plus factory paint for each of Serein, Rendan and Canto Club. Save v26 / CE1
+preserves all existing progress. See [Tier-2 customization](docs/TIER_TWO_CUSTOMIZATION.md)
+for exact prices, scoped effects, paint limitations and verification/release status.
+Six vehicles remain playable; the seventeen-identity wishlist is still planning only.
+Older phase sections below are historical. No merge or deployment is claimed here.
+
+## Previous phase — Garage IV-C: Rendan and Canto Club
 
 Implemented with user-approved model artwork: Rendan ($115,000, Player 12 /
 Afterdark 3, +18% manual and Dispatcher Cash) and Canto Club ($165,000, Player 14 /
