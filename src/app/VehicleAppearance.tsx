@@ -7,13 +7,15 @@ import { VehicleArtwork } from './VehicleArtwork';
 import { FINISH_PALETTE } from './vehicle-finishes';
 import './VehicleAppearance.css';
 
-export function VehicleAppearance({ state, paused, onApply }: {
+export function VehicleAppearance({ state, paused, onApply, selectedVehicle, onChooseVehicle }: {
+  readonly selectedVehicle?: VehicleId;
+  readonly onChooseVehicle?: (id: VehicleId) => void;
   readonly state: GameState; readonly paused: boolean;
   readonly onApply: (vehicleId: string, appearanceId: string | null) => void;
 }) {
   const text = useLocalizedText();
   const [vehicleId, setVehicleId] = useState<VehicleId>(state.garage.activeVehicleId ?? STARTER_VEHICLE.id);
-  const vehicle = findVehicle(vehicleId) ?? STARTER_VEHICLE;
+  const vehicle = findVehicle(selectedVehicle ?? vehicleId) ?? STARTER_VEHICLE;
   // A draft belongs to its car, never to the active-vehicle command or the saved Garage.
   const [drafts, setDrafts] = useState<Partial<Record<VehicleId, AppearanceId | null>>>({});
   const saved = state.garage.appearances?.[vehicle.id] ?? null;
@@ -33,7 +35,7 @@ export function VehicleAppearance({ state, paused, onApply }: {
     <label htmlFor="appearance-vehicle">{text('Choose paint studio vehicle', 'Fahrzeug fürs Lackstudio wählen')}</label>
     <select id="appearance-vehicle" value={vehicle.id} onChange={event => {
       const chosen = findVehicle(event.target.value);
-      if (chosen) setVehicleId(chosen.id);
+      if (chosen) { setVehicleId(chosen.id); onChooseVehicle?.(chosen.id); }
     }}>{VEHICLE_CATALOG.map(car => <option key={car.id} value={car.id}>
       {text(car.name)} · {state.garage.ownedVehicleIds.includes(car.id) ? text('Owned', 'Im Besitz') : text('Not owned', 'Nicht im Besitz')}
     </option>)}</select>

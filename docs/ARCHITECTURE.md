@@ -1,5 +1,14 @@
 # Architecture
 
+## Current phase — Garage and workshop UX
+
+Implemented: separate Garage/Workshop views, compact vehicle selection, ownership
+filters, price/name sorting, a focused detail view and shared workshop selection.
+Tuning and Paint are separate services; paint drafts survive their tab changes.
+Save v24 / CE1 and all gameplay contracts are unchanged. See [Garage workspace](GARAGE_WORKSPACE.md)
+for interaction and release checks. This user-requested UX interlude comes before
+IV-C Rendan/Canto; those cars are not part of this update.
+
 ## Current phase — Garage IV-B: Serein pilot
 
 Implemented: Namera Serein, $80,000, Player Level 10 and owned Afterdark Customs,

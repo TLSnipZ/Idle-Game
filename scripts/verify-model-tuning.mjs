@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -8,7 +9,7 @@ const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'previe
 const K = 'vehicle:kairo-kx-r', S = 'vehicle:kairo-senda', L = 'vehicle:namera-lilt';
 const E = 'tuning:senda-express-ecu', F = 'tuning:senda-fleet-gearing', Q = 'tuning:lilt-quiet-running', D = 'tuning:lilt-decoy-kit';
 const saved = page => page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-const nav = (page, index) => page.locator('.primary-navigation button').nth(index).click();
+const nav = async (page, index) => { await page.locator('.primary-navigation button').nth(index).click(); if(index === 3) await openCollectionView(page, 'tuning'); };
 const part = (page, id) => page.locator('[data-tuning-id="' + id + '"] button');
 let browser, count = 0;
 mkdirSync('browser-evidence', { recursive: true });
@@ -64,7 +65,8 @@ try {
     await page.locator('#tuning-vehicle').selectOption(L);
     await part(page, Q).click();
     assert.equal((await saved(page)).state.garage.activeVehicleId, S);
-    await page.locator('article[aria-labelledby="' + L + '-heading"] button').click();
+    await openGarageVehicle(page, L);
+    await page.locator('article[aria-labelledby="' + L + '-heading"] button:not(.garage-workshop-link)').click();
     await nav(page, 2);
     assert.ok((await page.locator('.heat-panel').textContent()).includes('54'));
     await nav(page, 3); await page.locator('#tuning-vehicle').selectOption(L);

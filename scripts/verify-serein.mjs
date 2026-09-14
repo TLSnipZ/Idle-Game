@@ -1,3 +1,4 @@
+import { openCollectionView, openGarageVehicle } from './collection-browser-helpers.mjs';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -26,13 +27,16 @@ try {
   },{f,locale});
   await page.goto(baseUrl);
   await page.locator('.primary-navigation button').nth(3).click();
+  await openGarageVehicle(page,N);
   const card=page.locator('article[aria-labelledby="'+N+'-heading"]');
   assert.equal(await card.count(),1);
   await verifyArtwork(card, width);
   await card.locator('.purchase-button').click();
   let saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('crime-empire:save')));
   assert.equal(saved.version,24);assert.deepEqual(saved.state.garage.ownedVehicleIds,[N]);assert.equal(saved.state.garage.activeVehicleId,N);
+  await openCollectionView(page,'tuning');
   await page.locator('#tuning-vehicle').selectOption(N);
+  await openCollectionView(page,'appearance');
   await page.locator('#appearance-vehicle').selectOption(N);
   assert.equal(await page.locator('.stock-only-notice').count(),2);
   assert.equal(await page.locator('.vehicle-tuning button,.vehicle-appearance button').count(),0);
@@ -42,6 +46,7 @@ try {
   assert.equal(saved.state.garage.activeVehicleId,N);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   assert.deepEqual(errors,[]);
+  await openGarageVehicle(page,N);
   await verifyArtwork(card, width);
   await card.evaluate(element=>window.scrollBy(0,element.getBoundingClientRect().top-240));
   await card.screenshot({path:'browser-evidence/serein-'+locale+'-'+width+'.png'});
