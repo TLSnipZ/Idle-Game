@@ -15,7 +15,7 @@ import { isRational, ZERO_RATIONAL } from '../shared/rational';
 import { findBusiness, isBusinessLevel, STARTER_BUSINESS } from '../features/businesses';
 import type { BusinessId } from '../features/businesses';
 import { isMoney } from '../features/economy';
-import { createInitialManualJobState, isManualJobState, MANUAL_JOB_INTERVAL_MS } from './manual-job-readiness';
+import { isManualJobState } from './manual-job-readiness';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
@@ -49,18 +49,12 @@ export function isSaveTimestamp(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
-/**
- * Shared state validation. Historical envelopes stay exact. The sole compatibility
- * exception is an already-ready v27 manualJobs slice on an in-memory state that is
- * deliberately relabelled by old regression fixtures; it is ignored by the legacy
- * version and can never smuggle a pending cooldown backwards.
- */
+/** Shared state validation; v27 stores manual readiness only while a delay is pending. */
 function validateState(value: unknown, version: number): GameState | null {
   const legacy = version === 1;
   const hasModifiers = version >= 3;
-  const legacyReadyManualJobs = version < 27 && record(value) && Object.hasOwn(value, 'manualJobs')
-    && isManualJobState(value.manualJobs) && value.manualJobs.elapsedMs === MANUAL_JOB_INTERVAL_MS;
-  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : []), ...(version >= 6 ? ['garage'] : []), ...(version >= 7 ? ['permanentProgression'] : []), ...(version >= 9 ? ['city'] : []), ...(version >= 11 ? ['crew'] : []), ...(version >= 12 ? ['events'] : []), ...(version >= 27 || legacyReadyManualJobs ? ['manualJobs'] : [])])) return null;
+  const hasManualJobs = version >= 27 && record(value) && Object.hasOwn(value, 'manualJobs');
+  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : []), ...(version >= 6 ? ['garage'] : []), ...(version >= 7 ? ['permanentProgression'] : []), ...(version >= 9 ? ['city'] : []), ...(version >= 11 ? ['crew'] : []), ...(version >= 12 ? ['events'] : []), ...(hasManualJobs ? ['manualJobs'] : [])])) return null;
   const { economy, businesses } = value;
   if (!record(economy) || !keys(economy, ['cash']) || !isMoney(economy.cash)
       || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents', ...(hasModifiers ? ['productionRemainderSubMilliCents'] : [])])) return null;
@@ -171,10 +165,10 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
-  const manualJobs = version >= 27 || legacyReadyManualJobs ? value.manualJobs : createInitialManualJobState();
-  if (!isManualJobState(manualJobs)) return null;
+  const manualJobs = hasManualJobs ? value.manualJobs : undefined;
+  if (manualJobs !== undefined && !isManualJobState(manualJobs)) return null;
   return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId, ...(appearances !== undefined && isVehicleAppearances(appearances, ownedVehicleIds) ? { appearances: { ...appearances } } : {}), ...(builds !== undefined && isVehicleBuilds(builds, ownedVehicleIds) ? { builds: cloneVehicleBuilds(builds) } : {}) }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
-    productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds }, manualJobs: { elapsedMs: manualJobs.elapsedMs } };
+    productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds }, ...(manualJobs !== undefined ? { manualJobs: { elapsedMs: manualJobs.elapsedMs } } : {}) };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
 function migrateV1ToV2(value: unknown): unknown {
