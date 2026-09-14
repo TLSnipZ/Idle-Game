@@ -70,7 +70,7 @@ try {
     // Repeated global shortcuts must reveal the correct City panel.
     for (let i = 0; i < 2; i++) { await page.locator('.activity-event').click(); assert.ok(await page.locator('.city-events').isVisible()); await open(page, 'crew-heading'); }
     if (locale === 'de' && [390, 1440].includes(width)) {
-      for (const id of views[0]) { await open(page, id); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-${id}-${width}.png`, fullPage: true }); }
+      for (const id of views[0]) { await open(page, id); if (id === 'city-heading') await districtArtwork(page); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-${id}-${width}.png`, fullPage: true }); }
       await page.locator('.primary-navigation button').nth(0).click(); await page.screenshot({ path: `browser-evidence/world-overview-${width}.png`, fullPage: true });
       await page.locator('.primary-navigation button').nth(4).click(); await open(page, 'skill-tree-heading'); await page.evaluate(() => window.scrollTo(0, 0)); await page.screenshot({ path: `browser-evidence/world-skills-${width}.png`, fullPage: true });
     }
