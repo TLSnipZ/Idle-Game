@@ -143,6 +143,15 @@ export function useGame() {
     if (result.ok) { setReplacementSequence(previous => previous + 1); setFeedback(previous => ({ sequence: previous.sequence + 1, tone: 'success', message: localize(localeRef.current, 'NEW GAME · All progress has been reset and saved. Start with your first delivery in Operations.', 'NEUES SPIEL · Alles gelöscht und gespeichert. Deine erste Lieferung wartet unter Operationen. Willkommen zurück am unteren Ende der Nahrungskette.') })); }
     return result;
   }
+  function configureAppearance(vehicleId: string, appearanceId: string | null) {
+    const result = runtime.configureAppearance(vehicleId, appearanceId);
+    setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
+      message: result?.ok
+        ? localize(localeRef.current, 'Look saved. Same engine, more expensive taste.',
+          'Look gespeichert. Gleicher Motor, teurerer Geschmack.')
+        : localize(localeRef.current, 'Look could not be saved. Check ownership and save status.',
+          'Look konnte nicht gespeichert werden. Besitz und Speicherstatus prüfen.') }));
+  }
   function configureTuning(vehicleId: string, id: string | null, purchase: boolean) {
     const result = runtime.configureTuning(vehicleId, id, purchase);
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning',
@@ -157,5 +166,5 @@ export function useGame() {
     setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result?.ok ? 'success' : 'warning', message: result?.ok ? localize(localeRef.current, `Auto-Upgrader target set to ${findBusiness(id)?.name}.`, `Auto-Upgrader-Ziel auf ${findBusiness(id)?.name} gesetzt. Dein Cash kennt jetzt seine nächste Bestimmung.`) : localize(localeRef.current, 'Auto-Upgrader target could not be changed.', 'Auto-Upgrader-Ziel konnte nicht geändert werden. Die Maschine verweigert die Umstrukturierung.') }));
   }
 
-  return { configureTuning, runManhuntDecoy, chooseDistrict, runDiscreetDelivery, runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
+  return { configureAppearance, configureTuning, runManhuntDecoy, chooseDistrict, runDiscreetDelivery, runRiskyDelivery, setPresentationLocale, chooseActiveVehicle, replacementSequence, resetProgress, changeAutoUpgraderTarget, toggleAutomation, achievementEvent: view.achievementEvent, chooseEvent, cityEvent: view.cityEvent, recruitCrew, assignCrew, unassignCrew, coolDown, takeTerritory, buySkill, rebirth, buyVehicle, levelEvent: view.levelEvent, buyAutomation, automationEvent: view.automationEvent, buyUpgrade, upgradeOwnedBusiness, offline: view.offline, dismissOffline: runtime.dismissOffline, saveActions: { ...runtime, importCode }, persistence: view.persistence, feedback, snapshot: view.result, runtimeError: view.persistence.kind === 'offline-error' ? 'offline-bootstrap' : view.runtimeError, runStarterJob, buyBusiness };
 }

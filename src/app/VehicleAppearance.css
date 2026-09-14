@@ -1,0 +1,24 @@
+.vehicle-image { position: relative; isolation: isolate; width: 100%; aspect-ratio: 1672 / 941; overflow: hidden; border-radius: var(--radius-control); }
+.vehicle-image .vehicle-artwork { display: block; width: 100%; height: 100%; max-height: none; object-fit: contain; margin: 0; border-radius: 0; }
+.vehicle-paint { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.vehicle-appearance { margin-top: var(--space-lg); padding: var(--space-md); min-width: 0; }
+.vehicle-appearance h3 { margin: .3rem 0; }
+.vehicle-appearance p { line-height: 1.5; overflow-wrap: anywhere; }
+.vehicle-appearance label { display: block; margin-bottom: .4rem; color: var(--color-secondary); }
+#appearance-vehicle { width: 100%; max-width: 28rem; min-height: 44px; padding: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-background); color: var(--color-text); font: inherit; }
+.paint-studio-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr); gap: var(--space-lg); margin-top: var(--space-md); align-items: start; }
+.paint-preview { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
+.paint-caption { display: grid; gap: .4rem; padding: var(--space-md); }
+.paint-caption strong { font-size: 1.25rem; }
+.paint-controls { min-width: 0; }
+.paint-controls fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.paint-controls legend { margin-bottom: .75rem; color: var(--color-secondary); }
+.finish-option { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .7rem; margin-bottom: .5rem; min-height: 48px; border: 1px solid var(--color-border); border-radius: var(--radius-control); color: var(--color-text); background: var(--color-background); text-align: start; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
+.finish-option[aria-pressed="true"] { border-color: var(--color-cool); box-shadow: inset 3px 0 var(--color-cool); background: var(--color-cool-tint); }
+.finish-option[aria-pressed="true"]::after { content: '✓'; margin-left: auto; }
+.finish-swatch { display: block; flex: 0 0 1.5rem; height: 1.5rem; border-radius: 50%; border: 1px solid var(--color-secondary); }
+.factory-swatch { background: linear-gradient(135deg, var(--color-text) 0 45%, var(--color-border) 45% 55%, var(--color-background) 55%); }
+.paint-controls .action-button { width: 100%; min-height: 44px; white-space: normal; overflow-wrap: anywhere; }
+.discard-appearance { margin-top: .5rem; }
+.paint-saved { padding-top: .5rem; border-top: 1px solid var(--color-border); }
+@media (max-width: 1000px) { .paint-studio-layout { grid-template-columns: minmax(0, 1fr); } }

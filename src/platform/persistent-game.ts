@@ -1,3 +1,4 @@
+import { selectVehicleAppearance } from '../game/vehicle-appearance';
 import { findTuning } from '../features/vehicles';
 import { deployDecoy } from '../game/deploy-decoy';
 import { purchaseTuning, selectTuning } from '../game/vehicle-tuning';
@@ -148,6 +149,14 @@ export function createPersistentGame(
     if ((!prepared.ok && prepared.error !== 'insufficient-funds') || (prepared.ok && prepared.state === state)) return prepared;
     return execute(command);
   }
+  function configureAppearance(vehicleId: unknown, appearanceId: unknown) {
+    if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
+      || view.persistence.kind === 'offline-error') return;
+    const state = runtime.getSnapshot().result.state;
+    const prepared = selectVehicleAppearance(state, vehicleId, appearanceId);
+    if (!prepared.ok || prepared.state === state) return prepared;
+    return execute(current => selectVehicleAppearance(current, vehicleId, appearanceId));
+  }
   function selectActiveVehicle(id: unknown) {
     if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
       || view.persistence.kind === 'offline-error') return;
@@ -241,5 +250,5 @@ export function createPersistentGame(
     return { ok: true };
   }
   function dismissOffline() { view = { ...view, offline: null }; publish(view); }
-  return { configureTuning, deployManhuntDecoy, selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
+  return { configureAppearance, configureTuning, deployManhuntDecoy, selectActiveDistrict, selectActiveVehicle, resetProgress, rebirth, dismissOffline, start, stop, execute, exportCode, importCode, getSnapshot: () => view };
 }

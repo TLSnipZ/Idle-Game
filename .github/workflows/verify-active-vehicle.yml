@@ -62,6 +62,10 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-model-tuning.mjs
+      - name: Verify vehicle paint studio in Chromium
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-vehicle-appearance.mjs
       - name: Verify whitespace
         run: git diff --check ba36d2abb3e1e666463d6eae916f8c53fc06b245 HEAD
       - name: Upload verification evidence

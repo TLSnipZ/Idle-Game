@@ -1,3 +1,4 @@
+import type { AppearanceResult } from '../game/vehicle-appearance';
 import type { TuningResult } from '../game/vehicle-tuning';
 import type { DecoyResult } from '../game/deploy-decoy';
 import { getActiveDistrictId } from '../features/territories';
@@ -30,7 +31,7 @@ import type { GameSimulationResult } from '../game/simulate-game-elapsed';
 
 export const RUNTIME_CADENCE_MS = 250;
 
-type CommandResult = TuningResult | DecoyResult | ActiveDistrictResult | RiskyDeliveryResult | ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
+type CommandResult = AppearanceResult | TuningResult | DecoyResult | ActiveDistrictResult | RiskyDeliveryResult | ActiveVehicleResult | ToggleAutomationResult | EventResolutionResult | CrewCommandResult | LayLowResult | AcquireTerritoryResult | PurchaseSkillResult | PurchaseVehicleResult | PurchaseAutomationResult | StarterJobResult | PurchaseBusinessResult | UpgradeBusinessResult | PurchaseUpgradeResult;
 type RuntimeError = Extract<GameSimulationResult, { ok: false }>['error']
   | 'invalid-clock' | 'invalid-state' | 'persistence-failure';
 
