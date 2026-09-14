@@ -1,5 +1,21 @@
 # Roadmap
 
+## Patch — paint edge coverage across the full current garage
+
+Refined KX-R, Senda and Lilt body contours, mirrors, spoiler, wheel arches,
+grille surrounds and lamp cutouts for both finishes per model. Small mask strokes
+cover antialias seams; protected lamp, glass, tyre and showroom interiors retain
+the source artwork. Senda handles and the Lilt far mirror now receive paint.
+
+The browser verifier checks 148 body/protected pixel comparisons at each of
+two display densities (296 total), with factory and both-finish screenshots for
+all three models. The existing 15 appearance flows still cover preview, apply,
+storage failure, reload, localization and responsive layout. Samples supplement
+enlarged visual review; they do not prove every boundary pixel is perfect.
+Save v23 / CE1 and gameplay are unchanged. Release evidence belongs in the PR.
+The next roadmap scope remains later vehicle tiers.
+
+
 ## Patch — KX-R paint mask
 
 Corrected missed bodywork and rear-lamp color leakage with refined contours and

@@ -21,9 +21,9 @@ export function VehicleArtwork({ vehicleId, appearanceId = null }: {
     {finish && <svg className="vehicle-paint" viewBox="0 0 720 405" aria-hidden="true" focusable="false">
       <defs>
         <mask id={`paint-${id}`} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="405" style={{ maskType: 'luminance' }}>
-          <path d={body} fill="white" />
-          <path d={openings.join(' ')} fill="black" />
-          <path d={PAINT_DETAILS[vehicleId]} fill="white" />
+          <path d={body} fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
+          <path d={openings.join(' ')} fill="black" stroke="white" strokeWidth=".65" strokeLinejoin="round" />
+          <path d={PAINT_DETAILS[vehicleId]} fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
         </mask>
         <filter id={`finish-${id}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
           <feColorMatrix type="matrix" values=".6 .3 .1 0 0 .6 .3 .1 0 0 .6 .3 .1 0 0 0 0 0 1 0" />
