@@ -1,4 +1,5 @@
 import { activeTuning, assertGarageState, findVehicle } from '../features/vehicles';
+import type { Modifier } from './modifiers';
 import type { GameState } from './game-state';
 
 export type ActiveVehicleResult = { readonly ok: true; readonly state: GameState }
@@ -19,17 +20,17 @@ export function setActiveVehicle(state: GameState, id: unknown): ActiveVehicleRe
 export function activeVehicleEffectChanged(previous: GameState, next: GameState): boolean {
   if (activeTuning(previous.garage)?.id !== activeTuning(next.garage)?.id) return true;
   if (previous.garage.activeVehicleId === next.garage.activeVehicleId) return false;
-  const before = findVehicle(previous.garage.activeVehicleId)?.modifier;
-  const after = findVehicle(next.garage.activeVehicleId)?.modifier;
-  if (!before || !after) return before !== after;
-  if (before.target.stat !== after.target.stat
-    || (before.target.stat === 'business-production' && after.target.stat === 'business-production'
-      && before.target.businessId !== after.target.businessId)) return true;
-  if (before.target.stat === 'job-reward' && after.target.stat === 'job-reward'
-    && before.target.context !== after.target.context) return true;
-  if (before.operation === 'reduce-interval')
-    return after.operation !== 'reduce-interval' || before.reductionMs !== after.reductionMs;
-  return before.operation === 'add-flat'
-    ? after.operation !== 'add-flat' || before.amount !== after.amount
-    : after.operation !== 'multiply-basis-points' || before.bonusBasisPoints !== after.bonusBasisPoints;
+  const before = (findVehicle(previous.garage.activeVehicleId)?.modifiers ?? []).map(effectKey).sort();
+  const after = (findVehicle(next.garage.activeVehicleId)?.modifiers ?? []).map(effectKey).sort();
+  return before.length !== after.length || before.some((key, index) => key !== after[index]);
+}
+
+/** Compare the complete effect multiset, independent of source IDs and ordering. */
+function effectKey(modifier: Modifier): string {
+  const target = modifier.target;
+  const scope = target.stat === 'business-production' ? target.businessId
+    : target.stat === 'job-reward' ? target.context ?? null : null;
+  const value = modifier.operation === 'reduce-interval' ? modifier.reductionMs
+    : modifier.operation === 'add-flat' ? modifier.amount : modifier.bonusBasisPoints;
+  return JSON.stringify([target.stat, scope, modifier.operation, value]);
 }

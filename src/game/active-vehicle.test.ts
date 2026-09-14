@@ -42,8 +42,8 @@ describe('Active Vehicle Foundation', () => {
   });
   it('collects exactly the active bonus without inactive stacking', () => {
     const state = both(), switched = setActiveVehicle(state, SECOND).state;
-    expect(collectModifiers(state).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual([V.modifier]);
-    expect(collectModifiers(switched).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual([findVehicle(SECOND)?.modifier]);
+    expect(collectModifiers(state).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual(V.modifiers);
+    expect(collectModifiers(switched).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual(findVehicle(SECOND)?.modifiers);
     expect(evaluateBusinessProduction(state, B.id, 4)).toMatchObject({ ok: true, effective: rational(330n) });
     expect(evaluateBusinessProduction(switched, B.id, 4)).toMatchObject({ ok: true, effective: rational(375n) });
   });

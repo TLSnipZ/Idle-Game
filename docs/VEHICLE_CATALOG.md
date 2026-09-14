@@ -1,5 +1,15 @@
 # Solara City Vehicle Catalog
 
+## Current phase — Garage IV-C: Rendan and Canto Club
+
+Implemented with user-approved model artwork: Rendan ($115,000, Player 12 /
+Afterdark 3, +18% manual and Dispatcher Cash) and Canto Club ($165,000, Player 14 /
+Afterdark 5, +18% Business Production and +12% Dispatcher Cash). Only the active
+car contributes; both remain factory-only. Save v25 / CE1 preserves prior progress.
+See [Rendan/Canto](RENDAN_CANTO.md) for approval, migration and verification scope.
+Release evidence belongs in the PR. IV-D customization remains a separate phase.
+
+
 ## Current authority — Tier-2 analysis after Garage tuning/paint
 
 Tier-1 models, tuning and finishes are implemented through Save v23 / CE1.

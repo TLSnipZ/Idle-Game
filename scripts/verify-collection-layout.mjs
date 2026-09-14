@@ -32,11 +32,11 @@ try {
     assert.equal(await page.locator('.vehicle-appearance').isVisible(),false);
     const filter=page.locator('.garage-filters select').first();
     await filter.selectOption('owned');assert.equal(await page.locator('.garage-tile').count(),2);
-    await filter.selectOption('missing');assert.equal(await page.locator('.garage-tile').count(),2);
+    await filter.selectOption('missing');assert.equal(await page.locator('.garage-tile').count(),4);
     await filter.selectOption('all');
     await page.locator('.garage-filters select').last().selectOption('name');
     const names=await page.locator('.tile-copy strong').allTextContents();
-    assert.equal(names.length,4);
+    assert.equal(names.length,6);
     assert.deepEqual(names,[...names].sort((a,b)=>a.localeCompare(b,locale==='villager'?'en':locale)),'Displayed names sort correctly');
     for (const picture of await page.locator('.garage-tile img').all()) { await picture.scrollIntoViewIfNeeded(); await picture.evaluate(image=>image.decode()); }
     await page.locator('.collection-workspace').screenshot({path:`browser-evidence/collection-grid-${locale}-${width}.png`});

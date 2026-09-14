@@ -37,9 +37,9 @@ function reward(modifiers: readonly Modifier[], context: 'manual' | 'dispatcher'
   return value(STARTER_JOB.reward,{stat:'job-reward',context},modifiers,true);
 }
 const current = VEHICLE_CATALOG.flatMap(car => [
-  { name: car.name+' stock', modifiers:[car.modifier] },
+  { name: car.name+' stock', modifiers:car.modifiers },
   ...TUNING_CATALOG.filter(part=>part.vehicleId===car.id).map(part=>({
-    name:car.name+' / '+part.name,modifiers:[car.modifier,part.modifier],
+    name:car.name+' / '+part.name,modifiers:[...car.modifiers,part.modifier],
   })),
 ]);
 function gates(p: typeof proposals[number]): Requirement[] {

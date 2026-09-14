@@ -60,9 +60,10 @@ describe('Phase 9D bounded runtime and frozen pre-9D outputs', () => {
     // Recorded from f3a8631. Keep its historical +15% vehicle solely for this oracle;
     // current KX-R +10% and chronology are covered by current production tests.
     const vehicle = vehicles.STARTER_VEHICLE;
-    if (vehicle.modifier.operation !== 'multiply-basis-points') throw Error('fixture');
+    const base = vehicle.modifiers[0];
+    if (base?.operation !== 'multiply-basis-points') throw Error('fixture');
     vi.spyOn(vehicles, 'findVehicle').mockImplementation(id => id === vehicle.id
-      ? { ...vehicle, modifier: { ...vehicle.modifier, operation: 'multiply-basis-points', bonusBasisPoints: 1500 } } : undefined);
+      ? { ...vehicle, modifiers: [{ ...base, operation: 'multiply-basis-points', bonusBasisPoints: 1500 }] } : undefined);
     const state = runtimeLoad(expected.start, expected.cash); freeze(state);
     const calls = vi.spyOn(production, 'simulateElapsed');
     const result = simulate(state, 43200000);

@@ -18,7 +18,7 @@ import { isMoney } from '../features/economy';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 24;
+export const CURRENT_SAVE_VERSION = 25;
 // Historical identity is accepted only before v16, never by current catalog lookup.
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
@@ -116,6 +116,8 @@ function validateState(value: unknown, version: number): GameState | null {
       // Historical Tier-1 envelopes must not accept future catalog identities.
       if (version >= 19 && version < 24
         && ![KXR_VEHICLE_ID, 'vehicle:kairo-senda', 'vehicle:namera-lilt'].includes(vehicleId)) return null;
+      if (version === 24
+        && ![KXR_VEHICLE_ID, 'vehicle:kairo-senda', 'vehicle:namera-lilt', 'vehicle:namera-serein'].includes(vehicleId)) return null;
       ownedVehicleIds.push(vehicleId);
     }
   }
@@ -313,6 +315,8 @@ export function migrateToCurrentSave(value: unknown): SaveResult {
   if (value.version <= 22) migrated = validateState(migrated, 22);
   // v23 -> v24: validate the frozen Tier-1 identity boundary before adding Serein.
   if (value.version <= 23) migrated = validateState(migrated, 23);
+  // v24 -> v25: preserve four-car saves before accepting Rendan and Canto.
+  if (value.version <= 24) migrated = validateState(migrated, 24);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

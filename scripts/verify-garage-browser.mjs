@@ -12,7 +12,7 @@ async function verifyArtwork(page, width, locale) {
   await openCollectionView(page, 'garage');
   if (await page.locator('.garage-back').isVisible()) await page.locator('.garage-back').click();
   const pictures = page.locator('.garage-rail .vehicle-artwork');
-  assert.equal(await pictures.count(), 4, 'Every configured vehicle has its own image');
+  assert.equal(await pictures.count(), 6, 'Every configured vehicle has its own image');
   const sources = [];
   for (const picture of await pictures.all()) {
     await picture.scrollIntoViewIfNeeded();
@@ -24,7 +24,7 @@ async function verifyArtwork(page, width, locale) {
         loading: image.loading, fit: getComputedStyle(image).objectFit };
     });
     assert.equal(view.width, 1672);
-    const expectedHeight = view.src.includes('namera-serein') ? 940 : 941;
+    const expectedHeight = /namera-serein|toseki-rendan|sevrin-canto-club/.test(view.src) ? 940 : 941;
     assert.equal(view.height, expectedHeight);
     assert.ok(view.left >= -1 && view.right <= width + 1, 'Whole artwork fits viewport');
     assert.ok(Math.abs(view.ratio - 1672 / expectedHeight) < 0.02, 'Artwork is not distorted');
@@ -34,7 +34,7 @@ async function verifyArtwork(page, width, locale) {
     if (locale === 'villager') assert.match(view.alt, /^[hmr -]+$/i);
     sources.push(view.src);
   }
-  assert.equal(new Set(sources).size, 4, 'Models never reuse another car image');
+  assert.equal(new Set(sources).size, 6, 'Models never reuse another car image');
 }
 mkdirSync('browser-evidence', { recursive: true });
 try {
@@ -66,7 +66,7 @@ try {
     });
     await page.locator('.garage-active-summary').waitFor();
     let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-    assert.equal(saved.version, 24);
+    assert.equal(saved.version, 25);
     assert.equal(saved.state.garage.activeVehicleId, owner ? 'vehicle:kairo-kx-r' : null);
     await openGarageVehicle(page, 'vehicle:kairo-kx-r');
     if (!owner) {
@@ -123,9 +123,9 @@ try {
       const select = card.locator('button:not(.garage-workshop-link)');
       await select.focus(); await page.keyboard.press('Enter');
       const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('crime-empire:save')));
-      assert.equal(saved.version, 24); assert.equal(saved.state.garage.activeVehicleId, id);
+      assert.equal(saved.version, 25); assert.equal(saved.state.garage.activeVehicleId, id);
       assert.equal(await card.locator('button:not(.garage-workshop-link)').count(), 0);
-      assert.equal(await page.locator('.vehicle-specification button:not(.garage-workshop-link)').count(), 3);
+      assert.equal(await page.locator('.vehicle-specification button:not(.garage-workshop-link)').count(), 5);
       assert.equal(saved.state.garage.ownedVehicleIds.length, 3);
     }
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Three-car Garage fits viewport');

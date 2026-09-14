@@ -150,7 +150,7 @@ try {
     assert.deepEqual(result.garage.builds, original.garage.builds);
     await page.reload(); await page.locator('.primary-navigation button').nth(3).click();
     assert.deepEqual((await saved(page)).state.garage.appearances, applied);
-    assert.equal((await saved(page)).version, 24);
+    assert.equal((await saved(page)).version, 25);
     await openCollectionView(page, 'appearance'); await page.locator('#appearance-vehicle').selectOption(K);
     await studio(page).locator('.finish-option').first().click();
     await studio(page).locator('.discard-appearance').click();

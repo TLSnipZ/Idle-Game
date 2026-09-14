@@ -408,3 +408,18 @@ edits during conversion. Masters are not imported into runtime. Presentation kee
 1672×941 intrinsic dimensions, contain sizing, lazy/async loading, localized alt
 text and separate HTML name/effect/gate/action facts. No art paths enter saves.
 Browser checks decode all three distinct assets at five widths in EN/DE/Villager.
+
+
+## Garage IV-C — approved Rendan and Canto Club
+
+The user explicitly approved Rendan A (blue four-door rally sedan) and Canto Club A
+(dark emerald two-door performance coupe) with “Perfekt. Hau das update raus bro”.
+The exact generated PNGs are preserved under `src/assets/reference/vehicles/` as
+`toseki-rendan-reference.png` and `sevrin-canto-club-reference.png`. These are
+canonical Model References. See [Rendan/Canto](RENDAN_CANTO.md) for provenance.
+
+Retain each model's doors, greenhouse, lamps, grille, original badges, wheels and
+aero when future customization is requested. Rendan retains its scoop and wing;
+Canto retains restrained aero and silver five-spoke wheels. Both share the
+approved low front-three-quarter coastal-night scene, whole-car framing and
+lighting. No masks, tuning variants or alternate paint are approved in IV-C.
