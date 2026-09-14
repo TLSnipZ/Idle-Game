@@ -15,7 +15,6 @@ import { createInitialBusinessState } from '../features/businesses';
 import type { BusinessState } from '../features/businesses';
 import { createInitialEconomyState } from '../features/economy';
 import type { EconomyState } from '../features/economy';
-import { createInitialManualJobState } from './manual-job-readiness';
 import type { ManualJobState } from './manual-job-readiness';
 
 export interface GameState {
@@ -29,9 +28,9 @@ export interface GameState {
   readonly upgrades: UpgradeState;
   readonly economy: EconomyState;
   readonly businesses: BusinessState;
-  readonly manualJobs: ManualJobState;
+  readonly manualJobs?: ManualJobState;
 }
 
 export function createInitialGameState(): GameState {
-  return { events: createInitialEventState(), crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [], activeVehicleId: null }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] }, manualJobs: createInitialManualJobState() };
+  return { events: createInitialEventState(), crew: createInitialCrewState(), city: createInitialCityState(), permanentProgression: createInitialPermanentProgression(), garage: { ownedVehicleIds: [], activeVehicleId: null }, progression: { xp: 0 }, automation: createInitialAutomationState(), economy: createInitialEconomyState(), businesses: createInitialBusinessState(), upgrades: { purchasedIds: [] } };
 }
