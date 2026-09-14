@@ -173,6 +173,6 @@ describe('New Game in Empire / Save & Transfer', () => {
     expect(f.game().getSnapshot().result.state.progression.xp).toBe(10);
     expect(f.game().getSnapshot().result.state.economy.cash).toBe('2500');
     expect(f.game().getSnapshot().result.state.permanentProgression.statistics.manualJobsCompleted).toBe(1);
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 21 } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 22 } });
   });
 });

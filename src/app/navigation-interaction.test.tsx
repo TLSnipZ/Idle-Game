@@ -210,7 +210,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 21,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 22,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);
@@ -526,4 +526,30 @@ describe('whole-game quick access', () => {
     expect(f.game().getSnapshot().result.state.events.pendingEventId).toBe('event:hot-tip');
     expect(f.reads()).toBe(reads); expect(f.writes()).toBe(writes);
   });
+});
+
+it('workshop selection is UI-only and stock targets the displayed car', async () => {
+  const initial = autoUpgraderState();
+  const f = await mount({ ...initial, garage: { ownedVehicleIds: ['vehicle:kairo-kx-r', 'vehicle:kairo-senda', 'vehicle:namera-lilt'], activeVehicleId: 'vehicle:kairo-kx-r' } });
+  await navigate('COLLECTION');
+  const selector = container.querySelector<HTMLSelectElement>('#tuning-vehicle');
+  if (!selector) throw Error('workshop');
+  const before = f.game().getSnapshot().result.state, raw = f.raw(), reads = f.reads();
+  async function choose(id: string) {
+    await act(() => { selector!.value = id; selector!.dispatchEvent(new Event('change', { bubbles: true })); });
+  }
+  await choose('vehicle:kairo-senda');
+  expect(f.game().getSnapshot().result.state).toBe(before);
+  expect(f.raw()).toBe(raw); expect(f.reads()).toBe(reads);
+  await act(() => container.querySelector<HTMLButtonElement>('[data-tuning-id="tuning:senda-express-ecu"] button')?.click());
+  expect(f.game().getSnapshot().result.state.garage.activeVehicleId).toBe('vehicle:kairo-kx-r');
+  const build = f.game().getSnapshot().result.state.garage.builds?.['vehicle:kairo-senda'];
+  expect(build?.selectedId).toBe('tuning:senda-express-ecu');
+  await choose('vehicle:namera-lilt');
+  expect(container.querySelector<HTMLButtonElement>('.tuning-stock')?.disabled).toBe(true);
+  await choose('vehicle:kairo-senda');
+  await act(() => container.querySelector<HTMLButtonElement>('.tuning-stock')?.click());
+  expect(f.game().getSnapshot().result.state.garage.builds?.['vehicle:kairo-senda'])
+    .toEqual({ purchasedIds: ['tuning:senda-express-ecu'], selectedId: null });
+  expect(f.game().getSnapshot().result.state.garage.builds?.['vehicle:kairo-kx-r']).toBeUndefined();
 });

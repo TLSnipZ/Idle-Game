@@ -1,4 +1,6 @@
-import { TUNING_CATALOG, STARTER_VEHICLE, findTuning } from '../features/vehicles';
+import { useState } from 'react';
+import { TUNING_CATALOG, STARTER_VEHICLE, VEHICLE_CATALOG, findVehicle, findTuning } from '../features/vehicles';
+import type { VehicleId } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
 import { purchaseTuning } from '../game/vehicle-tuning';
 import { formatPrice } from './number-format';
@@ -8,40 +10,53 @@ import './VehicleTuning.css';
 
 export function VehicleTuning({ state, paused, onConfigure }: {
   readonly state: GameState; readonly paused: boolean;
-  readonly onConfigure: (id: string | null, purchase: boolean) => void;
+  readonly onConfigure: (vehicleId: string, id: string | null, purchase: boolean) => void;
 }) {
   const text = useLocalizedText();
-  const owned = state.garage.ownedVehicleIds.includes(STARTER_VEHICLE.id);
-  const build = state.garage.builds?.[STARTER_VEHICLE.id];
+  const [vehicleId, setVehicleId] = useState<VehicleId>(state.garage.activeVehicleId ?? STARTER_VEHICLE.id);
+  const vehicle = findVehicle(vehicleId) ?? STARTER_VEHICLE;
+  const owned = state.garage.ownedVehicleIds.includes(vehicle.id);
+  const build = state.garage.builds?.[vehicle.id];
   const selected = findTuning(build?.selectedId);
-  const active = state.garage.activeVehicleId === STARTER_VEHICLE.id;
+  const active = state.garage.activeVehicleId === vehicle.id;
   return <section className="vehicle-tuning panel" aria-labelledby="tuning-heading">
-    <h3 id="tuning-heading" tabIndex={-1}>{text('KX-R Workshop', 'KX-R-Werkstatt')}</h3>
-    <p>{text('One car, one setup. Buy and fit permanent parts; swap owned setups or restore stock for free. Rebirth keeps the build. Your accountant keeps the nightmares.',
-      'Ein Auto, ein Setup. Teile dauerhaft kaufen und einbauen. Gekaufte Setups und Serie kostenlos wechseln. Rebirth behält den Ausbau. Dein Buchhalter behält die Albträume.')}</p>
+    <h3 id="tuning-heading" tabIndex={-1}>{text(`${vehicle.model} Workshop`, `${vehicle.model}-Werkstatt`)}</h3>
+    <label className="tuning-vehicle-label" htmlFor="tuning-vehicle">{text('Choose workshop vehicle', 'Werkstatt-Fahrzeug wählen')}</label>
+    <select id="tuning-vehicle" value={vehicle.id} onChange={event => {
+      const chosen = findVehicle(event.target.value);
+      if (chosen) setVehicleId(chosen.id);
+    }}>{VEHICLE_CATALOG.map(car => <option key={car.id} value={car.id}>{text(car.name)} · {state.garage.ownedVehicleIds.includes(car.id) ? text('Owned', 'Im Besitz') : text('Not owned', 'Nicht im Besitz')}</option>)}</select>
+    <p>{text('One setup per car. Buy permanent parts, switch owned setups or restore stock for free. Rebirth keeps every build. Your accountant keeps every nightmare.',
+      'Ein Setup pro Auto. Teile dauerhaft kaufen, gekaufte Setups oder Serie kostenlos wechseln. Rebirth behält jeden Ausbau. Dein Buchhalter behält jeden Albtraum.')}</p>
     <p className="tuning-selection">{text('Fitted:', 'Eingebaut:')} <strong>{selected ? text(selected.name, selected.germanName) : text('Stock', 'Serie')}</strong>
       {' · '}{active ? selected ? text('BONUS ACTIVE', 'BONUS AKTIV') : text('BASE BONUS ONLY', 'NUR BASISBONUS') : text('INACTIVE CAR · NO TUNING BONUS', 'AUTO INAKTIV · KEIN TUNING-BONUS')}</p>
-    <p>{text('The base vehicle bonus remains. Only the fitted setup adds its effect while the KX-R is active. Buying both does not stack them.',
-      'Der Basisbonus des Autos bleibt. Nur das eingebaute Setup wirkt zusätzlich, solange der KX-R aktiv ist. Beide kaufen stapelt die Boni nicht.')}</p>
-    {!owned && <p>{text('Own a Kairo KX-R to unlock this workshop.', 'Kairo KX-R kaufen, um diese Werkstatt freizuschalten.')}</p>}
-    <div className="tuning-options">{TUNING_CATALOG.map(part => {
+    <p>{text('The base vehicle bonus remains. Only one fitted setup adds its effect while that car is active. Choosing a workshop or fitting parts does not activate the car.',
+      'Der Basisbonus bleibt. Nur ein eingebautes Setup wirkt zusätzlich, solange dieses Auto aktiv ist. Werkstatt-Auswahl und Einbau aktivieren das Auto nicht.')}</p>
+    {!owned && <p>{text(`Own a ${vehicle.name} to unlock this workshop.`, `${vehicle.name} kaufen, um diese Werkstatt freizuschalten.`)}</p>}
+    <div className="tuning-options">{TUNING_CATALOG.filter(part => part.vehicleId === vehicle.id).map(part => {
       const purchased = build?.purchasedIds.includes(part.id) ?? false;
       const fitted = selected?.id === part.id;
       const canBuy = owned && purchaseTuning(state, part.id).ok;
+      const effect = part.modifier.target.stat === 'heat-decay-interval'
+        ? text('seconds per Heat cooling step', 'Sekunden pro Heat-Abkühlschritt')
+        : part.modifier.target.stat === 'heat-response-cost'
+          ? text('Decoy cost · stacks with active support', 'Ablenkungskosten · mit aktiver Unterstützung kombinierbar')
+          : part.modifier.target.stat === 'business-production'
+            ? text('Business Production', 'Business-Produktion')
+            : text('Manual Job Cash · no Dispatcher bonus', 'Manueller Job-Cash · kein Dispatcher-Bonus');
       return <article className="tuning-option" key={part.id} data-tuning-id={part.id}>
         <p className="eyebrow">{text(part.category, part.germanCategory)}</p>
         <h4>{text(part.name, part.germanName)}</h4>
-        <p>{formatModifier(part.modifier)} {part.modifier.target.stat === 'business-production'
-          ? text('Business Production', 'Business-Produktion') : text('Manual Job Cash · no Dispatcher bonus', 'Manueller Job-Cash · kein Dispatcher-Bonus')}</p>
+        <p>{formatModifier(part.modifier)} {effect}</p>
         <p>{text('One-time price:', 'Einmaliger Preis:')} <strong>{formatPrice(part.cost)}</strong></p>
         <p>{fitted ? text('FITTED', 'EINGEBAUT') : purchased ? text('OWNED', 'IM BESITZ')
-          : !owned ? text('KX-R REQUIRED', 'KX-R ERFORDERLICH') : canBuy ? text('AVAILABLE', 'VERFÜGBAR') : text('INSUFFICIENT CASH', 'ZU WENIG CASH')}</p>
+          : !owned ? text('VEHICLE REQUIRED', 'FAHRZEUG ERFORDERLICH') : canBuy ? text('AVAILABLE', 'VERFÜGBAR') : text('INSUFFICIENT CASH', 'ZU WENIG CASH')}</p>
         <button className="action-button" disabled={paused || fitted || (!purchased && !canBuy)}
-          onClick={() => onConfigure(part.id, !purchased)}>{fitted ? text('Fitted', 'Eingebaut')
+          onClick={() => onConfigure(vehicle.id, part.id, !purchased)}>{fitted ? text('Fitted', 'Eingebaut')
             : purchased ? text('Fit setup', 'Setup einbauen') : text('Buy & fit', 'Kaufen & einbauen')}</button>
       </article>;
     })}</div>
     <button className="action-button secondary-button tuning-stock" disabled={paused || !selected}
-      onClick={() => onConfigure(null, false)}>{text('Restore stock · keep purchased parts', 'Zur Serie wechseln · gekaufte Teile behalten')}</button>
+      onClick={() => onConfigure(vehicle.id, null, false)}>{text('Restore stock · keep purchased parts', 'Zur Serie wechseln · gekaufte Teile behalten')}</button>
   </section>;
 }

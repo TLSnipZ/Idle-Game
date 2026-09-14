@@ -1,4 +1,4 @@
-import { assertGarageState, findTuning, STARTER_VEHICLE } from '../features/vehicles';
+import { assertGarageState, findTuning, findVehicle } from '../features/vehicles';
 import { spendCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
 import type { GameState } from './game-state';
@@ -23,18 +23,18 @@ export function purchaseTuning(state: GameState, id: unknown): TuningResult {
   } } };
 }
 
-/** The KX-R pilot has one setup slot. Null restores stock without selling purchased parts. */
-export function selectTuning(state: GameState, id: unknown): TuningResult {
+/** Every owned car has one setup slot. Stock never sells purchased parts. */
+export function selectTuning(state: GameState, vehicleId: unknown, id: unknown): TuningResult {
   assertGarageState(state.garage);
   const part = findTuning(id);
-  if (id !== null && !part) return { ok: false, state, error: 'unknown-upgrade' };
-  const vehicleId = STARTER_VEHICLE.id;
-  if (!state.garage.ownedVehicleIds.includes(vehicleId)) return { ok: false, state, error: 'vehicle-not-owned' };
-  const build = state.garage.builds?.[vehicleId];
+  const vehicle = findVehicle(vehicleId);
+  if (!vehicle || (id !== null && (!part || part.vehicleId !== vehicle.id))) return { ok: false, state, error: 'unknown-upgrade' };
+  if (!state.garage.ownedVehicleIds.includes(vehicle.id)) return { ok: false, state, error: 'vehicle-not-owned' };
+  const build = state.garage.builds?.[vehicle.id];
   if (part && !build?.purchasedIds.includes(part.id)) return { ok: false, state, error: 'tuning-not-owned' };
   const selectedId = part?.id ?? null;
   if (!build || build.selectedId === selectedId) return { ok: true, state };
   return { ok: true, state: { ...state, garage: { ...state.garage,
-    builds: { ...state.garage.builds, [vehicleId]: { ...build, selectedId } },
+    builds: { ...state.garage.builds, [vehicle.id]: { ...build, selectedId } },
   } } };
 }

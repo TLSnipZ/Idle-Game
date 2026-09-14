@@ -1,5 +1,15 @@
 # Post-roadmap priorities
 
+## Current phase — Garage 2.0 II: model-specific tuning
+
+Implemented: two permanent setups each for Senda and Lilt, per-model workshop
+selection, independent stock/fit commands, cooling and decoy integration.
+Save **v22 / CE1** preserves existing KX-R builds without grants.
+See [Model tuning](MODEL_TUNING.md) for prices, exact balance, save boundaries
+and verification. Release evidence is tracked in the PR.
+Next separate scope: curated visual customization; later car tiers remain planned.
+
+
 ## Current phase — Garage 2.0 I: KX-R tuning
 
 Implemented in [PR #35](https://github.com/TLSnipZ/Idle-Game/pull/35): permanent Fleet gearing / Courier ECU, one fitted setup, free stock/owned switching and durable Garage writes. Save **v21 / CE1** migrates existing stock garages without granting parts. See [Tuning pilot](GARAGE_TUNING.md) for prices, balance, persistence and verification scope.

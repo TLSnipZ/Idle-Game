@@ -1,5 +1,15 @@
 # Roadmap
 
+## Current phase — Garage 2.0 II: model-specific tuning
+
+Implemented: two permanent setups each for Senda and Lilt, per-model workshop
+selection, independent stock/fit commands, cooling and decoy integration.
+Save **v22 / CE1** preserves existing KX-R builds without grants.
+See [Model tuning](MODEL_TUNING.md) for prices, exact balance, save boundaries
+and verification. Release evidence is tracked in the PR.
+Next separate scope: curated visual customization; later car tiers remain planned.
+
+
 ## Interlude — whole-game layout and navigation
 
 Implemented: responsive overview, desktop section indexes/mobile quick access,

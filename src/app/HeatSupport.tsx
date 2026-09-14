@@ -1,3 +1,4 @@
+import { formatModifier } from './stat-format';
 import { findBusiness } from '../features/businesses';
 import { findCrewMember } from '../features/crew';
 import { findVehicle } from '../features/vehicles';
@@ -25,7 +26,12 @@ export function HeatSupport({ pricing }: { readonly pricing: ReturnType<typeof e
         <strong>{text(name)} · −{discount}%</strong><span>{requirement}</span>
         <span>{active ? text('Active', 'Aktiv') : text('Not active', 'Nicht aktiv')}</span>
       </li>;
-    })}</ul>
+    })}
+    {pricing.tuning && <li data-support-active={true}>
+      <strong>{text(pricing.tuning.name, pricing.tuning.germanName)} · {formatModifier(pricing.tuning.modifier)}</strong>
+      <span>{text('Fitted to the active vehicle', 'Im aktiven Fahrzeug eingebaut')}</span>
+      <span>{text('Active', 'Aktiv')}</span>
+    </li>}</ul>
     <p>{text('Discounts apply only to the decoy price. The response still removes the same local Heat and grants no reward.',
       'Rabatte gelten nur für den Preis des Ablenkungsmanövers. Es senkt weiterhin gleich viel lokales Heat und gibt keine Belohnung.')}</p>
   </details>;

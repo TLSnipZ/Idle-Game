@@ -9,3 +9,8 @@
 @media (max-width: 740px) { .tuning-options { grid-template-columns: minmax(0, 1fr); } }
 
 .vehicle-tuning .action-button:enabled, .garage-workshop-link { color: var(--color-cool); background: var(--color-cool-tint); border-color: var(--color-cool); text-decoration: none; }
+
+.tuning-vehicle-label { display: block; margin-bottom: .35rem; font-size: .85rem; color: var(--color-secondary); }
+#tuning-vehicle { width: 100%; max-width: 28rem; min-height: 44px; padding: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-background); color: var(--color-text); font: inherit; }
+.tuning-option { display: flex; flex-direction: column; }
+.tuning-option .action-button { margin-top: auto; }

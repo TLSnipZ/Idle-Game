@@ -16,7 +16,7 @@ function state() {
 describe('durable tuning transactions', () => {
   it('saves payment and fitted build before publication; reload retains both', () => {
     const f = rebirthRuntime(state());
-    expect(f.game.configureTuning(F.id, true)?.ok).toBe(true);
+    expect(f.game.configureTuning(K.id, F.id, true)?.ok).toBe(true);
     const write = f.events.findIndex(e => e.type === 'write' && e.state.garage.builds?.[K.id]);
     const publish = f.events.findIndex(e => e.type === 'publish' && e.state.garage.builds?.[K.id]);
     expect(write).toBeGreaterThanOrEqual(0); expect(publish).toBeGreaterThan(write);
@@ -30,25 +30,25 @@ describe('durable tuning transactions', () => {
     const f = rebirthRuntime(state()), before = f.game.getSnapshot().result.state;
     if (kind === 'quota') f.fail(); else f.replaceRaw('other-session');
     const raw = f.raw();
-    expect(f.game.configureTuning(F.id, true)).toBeUndefined();
+    expect(f.game.configureTuning(K.id, F.id, true)).toBeUndefined();
     expect(f.game.getSnapshot().result.state).toEqual(before); expect(f.raw()).toBe(raw);
     expect(f.events.some(e => e.state.garage.builds)).toBe(false);
     f.game.stop();
   });
   it('same setup, invalid IDs and stopped sessions perform no IO', () => {
     const f = rebirthRuntime(state());
-    f.game.configureTuning(F.id, true);
+    f.game.configureTuning(K.id, F.id, true);
     const raw = f.raw(), reads = f.clockReads(), events = f.events.length;
-    expect(f.game.configureTuning(F.id, false)?.ok).toBe(true);
-    expect(f.game.configureTuning('fake', false)?.ok).toBe(false);
-    expect(f.game.configureTuning(C.id, false)?.ok).toBe(false);
-    expect(f.game.configureTuning(F.id, true)?.ok).toBe(false);
+    expect(f.game.configureTuning(K.id, F.id, false)?.ok).toBe(true);
+    expect(f.game.configureTuning(K.id, 'fake', false)?.ok).toBe(false);
+    expect(f.game.configureTuning(K.id, C.id, false)?.ok).toBe(false);
+    expect(f.game.configureTuning(K.id, F.id, true)?.ok).toBe(false);
     expect(f.clockReads()).toBe(reads); expect(f.events).toHaveLength(events); expect(f.raw()).toBe(raw);
-    f.game.stop(); expect(f.game.configureTuning(null, false)).toBeUndefined();
+    f.game.stop(); expect(f.game.configureTuning(K.id, null, false)).toBeUndefined();
   });
   it('reconciles old production before installing a new bonus', () => {
     const f = rebirthRuntime(state()); f.at(1000);
-    f.game.configureTuning(F.id, true);
+    f.game.configureTuning(K.id, F.id, true);
     expect(f.game.getSnapshot().result.state.economy.cash).toBe('3500082');
     expect(f.game.getSnapshot().result.state.businesses.productionRemainderMilliCents).toBe(500);
     f.at(2000); f.tick();
@@ -56,8 +56,8 @@ describe('durable tuning transactions', () => {
     f.game.stop();
   });
   it('failed free reconfiguration retains the fitted setup', () => {
-    const f = rebirthRuntime(state()); f.game.configureTuning(F.id, true); f.fail();
-    expect(f.game.configureTuning(null, false)).toBeUndefined();
+    const f = rebirthRuntime(state()); f.game.configureTuning(K.id, F.id, true); f.fail();
+    expect(f.game.configureTuning(K.id, null, false)).toBeUndefined();
     expect(f.game.getSnapshot().result.state.garage.builds?.[K.id]?.selectedId).toBe(F.id);
     f.game.stop();
   });
@@ -67,7 +67,7 @@ describe('durable tuning transactions', () => {
     const reload = f.make(); reload.start();
     expect(reload.getSnapshot().result.state.economy.cash).toBe('3500086');
     expect(reload.getSnapshot().result.state.businesses.productionRemainderMilliCents).toBe(625);
-    reload.configureTuning(null, false);
+    reload.configureTuning(K.id, null, false);
     expect(reload.getSnapshot().result.state.economy.cash).toBe('3500086');
     reload.stop(); const again = f.make(); again.start();
     expect(again.getSnapshot().result.state.economy.cash).toBe('3500086'); again.stop();

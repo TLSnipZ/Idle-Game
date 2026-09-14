@@ -1,3 +1,4 @@
+import { findTuning } from '../features/vehicles';
 import { deployDecoy } from '../game/deploy-decoy';
 import { purchaseTuning, selectTuning } from '../game/vehicle-tuning';
 import { setActiveDistrict } from '../game/set-active-district';
@@ -135,14 +136,17 @@ export function createPersistentGame(
     return completed;
   }
   /** Preflight makes a repeated selection an IO-free no-op, before any reconciliation. */
-  function configureTuning(id: unknown, purchase: boolean) {
+  function configureTuning(vehicleId: unknown, id: unknown, purchase: boolean) {
     if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'
       || view.persistence.kind === 'offline-error') return;
     const state = runtime.getSnapshot().result.state;
-    const command = purchase ? purchaseTuning : selectTuning;
-    const prepared = command(state, id);
+    const command = (current: GameState) => purchase
+      ? findTuning(id)?.vehicleId === vehicleId ? purchaseTuning(current, id)
+        : { ok: false as const, state: current, error: 'unknown-upgrade' as const }
+      : selectTuning(current, vehicleId, id);
+    const prepared = command(state);
     if ((!prepared.ok && prepared.error !== 'insufficient-funds') || (prepared.ok && prepared.state === state)) return prepared;
-    return execute(current => command(current, id));
+    return execute(command);
   }
   function selectActiveVehicle(id: unknown) {
     if (!active || !runtime || view.runtimeError || view.persistence.kind === 'blocked'

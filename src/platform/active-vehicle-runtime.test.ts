@@ -74,7 +74,7 @@ describe('durable active vehicle selection', () => {
     const saves = createLocalSave(() => ({ getItem: () => raw, setItem: (_key, value) => { raw = value; } }), () => 26000);
     const loaded = saves.bootstrap(), expected = simulateGameElapsed(state, 25000).state;
     expect(loaded).toMatchObject({ kind: 'loaded', state: expected });
-    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 21, savedAt: 26000, state: expected } });
+    expect(parseSave(raw)).toMatchObject({ ok: true, envelope: { version: 22, savedAt: 26000, state: expected } });
     expect(saves.bootstrap()).toMatchObject({ kind: 'loaded', state: expected, offline: { incomeEarned: '0' } });
   });
   it('offline credit uses the saved car before a later switch; reload and CE1 retain selection', () => {
@@ -101,7 +101,7 @@ describe('durable active vehicle selection', () => {
     const f = rebirthRuntime(both()), before = f.game.getSnapshot().result.state, raw = f.raw();
     const incoming = setActiveVehicle(both(), SECOND).state;
     const exported = exportSaveCode(incoming, 1); if (!exported.ok) throw Error(exported.error);
-    const code = mode === 'invalid' ? encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 21,
+    const code = mode === 'invalid' ? encodeSaveText(JSON.stringify({ format: 'crime-empire-save', version: 22,
       savedAt: 1, state: { ...incoming, garage: { ...incoming.garage, activeVehicleId: 'vehicle:unknown' } } })) : exported.code;
     if (mode === 'quota') f.fail(); f.wall(1000000);
     expect(f.game.importCode(code).ok).toBe(mode === 'valid');
@@ -110,7 +110,7 @@ describe('durable active vehicle selection', () => {
     f.game.stop();
   });
   it('blocked and failed-offline sessions reject selection without touching clocks', () => {
-    for (const raw of ['broken', JSON.stringify({ format: 'crime-empire-save', version: 21, savedAt: 0, state: both() })]) {
+    for (const raw of ['broken', JSON.stringify({ format: 'crime-empire-save', version: 22, savedAt: 0, state: both() })]) {
       const now = vi.fn(() => 0), game = createPersistentGame(() => {},
         createLocalSave(() => ({ getItem: () => raw, setItem: () => { throw Error('write'); } }), () => 1000),
         { now, schedule: () => () => {} }, () => () => {});
