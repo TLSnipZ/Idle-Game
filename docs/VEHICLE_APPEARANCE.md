@@ -18,8 +18,8 @@ Factory restoration changes only that vehicle's appearance, retaining every tuni
 purchase and fitted setup. The Garage immediately uses the applied finish.
 
 Drafts survive switching the studio selector while mounted; leaving Collection
-discards unapplied previews. Rebirth and imported/full replacement state remount
-section content through the existing replacement boundary. All player-facing
+discards unapplied previews. Rebirth, import and New Game are initiated from Empire,
+so returning to Collection initializes the studio from the resulting saved Garage. All player-facing
 strings use EN/DE localization and complete Villager transformation.
 Desktop pairs preview and controls; narrow screens stack them. Native buttons,
 pressed states, labels and a text status accompany the swatches. Quick access
