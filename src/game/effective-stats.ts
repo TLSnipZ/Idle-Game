@@ -5,7 +5,8 @@ import { collectSkillModifiers } from '../features/skills';
 import { activeTuning, assertGarageState, findVehicle } from '../features/vehicles';
 import { findUpgrade } from '../features/upgrades';
 import { findBusiness, getLevelProduction, getOwnedProductionInputs } from '../features/businesses';
-import { STARTER_JOB } from '../features/economy';
+import { STARTER_JOB, addMoney, compareMoney, moneyFromMinorUnits, multiplyMoney } from '../features/economy';
+import type { Money } from '../features/economy';
 import { evaluateStat, wholeStatValue } from './modifiers';
 import type { Modifier } from './modifiers';
 import type { GameState } from './game-state';
@@ -41,6 +42,20 @@ export function effectiveProductionRates(state: GameState) {
   }
   return { ok: true as const, rates };
 }
+
+export function evaluateDeliveryRewardBase(state: GameState, context: 'manual' | 'dispatcher'):
+  { readonly ok: true; readonly base: Money } | { readonly ok: false; readonly error: 'overflow' } {
+  let production = moneyFromMinorUnits('0');
+  for (const input of getOwnedProductionInputs(state.businesses)) {
+    const sum = addMoney(production, input.base);
+    if (!sum.ok) return { ok: false, error: 'overflow' };
+    production = sum.value;
+  }
+  const scaled = multiplyMoney(production, context === 'manual' ? 8 : 1);
+  if (!scaled.ok) return { ok: false, error: 'overflow' };
+  return { ok: true, base: compareMoney(scaled.value, STARTER_JOB.reward) < 0 ? STARTER_JOB.reward : scaled.value };
+}
+
 export function evaluateJobReward(state: GameState, context: 'manual' | 'dispatcher' = 'manual') {
   return evaluateDeliveryReward(state, context, []);
 }
@@ -59,6 +74,8 @@ export function evaluateDiscreetJobReward(state: GameState) {
   }]);
 }
 function evaluateDeliveryReward(state: GameState, context: 'manual' | 'dispatcher', extra: readonly Modifier[]) {
-  const evaluated = evaluateStat(STARTER_JOB.reward, { stat: 'job-reward', context }, [...collectModifiers(state, context), ...extra]);
+  const base = evaluateDeliveryRewardBase(state, context);
+  if (!base.ok) return base;
+  const evaluated = evaluateStat(base.base, { stat: 'job-reward', context }, [...collectModifiers(state, context), ...extra]);
   return evaluated.ok ? { ok: true as const, reward: wholeStatValue(evaluated.effective), effective: evaluated.effective, base: evaluated.base, applied: evaluated.applied } : evaluated;
 }

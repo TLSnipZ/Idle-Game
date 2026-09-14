@@ -9,20 +9,30 @@ import type { XpError } from '../features/progression';
 import { evaluateJobReward } from './effective-stats';
 import { earnCash } from '../features/economy';
 import type { EconomyError } from '../features/economy';
+import { consumeManualJobReadiness, isManualJobReady, manualJobRemainingMs } from './manual-job-readiness';
 import type { GameState } from './game-state';
 
 export type StarterJobResult =
   | { readonly ok: true; readonly state: GameState; readonly moneyEarned: Money; readonly xpEarned: number }
-  | { readonly ok: false; readonly state: GameState; readonly error: StatisticsError | XpError | EconomyError };
+  | { readonly ok: false; readonly state: GameState; readonly error: StatisticsError | XpError | EconomyError }
+  | { readonly ok: false; readonly state: GameState; readonly error: 'manual-job-not-ready'; readonly remainingMs: number };
+
+function readinessFailure(state: GameState): Extract<StarterJobResult, { readonly error: 'manual-job-not-ready' }> | null {
+  return isManualJobReady(state.manualJobs) ? null
+    : { ok: false, state, error: 'manual-job-not-ready', remainingMs: manualJobRemainingMs(state.manualJobs) };
+}
 
 export function performStarterJob(state: GameState): StarterJobResult {
-  return completeDelivery(state, evaluateJobReward(state), MANUAL_JOB_HEAT);
+  const blocked = readinessFailure(state);
+  return blocked ?? completeDelivery(state, evaluateJobReward(state), MANUAL_JOB_HEAT);
 }
 
 export type RiskyDeliveryResult = StarterJobResult
   | { readonly ok: false; readonly state: GameState; readonly error: 'too-hot' };
 
 export function performRiskyDelivery(state: GameState): RiskyDeliveryResult {
+  const blocked = readinessFailure(state);
+  if (blocked) return blocked;
   const view = selectRiskyDelivery(state);
   if (view.tooHot) return { ok: false, state, error: 'too-hot' };
   return completeDelivery(state, view.reward, view.heatGain);
@@ -32,6 +42,8 @@ export type DiscreetDeliveryResult = StarterJobResult
   | { readonly ok: false; readonly state: GameState; readonly error: 'already-cold' };
 
 export function performDiscreetDelivery(state: GameState): DiscreetDeliveryResult {
+  const blocked = readinessFailure(state);
+  if (blocked) return blocked;
   const view = selectDiscreetDelivery(state);
   if (view.reduction === 0) return { ok: false, state, error: 'already-cold' };
   return completeDelivery(state, view.reward, -view.reduction, false);
@@ -43,7 +55,8 @@ function completeDelivery(state: GameState, reward: ReturnType<typeof evaluateJo
   if (!result.ok) return { ok: false, state, error: result.error };
   const xp = earnsXp ? awardXp(state, 'manualJob') : { ok: true as const, state: state.progression };
   if (!xp.ok) return { ok: false, state, error: xp.error };
-  const counted = countStatistic(state, { ...state, city: heatGain < 0 ? reduceHeat(state.city, -heatGain) : gainHeat(state.city, heatGain), progression: xp.state, economy: result.state }, 'manualJobsCompleted');
+  const candidate = { ...state, manualJobs: consumeManualJobReadiness(state.manualJobs), city: heatGain < 0 ? reduceHeat(state.city, -heatGain) : gainHeat(state.city, heatGain), progression: xp.state, economy: result.state };
+  const counted = countStatistic(state, candidate, 'manualJobsCompleted');
   if (!counted.ok) return counted;
   return { ok: true, moneyEarned: reward.reward, xpEarned: xp.state.xp - state.progression.xp, state: observePeakHeat(counted.state) };
 }
