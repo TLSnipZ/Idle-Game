@@ -45,7 +45,7 @@ export function SectionWorkspace({ name, views, destination }: {
         {text(...view.label)}{view.pending && <span className="workspace-pending">{text('Pending', 'Offen')}</span>}
       </button>)}
     </nav>
-    <div className="workspace-panels">
+    <div className="workspace-panels section-stack">
       {views.map(view => <div key={view.id} id={`${name}-${view.id}-panel`} data-workspace-panel={view.id} hidden={selected !== view.id}>
         {view.content}
       </div>)}
