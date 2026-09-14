@@ -1,6 +1,18 @@
 # Architecture
 
-## Current phase — Garage IV-D: Tier-2 customization
+## Current phase — Workshop purchase insight
+
+Implements the first bounded Purchase Intelligence slice: optional before/after
+comparisons for all twelve Workshop setups. Both columns assume the selected car
+is active; current fitted effects are replaced, never stacked. Shared game rules
+supply Business Production, manual and Dispatcher Cash, cooling and decoy cost.
+See [Workshop purchase insight](WORKSHOP_INSIGHT.md) for assumptions and verification.
+Save v26 / CE1, prices, rewards, approved artwork and all player progress remain
+unchanged. This follows PR #49, which was still open when this phase started;
+the follow-up PR targets its branch until IV-D is merged. No new cars or economy
+rebalance are included. Older status sections below are historical.
+
+## Previous phase — Garage IV-D: Tier-2 customization
 
 Implemented and verified in [PR #49](https://github.com/TLSnipZ/Idle-Game/pull/49):
 two alternative permanent setups and two signature finishes

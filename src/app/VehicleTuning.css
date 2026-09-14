@@ -14,3 +14,14 @@
 #tuning-vehicle { width: 100%; max-width: 28rem; min-height: 44px; padding: .65rem; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-background); color: var(--color-text); font: inherit; }
 .tuning-option { display: flex; flex-direction: column; }
 .tuning-option .action-button { margin-top: auto; }
+
+.tuning-insight { margin: .5rem 0; border-top: 1px solid var(--color-border); }
+.tuning-insight summary { cursor: pointer; padding: .8rem 0; min-height: 44px; color: var(--color-cool); overflow-wrap: anywhere; }
+.tuning-insight summary:focus-visible { outline: 2px solid var(--color-cool); outline-offset: 3px; }
+.tuning-insight p { font-size: .85rem; color: var(--color-secondary); }
+.tuning-insight .tuning-insight-notice { color: var(--color-text); }
+.tuning-insight dl { margin: .75rem 0; }
+.tuning-insight dl > div { padding: .5rem 0; border-bottom: 1px solid var(--color-border); }
+.tuning-insight dt { font-size: .85rem; color: var(--color-secondary); }
+.tuning-insight dd { margin: .25rem 0 0; display: flex; flex-wrap: wrap; gap: .35rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tuning-insight dd span, .tuning-insight dd strong { min-width: 0; }

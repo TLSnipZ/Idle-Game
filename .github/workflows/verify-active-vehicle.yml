@@ -1,7 +1,7 @@
 name: Verify Solara City
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feat/tier-two-customization]
     paths:
       - 'src/**'
       - 'scripts/**'
@@ -82,6 +82,10 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-collection-layout.mjs
+      - name: Verify Workshop purchase insight
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-tuning-insight.mjs
       - name: Verify Business portfolio navigation
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs

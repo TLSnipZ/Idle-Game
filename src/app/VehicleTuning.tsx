@@ -1,4 +1,5 @@
 import { VehicleArtwork } from './VehicleArtwork';
+import { TuningInsight } from './TuningInsight';
 import { useState } from 'react';
 import { TUNING_CATALOG, STARTER_VEHICLE, VEHICLE_CATALOG, findVehicle, findTuning } from '../features/vehicles';
 import type { VehicleId } from '../features/vehicles';
@@ -59,6 +60,7 @@ export function VehicleTuning({ state, paused, onConfigure, selectedVehicle, onC
         <h4>{text(part.name, part.germanName)}</h4>
         <div className="setup-comparison"><p><span>{text('Fitted now', 'Aktuell eingebaut')}</span><strong>{selected ? text(selected.name, selected.germanName) : text('Stock', 'Serie')}</strong></p><p><span>{text('Selected setup effect', 'Effekt dieses Setups')}</span><strong>{formatModifier(part.modifier)} {effect}</strong></p></div>
         {!fitted && <p>{text('Replaces the fitted setup. The vehicle base bonus remains.', 'Ersetzt das eingebaute Setup. Der Fahrzeug-Basisbonus bleibt.')}</p>}
+        <TuningInsight state={state} partId={part.id} />
         <p>{text('One-time price:', 'Einmaliger Preis:')} <strong>{formatPrice(part.cost)}</strong></p>
         <p>{fitted ? text('FITTED', 'EINGEBAUT') : purchased ? text('OWNED', 'IM BESITZ')
           : !owned ? text('VEHICLE REQUIRED', 'FAHRZEUG ERFORDERLICH') : canBuy ? text('AVAILABLE', 'VERFÜGBAR') : text('INSUFFICIENT CASH', 'ZU WENIG CASH')}</p>
