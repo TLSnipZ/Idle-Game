@@ -265,3 +265,16 @@ describe('navigation around the unchanged authoritative runtime', () => {
     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
   });
 });
+
+it('Operations destinations reveal the matching business, equipment or automation before focus', async () => {
+  const h = harness(view(autoUpgraderState())); h.select(SECTION.operations.id);
+  const container = await mountNode(<SectionContent {...h.props()} />);
+  const mountedRoot = mounted.find(item => item.container === container)?.root;
+  if (!mountedRoot) throw Error('mount');
+  for (const [sequence, headingId] of ['business:solara-nights-name', 'upgrade:commercial-pressure-washer-heading', 'auto-upgrader-heading', 'business-name'].entries()) {
+    await act(() => mountedRoot.render(<SectionContent {...h.props()} operationsDestination={{ sequence: sequence + 1, headingId }} />));
+    const target = document.getElementById(headingId);
+    expect(target).not.toBeNull(); expect(target?.closest('[hidden]')).toBeNull();
+    expect(document.activeElement).toBe(target);
+  }
+});

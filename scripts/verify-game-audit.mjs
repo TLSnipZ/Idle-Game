@@ -238,11 +238,14 @@ try {
     }, { fixture: fixtures[2], locale });
     await page.goto('http://127.0.0.1:4174');
     await navigation(page).nth(1).click();
+    await page.locator('[data-operations-view="automation"]').click();
     await page.locator('.auto-spend-card > button').click();
     assert.deepEqual((await saved(page)).state.automation.enabledIds, []);
     await page.locator('#auto-upgrader-target').selectOption('business:dockside-detail');
     assert.equal((await saved(page)).state.automation.businessAutoUpgradeTargetId, 'business:dockside-detail');
     const level = (await saved(page)).state.businesses.owned['business:dockside-detail'].level;
+    await page.locator('[data-operations-view="businesses"]').click();
+    await page.locator('[data-business-id="business:dockside-detail"]').click();
     await page.locator('.business-card .purchase-button').first().click();
     assert.equal((await saved(page)).state.businesses.owned['business:dockside-detail'].level, level + 1);
     await navigation(page).nth(2).click();

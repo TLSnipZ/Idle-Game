@@ -580,3 +580,48 @@ it('previews paint without IO, applies explicitly and keeps independent car draf
   await click('Factory finish'); await click('Apply look · free');
   expect(f.game().getSnapshot().result.state.garage.appearances?.[K]).toBeUndefined();
 });
+
+// Design 2.0: route changes must reveal controls before moving focus.
+describe('Operations portfolio navigation', () => {
+  it('inspects businesses and returns to selection without spending or changing automation', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('OPERATIONS');
+    const before = f.game().getSnapshot().result.state, writes = f.writes();
+    await click('BUSINESSES');
+    expect(container.querySelector('.jobs-block')?.closest('[hidden]')).not.toBeNull();
+    expect(container.querySelector('.businesses-block')?.closest('[hidden]')).toBeNull();
+    await act(() => container.querySelector<HTMLButtonElement>('[data-business-id="business:neon-laundry"]')?.click());
+    expect(document.activeElement?.id).toBe('business:neon-laundry-name');
+    expect(document.activeElement?.closest('[hidden]')).toBeNull();
+    await click('AUTOMATION');
+    expect(container.querySelector('.businesses-block')?.closest('[hidden]')).not.toBeNull();
+    await click('BUSINESSES');
+    expect(container.querySelector('[data-business-id="business:neon-laundry"]')?.getAttribute('aria-pressed')).toBe('true');
+    await act(() => container.querySelector<HTMLButtonElement>('.business-back')?.click());
+    expect(document.activeElement?.getAttribute('data-business-id')).toBe('business:neon-laundry');
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.writes()).toBe(writes);
+  });
+  it('acquires and upgrades the inspected business with stable focus and visible actions', async () => {
+    const f = await mount(autoUpgraderState()); await navigate('OPERATIONS'); await click('BUSINESSES');
+    await act(() => container.querySelector<HTMLButtonElement>('[data-business-id="business:neon-laundry"]')?.click());
+    const acquire = button('Acquire Neon Laundry');
+    expect(acquire.closest('[hidden]')).toBeNull(); acquire.focus();
+    await click('Acquire Neon Laundry'); await click('Upgrade Neon Laundry to Level 2');
+    expect(f.game().getSnapshot().result.state.businesses.owned['business:neon-laundry']?.level).toBe(2);
+    expect(document.activeElement).toBe(acquire); expect(acquire.closest('[hidden]')).toBeNull();
+    expect(container.querySelector('.business-portfolio')?.classList.contains('is-detail-open')).toBe(true);
+  });
+  it('the activity shortcut reveals automation repeatedly without replaying on later visits', async () => {
+    const f = await mount(autoUpgraderState());
+    const before = f.game().getSnapshot().result.state, writes = f.writes();
+    for (let i = 0; i < 2; i++) {
+      await act(() => container.querySelector<HTMLButtonElement>('.activity-auto')?.click());
+      expect(document.activeElement?.id).toBe('automation-heading');
+      expect(document.activeElement?.closest('[hidden]')).toBeNull();
+      await click('JOBS');
+    }
+    await navigate('CITY'); await navigate('OPERATIONS');
+    expect(container.querySelector('.jobs-block')?.closest('[hidden]')).toBeNull();
+    expect(container.querySelector('.automation-block')?.closest('[hidden]')).not.toBeNull();
+    expect(f.game().getSnapshot().result.state).toBe(before); expect(f.writes()).toBe(writes);
+  });
+});

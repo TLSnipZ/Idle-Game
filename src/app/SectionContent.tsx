@@ -21,6 +21,7 @@ import type { useSaveManagement } from './SaveManagement';
 import { useLocalizedText } from './LocalizationProvider';
 
 export interface SectionContentProps {
+  readonly operationsDestination?: CollectionDestination | null;
   readonly collectionDestination?: CollectionDestination | null;
   readonly active: SectionId;
   readonly game: ReturnType<typeof useGame>;
@@ -29,13 +30,13 @@ export interface SectionContentProps {
   readonly rebirth: ReturnType<typeof useRebirthControls>;
 }
 /** One active presentation tree. Runtime and confirmation controllers live above it. */
-export function SectionContent({ active, game, onNavigate, save, rebirth, collectionDestination }: SectionContentProps) {
+export function SectionContent({ active, game, onNavigate, save, rebirth, collectionDestination, operationsDestination }: SectionContentProps) {
   const text = useLocalizedText();
   const state = game.snapshot.state;
   const paused = game.runtimeError !== null;
   switch (active) {
     case SECTION.overview.id: return <OverviewSection state={state} paused={paused} onNavigate={onNavigate} />;
-    case SECTION.operations.id: return <OperationsSection game={game} />;
+    case SECTION.operations.id: return <OperationsSection key={game.replacementSequence} game={game} destination={operationsDestination ?? null} />;
     case SECTION.city.id: return <div className="section-workspace"><SectionIndex section="city" /><div className="section-stack">
       <City state={state} paused={paused || game.persistence.kind === 'blocked'} onAcquire={game.takeTerritory} onLayLow={game.coolDown} onChooseDistrict={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
       <CrewPanel state={state} paused={paused} onRecruit={game.recruitCrew} onAssign={game.assignCrew} onUnassign={game.unassignCrew} />

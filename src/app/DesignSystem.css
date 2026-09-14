@@ -1,0 +1,28 @@
+/* Solara Design 2.0: shared hierarchy, no gameplay or artwork transformation. */
+
+.app-shell .panel { box-shadow: var(--shadow-standard); }
+.app-shell .section-heading { border-left: 0; padding: 0; margin-block: 1.75rem; }
+.app-shell .section-heading h1 { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -.045em; }
+.app-shell .section-heading p { color: var(--color-secondary); line-height: 1.6; }
+.app-shell .primary-navigation { gap: .4rem; }
+.app-shell .primary-navigation button { border-radius: var(--radius-control); min-height: 48px; }
+.app-shell .primary-navigation button[aria-current="page"] { color: var(--color-accent); background: var(--color-accent-tint); box-shadow: inset 0 -3px var(--color-accent); }
+.app-shell .summary-card { padding: clamp(1.1rem, 2.3vw, 1.8rem); }
+.app-shell .summary-card .summary-value { font-size: clamp(1.6rem, 3vw, 2.5rem); letter-spacing: -.035em; }
+.app-shell .action-button { min-height: 48px; }
+.app-shell .operations-disclosure summary { font-size: .85rem; }
+.app-shell .operations-section-heading h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); letter-spacing: -.035em; }
+.app-shell .operations-lead { font-size: .95rem; }
+.app-shell .business-total-compact { padding: .75rem 1rem; }
+.app-shell .business-total-compact strong { font-size: 1.4rem; }
+.app-shell .value-unit { display: inline-flex; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; margin: 0; }
+.app-shell .value-unit > span { display: inline; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; margin: 0; }
+@media (min-width: 1000px) {
+  .operations-workspace .jobs-block { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1.5rem; }
+  .operations-workspace .standard-delivery { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .app-shell .section-heading { margin-block: 1.25rem; }
+  .operations-workspace .operations-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .operations-workspace .operations-tabs button { font-size: .75rem; }
+}
