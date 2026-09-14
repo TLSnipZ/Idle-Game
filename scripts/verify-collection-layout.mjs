@@ -32,7 +32,7 @@ try {
     assert.equal(await page.locator('.vehicle-appearance').isVisible(),false);
     const filter=page.locator('.garage-filters select').first();
     await filter.selectOption('owned');assert.equal(await page.locator('.garage-tile').count(),2);
-    await filter.selectOption('missing');assert.equal(await page.locator('.garage-tile').count(),2);
+    await filter.selectOption('missing');assert.equal(await page.locator('.garage-tile').count(),4);
     await filter.selectOption('all');
     await page.locator('.garage-filters select').last().selectOption('name');
     const names=await page.locator('.tile-copy strong').allTextContents();
