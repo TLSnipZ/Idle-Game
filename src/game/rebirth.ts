@@ -51,7 +51,8 @@ export function performRebirth(state: GameState): RebirthResult {
   const permanent = addRebirthReward(unlockEligibleAchievements(state).state.permanentProgression, preview.reward);
   if (!permanent.ok) return { ok: false, state, error: permanent.error };
   // Authoritative reset construction: fresh temporary slices, explicit retained slices.
-  const candidate: GameState = { ...createInitialGameState(), garage: state.garage, manualJobs: { ...state.manualJobs }, permanentProgression: permanent.state };
+  const candidate: GameState = { ...createInitialGameState(), garage: state.garage,
+    ...(state.manualJobs ? { manualJobs: { ...state.manualJobs } } : {}), permanentProgression: permanent.state };
   const counted = countStatistic(state, candidate, 'rebirthsCompleted');
   if (!counted.ok) return counted;
   return { ok: true, state: unlockEligibleAchievements(counted.state).state, reward: preview.reward };
