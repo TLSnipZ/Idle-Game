@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 const { chromium } = await import(pathToFileURL(process.env.SOLARA_PLAYWRIGHT_MODULE).href);
 const fixtures = JSON.parse(readFileSync(process.env.SOLARA_AUDIT_FIXTURES, 'utf8'));
-const server = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', '4176'], { stdio: 'inherit' });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', '4176'], { stdio: 'inherit' });
 const targets = [[], ['starter-heading', 'businesses-heading', 'upgrades-heading', 'automation-heading'], ['city-heading', 'crew-heading', 'city-events-heading'], ['garage-heading', 'tuning-heading', 'appearance-heading'], ['rebirth-heading', 'skill-tree-heading', 'achievements-heading', 'statistics-heading', 'save-transfer-heading']];
 const results = [];
 let browser;

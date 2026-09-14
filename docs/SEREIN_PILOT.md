@@ -1,6 +1,6 @@
 # Serein pilot — implementation checkpoint
 
-Status: gameplay implementation prepared; **draft, not release-ready**.
+Status: gameplay and approved artwork integrated; release verification tracked in PR #43.
 The user explicitly approved the generated platinum-silver Serein model in the
 task conversation on 2026-09-14 (“Perfekt. Dann setz alles jetzt genau so um im game”).
 This approval is final for that exact design; do not ask for design approval again.
@@ -19,21 +19,17 @@ This approval is final for that exact design; do not ask for design approval aga
   set before current catalog acceptance. Existing builds, paint, timestamps,
   state and cash are preserved without rewards or compensation.
 
-## Exact artwork transfer blocker
+## Approved artwork provenance
 
-Approved original: “Namera Serein am nächtlichen Yachthafen.png”, generated
-2026-09-14, 1672 x 940 as displayed, 2,223,372 bytes per source metadata.
-The file service reports materialization into the ChatGPT workspace, but that
-workspace is unavailable to the connected build sandbox. Reading native image
-pixels also returned “Native image pixels were unavailable.”
-The approved image has NOT been replaced, regenerated, approximated or shipped.
+Transferred from the user attachment in PR #43, comment 5663221085:
+https://github.com/TLSnipZ/Idle-Game/pull/43#issuecomment-5663221085
 
-Need the user to attach that exact image file again so the attachment transfer
-can supply its bytes. Then retain the original in
-src/assets/reference/vehicles/namera-serein-reference.png, create a WebP runtime
-derivative without visual edits, and add the vehicle-artwork.ts registry entry.
-Update the Garage image-count check from three to four only with that actual asset.
-Do not merge this draft before artwork integration and visual acceptance checks.
+Original PNG: 1672 x 940, 2,223,372 bytes.
+SHA-256: `c18d830adcd113688238463f3d855219e2b4523e396b6c262611ec036a2e1307`.
+Retained byte-for-byte at `src/assets/reference/vehicles/namera-serein-reference.png`.
+Runtime: `src/assets/vehicles/namera-serein.webp`, WebP quality 90 / method 6,
+original dimensions, no crop, recolor, regeneration or other visual edits.
+The registry supplies the actual 1672 x 940 dimensions and the Garage uses contain.
 
 ## Verification and remaining release work
 
@@ -47,10 +43,11 @@ UI checks cover localized factory-only states; the new browser script covers
 
 Current-version assertions and current Garage counts advance; historical fixtures
 remain historical. No existing test is removed or skipped.
-The PR records executed local results. scripts/verify-serein.mjs explicitly reports
-pending artwork acceptance rather than claiming it checked an image.
+The PR records executed local results. scripts/verify-serein.mjs verifies real decoding, source identity, full-frame containment
+and purchase/save/reload at all five widths in all three locales. The release CI
+includes this script. SOLARA_BASE_URL optionally runs the same checks against Pages
+in disposable browser contexts without accessing a player's browser save.
 
-After image transfer: verify full image decoding, crop and card presentation at all
-five widths; add the Serein browser step to the release workflow; run full GitHub
-CI, merge and Pages deployment, then check live purchase/save/reload.
+Release gates: full build/tests and browser suite, GitHub CI, merge, successful
+Pages deployment and live purchase/save/reload. Results are recorded in PR #43.
 Rendan/Canto remain the next separate phase after this pilot.
