@@ -28,13 +28,13 @@ it.each<PlayerModel>(['active', 'optimized', 'idle-leaning'])('%s: compares firs
         const actual = await vi.importActual<typeof import('../features/vehicles')>('../features/vehicles');
         const { moneyFromMinorUnits } = await import('../features/economy');
         const { STARTER_BUSINESS } = await import('../features/businesses');
-        if (actual.STARTER_VEHICLE.modifier.operation !== 'multiply-basis-points')
+        if (actual.STARTER_VEHICLE.modifiers[0]?.operation !== 'multiply-basis-points')
           throw new Error('Analysis expects the live percentage vehicle modifier');
         const vehicle: typeof actual.STARTER_VEHICLE = {
           ...actual.STARTER_VEHICLE, name: 'Vortex S9', purchaseCost: moneyFromMinorUnits('5000000'),
           requirements: [{ type: 'player-level', minimumLevel: 7 },
             { type: 'business-level', businessId: STARTER_BUSINESS.id, minimumLevel: 10 }],
-          modifier: { ...actual.STARTER_VEHICLE.modifier, bonusBasisPoints: 1500 },
+          modifiers: [{ ...actual.STARTER_VEHICLE.modifiers[0], bonusBasisPoints: 1500 }],
         };
         return { ...actual, STARTER_VEHICLE: vehicle, VEHICLE_CATALOG: [vehicle],
           findVehicle: (id: unknown) => id === vehicle.id ? vehicle : undefined };
@@ -60,6 +60,6 @@ it.each<PlayerModel>(['active', 'optimized', 'idle-leaning'])('%s: compares firs
   }
   const live = await vi.importActual<typeof import('../features/vehicles')>('../features/vehicles');
   expect(live.STARTER_VEHICLE.purchaseCost).toBe('2500000');
-  expect(live.STARTER_VEHICLE.modifier).toMatchObject({ operation: 'multiply-basis-points', bonusBasisPoints: 1000 });
+  expect(live.STARTER_VEHICLE.modifiers[0]).toMatchObject({ operation: 'multiply-basis-points', bonusBasisPoints: 1000 });
   console.info('POST 2A modeled seconds', model, JSON.stringify(rows));
 }, 60_000);

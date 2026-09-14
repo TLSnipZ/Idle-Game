@@ -19,6 +19,8 @@ const DE: Record<string, LocalizedFields> = {
   'vehicle:kairo-kx-r': { category: 'Business-Starter', description: 'Leichter Street-Performance-Hatch. Dein erster Tuner für ein wachsendes Imperium und fragwürdige Parkhausentscheidungen.' },
 
   'vehicle:kairo-senda': { category: 'Selbstfahrer-Verdiener', description: 'Spielerisches Coupé mit Heckantrieb und sehr persönlichem Lieferservice. Das Trinkgeld stimmt, wenn der Chef selbst fährt.' },
+  'vehicle:toseki-rendan': { category: 'Allwetter-Lieferprofi', description: 'Vier Türen, ein verdächtig gut organisierter Lieferdienst. Der Heckflügel ist vermutlich nicht absetzbar.' },
+  'vehicle:sevrin-canto-club': { category: 'Diskretes Logistik-Coupé', description: 'Ein dezentes Sportcoupé für ein Imperium, das auch beim Parken verdient. Die Rechnungen liegen hervorragend auf der Straße.' },
   'vehicle:namera-serein': { category: 'Street-Coupé der Werkstattklasse', description: 'Flaches Street-Coupé. Express geliefert. Dem Steuerberater erklären wir das in Zeitlupe.' },
   'vehicle:namera-lilt': { category: 'Unauffälliger Küstenflitzer', description: 'Leichter Zweisitzer-Roadster für die Küste. Offenes Dach, leiser Abgang und absolut kein Platz für Zeugen.' },
 

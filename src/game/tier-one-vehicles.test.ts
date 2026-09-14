@@ -20,6 +20,9 @@ import { migrateToCurrentSave, serializeSave, parseSave } from './save-schema';
 import { encodeSaveText, validateSaveCode } from './save-code';
 import { rational } from '../shared/rational';
 
+const liltModifier = L.modifiers[0];
+if (!liltModifier) throw Error('Expected Lilt cooling modifier');
+
 function owned(id: VehicleId): GameState {
   return { ...createInitialGameState(), garage: { ownedVehicleIds: VEHICLE_CATALOG.map(v => v.id), activeVehicleId: id } };
 }
@@ -45,7 +48,7 @@ describe('Tier-1 purchases and permanent selection', () => {
     expect(state.garage).toEqual({ ownedVehicleIds: [K.id, S.id, L.id], activeVehicleId: K.id });
     for (const car of [K, S, L]) {
       const selected = setActiveVehicle(state, car.id).state;
-      expect(collectModifiers(selected).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual([car.modifier]);
+      expect(collectModifiers(selected).filter(m => m.sourceId.startsWith('vehicle:'))).toEqual(car.modifiers);
       expect(selected.businesses).toBe(state.businesses);
     }
   });
@@ -105,9 +108,9 @@ describe('Lilt interval utility', () => {
     expect(result).toMatchObject({ ok: true, automation: { completedJobs: 57, income: '128250' }, state: { city: { heat: 61, heatDecayElapsedMs: 0 } } });
   });
   it('bounds duration reductions and rejects malformed shared effects', () => {
-    expect(evaluateIntervalMs(60000, 1000, [{ ...L.modifier, operation: 'reduce-interval', reductionMs: 90000 }])).toBe(1000);
-    expect(() => evaluateIntervalMs(60000, 1000, [{ ...L.modifier, operation: 'reduce-interval', reductionMs: -1 }])).toThrow(RangeError);
-    expect(() => evaluateIntervalMs(60000, 1000, [L.modifier, L.modifier])).toThrow(RangeError);
+    expect(evaluateIntervalMs(60000, 1000, [{ ...liltModifier, operation: 'reduce-interval', reductionMs: 90000 }])).toBe(1000);
+    expect(() => evaluateIntervalMs(60000, 1000, [{ ...liltModifier, operation: 'reduce-interval', reductionMs: -1 }])).toThrow(RangeError);
+    expect(() => evaluateIntervalMs(60000, 1000, [liltModifier, liltModifier])).toThrow(RangeError);
   });
 });
 describe('Save v19 identity boundary', () => {
@@ -115,7 +118,7 @@ describe('Save v19 identity boundary', () => {
     const state = owner ? rebirthState() : createInitialGameState();
     const input = { format: 'crime-empire-save', version: 18, savedAt: 123, state }, before = structuredClone(input);
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: { ...input, version: 24 } });
+    expect(result).toEqual({ ok: true, envelope: { ...input, version: 25 } });
     expect(input).toEqual(before);
     expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
   });
@@ -132,7 +135,7 @@ describe('Save v19 identity boundary', () => {
   it.each(VEHICLE_CATALOG.map(v => v.id))('current selection %s round-trips in local save and CE1', id => {
     const state = owned(id), encoded = serializeSave(state, 123);
     if (!encoded.ok) throw Error(encoded.error);
-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 24, savedAt: 123, state } });
+    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 25, savedAt: 123, state } });
     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toEqual(parseSave(encoded.serialized));
   });
 });

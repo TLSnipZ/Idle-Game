@@ -20,11 +20,11 @@ function eligible() {
       productionRemainderMilliCents: 975, productionRemainderSubMilliCents: rational(1n,3n) } };
 }
 describe('vehicle acquisition', () => {
-  it('configures the starter in a four-car catalog with canonical price, scope and gates', () => {
-    expect(VEHICLE_CATALOG).toHaveLength(4); expect(VEHICLE_CATALOG[0]).toBe(V); expect(V.id).toBe('vehicle:kairo-kx-r');
+  it('configures the starter in a six-car catalog with canonical price, scope and gates', () => {
+    expect(VEHICLE_CATALOG).toHaveLength(6); expect(VEHICLE_CATALOG[0]).toBe(V); expect(V.id).toBe('vehicle:kairo-kx-r');
     expect(findVehicle(V.id)).toBe(V); expect(findVehicle('Kairo KX-R')).toBeUndefined();
     expect(V.purchaseCost).toBe('2500000'); expect(isMoney(V.purchaseCost)).toBe(true);
-    expect(V.modifier).toMatchObject({ sourceId: V.id, target: { stat: 'business-production', businessId: null },
+    expect(V.modifiers[0]).toMatchObject({ sourceId: V.id, target: { stat: 'business-production', businessId: null },
       operation: 'multiply-basis-points', bonusBasisPoints: 1000 });
     expect(V.requirements).toEqual([{ type:'player-level',minimumLevel:5 },
       { type:'business-owned',businessId:B.id }, { type:'business-level',businessId:B.id,minimumLevel:5 }]);
@@ -62,11 +62,11 @@ describe('vehicle acquisition', () => {
   });
   it('spends exactly beyond Number precision and derives counts/eligibility', () => {
     const state={...eligible(),economy:{cash:moneyFromMinorUnits('900719925474099312345')}};
-    expect(selectGarage(state)).toEqual({activeVehicle:null,ownedVehicleCount:0,totalConfiguredVehicles:4});
+    expect(selectGarage(state)).toEqual({activeVehicle:null,ownedVehicleCount:0,totalConfiguredVehicles:6});
     expect(selectVehicle(state,V.id)).toMatchObject({eligible:true,affordable:true,canPurchase:true});
     const purchased=purchaseVehicle(state,V.id).state;
     expect(purchased.economy.cash).toBe('900719925474096812345');
-    expect(selectGarage(purchased)).toEqual({activeVehicle:V,ownedVehicleCount:1,totalConfiguredVehicles:4});
+    expect(selectGarage(purchased)).toEqual({activeVehicle:V,ownedVehicleCount:1,totalConfiguredVehicles:6});
     expect(selectVehicle(purchased,V.id)?.canPurchase).toBe(false); expect(selectVehicle(state,'unknown')).toBeNull();
   });
   it('announces newly eligible vehicle at the exact level 5 boundary', () => {

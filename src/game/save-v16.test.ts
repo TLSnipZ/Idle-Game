@@ -34,7 +34,7 @@ describe('v16 canonical vehicle boundary', () => {
     vi.spyOn(Date, 'now').mockImplementation(() => { throw Error('migration clock'); });
     vi.spyOn(Math, 'random').mockImplementation(() => { throw Error('migration RNG'); });
     const result = migrateToCurrentSave(input);
-    expect(result).toEqual({ ok: true, envelope: envelope(expected, 24) });
+    expect(result).toEqual({ ok: true, envelope: envelope(expected, 25) });
     expect(migrateToCurrentSave(input)).toEqual(result); expect(input).toEqual(before);
     const code = encodeSaveText(JSON.stringify(input)); expect(code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(code)).toEqual(result);
@@ -47,7 +47,7 @@ describe('v16 canonical vehicle boundary', () => {
   it('fresh current state has no free vehicle or future Garage fields', () => {
     const state = createInitialGameState(), serialized = serializeSave(state, 0);
     expect(state.garage).toEqual({ ownedVehicleIds: [], activeVehicleId: null });
-    expect(migrateToCurrentSave(envelope(state, 18))).toEqual({ ok: true, envelope: envelope(state, 24) });
+    expect(migrateToCurrentSave(envelope(state, 18))).toEqual({ ok: true, envelope: envelope(state, 25) });
     expect(serialized.ok).toBe(true); expect(findVehicle(LEGACY)).toBeUndefined();
   });
   it.each([[LEGACY, LEGACY], ['vehicle:unknown'], [V.id], [LEGACY, V.id]].map(ownedVehicleIds => ({ ownedVehicleIds })))('historical validator rejects malformed/future IDs %#', ({ ownedVehicleIds }) => {
@@ -63,7 +63,7 @@ describe('v16 canonical vehicle boundary', () => {
     const reset = performRebirth(migrated.envelope.state); expect(reset.ok).toBe(true);
     expect(reset.state.garage).toEqual({ ownedVehicleIds: [V.id], activeVehicleId: V.id });
     const vehicleModifiers = collectModifiers(reset.state).filter(m => m.sourceId.startsWith('vehicle:'));
-    expect(vehicleModifiers).toEqual([V.modifier]);
+    expect(vehicleModifiers).toEqual(V.modifiers);
     // Separate skill-free fixture isolates the vehicle from permanent skills retained above.
     const state = { ...createInitialGameState(), garage: reset.state.garage };
     expect(evaluateBusinessProduction(state, B.id, 4)).toMatchObject({ ok: true, effective: rational(330n) });

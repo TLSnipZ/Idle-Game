@@ -31,7 +31,7 @@ describe('Phase 9E Base Game release flow', () => {
     expect(validateSaveState(state)).toEqual(state);
     const code = exportSaveCode(state, 123);
     if (!code.ok) throw Error(code.error);
-    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 24, savedAt: 123, state } });
+    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 25, savedAt: 123, state } });
   });
 
   it('legal earnings and acquisitions reach all milestones, then reset and rebuild with permanent benefits', () => {

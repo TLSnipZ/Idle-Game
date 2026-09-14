@@ -70,6 +70,10 @@ jobs:
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
         run: node scripts/verify-serein.mjs
+      - name: Verify Rendan and Canto purchase, migration and artwork
+        env:
+          SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs
+        run: node scripts/verify-rendan-canto.mjs
       - name: Verify Garage and Workshop navigation
         env:
           SOLARA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/solara-browser/node_modules/playwright/index.mjs

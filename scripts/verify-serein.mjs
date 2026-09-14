@@ -33,7 +33,7 @@ try {
   await verifyArtwork(card, width);
   await card.locator('.purchase-button').click();
   let saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('crime-empire:save')));
-  assert.equal(saved.version,24);assert.deepEqual(saved.state.garage.ownedVehicleIds,[N]);assert.equal(saved.state.garage.activeVehicleId,N);
+  assert.equal(saved.version,25);assert.deepEqual(saved.state.garage.ownedVehicleIds,[N]);assert.equal(saved.state.garage.activeVehicleId,N);
   await openCollectionView(page,'tuning');
   await page.locator('#tuning-vehicle').selectOption(N);
   await openCollectionView(page,'appearance');

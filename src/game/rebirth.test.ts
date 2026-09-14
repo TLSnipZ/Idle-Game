@@ -101,7 +101,7 @@ describe('explicit reset and retention', () => {
     state=purchaseBusiness(state,B.id).state;
     expect(state.upgrades.purchasedIds).toEqual([]);expect(state.garage.ownedVehicleIds).toEqual([V.id]);
     const production=evaluateBusinessProduction(state,B.id,1);
-    expect(production).toMatchObject({ok:true,effective:rational(165n,2n),applied:[V.modifier]}); // $0.825/s
+    expect(production).toMatchObject({ok:true,effective:rational(165n,2n),applied:V.modifiers}); // $0.825/s
     expect(simulateGameElapsed(state,1000).state.economy.cash).toBe('82');
     expect(reconcileOffline(state,0,1000).state).toEqual(simulateGameElapsed(state,1000).state);
   });

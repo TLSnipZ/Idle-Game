@@ -3,8 +3,8 @@
 ## Phase entry
 
 The user accepted the district correction in PR #47 and requested the next phase.
-IV-C starts with two model candidates before their artwork is integrated.
-Baseline: PR #47, Save v24 / CE1. No new cars are playable at this checkpoint.
+IV-C integrates both approved models. Baseline: PR #47, Save v24 / CE1.
+The implementation advances to Save v25 / CE1; release evidence is in the PR.
 The revised roles in TIER_TWO_GARAGE.md remain authoritative; older numeric rows
 in VEHICLE_CATALOG.md are historical proposals.
 
@@ -17,12 +17,12 @@ These are independent optional purchases. Existing cars are not prerequisites.
 The manual-focused Serein remains +26% manual Cash. Tuning and finishes for these
 models belong to IV-D; factory-only controls must be complete and localized.
 
-## Initial model candidates — awaiting selection
+## Approved model references
 
 Generated with built-in Imagegen on 2026-09-14 and displayed in the conversation.
 The approved Serein runtime image was used only for scene/rendering/camera style.
-Neither candidate is an approved model reference or production asset yet.
-The original generated PNGs remain available with the conversation images.
+The user approved both shown candidates with “Perfekt. Hau das update raus bro”,
+then reiterated “Goooo”. The exact originals are preserved in the repository.
 
 | Candidate | Generation filename | Proposed identity |
 | --- | --- | --- |
@@ -36,10 +36,11 @@ warm/pink/turquoise lighting. No real brand badges, UI, captions or collage.
 Model-specific prompts request independent lamps, grille, intakes and body details;
 the real-world era archetypes in VEHICLE_CATALOG.md are development guidance only.
 
-ART_DIRECTION.md requires explicit selection of the actual model images before
-reference promotion. The user has not yet approved these two candidates.
+This explicit selection satisfies ART_DIRECTION.md. Runtime WebPs use Pillow
+quality 90 / method 6, original 1672 × 940 dimensions, no crop or visual edits.
+Only the WebPs are imported; source masters stay outside the runtime bundle.
 
-## Implementation after model selection
+## Implemented scope
 
 1. Preserve selected originals and create optimized runtime WebPs, with actual
    intrinsic dimensions and whole-frame Garage display.
@@ -57,5 +58,15 @@ reference promotion. The user has not yet approved these two candidates.
 6. Run full build/tests, browser purchase/selection/reload/artwork checks across
    all existing languages and widths, then CI, merge, Pages and live verification.
 
-This checkpoint initiates the phase and presents its artwork; it does not claim
-integration, new-save compatibility or release. Do not advance to IV-D or Tier 3.
+Full build/tests, browser results and deployment/live evidence are recorded in
+the PR. The 30-case browser flow tests v24 migration, purchase without activation,
+explicit switching, retained KX-R setup/finish, factory-only controls, reload,
+image decoding/containment, all three languages, five widths and 125% text.
+Domain/runtime tests cover both active scopes, exact stacking, old-effect-first
+reconciliation, quota/conflict rollback, historical injections, CE1, offline,
+Rebirth and New Game. Do not advance to IV-D or Tier 3.
+
+## Preserved originals
+
+- `src/assets/reference/vehicles/toseki-rendan-reference.png`: 2,171,396 bytes, SHA-256 `238d27625e8668251a60220f5556f9902a4682c4b153d08fba0f9e5619d0908d`. Runtime: `src/assets/vehicles/toseki-rendan.webp` (285,678 bytes).
+- `src/assets/reference/vehicles/sevrin-canto-club-reference.png`: 2,150,336 bytes, SHA-256 `b59d4d2b083c48f6e2d5b17a890e68c3a25a3c84693e52e77296bee09c639a00`. Runtime: `src/assets/vehicles/sevrin-canto-club.webp` (266,036 bytes).

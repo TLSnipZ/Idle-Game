@@ -21,5 +21,5 @@ export interface VehicleDefinition {
   readonly description: string;
   readonly purchaseCost: Money;
   readonly requirements: readonly Requirement[];
-  readonly modifier: Modifier;
+  readonly modifiers: readonly Modifier[];
 }

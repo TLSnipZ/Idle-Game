@@ -5,7 +5,7 @@ import { activeTuning, VEHICLE_CATALOG } from '../features/vehicles';
 import type { GameState } from '../game/game-state';
 import { selectGarage, selectVehicle } from '../game/vehicle-selectors';
 import { formatPrice } from './number-format';
-import { formatModifier } from './stat-format';
+import { vehicleEffects } from './vehicle-effects';
 import { VehicleArtwork } from './VehicleArtwork';
 import { RequirementList } from './RequirementList';
 import { useLocale, useLocalizedText } from './LocalizationProvider';
@@ -73,7 +73,7 @@ export function Garage({ state, paused, onPurchase, onSelect, onWorkshop, select
       </div>
       <div className="garage-tiles">{cars.map(car => <button type="button" className="garage-tile" key={car.id} data-vehicle-id={car.id} aria-pressed={inspected === car.id} onClick={() => inspect(car.id)}>
         <VehicleArtwork vehicleId={car.id} appearanceId={state.garage.appearances?.[car.id] ?? null} />
-        <span className="tile-copy"><strong>{text(car.name)}</strong><span>{state.garage.activeVehicleId === car.id ? text('ACTIVE', 'AKTIV') : state.garage.ownedVehicleIds.includes(car.id) ? text('OWNED', 'IM BESITZ') : formatPrice(car.purchaseCost)}</span><span className="tile-bonus">{formatModifier(car.modifier)} {car.modifier.target.stat === 'business-production' ? text('Production', 'Produktion') : car.modifier.target.stat === 'job-reward' ? text('Manual Cash', 'Manueller Cash') : text('seconds · cooling', 'Sekunden · Abkühlung')}</span></span>
+        <span className="tile-copy"><strong>{text(car.name)}</strong><span>{state.garage.activeVehicleId === car.id ? text('ACTIVE', 'AKTIV') : state.garage.ownedVehicleIds.includes(car.id) ? text('OWNED', 'IM BESITZ') : formatPrice(car.purchaseCost)}</span><span className="tile-bonus">{vehicleEffects(car, locale, true)}</span></span>
       </button>)}</div>
       {cars.length === 0 && <p className="garage-empty" role="status">{text('No cars here. Your parking attendant is enjoying the silence.', 'Hier steht noch nichts. Der Parkservice genießt die Stille.')}</p>}
     </div>
@@ -94,11 +94,7 @@ export function Garage({ state, paused, onPurchase, onSelect, onWorkshop, select
         <VehicleArtwork vehicleId={vehicle.id} appearanceId={state.garage.appearances?.[vehicle.id] ?? null} />
         </header><div className="vehicle-specification"><p>{description}</p>
         <p className="ownership-badge">{text('PERMANENT VEHICLE · Kept through Rebirth', 'PERMANENTES FAHRZEUG · Bleibt durch Rebirth erhalten')}</p>
-        <p className="production">{formatModifier(vehicle.modifier)} {vehicle.modifier.target.stat === 'business-production'
-          ? text('Business Production · while active', 'Business-Produktion · wenn aktiv')
-          : vehicle.modifier.target.stat === 'job-reward'
-            ? text('Manual Job Cash · while active', 'Manueller Job-Cash · wenn aktiv')
-            : text('seconds per Heat cooling interval · while active', 'Sekunden pro Heat-Abkühlintervall · wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
+        <p className="production">{vehicleEffects(vehicle, locale)} · {text('while active', 'wenn aktiv')}{view.owned && paused ? text(' · Session paused', ' · Session pausiert') : ''}</p>
         {view.owned && !view.active && <button type="button" className="action-button"
           disabled={paused} onClick={() => onSelect(vehicle.id)}
           aria-label={text(`Activate ${vehicle.name}`, `${vehicle.name} aktivieren`)}>

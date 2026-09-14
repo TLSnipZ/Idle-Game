@@ -55,7 +55,7 @@ describe('permanent vehicle appearance', () => {
   it('migrates v22 with all model builds, exact cash and timestamp, without selecting cosmetics', () => {
     const bought = purchaseTuning(state(), 'tuning:lilt-quiet-running'); if (!bought.ok) throw Error(bought.error);
     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 22, savedAt: 4321, state: bought.state });
-    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 24, savedAt: 4321, state: bought.state } });
+    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 25, savedAt: 4321, state: bought.state } });
     if (!r.ok) throw Error(r.error);
     expect(r.envelope.state.garage).not.toBe(bought.state.garage);
     expect(r.envelope.state.garage.appearances).toBeUndefined();
@@ -65,7 +65,7 @@ describe('permanent vehicle appearance', () => {
   it('round-trips every saved finish in v23 and CE1 and retains them through Rebirth', () => {
     const s = paint(paint(paint(state(), K.id, 'appearance:kxr-coastal'), S.id, 'appearance:senda-amethyst'), L.id, 'appearance:lilt-lagoon');
     const saved = serializeSave(s, 1234); if (!saved.ok) throw Error(saved.error);
-    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 24, state: s } });
+    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 25, state: s } });
     const code = exportSaveCode(s, 1234); if (!code.ok) throw Error(code.error);
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: s } });
     const r = performRebirth(s); if (!r.ok) throw Error(r.error);

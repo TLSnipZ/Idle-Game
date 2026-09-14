@@ -23,7 +23,7 @@ export function collectModifiers(state: GameState, context: 'manual' | 'dispatch
   assertGarageState(state.garage);
   const activeVehicle = findVehicle(state.garage.activeVehicleId);
   const tuning = activeTuning(state.garage);
-  const vehicles = [...(activeVehicle ? [activeVehicle.modifier] : []), ...(tuning ? [tuning.modifier] : [])];
+  const vehicles = [...(activeVehicle?.modifiers ?? []), ...(tuning ? [tuning.modifier] : [])];
   return [...collectCrewModifiers(state.crew), ...collectHeatModifiers(context === 'dispatcher' ? getDistrictHeat(state.city, WATERFRONT.id) : state.city), ...upgrades, ...vehicles, ...collectTerritoryModifiers(state.city), ...collectSkillModifiers(state.permanentProgression.skills)];
 }
 export function evaluateBusinessProduction(state: GameState, id: string, level: number) {
