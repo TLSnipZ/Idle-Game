@@ -46,7 +46,7 @@ try {
     if (locale === 'villager') assert.ok(!/\p{L}/u.test((await insight.textContent()).replace(/[hmr]/gi, '')), 'Villager insight has no readable prose');
     const values = await insight.locator('dd').allTextContents();
     assert.match(values[0], /\$7\.88\/.*\$7\.50\//);
-    assert.match(values[1], /\$31\.50.*\$34\.02/);
+    assert.match(values[1], /\$75\.60.*\$81\.64/);
     assert.deepEqual((await saved(page)).garage, garage);
     await page.evaluate(() => { document.documentElement.style.fontSize = '20px'; });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
@@ -54,7 +54,7 @@ try {
     if (locale === 'de' && [390, 1440].includes(width)) await card.screenshot({ path: `browser-evidence/tuning-insight-${width}.png` });
     await card.locator('button').click();
     assert.equal((await saved(page)).garage.activeVehicleId, K);
-    assert.match((await insight.locator('dd').allTextContents())[1], /\$34\.02.*\$34\.02/);
+    assert.match((await insight.locator('dd').allTextContents())[1], /\$81\.64.*\$81\.64/);
     await page.locator('#tuning-vehicle').selectOption(L);
     const lilt = page.locator('[data-tuning-id="tuning:lilt-decoy-kit"] .tuning-insight');
     await lilt.locator('summary').click();
