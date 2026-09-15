@@ -14,24 +14,38 @@ import { simulateAutomation } from './simulate-automation';
 import { moneyFromMinorUnits, subtractMoney } from '../features/economy';
 import type { Money } from '../features/economy';
 import type { AutomationSimulationResult } from './simulate-automation';
+import { advanceManualJobReadiness } from './manual-job-readiness';
 import type { GameState } from './game-state';
 
 export type GameSimulationResult = { readonly ok: false; readonly state: GameState; readonly error: StatisticsError | 'simulation-limit' }
   | Extract<UpgradeBusinessResult, { ok: false }>
   | Extract<AutomationSimulationResult, { ok: false }>
   | (Extract<AutomationSimulationResult, { ok: true }> & { readonly businessIncome: Money; readonly autoUpgrader?: { readonly targetId: BusinessId; readonly levelsPurchased: number; readonly spent: Money } });
-/** One transaction: production, start-tier job rewards/XP, batch Heat gain, then cooling. */
+
+function advanceManualReadinessInState(state: GameState, elapsedMs: number): GameState {
+  const manualJobs = advanceManualJobReadiness(state.manualJobs, elapsedMs);
+  if (manualJobs === state.manualJobs) return state;
+  if (manualJobs === undefined) {
+    const { manualJobs: _manualJobs, ...ready } = state;
+    return ready;
+  }
+  return { ...state, manualJobs };
+}
+
+/** One transaction: production, start-tier job rewards/XP, batch Heat gain, cooling, then manual readiness. */
 export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameSimulationResult {
   if (!isElapsedMs(elapsedMs)) return { ok: false, state, error: 'invalid-elapsed' };
-  // A valid authoritative snapshot needs no evaluation or historical observation
-  // when no time passed. Bootstrap's separate achievement policy remains outside.
   if (elapsedMs === 0) {
-    // Retain the zero-time corruption check without planning rewards or production.
     if (!isAutomationState(state.automation)) throw new RangeError('Invalid authoritative automation');
+    advanceManualJobReadiness(state.manualJobs, 0);
     return { ok: true, state, businessIncome: moneyFromMinorUnits('0'),
       automation: { completedJobs: 0, income: moneyFromMinorUnits('0'), xpEarned: 0 } };
   }
-  if (state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) return simulateAutoUpgrader(state, elapsedMs);
+  if (state.automation.enabledIds.includes(BUSINESS_AUTO_UPGRADER.id)) {
+    const upgraded = simulateAutoUpgrader(state, elapsedMs);
+    if (!upgraded.ok) return upgraded;
+    return { ...upgraded, state: advanceManualReadinessInState(upgraded.state, elapsedMs) };
+  }
   const business = simulateElapsed(state, elapsedMs);
   if (!business.ok) return business;
   requireXp(state.progression.xp);
@@ -43,5 +57,6 @@ export function simulateGameElapsed(state: GameState, elapsedMs: unknown): GameS
   const candidate = city === automation.state.city ? automation.state : { ...automation.state, city };
   const counted = countStatistic(state, candidate, 'automatedJobsCompleted', automation.automation.completedJobs);
   if (!counted.ok) return counted;
-  return { ...automation, state: unlockEligibleAchievements(observePeakHeat(counted.state)).state, businessIncome: income.value };
+  const achieved = unlockEligibleAchievements(observePeakHeat(counted.state)).state;
+  return { ...automation, state: advanceManualReadinessInState(achieved, elapsedMs), businessIncome: income.value };
 }

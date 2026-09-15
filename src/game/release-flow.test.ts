@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialGameState } from './game-state';
-import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { purchaseSkillRank } from './purchase-skill-rank';
 import { performRebirth, selectRebirth } from './rebirth';
@@ -11,6 +11,7 @@ import { validateSaveState } from './save-schema';
 import { exportSaveCode, validateSaveCode } from './save-code';
 import { runBalanceModel, successful, productionDollars } from './test-fixtures/balance-model';
 import { rebirthState } from './test-fixtures/rebirth-state';
+import { unlockEligibleAchievements } from './achievements';
 import { STARTER_BUSINESS as B } from '../features/businesses';
 import { BUSINESS_AUTO_UPGRADER as A, DELIVERY_DISPATCHER as D } from '../features/automation';
 import { STARTER_VEHICLE as V } from '../features/vehicles';
@@ -31,14 +32,17 @@ describe('Phase 9E Base Game release flow', () => {
     expect(validateSaveState(state)).toEqual(state);
     const code = exportSaveCode(state, 123);
     if (!code.ok) throw Error(code.error);
-    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 26, savedAt: 123, state } });
+    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 27, savedAt: 123, state } });
   });
 
   it('legal earnings and acquisitions reach all milestones, then reset and rebuild with permanent benefits', () => {
     // No gifted cash, XP, ownership or completed milestones. Sixty legal jobs
     // also exercise Running Hot before the existing deterministic idle route.
     let state = createInitialGameState();
-    for (let job = 0; job < 60; job++) state = successful(performStarterJob(state));
+    for (let job = 0; job < 60; job++) state = performReadyStarterJobFixture(state);
+    // The fixture bypasses the platform command wrapper, so mirror the runtime's
+    // immediate post-command achievement observation before the long offline route cools Heat.
+    state = unlockEligibleAchievements(state).state;
     const route = runBalanceModel('idle-leaning', state);
     for (const name of ['Player 2', 'Dockside 1', 'Dockside 5', 'Dockside 10', 'Delivery Dispatcher',
       'Kairo KX-R', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Business Auto-Upgrader', 'Rebirth eligible'])
@@ -68,7 +72,7 @@ describe('Phase 9E Base Game release flow', () => {
     expect(reset.permanentProgression.unlockedAchievementIds).toEqual(ACHIEVEMENT_CATALOG.map(a => a.id));
     expect(validateSaveState(reset)).toEqual(reset);
     reset = successful(purchaseSkillRank(reset, 'skill:streetwise-investment'));
-    for (let job = 0; job < 6; job++) reset = successful(performStarterJob(reset));
+    for (let job = 0; job < 6; job++) reset = performReadyStarterJobFixture(reset);
     reset = successful(purchaseBusiness(reset, B.id));
     expect(productionDollars(reset)).toBeCloseTo(0.86625, 8);
     expect(reset.permanentProgression.statistics.manualJobsCompleted).toBe(state.permanentProgression.statistics.manualJobsCompleted + 6);

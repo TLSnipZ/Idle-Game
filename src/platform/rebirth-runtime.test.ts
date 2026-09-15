@@ -39,10 +39,10 @@ describe('durable Rebirth transaction', () => {
   });
   it('uses a fresh fractional clock baseline for the new run with no old production or jobs', () => {
     const f=rebirthRuntime();f.at(10000.75);expect(f.game.rebirth().ok).toBe(true);
-    const reset=f.game.getSnapshot().result.state;f.at(10001);f.tick();expect(f.game.getSnapshot().result.state).toEqual(reset);
-    for(let i=0;i<6;i++)f.game.execute(performStarterJob);
+    const reset=f.game.getSnapshot().result.state;let now=10001;f.at(now);f.tick();expect(f.game.getSnapshot().result.state).toEqual(reset);
+    for(let i=0;i<6;i++){f.game.execute(performStarterJob);if(i<5){now+=10000;f.at(now);f.tick();}}
     f.game.execute(state=>purchaseBusiness(state,B.id));const rebuilt=f.game.getSnapshot().result.state;
-    f.at(11001);f.tick();expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(rebuilt,1000).state);
+    f.at(now+1000);f.tick();expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(rebuilt,1000).state);
     expect(f.game.getSnapshot().result.state.progression.xp).toBe(60);
     expect(f.game.getSnapshot().result.state.automation.unlockedIds).toEqual([]);f.game.stop();
   });
@@ -89,7 +89,7 @@ describe('durable Rebirth transaction', () => {
     const f=rebirthRuntime();expect(f.game.rebirth().ok).toBe(true);const state=onlineElapsed(f.game.getSnapshot().result.state,5000).state;
     f.at(5000);f.wall(6000);f.autosave();expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{state}});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');expect(code.code.startsWith('CE1-')).toBe(true);
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 26,state}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 27,state}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);
     expect(f.game.getSnapshot().result.state).toEqual(state);f.game.stop();expect(f.timers()).toBe(0);
   });

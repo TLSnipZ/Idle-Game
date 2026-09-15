@@ -15,6 +15,7 @@ import { createInitialBusinessState } from '../features/businesses';
 import type { BusinessState } from '../features/businesses';
 import { createInitialEconomyState } from '../features/economy';
 import type { EconomyState } from '../features/economy';
+import type { ManualJobState } from './manual-job-readiness';
 
 export interface GameState {
   readonly events: EventState;
@@ -27,6 +28,7 @@ export interface GameState {
   readonly upgrades: UpgradeState;
   readonly economy: EconomyState;
   readonly businesses: BusinessState;
+  readonly manualJobs?: ManualJobState;
 }
 
 export function createInitialGameState(): GameState {

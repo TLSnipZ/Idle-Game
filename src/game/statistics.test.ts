@@ -23,6 +23,7 @@ import { EVENT_CATALOG } from '../features/events';
 import { moneyFromMinorUnits } from '../features/economy';
 import { ACHIEVEMENT_CATALOG } from '../features/achievements';
 import { unlockEligibleAchievements } from './achievements';
+import { performReadyStarterJobFixture, readyManualJobFixture } from './test-fixtures/manual-job-ready';
 const fresh = createInitialGameState;
 function stats(state: GameState) { return state.permanentProgression.statistics; }
 function history(state: GameState, changes: Partial<StatisticsState>): GameState {
@@ -55,7 +56,7 @@ describe('eight permanent lifetime observations', () => {
     const s = Object.freeze(createInitialStatistics()); expect(() => incrementStatistic(s, 'manualJobsCompleted', amount)).toThrow(RangeError);
   });
   it('manual actions count independently and retain exact existing Money/XP/Heat', () => {
-    let s = fresh(); for (let i = 0; i < 10; i++) s = success(performStarterJob(s));
+    let s = fresh(); for (let i = 0; i < 10; i++) s = performReadyStarterJobFixture(s);
     expect(stats(s)).toEqual({ ...createInitialStatistics(), manualJobsCompleted: 10, peakHeat: 10 });
     expect(s.economy.cash).toBe('25000'); expect(s.progression.xp).toBe(100); expect(s.city.heat).toBe(10);
     const failed = performStarterJob({ ...s, progression: { xp: Number.MAX_SAFE_INTEGER } });
@@ -130,7 +131,7 @@ describe('eight permanent lifetime observations', () => {
     const first = success(performStarterJob(fresh())); expect(stats(first).peakHeat).toBe(1);
     const cold = success(simulateGameElapsed(first, 60000)); expect(cold.city.heat).toBe(0); expect(stats(cold).peakHeat).toBe(1);
     const hot = success(performStarterJob(heat(cold, 59))); expect(stats(hot).peakHeat).toBe(60);
-    const max = success(performStarterJob(heat(hot, 99))); expect(stats(max).peakHeat).toBe(100);
+    const max = success(performStarterJob(readyManualJobFixture(heat(hot, 99)))); expect(stats(max).peakHeat).toBe(100);
     const lower = success(layLow({ ...max, economy: rebirthState().economy })); expect(stats(lower).peakHeat).toBe(100);
     const reset = success(performRebirth({ ...rebirthState(), permanentProgression: lower.permanentProgression }));
     expect(reset.city.heat).toBe(0); expect(stats(reset).peakHeat).toBe(100);

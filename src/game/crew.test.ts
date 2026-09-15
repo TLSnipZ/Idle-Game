@@ -16,6 +16,7 @@ import { getHeatDecayIntervalMs } from './heat-decay-interval';
 import { selectHeat } from './heat-selectors';
 import { selectCrew, selectCrewMember } from './crew-selectors';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { simulateAutomation } from './simulate-automation';
 import { simulateGameElapsed } from './simulate-game-elapsed';
 import { simulateElapsed } from './simulate-elapsed';
@@ -147,13 +148,13 @@ describe('assigned Crew effects and exact shared math', () => {
     expect(evaluateBusinessProduction(bench,B.id,1)).toEqual(evaluateBusinessProduction(s,B.id,1));
     expect(getOfflineCapMs(bench)).toBe(getOfflineCapMs(s));expect(selectRebirth(bench)).toEqual(selectRebirth(s));
   });
-  it.each([[0,rational(23958n,5n),'4791'],[60,rational(107811n,25n),'4312']] as const)('Rico full stack at Heat %i stays rational before existing per-job floor', (h,exact,payout) => {
+  it.each([[0,rational(75867n,5n),'15173','4791'],[60,rational(682803n,50n),'13656','4312']] as const)('Rico full stack at Heat %i keeps manual portfolio pay separate from Dispatcher pay', (h,exact,manualPayout,dispatcherPayout) => {
     const s=jobStack(h), evaluated=evaluateJobReward(s);
-    expect(evaluated).toMatchObject({ok:true,effective:exact,reward:payout});
+    expect(evaluated).toMatchObject({ok:true,effective:exact,reward:manualPayout});
     if(!evaluated.ok)throw Error('fixture');expect(evaluated.applied.some(m=>m.sourceId===R.id)).toBe(true);
     expect(evaluated.applied.filter(m=>m.operation==='multiply-basis-points').map(m=>m.id)).toEqual(evaluated.applied.filter(m=>m.operation==='multiply-basis-points').map(m=>m.id).sort());
-    const manual=performStarterJob(s);expect(manual).toMatchObject({ok:true,moneyEarned:payout,xpEarned:11});expect(manual.state.city.heat).toBe(h+1);
-    const batch=simulateAutomation(s,30000);expect(batch).toMatchObject({ok:true,automation:{completedJobs:3,income:(BigInt(payout)*3n).toString(),xpEarned:16}});
+    const manual=performStarterJob(s);expect(manual).toMatchObject({ok:true,moneyEarned:manualPayout,xpEarned:11});expect(manual.state.city.heat).toBe(h+1);
+    const batch=simulateAutomation(s,30000);expect(batch).toMatchObject({ok:true,automation:{completedJobs:3,income:(BigInt(dispatcherPayout)*3n).toString(),xpEarned:16}});
   });
   it('Rico alone adds 10% Money, disappears on unassignment, and changes neither XP nor Heat or production', () => {
     const base={...createInitialGameState(),crew:crewState().crew};const s=assignCrewMember(base,'operations',R.id).state;
@@ -237,7 +238,7 @@ describe('Crew offline and Rebirth contracts', () => {
     const second=performRebirth({...s,permanentProgression:r.state.permanentProgression});expect(second.state.permanentProgression.empirePoints).toBe(11);expect(second.state.crew).toEqual(fresh.crew);
   });
   it('fresh progression and max Heat work without optional Crew', () => {
-    let s=createInitialGameState();for(let i=0;i<6;i++)s=performStarterJob(s).state;
+    let s=createInitialGameState();for(let i=0;i<6;i++)s=performReadyStarterJobFixture(s);
     expect(s.progression.xp).toBe(60);expect(purchaseBusiness(s,B.id).ok).toBe(true);expect(s.crew).toEqual(createInitialCrewState());
     expect(performStarterJob(heat(s,100))).toMatchObject({ok:true,moneyEarned:'1875'});
     const d=heat({...crewState(),crew:createInitialCrewState()},100);expect(simulateGameElapsed(d,10000).ok).toBe(true);

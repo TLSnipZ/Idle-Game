@@ -25,6 +25,7 @@ export const REBIRTH_POLICY = {
   upgrades: { action: 'reset', labels: ['Normal upgrades'] },
   automation: { action: 'reset', labels: ['Delivery Dispatcher and unfinished delivery progress', 'Business Auto-Upgrader ownership, enabled state and progress'] },
   progression: { action: 'reset', labels: ['Player XP / Level (returns to Level 1)'] },
+  manualJobs: { action: 'retain', labels: ['Remaining manual delivery readiness delay'] },
   garage: { action: 'retain', labels: ['Vehicles'] },
   permanentProgression: { action: 'accumulate', labels: ['Empire Points', 'Rebirth count', 'Permanent skills', 'Achievements', 'Lifetime Statistics'] },
 } as const satisfies Record<keyof GameState, { readonly action: 'reset' | 'retain' | 'accumulate'; readonly labels: readonly string[] }>;
@@ -49,8 +50,9 @@ export function performRebirth(state: GameState): RebirthResult {
   if (preview.reward === null) return { ok: false, state, error: 'requirements-not-met', requirements: preview.requirements };
   const permanent = addRebirthReward(unlockEligibleAchievements(state).state.permanentProgression, preview.reward);
   if (!permanent.ok) return { ok: false, state, error: permanent.error };
-  // Authoritative reset construction: fresh temporary slices, explicit permanent retention.
-  const candidate: GameState = { ...createInitialGameState(), garage: state.garage, permanentProgression: permanent.state };
+  // Authoritative reset construction: fresh temporary slices, explicit retained slices.
+  const candidate: GameState = { ...createInitialGameState(), garage: state.garage,
+    ...(state.manualJobs ? { manualJobs: { ...state.manualJobs } } : {}), permanentProgression: permanent.state };
   const counted = countStatistic(state, candidate, 'rebirthsCompleted');
   if (!counted.ok) return counted;
   return { ok: true, state: unlockEligibleAchievements(counted.state).state, reward: preview.reward };

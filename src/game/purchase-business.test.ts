@@ -6,6 +6,7 @@ import type { GameState } from './game-state';
 import { purchaseBusiness } from './purchase-business';
 import { performStarterJob } from './perform-starter-job';
 import { selectCash, selectCanPurchaseBusiness, selectOwnsBusiness } from './selectors';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 
 const id = STARTER_BUSINESS.id;
 
@@ -94,9 +95,7 @@ describe('atomic business purchase', () => {
     let state = createInitialGameState();
     for (let delivery = 0; delivery < 6; delivery++) {
       expect(selectCanPurchaseBusiness(state, id)).toBe(false);
-      const earned = performStarterJob(state);
-      expect(earned.ok).toBe(true);
-      state = earned.state;
+      state = performReadyStarterJobFixture(state);
     }
     const result = purchaseBusiness(state, id);
     expect(result.ok).toBe(true);

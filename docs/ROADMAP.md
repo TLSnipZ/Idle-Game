@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current phase — Operations Balance II
+
+Implemented on PR #52: portfolio-paced Operations rewards and one shared 10-second manual readiness slot. Manual base Cash is `max($25, P × 8s)` and Dispatcher base Cash is `max($25, P × 1s)`, where `P` is owned unmodified Business production at current levels; existing scoped modifiers apply afterward. Save v27 / CE1 persists pending readiness, migrates v26 ready without grants, and retains a pending delay through Rebirth/import without historic manual payout. Dedicated EN/DE/Villager browser verification is part of the acceptance gate. See [Operations Balance II](OPERATIONS_BALANCE_II.md). PR #52 remains unmerged/unpublished until explicitly approved.
+
+
 ## Current phase — Workshop purchase insight
 
 Implements the first bounded Purchase Intelligence slice: optional before/after
@@ -322,7 +327,11 @@ foundation work. Roadmap order may change explicitly; it is not authorization.
 | 9E — Release Candidate / Base Game Freeze (implementation complete; live pending) | Regression verification and release readiness | Preserve balance, v15/CE1, runtime and accessibility contracts |
 | Post-roadmap — Rebranding (not started) | Final art direction, palette, typography and assets | Separate approval and asset provenance |
 
-## Current status
+## Current status — Operations Balance II
+
+**Implementation complete on PR #52; merge/deploy pending explicit approval.** The approved portfolio-paced reward contract uses unmodified owned-Business production as the manual/Dispatcher base, then applies existing modifiers. One shared 10-second manual readiness slot governs normal/risky/discreet deliveries without banking offline actions. Save v27 / CE1 adds only pending readiness state and migrates v26 ready with no grants or resets. Rebirth/import/runtime chronology and Dispatcher/Auto-Upgrader outer-batch semantics are regression-covered. Full acceptance requires the complete unit suite, Chromium matrix including the dedicated EN/DE/Villager × mobile/desktop Balance-II verifier, and whitespace checks on the final PR head. See `docs/OPERATIONS_BALANCE_II.md`.
+
+## Previous status — Workshop purchase insight
 
 Phases 0, 1A, 1B, 1C.1 and 1C.2 are complete. Cash, starter delivery, business
 purchase and deterministic production simulation are connected to a 250 ms browser

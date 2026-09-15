@@ -1,6 +1,12 @@
 # Architecture
 
-## Current phase — Workshop purchase insight
+## Current phase — Operations Balance II
+
+Operations reward selection now lives in `src/game/effective-stats.ts`: `evaluateDeliveryRewardBase` sums catalog-backed **unmodified** production from owned Businesses, applies the manual 8-second or Dispatcher 1-second scale with the $25 floor, and only then enters the existing modifier pipeline. This prevents production modifiers from being counted twice. Dispatcher planning still prices one outer batch against its starting state, so Auto-Upgrader purchases inside elapsed simulation never reprice earlier Dispatcher jobs.
+
+Manual cadence is isolated in `src/game/manual-job-readiness.ts`. A pending shared normal/risky/discreet action stores `manualJobs: { elapsedMs }`; absence is the canonical ready state. Successful commands create pending state, rejected commands preserve input, and elapsed simulation removes pending state at 10 seconds without banking extra actions. Save v27 validates that slice; v26 migration starts ready with no grants, Rebirth retains pending delay, and import preserves validated remaining delay while runtime replacement establishes a fresh local clock anchor. Presentation reads the same authoritative state. See [Operations Balance II](OPERATIONS_BALANCE_II.md).
+
+## Previous phase — Workshop purchase insight
 
 Implements the first bounded Purchase Intelligence slice: optional before/after
 comparisons for all twelve Workshop setups. Both columns assume the selected car

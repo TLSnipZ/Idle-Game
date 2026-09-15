@@ -57,7 +57,8 @@ export function runBalanceModel(model: PlayerModel, initial = createInitialGameS
   let seconds = 0;
   const checkpoints: Record<string, Checkpoint> = {};
   let firstRebirth: GameState | undefined;
-  const manualPeriod = model === 'idle-leaning' ? 1 : 5;
+  // Operations Balance II accepts at most one paid manual delivery every 10 seconds.
+  const manualPeriod = 10;
   const record = (name: string, condition: boolean) => {
     if (!condition || checkpoints[name]) return;
     checkpoints[name] = { seconds, manualJobs: state.permanentProgression.statistics.manualJobsCompleted,
@@ -81,8 +82,6 @@ export function runBalanceModel(model: PlayerModel, initial = createInitialGameS
       firstRebirth ??= state;
     }
   };
-  // Finite content-completion route. Optimized chooses the shortest immediate income payback;
-  // it is a transparent greedy policy, not a proof of globally optimal human play.
   const shop = () => {
     for (let purchases = 0; purchases < 50; purchases++) {
       const actions: { name: string; apply: (s: GameState) => Result }[] = [
@@ -116,17 +115,15 @@ export function runBalanceModel(model: PlayerModel, initial = createInitialGameS
       const action = available[0];
       if (!action) break;
       const purchase = action.apply(state);
-      if (!purchase.ok) break; // Optimized saves for its chosen investment instead of buying a cheaper distraction.
+      if (!purchase.ok) break;
       state = successful(purchase);
       record(action.name, true);
       if (action.name === RICO_VALE.name) state = successful(assignCrewMember(state, 'operations', RICO_VALE.id));
       if (action.name === JAX_MERCER.name) state = successful(assignCrewMember(state, 'logistics', JAX_MERCER.id));
-      // Mara is recruited for access/completion, not substituted for the income specialist.
       observe();
     }
   };
   observe();
-  // No events as a reproducible conservative cash case; there is no random expected-value credit.
   const noSpawn = { next: () => 0.999999 };
   while (seconds < 30 * 24 * 3600) {
     if (model === 'idle-leaning' && state.permanentProgression.statistics.manualJobsCompleted >= 40) {
@@ -145,7 +142,6 @@ export function runBalanceModel(model: PlayerModel, initial = createInitialGameS
   return { model, checkpoints, firstRebirth, state };
 }
 
-/** Derived acquisition/upgrade bill; no copied quadratic formula. */
 export function docksideBill(target: number): bigint {
   let total = BigInt(B.purchaseCost);
   for (let level = 1; level < target; level++) {

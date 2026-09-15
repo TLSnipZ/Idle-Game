@@ -75,7 +75,7 @@ export function runExpansionModel(model: PlayerModel, options: RouteOptions, ini
   const catalog = [B, ...(options.expanded ? BUSINESS_PROPOSALS.filter(b => !options.omitAfterdark || b.name !== 'Afterdark Customs') : [])];
   const checkpoints: Record<string, Checkpoint> = {};
   let firstRebirth: GameState | undefined;
-  const manualPeriod = model === 'idle-leaning' ? 1 : 5;
+  const manualPeriod = 10;
   const record = (name: string, condition: boolean) => {
     if (!condition || checkpoints[name]) return;
     checkpoints[name] = { seconds, manualJobs: state.permanentProgression.statistics.manualJobsCompleted - initialJobs,

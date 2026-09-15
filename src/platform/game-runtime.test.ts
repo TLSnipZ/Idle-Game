@@ -4,13 +4,14 @@ import { moneyFromMinorUnits } from '../features/economy';
 import { createInitialGameState } from '../game/game-state';
 import type { GameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
+import { performReadyStarterJobFixture } from '../game/test-fixtures/manual-job-ready';
 import { purchaseBusiness } from '../game/purchase-business';
 import { onlineElapsed } from './test-fixtures/online-elapsed';
 import { browserTiming, createGameRuntime, RUNTIME_CADENCE_MS } from './game-runtime';
 
 function funded(): GameState {
   let state = createInitialGameState();
-  for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
+  for (let i = 0; i < 6; i++) state = performReadyStarterJobFixture(state);
   return state;
 }
 function owned(): GameState {
@@ -104,7 +105,7 @@ describe('mounted game runtime', () => {
     const f = fixture(); f.runtime.start(); f.at(0.75);
     f.runtime.execute(performStarterJob);
     f.at(1); f.tick();
-    expect(f.state()).toEqual(performStarterJob(onlineElapsed(owned(), 1).state).state);
+    expect(f.state()).toEqual(onlineElapsed(performStarterJob(owned()).state, 1).state);
   });
   it('commands see pre-command production and preserve it through a job', () => {
     const f = fixture(); f.runtime.start(); f.at(1000);
@@ -115,12 +116,14 @@ describe('mounted game runtime', () => {
     f.tick();
     expect(f.state().economy.cash).toBe('2575');
   });
-  it('sequential queued intents consume the latest state before React renders', () => {
+  it('sequential queued manual intents consume the latest state and accept only the first before React renders', () => {
     const f = fixture(createInitialGameState()); f.runtime.start();
     for (let i = 0; i < 6; i++) f.runtime.execute(performStarterJob);
-    f.runtime.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
-    f.at(1000); f.tick(); f.runtime.execute(performStarterJob);
-    expect(f.state().economy.cash).toBe('2575');
+    expect(f.state().economy.cash).toBe('2500');
+    expect(f.state().progression.xp).toBe(10);
+    expect(f.runtime.getSnapshot().result).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
+    f.at(10000); f.tick(); f.runtime.execute(performStarterJob);
+    expect(f.state().economy.cash).toBe('5000');
   });
   it('failed commands retain reconciled income and feedback across ticks', () => {
     const f = fixture(); f.runtime.start(); f.at(1000);

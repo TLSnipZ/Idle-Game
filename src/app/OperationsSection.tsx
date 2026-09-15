@@ -11,6 +11,7 @@ import { formatReward } from './number-format';
 import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { evaluateXpReward } from '../game/xp-reward';
+import { isManualJobReady, manualJobRemainingMs } from '../game/manual-job-readiness';
 import { MANUAL_JOB_HEAT } from '../features/heat';
 import { formatXp } from './progression-presentation';
 import { ModifierBreakdown } from './ModifierBreakdown';
@@ -50,6 +51,8 @@ export function OperationsSection({ game, destination }: { readonly game: Return
   const waterfront = getActiveDistrictId(snapshot.state.city) === WATERFRONT.id;
   const reward = evaluateJobReward(snapshot.state);
   const xp = evaluateXpReward(snapshot.state, 'manualJob');
+  const ready = isManualJobReady(snapshot.state.manualJobs);
+  const remainingSeconds = Math.ceil(manualJobRemainingMs(snapshot.state.manualJobs) / 1000);
   const unavailable = text('Unavailable', 'Nicht verfügbar');
   const totalProduction = dashboardPresentation(snapshot.state).production;
 
@@ -68,19 +71,22 @@ export function OperationsSection({ game, destination }: { readonly game: Return
         <div><span className="eyebrow">{text('QUICK CASH', 'SCHNELLES CASH')}</span><h2 id="starter-heading" className="operations-target" tabIndex={-1}>{waterfront ? text('Waterfront Delivery', 'Waterfront-Lieferung') : text('District Delivery', 'Bezirkslieferung')}</h2></div>
         <span className="operations-kicker">{text('Manual work', 'Handarbeit')}</span>
       </div>
-      <p className="operations-lead">{text('Move a package across your operating district, get paid, and keep HR comfortably fictional.', 'Bring ein Paket durch deinen Einsatzbezirk, kassier ab und lass HR weiterhin angenehm fiktiv bleiben.')}</p>
+      <p className="operations-lead">{text('Move a package across your operating district, get paid, and keep HR comfortably fictional. Manual delivery pay grows with the unmodified production of your owned Businesses.', 'Bring ein Paket durch deinen Einsatzbezirk, kassier ab und lass HR weiterhin angenehm fiktiv bleiben. Manuelle Liefer-Cash wächst mit der unmodifizierten Produktion deiner eigenen Businesses.')}</p>
       <dl className="job-metrics">
         <div><dt>{text('Payout', 'Auszahlung')}</dt><dd>{reward.ok ? formatReward(reward.reward) : unavailable}</dd></div>
         <div><dt>{text('XP')}</dt><dd>+{xp.ok ? formatXp(xp.reward) : unavailable}</dd></div>
         <div><dt>{text('Heat')}</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
       </dl>
-      <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused}>
-        <span>{waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
+      <p className={`manual-readiness ${ready ? 'is-ready' : ''}`} aria-live="polite">{ready
+        ? text('DELIVERY READY · One manual job can leave now.', 'LIEFERUNG BEREIT · Ein manueller Job kann jetzt raus.')
+        : text(`CREW RESET · ${remainingSeconds}s · Normal, risky and discreet deliveries share this slot.`, `CREW RESET · ${remainingSeconds}s · Normal, riskant und diskret teilen sich diesen Slot.`)}</p>
+      <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused || !ready}>
+        <span>{paused ? text('Session paused', 'Session pausiert') : !ready ? text(`Crew resetting · ${remainingSeconds}s`, `Crew sortiert sich · ${remainingSeconds}s`) : waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
         <span className="reward">+{reward.ok ? formatReward(reward.reward) : unavailable} <span aria-hidden="true">↗</span></span>
       </button>
       {reward.ok && reward.applied.length > 0 && <details className="operations-disclosure">
         <summary>{text('Reward details', 'Auszahlungsdetails')}</summary>
-        <div className="operations-disclosure-body"><p>{text('Base reward:', 'Basis-Auszahlung:')} <strong>{formatReward(reward.base)}</strong></p><ModifierBreakdown modifiers={reward.applied} /><p>{text('Effective reward:', 'Tatsächliche Auszahlung:')} <strong>{formatReward(reward.reward)}</strong></p></div>
+        <div className="operations-disclosure-body"><p>{text('Portfolio-paced base reward:', 'Portfolio-basierte Grundauszahlung:')} <strong>{formatReward(reward.base)}</strong></p><ModifierBreakdown modifiers={reward.applied} /><p>{text('Effective reward:', 'Tatsächliche Auszahlung:')} <strong>{formatReward(reward.reward)}</strong></p></div>
       </details>}
       </div>
       <RiskyDelivery state={snapshot.state} paused={paused} onRun={game.runRiskyDelivery} />

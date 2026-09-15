@@ -15,14 +15,13 @@ import { isRational, ZERO_RATIONAL } from '../shared/rational';
 import { findBusiness, isBusinessLevel, STARTER_BUSINESS } from '../features/businesses';
 import type { BusinessId } from '../features/businesses';
 import { isMoney } from '../features/economy';
+import { isManualJobState } from './manual-job-readiness';
 import type { GameState } from './game-state';
 
 export const SAVE_FORMAT = 'crime-empire-save';
-export const CURRENT_SAVE_VERSION = 26;
-// Historical identity is accepted only before v16, never by current catalog lookup.
+export const CURRENT_SAVE_VERSION = 27;
 const LEGACY_VEHICLE_ID: VehicleId = 'vehicle:starter-sport-sedan';
 const KXR_VEHICLE_ID: VehicleId = 'vehicle:kairo-kx-r';
-// UTF-16 code units: at most 128 KiB of string storage before JSON parsing.
 export const MAX_SAVE_LENGTH = 65_536;
 
 export interface SaveEnvelope {
@@ -50,11 +49,12 @@ export function isSaveTimestamp(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
-/** Shared state validation; legacy ownership is accepted only by the v1 migration. */
+/** Shared state validation; v27 stores manual readiness only while a delay is pending. */
 function validateState(value: unknown, version: number): GameState | null {
   const legacy = version === 1;
   const hasModifiers = version >= 3;
-  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : []), ...(version >= 6 ? ['garage'] : []), ...(version >= 7 ? ['permanentProgression'] : []), ...(version >= 9 ? ['city'] : []), ...(version >= 11 ? ['crew'] : []), ...(version >= 12 ? ['events'] : [])])) return null;
+  const hasManualJobs = version >= 27 && record(value) && Object.hasOwn(value, 'manualJobs');
+  if (!record(value) || !keys(value, ['economy', 'businesses', ...(hasModifiers ? ['upgrades'] : []), ...(version >= 4 ? ['automation'] : []), ...(version >= 5 ? ['progression'] : []), ...(version >= 6 ? ['garage'] : []), ...(version >= 7 ? ['permanentProgression'] : []), ...(version >= 9 ? ['city'] : []), ...(version >= 11 ? ['crew'] : []), ...(version >= 12 ? ['events'] : []), ...(hasManualJobs ? ['manualJobs'] : [])])) return null;
   const { economy, businesses } = value;
   if (!record(economy) || !keys(economy, ['cash']) || !isMoney(economy.cash)
       || !record(businesses) || !keys(businesses, [legacy ? 'ownedIds' : 'owned', 'productionRemainderMilliCents', ...(hasModifiers ? ['productionRemainderSubMilliCents'] : [])])) return null;
@@ -113,7 +113,6 @@ function validateState(value: unknown, version: number): GameState | null {
         ? id === LEGACY_VEHICLE_ID ? LEGACY_VEHICLE_ID : undefined
         : version < 19 ? id === KXR_VEHICLE_ID ? KXR_VEHICLE_ID : undefined : findVehicle(id)?.id;
       if (!vehicleId || ownedVehicleIds.includes(vehicleId)) return null;
-      // Historical Tier-1 envelopes must not accept future catalog identities.
       if (version >= 19 && version < 24
         && ![KXR_VEHICLE_ID, 'vehicle:kairo-senda', 'vehicle:namera-lilt'].includes(vehicleId)) return null;
       if (version === 24
@@ -141,8 +140,6 @@ function validateState(value: unknown, version: number): GameState | null {
   const appearances = record(value.garage) && Object.hasOwn(value.garage, 'appearances') ? value.garage.appearances : undefined;
   if (record(value.garage) && Object.hasOwn(value.garage, 'appearances')
     && !isVehicleAppearances(appearances, ownedVehicleIds)) return null;
-  // v25 and earlier only support customization for the three Tier-1 models.
-  // Freeze this boundary before the current catalogs gain Tier-2 parts/finishes.
   if (version <= 25) {
     const tierOne = [KXR_VEHICLE_ID, 'vehicle:kairo-senda', 'vehicle:namera-lilt'];
     if (record(builds) && Object.keys(builds).some(id => !tierOne.includes(id))) return null;
@@ -168,8 +165,10 @@ function validateState(value: unknown, version: number): GameState | null {
   if (!isCrewState(crew)) return null;
   const events = version >= 12 ? value.events : createInitialEventState();
   if (!isEventState(events)) return null;
+  const manualJobs = hasManualJobs ? value.manualJobs : undefined;
+  if (manualJobs !== undefined && !isManualJobState(manualJobs)) return null;
   return { events: { ...events }, crew: { recruitedIds: [...crew.recruitedIds], assignments: { ...crew.assignments } }, city: { ...city, ...(city.districts ? { districts: { ...city.districts, parked: { ...city.districts.parked } } } : {}), ownedTerritoryIds: [...city.ownedTerritoryIds] }, permanentProgression: { statistics: { ...statistics }, empirePoints: permanent.empirePoints, rebirthCount: permanent.rebirthCount, skills: { ...skills }, unlockedAchievementIds: [...unlockedAchievementIds] }, garage: { ownedVehicleIds, activeVehicleId, ...(appearances !== undefined && isVehicleAppearances(appearances, ownedVehicleIds) ? { appearances: { ...appearances } } : {}), ...(builds !== undefined && isVehicleBuilds(builds, ownedVehicleIds) ? { builds: cloneVehicleBuilds(builds) } : {}) }, progression: { xp: progression.xp }, automation: { ...automation, unlockedIds: [...automation.unlockedIds], enabledIds: [...automation.enabledIds] }, economy: { cash: economy.cash }, businesses: { owned, productionRemainderMilliCents: remainder,
-    productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds } };
+    productionRemainderSubMilliCents: { numerator: sub.numerator, denominator: sub.denominator } }, upgrades: { purchasedIds }, ...(manualJobs !== undefined ? { manualJobs: { elapsedMs: manualJobs.elapsedMs } } : {}) };
 }
 export function validateSaveState(value: unknown): GameState | null { return validateState(value, CURRENT_SAVE_VERSION); }
 function migrateV1ToV2(value: unknown): unknown {
@@ -203,31 +202,31 @@ function migrateV5ToV6(value: unknown): unknown {
 function migrateV6ToV7(value: unknown): unknown {
   const valid = validateState(value, 6);
   if (!valid) return null;
-  const { events: _events, crew: _crew, city: _city, ...legacy } = valid;
+  const { events: _events, crew: _crew, city: _city, manualJobs: _manualJobs, ...legacy } = valid;
   return { ...legacy, permanentProgression: { empirePoints: valid.permanentProgression.empirePoints, rebirthCount: valid.permanentProgression.rebirthCount } };
 }
 function migrateV7ToV8(value: unknown): unknown {
   const valid = validateState(value, 7);
   if (!valid) return null;
-  const { events: _events, crew: _crew, city: _city, ...legacy } = valid;
+  const { events: _events, crew: _crew, city: _city, manualJobs: _manualJobs, ...legacy } = valid;
   return withoutAchievementsAndStatistics(legacy);
 }
 function migrateV8ToV9(value: unknown): unknown {
   const valid = validateState(value, 8);
   if (!valid) return null;
-  const { events: _events, crew: _crew, ...legacy } = valid;
+  const { events: _events, crew: _crew, manualJobs: _manualJobs, ...legacy } = valid;
   return { ...withoutAchievementsAndStatistics(legacy), city: { ownedTerritoryIds: valid.city.ownedTerritoryIds } };
 }
 function migrateV9ToV10(value: unknown): unknown {
   const valid = validateState(value, 9);
   if (!valid) return null;
-  const { events: _events, crew: _crew, ...legacy } = valid;
+  const { events: _events, crew: _crew, manualJobs: _manualJobs, ...legacy } = valid;
   return withoutAchievementsAndStatistics(legacy);
 }
 function migrateV10ToV11(value: unknown): unknown {
   const valid = validateState(value, 10);
   if (!valid) return null;
-  const { events: _events, ...legacy } = valid;
+  const { events: _events, manualJobs: _manualJobs, ...legacy } = valid;
   return withoutAchievementsAndStatistics(legacy);
 }
 function withoutAchievementsAndStatistics<T extends { readonly permanentProgression: GameState['permanentProgression'] }>(state: T) {
@@ -236,96 +235,81 @@ function withoutAchievementsAndStatistics<T extends { readonly permanentProgress
 }
 function migrateV11ToV12(value: unknown): unknown {
   const valid = validateState(value, 11);
-  return valid ? withoutAchievementsAndStatistics(valid) : null;
+  if (!valid) return null;
+  const { manualJobs: _manualJobs, ...legacy } = valid;
+  return withoutAchievementsAndStatistics(legacy);
 }
 function migrateV12ToV13(value: unknown): unknown {
   const valid = validateState(value, 12);
   if (!valid) return null;
   const { statistics: _statistics, ...permanentProgression } = valid.permanentProgression;
-  return { ...valid, permanentProgression };
+  const { manualJobs: _manualJobs, ...legacy } = valid;
+  return { ...legacy, permanentProgression };
 }
-/** Schema-only addition: Rebirth count is the sole existing exact historical counter. */
 function migrateV13ToV14(value: unknown): GameState | null { return validateState(value, 13); }
-
 function migrateV14ToV15(value: unknown): GameState | null { return validateState(value, 14); }
-
-/** Identity only: historical strict validation rejects duplicates/unknown IDs. */
 function migrateV15ToV16(value: unknown): GameState | null {
   const valid = validateState(value, 15);
   return valid ? { ...valid, garage: { activeVehicleId: valid.garage.ownedVehicleIds.length ? KXR_VEHICLE_ID : null, ownedVehicleIds: valid.garage.ownedVehicleIds.map(
     id => id === LEGACY_VEHICLE_ID ? KXR_VEHICLE_ID : id,
   ) } } : null;
 }
-
-/** Emit historical automation shape between sequential legacy migrations. */
 function legacyAutomation(value: unknown): unknown {
   if (!record(value) || !record(value.automation)) return value;
   const { enabledIds: _enabled, businessAutoUpgradeElapsedMs: _elapsed, businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
   return { ...value, automation };
 }
-
-/** Preserve the historical v15/v16 targetless contract between sequential steps. */
 function withoutTarget(value: GameState | null): unknown {
   if (!value) return null;
   const { businessAutoUpgradeTargetId: _target, ...automation } = value.automation;
   return { ...value, automation };
 }
-/** Schema transformation only; all elapsed progress is retained for runtime. */
 function migrateV16ToV17(value: unknown): GameState | null { return validateState(value, 16); }
-
-/** Emit the exact historical Garage shape after a validated pre-v18 step. */
 function withoutActiveVehicle(value: unknown): unknown {
   if (!record(value) || !record(value.garage)) return value;
   const { activeVehicleId: _active, ...garage } = value.garage;
   return { ...value, garage };
 }
-/** Validated v17 owners automatically retain their existing vehicle's production bonus. */
 function migrateV17ToV18(value: unknown): GameState | null { return validateState(value, 17); }
+function withoutManualJobs(value: unknown): unknown {
+  if (!record(value)) return value;
+  const { manualJobs: _manualJobs, ...legacy } = value;
+  return legacy;
+}
 
-/** Future versions add real sequential vN -> vN+1 migrations here before final validation. */
 export function migrateToCurrentSave(value: unknown): SaveResult {
-  if (!record(value) || !keys(value, ['format', 'version', 'savedAt', 'state'])) {
-    return { ok: false, error: 'invalid-envelope' };
-  }
+  if (!record(value) || !keys(value, ['format', 'version', 'savedAt', 'state'])) return { ok: false, error: 'invalid-envelope' };
   if (value.format !== SAVE_FORMAT) return { ok: false, error: 'wrong-format' };
   if (!isSaveTimestamp(value.version) || value.version < 1) return { ok: false, error: 'invalid-envelope' };
-  // Sequential migration: validated v1 ownership becomes v2 level-1 records.
   if (value.version > CURRENT_SAVE_VERSION) return { ok: false, error: 'unsupported-version' };
   if (!isSaveTimestamp(value.savedAt)) return { ok: false, error: 'invalid-timestamp' };
   let migrated: unknown = value.state;
-  if (value.version === 1) migrated = withoutActiveVehicle(legacyAutomation(migrateV1ToV2(migrated)));
-  if (value.version <= 2) migrated = withoutActiveVehicle(legacyAutomation(migrateV2ToV3(migrated)));
-  if (value.version <= 3) migrated = withoutActiveVehicle(legacyAutomation(migrateV3ToV4(migrated)));
-  if (value.version <= 4) migrated = withoutActiveVehicle(legacyAutomation(migrateV4ToV5(migrated)));
-  if (value.version <= 5) migrated = withoutActiveVehicle(legacyAutomation(migrateV5ToV6(migrated)));
-  if (value.version <= 6) migrated = withoutActiveVehicle(legacyAutomation(migrateV6ToV7(migrated)));
-  if (value.version <= 7) migrated = withoutActiveVehicle(legacyAutomation(migrateV7ToV8(migrated)));
-  if (value.version <= 8) migrated = withoutActiveVehicle(legacyAutomation(migrateV8ToV9(migrated)));
-  if (value.version <= 9) migrated = withoutActiveVehicle(legacyAutomation(migrateV9ToV10(migrated)));
-  if (value.version <= 10) migrated = withoutActiveVehicle(legacyAutomation(migrateV10ToV11(migrated)));
-  if (value.version <= 11) migrated = withoutActiveVehicle(legacyAutomation(migrateV11ToV12(migrated)));
-  if (value.version <= 12) migrated = withoutActiveVehicle(legacyAutomation(migrateV12ToV13(migrated)));
-  if (value.version <= 13) migrated = withoutActiveVehicle(legacyAutomation(migrateV13ToV14(migrated)));
-  if (value.version <= 14) migrated = withoutActiveVehicle(withoutTarget(migrateV14ToV15(migrated)));
-  if (value.version <= 15) migrated = withoutActiveVehicle(withoutTarget(migrateV15ToV16(migrated)));
-  if (value.version <= 16) migrated = withoutActiveVehicle(migrateV16ToV17(migrated));
-  if (value.version <= 17) migrated = migrateV17ToV18(migrated);
-  // v18 has the same shape but a frozen one-car identity set. No rewards or timing changes.
-  if (value.version <= 18) migrated = validateState(migrated, 18);
-  // v19 -> v20: retain old Heat/remainder at Waterfront; implicit Neon Mile starts cold.
-  if (value.version <= 19) migrated = validateState(migrated, 19);
-  // v20 -> v21: stock builds remain implicit; no purchase, reward or timestamp changes.
-  if (value.version <= 20) migrated = validateState(migrated, 20);
-  // v21 -> v22: preserve KX-R builds and validate before accepting new model parts.
-  if (value.version <= 21) migrated = validateState(migrated, 21);
-  // v22 -> v23: keep factory looks implicit and preserve every existing build.
-  if (value.version <= 22) migrated = validateState(migrated, 22);
-  // v23 -> v24: validate the frozen Tier-1 identity boundary before adding Serein.
-  if (value.version <= 23) migrated = validateState(migrated, 23);
-  // v24 -> v25: preserve four-car saves before accepting Rendan and Canto.
-  if (value.version <= 24) migrated = validateState(migrated, 24);
-  // v25 -> v26: retain all six cars and existing Tier-1 builds/looks; grant nothing.
-  if (value.version <= 25) migrated = validateState(migrated, 25);
+  if (value.version === 1) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV1ToV2(migrated))));
+  if (value.version <= 2) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV2ToV3(migrated))));
+  if (value.version <= 3) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV3ToV4(migrated))));
+  if (value.version <= 4) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV4ToV5(migrated))));
+  if (value.version <= 5) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV5ToV6(migrated))));
+  if (value.version <= 6) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV6ToV7(migrated))));
+  if (value.version <= 7) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV7ToV8(migrated))));
+  if (value.version <= 8) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV8ToV9(migrated))));
+  if (value.version <= 9) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV9ToV10(migrated))));
+  if (value.version <= 10) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV10ToV11(migrated))));
+  if (value.version <= 11) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV11ToV12(migrated))));
+  if (value.version <= 12) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV12ToV13(migrated))));
+  if (value.version <= 13) migrated = withoutManualJobs(withoutActiveVehicle(legacyAutomation(migrateV13ToV14(migrated))));
+  if (value.version <= 14) migrated = withoutManualJobs(withoutActiveVehicle(withoutTarget(migrateV14ToV15(migrated))));
+  if (value.version <= 15) migrated = withoutManualJobs(withoutActiveVehicle(withoutTarget(migrateV15ToV16(migrated))));
+  if (value.version <= 16) migrated = withoutManualJobs(withoutActiveVehicle(migrateV16ToV17(migrated)));
+  if (value.version <= 17) migrated = withoutManualJobs(migrateV17ToV18(migrated));
+  if (value.version <= 18) migrated = withoutManualJobs(validateState(migrated, 18));
+  if (value.version <= 19) migrated = withoutManualJobs(validateState(migrated, 19));
+  if (value.version <= 20) migrated = withoutManualJobs(validateState(migrated, 20));
+  if (value.version <= 21) migrated = withoutManualJobs(validateState(migrated, 21));
+  if (value.version <= 22) migrated = withoutManualJobs(validateState(migrated, 22));
+  if (value.version <= 23) migrated = withoutManualJobs(validateState(migrated, 23));
+  if (value.version <= 24) migrated = withoutManualJobs(validateState(migrated, 24));
+  if (value.version <= 25) migrated = withoutManualJobs(validateState(migrated, 25));
+  if (value.version <= 26) migrated = validateState(migrated, 26);
   const state = validateSaveState(migrated);
   if (!state) return { ok: false, error: 'invalid-state' };
   return { ok: true, envelope: { format: SAVE_FORMAT, version: CURRENT_SAVE_VERSION, savedAt: value.savedAt, state } };

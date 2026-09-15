@@ -51,7 +51,7 @@ try {
     assert.deepEqual((await saved(page)).state.garage.ownedVehicleIds, [K, N]);
     await card.locator('.purchase-button').click();
     let snapshot = await saved(page);
-    assert.equal(snapshot.version, 26);
+    assert.equal(snapshot.version, 27);
     assert.deepEqual(snapshot.state.garage.ownedVehicleIds, [K, N, id]);
     assert.equal(snapshot.state.garage.activeVehicleId, K, 'Buying does not activate a later car');
     assert.deepEqual(snapshot.state.garage.builds, f.state.garage.builds);

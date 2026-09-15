@@ -17,8 +17,6 @@ import { DEFAULT_LOCALE } from './localization';
 import type { Locale } from './localization';
 import { localize } from './LocalizationProvider';
 
-
-
 export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'equipment' | 'automation' | 'vehicle', result: RuntimeSnapshot['result'], contentId?: unknown, locale: Locale = DEFAULT_LOCALE): string {
   const business = findBusiness(contentId ?? STARTER_BUSINESS.id);
   if (result.ok) {
@@ -51,6 +49,10 @@ export function describeAction(action: 'delivery' | 'purchase' | 'upgrade' | 'eq
       : localize(locale, `${business?.name ?? 'Business'} acquired. Live production has started.`, `${business?.name ?? 'Business'} übernommen. Produktion läuft. Papierkram angeblich auch.`);
   }
   switch (result.error) {
+    case 'manual-job-not-ready': {
+      const seconds = 'remainingMs' in result ? Math.ceil(result.remainingMs / 1000) : 1;
+      return localize(locale, `Manual crew is resetting. ${seconds}s until the next paid delivery.`, `Die manuelle Crew sortiert sich noch. ${seconds}s bis zur nächsten bezahlten Lieferung.`);
+    }
     case 'unknown-appearance': return localize(locale, 'This finish does not fit that vehicle.', 'Diese Lackierung passt nicht zu diesem Fahrzeug.');
     case 'tuning-not-owned': return localize(locale, 'Buy this setup before fitting it.', 'Erst kaufen, dann einbauen. Der Mechaniker arbeitet nicht für Ruhm.');
     case 'no-manhunt': return localize(locale, 'No local MANHUNT. Keep the decoy money.', 'Keine lokale Großfahndung. Das Geld fürs Ablenkungsmanöver bleibt bei dir.');
@@ -104,7 +106,7 @@ export function businessPresentation(owned: boolean, canPurchase: boolean, pause
     productionLabel: paused ? localize(locale, 'Production paused', 'Produktion pausiert') : owned ? localize(locale, 'Live production', 'Live-Produktion') : localize(locale, 'Potential production', 'Mögliche Produktion'),
     buttonLabel: paused ? localize(locale, 'Session paused', 'Session pausiert') : owned ? maxed ? localize(locale, 'MAX LEVEL', 'MAX-LEVEL') : progress ? localize(locale, `Upgrade to Level ${progress.level + 1}`, `Auf Level ${progress.level + 1} upgraden`) : localize(locale, 'Acquired', 'Übernommen') : localize(locale, 'Acquire business', 'Business übernehmen'),
     disabled,
-    note: paused ? localize(locale, 'Reload to restore the last available local save. Unsaved progress may be lost.', 'Neu laden, um den letzten lokalen Save wiederherzustellen. Ungespeicherter Fortschritt könnte dabei verschwinden — sehr seriös.')
+    note: paused ? localize(locale, 'Reload to restore the last available local save. Unsaved progress may be lost.', 'Neu laden, um den letzten lokalen Save wiederherzustellen. Ungespeicherter Fortschritt könnte dabei verloren gehen — sehr seriös.')
       : owned ? progress && !maxed && !progress.canUpgrade ? localize(locale, 'Insufficient Cash for the next Level.', 'Zu wenig Cash fürs nächste Level. Wachstum hat leider Eintritt.') : null
       : acquisition.note,
   };
