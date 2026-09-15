@@ -75,19 +75,20 @@ try {
     if (locale === 'en' && width === 390) {
       await page.waitForTimeout(10_300);
       await page.waitForFunction(() => !document.querySelector('.operations-primary-action')?.disabled);
-      const ready = await saved(page);
-      assert.equal(ready.manualJobs, undefined);
+      assert.equal(await page.locator('.manual-readiness.is-ready').count(), 3);
       assert.equal(await standard.isEnabled(), true);
       assert.equal(await risky.isEnabled(), true);
       assert.equal(await discreet.isEnabled(), true);
-      const xp = ready.progression.xp;
-      const heat = ready.city.heat;
+      const beforeDiscreet = await saved(page);
+      const xp = beforeDiscreet.progression.xp;
+      const heat = beforeDiscreet.city.heat;
       await discreet.click();
       const afterDiscreet = await saved(page);
       assert.equal(afterDiscreet.progression.xp, xp);
       assert.equal(afterDiscreet.city.heat, Math.max(0, heat - 2));
       assert.equal(afterDiscreet.manualJobs.elapsedMs, 0);
       assert.equal(await standard.isDisabled(), true);
+      assert.equal(await page.locator('.manual-readiness.is-ready').count(), 0);
     }
 
     assert.deepEqual(errors, []);
