@@ -1,4 +1,4 @@
-name: Finalize Operations Balance II docs
+name: Finalize Operations Balance II architecture docs
 on:
   push:
     branches: [tmp-balance-ii-staging-2]
@@ -13,57 +13,29 @@ jobs:
         with:
           ref: feat/operations-balance-ii
           fetch-depth: 0
-      - name: Record Operations Balance II
+      - name: Record remaining architecture handoff
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
 
-          phase = '''## Current phase — Operations Balance II\n\nOperations rewards now scale with the owned Business portfolio without using production modifiers twice: manual delivery base Cash is `max($25, P × 8s)` and Dispatcher base Cash is `max($25, P × 1s)`, where `P` is the sum of unmodified production from currently owned Businesses at their current levels. Existing scoped flat and percentage modifiers apply after that base. Normal, risky and discreet manual deliveries share one 10-second readiness slot; the first action is ready immediately, successful actions consume it, failed actions do not, and elapsed time can restore only one ready action with no offline backlog.\n\nSave **v27 / CE1** persists only a pending manual delay; the canonical ready state stores no `manualJobs` field. v26 migration starts ready without grants, Rebirth retains a pending delay, and imports retain the validated remaining delay while establishing a new local runtime clock. Dispatcher cadence, ownership, Heat and XP batching remain unchanged, including Auto-Upgrader outer-batch pricing semantics. EN/DE/Villager Operations UI shows ready/countdown feedback. See [Operations Balance II](docs/OPERATIONS_BALANCE_II.md). PR #52 owns final CI evidence and remains unmerged/unpublished until explicitly approved.\n\n'''
-          readme = Path('README.md')
-          text = readme.read_text()
-          marker = '## Current phase — Workshop purchase insight'
-          if '## Current phase — Operations Balance II' not in text:
-              text = text.replace(marker, phase + '## Previous phase — Workshop purchase insight', 1)
-          readme.write_text(text)
-
-          roadmap = Path('docs/ROADMAP.md')
-          text = roadmap.read_text()
-          section = '''## Current status — Operations Balance II\n\n**Implementation complete on PR #52; merge/deploy pending explicit approval.** The approved portfolio-paced reward contract uses unmodified owned-Business production as the manual/Dispatcher base, then applies existing modifiers. One shared 10-second manual readiness slot governs normal/risky/discreet deliveries without banking offline actions. Save v27 / CE1 adds only pending readiness state and migrates v26 ready with no grants or resets. Rebirth/import/runtime chronology and Dispatcher/Auto-Upgrader outer-batch semantics are regression-covered. Full acceptance requires the complete unit suite, Chromium matrix including the dedicated EN/DE/Villager × mobile/desktop Balance-II verifier, and whitespace checks on the final PR head. See `docs/OPERATIONS_BALANCE_II.md`.\n\n'''
-          marker = '## Current status\n'
-          if '## Current status — Operations Balance II' not in text:
-              text = text.replace(marker, section + '## Previous status — Workshop purchase insight\n', 1)
-          roadmap.write_text(text)
-
-          architecture = Path('docs/ARCHITECTURE.md')
-          text = architecture.read_text()
-          section = '''## Current architecture — Operations Balance II\n\nOperations reward selection is a domain rule in `src/game/effective-stats.ts`. `evaluateDeliveryRewardBase` sums catalog-backed **unmodified** production inputs from owned Businesses, applies the manual (8 seconds) or Dispatcher (1 second) scale with the $25 floor, and only then enters the existing modifier pipeline. This prevents Business-production modifiers from being counted into the delivery base and then applied again as reward modifiers. Dispatcher planning still evaluates one reward against the outer batch-start state before multiplication, so Auto-Upgrader purchases inside that elapsed batch never reprice earlier Dispatcher jobs.\n\nManual cadence is isolated in `src/game/manual-job-readiness.ts`. `manualJobs?: { elapsedMs }` exists only while a shared normal/risky/discreet action is pending; absence is the canonical ready state. Successful commands create pending state, failed commands preserve the input, and elapsed simulation removes the pending state once 10 seconds have accrued. The simulation never accumulates more than one ready action. Save v27 validates this optional pending slice, migrations synthesize no historic payout, Rebirth retains it, and import installs it with a fresh runtime clock anchor. Presentation reads the same readiness state and does not own a second timer.\n\nSee `docs/OPERATIONS_BALANCE_II.md` for invariants and verification.\n\n'''
-          marker = '## Current architecture — Workshop purchase insight'
-          if '## Current architecture — Operations Balance II' not in text:
-              text = text.replace(marker, section + '## Previous architecture — Workshop purchase insight', 1)
-          architecture.write_text(text)
-
-          post = Path('docs/POST_ROADMAP.md')
-          text = post.read_text()
-          if 'Operations Balance II implementation is complete on PR #52' not in text:
-              lines = text.splitlines()
-              for i, line in enumerate(lines):
-                  if line.startswith('Current status:'):
-                      previous = line.replace('Current status:', 'Previous status:', 1)
-                      lines[i:i+1] = [
-                          'Current status: **Operations Balance II implementation is complete on PR #52; merge/deploy awaits explicit approval.** Save v27 / CE1, portfolio-paced manual/Dispatcher rewards, shared 10-second manual cadence and dedicated browser verification are the active handoff. See `docs/OPERATIONS_BALANCE_II.md`.',
-                          previous,
-                      ]
-                      break
-              text = '\n'.join(lines) + ('\n' if post.read_text().endswith('\n') else '')
-          post.write_text(text)
-
-          Path('docs/OPERATIONS_BALANCE_II.md').write_text('''# Operations Balance II — portfolio rewards and shared cadence\n\nStatus: **implemented on PR #52; not merged or deployed**. This document is the authoritative implementation handoff for the second Operations balance pass.\n\n## Reward contract\n\nLet `P` be the sum of **unmodified** production rates of every currently owned Business at its current level, expressed as Cash per second.\n\n- Standard/risky/discreet manual delivery base Cash: `max($25, P × 8 seconds)`.\n- Dispatcher base Cash per completed job: `max($25, P × 1 second)`.\n- Existing scoped flat additions and percentage modifiers are applied only after the base is selected.\n- Business-production modifiers do not feed `P`; this avoids double-dipping production bonuses into delivery rewards.\n- Risky/discreet modifiers, Heat pressure, Crew, Territories, Upgrades, active vehicles/tuning and permanent skills keep their existing scope and ordering.\n\nDispatcher keeps its existing interval and ownership gate. A Dispatcher batch evaluates its reward once against the outer batch-start state, multiplies by completed jobs, and floors XP on the same existing outer batch. Auto-Upgrader purchases reached inside that elapsed window therefore never reprice earlier/prefix Dispatcher jobs.\n\n## Shared manual readiness\n\nNormal, risky and discreet manual deliveries share one **10,000 ms** readiness slot.\n\n- A fresh or fully recovered game is ready immediately.\n- Only a successful manual action consumes readiness.\n- Domain failures such as `too-hot`, `already-cold`, overflow or other rejected commands do not consume the slot.\n- While pending, the authoritative state is `manualJobs: { elapsedMs }` with `0 <= elapsedMs < 10000`.\n- Ready is canonicalized as **absence of `manualJobs`**.\n- Elapsed simulation restores readiness after the remaining duration and never banks a second action. Long online/offline elapsed therefore yields at most one ready manual action, never historic manual Cash/XP/Heat.\n- Queued same-frame intents consume latest state, so at most the first successful intent is accepted before the UI rerenders.\n\n## Persistence and replacement semantics\n\nSave **v27 / CE1** is current.\n\n- v26 and earlier migrations enter v27 ready and receive no Cash, XP, ownership, unlocks or historic manual work.\n- v27 validates the optional pending readiness slice strictly.\n- Export/import round-trips the exact remaining pending delay. Import does not treat the imported `savedAt` as manual elapsed; runtime replacement establishes a fresh local clock anchor.\n- Rebirth retains a pending manual delay. Rebirth must not gift a ready click merely because run-scoped economy/progression reset.\n- Offline reconciliation may advance a pending delay to ready, but never creates a manual backlog or payout.\n\n## Presentation\n\nOperations shows the shared Ready/countdown state on standard, risky and discreet cards. Buttons respect the same authoritative domain state rather than owning independent cooldowns. Copy is provided in English, German and the full Villager locale. Narrow/mobile and desktop layouts must not introduce horizontal overflow.\n\n## Startup playtest\n\nWith no Business owned, the $25 floor applies. The first action is immediate, so a player acting whenever ready reaches:\n\n- **30 seconds:** 4 successful standard jobs = **$100** and **40 XP**.\n- **50 seconds:** 6 successful standard jobs = **$150** and **60 XP**, exactly enough to buy Dockside Detail.\n\nThis keeps the opening actionable immediately while removing one-click spam. Dockside arrives at a clear ~50-second milestone; Player Level 2 is not handed out before the first Business purchase, so early XP gates still have room to matter.\n\n## Verification contract\n\nThe final PR head must pass all of the following before the PR is marked ready:\n\n- TypeScript typecheck and production Vite build.\n- Complete Vitest suite (**2,650 tests** at implementation time).\n- Existing full Chromium regression matrix.\n- Dedicated Operations Balance II browser verifier across **EN / DE / Villager × 390 / 1440 px**, including fresh Ready state, shared consumption, restored readiness, discreet action, screenshots and no horizontal overflow.\n- `git diff --check`.\n\nNo vehicle/content/artwork expansion, price changes outside the approved reward formula, layout overhaul or deployment is part of this phase. Final run/artifact evidence belongs in PR #52.\n''')
+          section = '''## Current phase — Operations Balance II\n\nOperations reward selection now lives in `src/game/effective-stats.ts`: `evaluateDeliveryRewardBase` sums catalog-backed **unmodified** production from owned Businesses, applies the manual 8-second or Dispatcher 1-second scale with the $25 floor, and only then enters the existing modifier pipeline. This prevents production modifiers from being counted twice. Dispatcher planning still prices one outer batch against its starting state, so Auto-Upgrader purchases inside elapsed simulation never reprice earlier Dispatcher jobs.\n\nManual cadence is isolated in `src/game/manual-job-readiness.ts`. A pending shared normal/risky/discreet action stores `manualJobs: { elapsedMs }`; absence is the canonical ready state. Successful commands create pending state, rejected commands preserve input, and elapsed simulation removes pending state at 10 seconds without banking extra actions. Save v27 validates that slice; v26 migration starts ready with no grants, Rebirth retains pending delay, and import preserves validated remaining delay while runtime replacement establishes a fresh local clock anchor. Presentation reads the same authoritative state. See [Operations Balance II](OPERATIONS_BALANCE_II.md).\n\n'''
+          for filename in ['docs/ARCHITECTURE.md', 'docs/POST_ROADMAP.md']:
+              path = Path(filename)
+              text = path.read_text()
+              marker = '## Current phase — Workshop purchase insight'
+              if '## Current phase — Operations Balance II' not in text:
+                  if marker not in text:
+                      raise SystemExit(f'missing expected marker in {filename}')
+                  text = text.replace(marker, section + '## Previous phase — Workshop purchase insight', 1)
+                  path.write_text(text)
           PY
           git diff --check
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md docs/ROADMAP.md docs/ARCHITECTURE.md docs/POST_ROADMAP.md docs/OPERATIONS_BALANCE_II.md
-          git commit -m 'docs: record Operations Balance II implementation handoff'
+          git add docs/ARCHITECTURE.md docs/POST_ROADMAP.md
+          git commit -m 'docs: finish Operations Balance II architecture handoff'
+          git fetch origin feat/operations-balance-ii
+          git rebase origin/feat/operations-balance-ii
           git push origin HEAD:feat/operations-balance-ii
