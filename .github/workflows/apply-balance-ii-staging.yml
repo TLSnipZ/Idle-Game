@@ -1,0 +1,62 @@
+name: Apply Balance II staging patch
+
+on:
+  push:
+    branches: [tmp-balance-ii-staging]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: balance-ii-staging
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    if: ${{ !contains(github.event.head_commit.message, '[balance-ii-applied]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: tmp-balance-ii-staging
+          fetch-depth: 0
+      - name: Reconstruct and apply regression patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d scripts/.balance-ii-app.patch.gz.b64 | gzip -dc > /tmp/balance-app.patch
+          cat scripts/.balance-ii-game.patch.gz.b64.part1 \
+              scripts/.balance-ii-game.patch.gz.b64.part2 \
+              scripts/.balance-ii-game.patch.gz.b64.part3 \
+              scripts/.balance-ii-game.patch.gz.b64.part4 \
+            | base64 -d | gzip -dc > /tmp/balance-game.patch
+          cat scripts/.balance-ii-platform.patch.gz.b64.part1 \
+              scripts/.balance-ii-platform.patch.gz.b64.part2 \
+            | base64 -d | gzip -dc > /tmp/balance-platform.patch
+
+          patch -p1 --forward < /tmp/balance-app.patch
+          patch -p1 --forward < /tmp/balance-game.patch
+          patch -p1 --forward < /tmp/balance-platform.patch
+
+          rm -f scripts/.balance-ii-app.patch.gz.b64
+          rm -f scripts/.balance-ii-game.patch.gz.b64
+          rm -f scripts/.balance-ii-game.patch.gz.b64.part1
+          rm -f scripts/.balance-ii-game.patch.gz.b64.part2
+          rm -f scripts/.balance-ii-game.patch.gz.b64.part3
+          rm -f scripts/.balance-ii-game.patch.gz.b64.part4
+          rm -f scripts/.balance-ii-platform.patch.gz.b64.part1
+          rm -f scripts/.balance-ii-platform.patch.gz.b64.part2
+          rm -f .github/workflows/apply-balance-ii-staging.yml
+
+          git diff --check
+      - name: Commit staged source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "test: align Operations Balance II regression contracts [balance-ii-applied]"
+          git push origin HEAD:tmp-balance-ii-staging
