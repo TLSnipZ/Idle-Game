@@ -1,0 +1,69 @@
+name: Finalize Operations Balance II
+
+on:
+  push:
+    branches: [feat/operations-balance-ii]
+    paths:
+      - .github/workflows/finalize-operations-balance-ii.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/operations-balance-ii
+          fetch-depth: 0
+      - name: Finalize docs and remove staging helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def insert_after_title(path: str, title: str, section: str) -> None:
+              p = Path(path)
+              text = p.read_text()
+              if title in text:
+                  return
+              first_break = text.find('\n\n')
+              if first_break < 0:
+                  raise SystemExit(f'Cannot locate title boundary in {path}')
+              p.write_text(text[:first_break + 2] + section.rstrip() + '\n\n' + text[first_break + 2:])
+
+          insert_after_title(
+              'docs/ARCHITECTURE.md',
+              '## Current phase — Operations Balance II',
+              '''## Current phase — Operations Balance II
+
+Operations Balance II keeps reward/cadence authority in the pure game layer. `evaluateDeliveryRewardBase` derives the delivery base from the sum of catalog-backed **unmodified** production of owned Businesses, using the approved 8-second manual scale or 1-second Dispatcher scale with a $25 floor; existing scoped flat/percentage modifiers run only after that base is selected. Dispatcher planning still evaluates a batch against its outer start state, so Auto-Upgrader purchases inside elapsed simulation cannot reprice earlier jobs.
+
+Manual normal/risky/discreet actions share the optional `manualJobs` state slice. Absence is canonical Ready; pending state stores only `{ elapsedMs }`. Successful manual commands create pending state, rejected commands preserve input, and elapsed simulation removes pending state at 10 seconds without banking work. Platform code supplies time and persistence only; it does not own cooldown formulas.
+
+Save v27 / CE1 validates pending readiness, migrates v26 and older saves into Ready without grants, retains pending delay across Rebirth, and preserves validated remaining delay across import while the replacement runtime creates a fresh local clock anchor. See [Operations Balance II](OPERATIONS_BALANCE_II.md) for the full reward, migration and verification contract.'''
+          )
+
+          insert_after_title(
+              'docs/ROADMAP.md',
+              '## Current phase — Operations Balance II',
+              '''## Current phase — Operations Balance II
+
+Implemented on PR #52: portfolio-scaled manual/Dispatcher rewards, one shared 10-second normal/risky/discreet readiness slot, Save v27 / CE1 migration and localized Ready/countdown presentation. Fresh play remains immediately actionable: four standard jobs by 30 seconds ($100 / 40 XP) and six by 50 seconds ($150 / 60 XP), enough for Dockside Detail. The phase preserves Dispatcher batching, Auto-Upgrader batch-start pricing, Heat rules, existing content/prices and approved artwork. See [Operations Balance II](OPERATIONS_BALANCE_II.md). PR #52 is not merged or deployed until explicitly approved; older sections below are historical.'''
+          )
+          PY
+
+          rm -f .github/ops52.patch.gz.b64
+          rm -f .github/ops52/chunk-00
+          rm -f .github/workflows/apply-ops52-fixes.yml
+          rm -f .github/workflows/fix-balance-ii-browser-save-v27.yml
+          rm -f .github/workflows/finalize-operations-balance-ii.yml
+
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'docs: finalize Operations Balance II handoff'
+          git push origin HEAD:feat/operations-balance-ii
