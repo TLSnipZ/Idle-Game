@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { STARTER_JOB } from '../features/economy';
 import { createInitialGameState } from './game-state';
 import { evaluateDeliveryRewardBase, evaluateJobReward } from './effective-stats';
-import { performDiscreetDelivery, performRiskyDelivery, performStarterJob } from './perform-starter-job';
+import { performRiskyDelivery, performStarterJob } from './perform-starter-job';
 import { isManualJobReady, MANUAL_JOB_INTERVAL_MS, manualJobRemainingMs } from './manual-job-readiness';
 import { simulateGameElapsed } from './simulate-game-elapsed';
 import { CURRENT_SAVE_VERSION, SAVE_FORMAT, migrateToCurrentSave, parseSave, serializeSave } from './save-schema';
