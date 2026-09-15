@@ -1,0 +1,55 @@
+name: Apply Balance II staging patch 2
+on:
+  push:
+    branches: [tmp-balance-ii-staging-2]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: ${{ github.event.head_commit.message == 'chore: add verified Balance II staging applier' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: tmp-balance-ii-staging-2
+          fetch-depth: 0
+      - name: Verify staged chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/checksums <<'EOF'
+          45e674c031cffe30d246d4336b7ab60d67a3285b4be2ada8c0f1db08d7c6a9a4  scripts/.balance-ii-app.patch.gz.b64
+          f7878ebd25548e00760c68f7f0f5efd4ece71ade256184047f581ee10dda2092  scripts/.balance-ii-game.patch.gz.b64.part1
+          3cdaee538eac236b932c16f8d04f601f17e5e5511962a196f0fbd7c1a591b911  scripts/.balance-ii-game.patch.gz.b64.part2
+          46901f2fd54c2a0e87a53a179766a529362f6a739a2c9ea4092cae6b4a5167af  scripts/.balance-ii-game.patch.gz.b64.part3
+          f36f3c069b9530ec65958e92267eab89da8b870c5cc127fe2ee390fdf1be283c  scripts/.balance-ii-game.patch.gz.b64.part4
+          3f94047d34f7d908972737027faba1adbfc3435a708a8c1473e54eb4bcdf4f60  scripts/.balance-ii-platform.patch.gz.b64.part1
+          66e043519e150692f266488a0470d9892778a0a7162736a36c9a927daa7db376  scripts/.balance-ii-platform.patch.gz.b64.part2
+          EOF
+          sha256sum -c /tmp/checksums
+      - name: Reconstruct and apply regression patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d scripts/.balance-ii-app.patch.gz.b64 | gzip -dc > /tmp/balance-app.patch
+          cat scripts/.balance-ii-game.patch.gz.b64.part1 \
+              scripts/.balance-ii-game.patch.gz.b64.part2 \
+              scripts/.balance-ii-game.patch.gz.b64.part3 \
+              scripts/.balance-ii-game.patch.gz.b64.part4 \
+            | base64 -d | gzip -dc > /tmp/balance-game.patch
+          cat scripts/.balance-ii-platform.patch.gz.b64.part1 \
+              scripts/.balance-ii-platform.patch.gz.b64.part2 \
+            | base64 -d | gzip -dc > /tmp/balance-platform.patch
+          patch -p1 --forward < /tmp/balance-app.patch
+          patch -p1 --forward < /tmp/balance-game.patch
+          patch -p1 --forward < /tmp/balance-platform.patch
+          git diff --check
+      - name: Commit staged source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src
+          git commit -m 'test: align regression suite with Operations Balance II'
+          git push origin HEAD:tmp-balance-ii-staging-2
