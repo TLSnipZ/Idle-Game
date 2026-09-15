@@ -19,4 +19,7 @@ export const HEAT_SUPPORT_RULES: readonly HeatSupportRule[] = Object.freeze([
   Object.freeze({ kind: 'active-vehicle',
     modifier: Object.freeze({ id: 'modifier:decoy-lilt', sourceId: 'vehicle:namera-lilt',
       target: Object.freeze({ stat: 'heat-response-cost' }), operation: 'multiply-basis-points', bonusBasisPoints: -1000 }) }),
+  Object.freeze({ kind: 'active-vehicle',
+    modifier: Object.freeze({ id: 'modifier:decoy-raizan', sourceId: 'vehicle:toseki-raizan',
+      target: Object.freeze({ stat: 'heat-response-cost' }), operation: 'multiply-basis-points', bonusBasisPoints: -2500 }) }),
 ]);
