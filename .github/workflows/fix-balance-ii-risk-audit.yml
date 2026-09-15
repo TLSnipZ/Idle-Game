@@ -1,0 +1,46 @@
+name: Fix Balance II risk audit
+on:
+  push:
+    branches: [tmp-balance-ii-staging-2]
+    paths: [.github/workflows/fix-balance-ii-risk-audit.yml]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/operations-balance-ii
+          fetch-depth: 0
+      - name: Align risk audit with shared manual readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/verify-game-audit.mjs')
+          text = path.read_text()
+          old = """    assert.equal(await button.isDisabled(), true);\n    assert.equal(await page.locator('.operations-primary-action').isDisabled(), false);\n"""
+          new = """    assert.equal(await button.isDisabled(), true);\n    assert.equal(await page.locator('.operations-primary-action').isDisabled(), true, 'Risky success consumes shared manual readiness');\n"""
+          if text.count(old) != 1:
+              raise SystemExit(f'expected first risk-audit assertion once, got {text.count(old)}')
+          text = text.replace(old, new, 1)
+          old = """    await page.locator('.heat-action button').click();\n    assert.equal((await saved(page)).state.city.heat, 54);\n    await navigation(page).nth(1).click();\n    assert.equal(await button.isDisabled(), false);\n    assert.deepEqual(errors, []);\n"""
+          new = """    await page.locator('.heat-action button').click();\n    assert.equal((await saved(page)).state.city.heat, 54);\n    await navigation(page).nth(1).click();\n    assert.equal(await button.isDisabled(), true, 'Lay Low does not clear shared manual readiness');\n    await page.evaluate(() => {\n      const envelope = JSON.parse(localStorage.getItem('crime-empire:save'));\n      envelope.state.manualJobs = { elapsedMs: 9999 };\n      envelope.savedAt = Date.now();\n      localStorage.setItem('crime-empire:save', JSON.stringify(envelope));\n    });\n    await page.reload();\n    await navigation(page).nth(1).click();\n    await page.waitForFunction(() => !document.querySelector('.risky-delivery-button')?.disabled);\n    assert.equal(await button.isDisabled(), false);\n    assert.deepEqual(errors, []);\n"""
+          if text.count(old) != 1:
+              raise SystemExit(f'expected recovery risk-audit assertion once, got {text.count(old)}')
+          path.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+      - name: Commit fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/verify-game-audit.mjs
+          git commit -m 'test: align risk browser audit with shared readiness'
+          git fetch origin feat/operations-balance-ii
+          git rebase origin/feat/operations-balance-ii
+          git push origin HEAD:feat/operations-balance-ii
