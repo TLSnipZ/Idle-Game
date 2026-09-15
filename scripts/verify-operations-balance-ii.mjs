@@ -54,8 +54,7 @@ try {
     assert.equal(await risky.isEnabled(), true);
     assert.equal(await discreet.isDisabled(), true);
     assert.equal(await page.locator('.manual-readiness.is-ready').count(), 3);
-    const before = await saved(page);
-    assert.equal(before.manualJobs, undefined);
+    assert.equal(await page.evaluate(() => localStorage.getItem('crime-empire:save')), null);
 
     await standard.click();
     const pending = await saved(page);
@@ -64,8 +63,8 @@ try {
     assert.equal(await risky.isDisabled(), true);
     assert.equal(await discreet.isDisabled(), true);
     assert.equal(await page.locator('.manual-readiness.is-ready').count(), 0);
-    assert.equal(pending.city.heat, before.city.heat + 1);
-    assert.equal(pending.progression.xp, before.progression.xp + 10);
+    assert.equal(pending.city.heat, 1);
+    assert.equal(pending.progression.xp, 10);
     await checkNoHorizontalOverflow(page);
 
     if (locale === 'de' && width === 390)
