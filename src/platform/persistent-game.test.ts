@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { STARTER_BUSINESS } from '../features/businesses';
 import { createInitialGameState } from '../game/game-state';
 import { performStarterJob } from '../game/perform-starter-job';
+import { performReadyStarterJobFixture } from '../game/test-fixtures/manual-job-ready';
 import { purchaseBusiness } from '../game/purchase-business';
 import { simulateGameElapsed } from '../game/simulate-game-elapsed';
 import { onlineElapsed } from './test-fixtures/online-elapsed';
@@ -16,10 +17,13 @@ import { AUTOSAVE_CADENCE_MS, createPersistentGame } from './persistent-game';
 import { RUNTIME_CADENCE_MS } from './game-runtime';
 
 function portable(state = owned()) { return encodeSaveText(encoded(state)); }
-function owned() {
+function fundedReady() {
   let state = createInitialGameState();
-  for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
-  return simulateGameElapsed(purchaseBusiness(state, STARTER_BUSINESS.id).state, 13).state;
+  for (let i = 0; i < 6; i++) state = performReadyStarterJobFixture(state);
+  return state;
+}
+function owned() {
+  return simulateGameElapsed(purchaseBusiness(fundedReady(), STARTER_BUSINESS.id).state, 13).state;
 }
 function encoded(state = owned()) {
   const result = serializeSave(state, 1); if (!result.ok) throw Error('fixture');
@@ -85,16 +89,15 @@ describe('persistent runtime lifecycle', () => {
     expect(game.getSnapshot().persistence.kind).toBe('saved');
   });
   it('purchase saves both cash and ownership atomically; failure does not save', () => {
-    const f = fixture(); const game = f.make(); game.start(); f.storage.setItem.mockClear();
-    for (let i = 0; i < 6; i++) game.execute(performStarterJob);
+    const f = fixture(encoded(fundedReady())); const game = f.make(); game.start(); f.storage.setItem.mockClear();
     f.at(5100.75); game.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     const persisted = JSON.parse(f.raw() ?? '').state;
     expect(persisted.economy.cash).toBe('0');
     expect(persisted.businesses.owned).toEqual({ [STARTER_BUSINESS.id]: { level: 1 } });
     expect(persisted.businesses.productionRemainderMilliCents).toBe(0);
-    expect(f.storage.setItem).toHaveBeenCalledTimes(7);
+    expect(f.storage.setItem).toHaveBeenCalledTimes(1);
     game.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
-    expect(f.storage.setItem).toHaveBeenCalledTimes(7);
+    expect(f.storage.setItem).toHaveBeenCalledTimes(1);
   });
   it('valid reload restores saved state and starts a new fractional timing baseline', () => {
     const f = fixture(encoded()); const first = f.make(); first.start();

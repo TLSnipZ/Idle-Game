@@ -17,7 +17,7 @@ it.each([N,R,C])('$name purchase is durable before publication and preserves pre
   const after=f.game.getSnapshot().result.state;
   expect(after.garage.activeVehicleId).toBe(K.id);
   expect(BigInt(before.economy.cash)-BigInt(after.economy.cash)).toBe(BigInt(car.purchaseCost));
-  expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 26,state:after}});
+  expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 27,state:after}});
   f.game.stop();
 });
 it.each([N,R,C].flatMap(car => (['quota','conflict'] as const).map(failure => ({car,failure}))))('$failure rolls back $car.name purchase and activation after old effects reconcile', ({car,failure})=>{

@@ -82,7 +82,7 @@ describe('shared vehicle modifiers', () => {
     expect(evaluateBusinessProduction(owned,B.id,4)).toMatchObject({ok:true,effective:rational(330n)});
     expect(evaluateStat(moneyFromMinorUnits('100'),{stat:'business-production',businessId:'business:synthetic'},collectModifiers(owned)))
       .toMatchObject({ok:true,effective:rational(110n)});
-    expect(evaluateJobReward(owned)).toMatchObject({ok:true,reward:'2500'});
+    expect(evaluateJobReward(owned)).toMatchObject({ok:true,reward:'3000'});
   });
   it('stacks the canonical all-bonus rate exactly in stable modifier order', () => {
     const state={...eligible(),garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id },upgrades:{purchasedIds:UPGRADE_CATALOG.map(u=>u.id)}};
@@ -92,7 +92,7 @@ describe('shared vehicle modifiers', () => {
     if (!evaluated.ok) throw Error('evaluation');
     expect(evaluated.applied.map(m=>m.id)).toEqual(evaluated.applied.map(m=>m.id).sort());
     expect(evaluated.applied.some(m=>m.sourceId===V.id)).toBe(true);
-    expect(evaluateJobReward(state)).toMatchObject({ok:true,reward:'3600'});
+    expect(evaluateJobReward(state)).toMatchObject({ok:true,reward:'4200'});
   });
   it('preserves both earned fractions with arbitrary split intervals and serializable state', () => {
     const initial=eligible(); const state={...initial,garage:{ ownedVehicleIds: [V.id], activeVehicleId: V.id },

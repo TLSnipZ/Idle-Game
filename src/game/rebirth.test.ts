@@ -10,6 +10,7 @@ import { STARTER_BUSINESS as B } from '../features/businesses';
 import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { STREET_CONNECTIONS as S, EXPRESS_TIPS as E, DETAILING_LINE as L, FLEET_LOGISTICS as F } from '../features/upgrades';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { selectUpgrade } from './selectors';
 import { selectDispatcher } from './automation-selectors';
@@ -65,7 +66,7 @@ describe('explicit reset and retention', () => {
     expect(after.permanentProgression).toEqual({ statistics: createInitialStatistics(4), unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4});
     expect(after).toEqual({...createInitialGameState(),garage:state.garage,permanentProgression:{ statistics: createInitialStatistics(4), unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4}});
     expect(JSON.stringify(state)).toBe(before);expect(result).toEqual(performRebirth(state));
-    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
+    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual([...new Set([...Object.keys(state), 'manualJobs'])].sort());
   });
   it('supports repeat Rebirths: 4 then 7 EP, count 2, same collection', () => {
     const first=performRebirth(rebirthState()).state;
@@ -97,7 +98,7 @@ describe('explicit reset and retention', () => {
     for(const upgrade of [S,L,F]) expect(selectUpgrade(state,upgrade.id)?.eligible).toBe(false);
     expect(selectDispatcher(state).eligible).toBe(false);
     expect(simulateGameElapsed(state,10000).state).toEqual(state);
-    for(let i=0;i<6;i++)state=performStarterJob(state).state;
+    for(let i=0;i<6;i++)state=performReadyStarterJobFixture(state);
     state=purchaseBusiness(state,B.id).state;
     expect(state.upgrades.purchasedIds).toEqual([]);expect(state.garage.ownedVehicleIds).toEqual([V.id]);
     const production=evaluateBusinessProduction(state,B.id,1);

@@ -31,7 +31,7 @@ describe('shared Heat runtime and durable boundaries', () => {
     expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{savedAt:51000,state:unlockEligibleAchievements(after).state}});
     f.at(60000);f.tick();expect(f.game.getSnapshot().automationEvent).toMatchObject({income:'2475'});
     expect(f.game.getSnapshot().result.state.city).toMatchObject({heat:60,heatDecayElapsedMs:0});
-    f.game.execute(performStarterJob);expect(f.game.getSnapshot().result).toMatchObject({moneyEarned:'2475'});f.game.stop();
+    f.game.execute(performStarterJob);expect(f.game.getSnapshot().result).toMatchObject({moneyEarned:'8910'});f.game.stop();
   });
   it('Lay Low reconciles old HOT jobs and cooling first; future jobs use reduced Heat', () => {
     const s=initial(65),f=rebirthRuntime(s);f.at(50000);f.wall(51000);f.game.execute(layLow);
@@ -48,10 +48,12 @@ describe('shared Heat runtime and durable boundaries', () => {
     expect(f.game.getSnapshot().result).toMatchObject({ok:false,error:'already-cold'});
     expect(f.game.getSnapshot().result.state).toEqual(onlineElapsed(s,60000).state);expect(f.raw()).toBe(raw);f.game.stop();
   });
-  it('manual job feedback carries its actual old-tier payout through a boundary', () => {
+  it('manual job feedback carries its actual old-tier payout through a boundary and enforces shared readiness', () => {
     const f=rebirthRuntime(initial(79));f.game.execute(performStarterJob);
-    expect(f.game.getSnapshot().result).toMatchObject({ok:true,moneyEarned:'2250',state:{city:{heat:80}}});
-    f.game.execute(performStarterJob);expect(f.game.getSnapshot().result).toMatchObject({moneyEarned:'1875'});f.game.stop();
+    expect(f.game.getSnapshot().result).toMatchObject({ok:true,moneyEarned:'8100',state:{city:{heat:80}}});
+    f.game.execute(performStarterJob);expect(f.game.getSnapshot().result).toMatchObject({ok:false,error:'manual-job-not-ready'});
+    f.at(10000);f.tick();f.game.execute(performStarterJob);
+    expect(f.game.getSnapshot().result).toMatchObject({ok:true,moneyEarned:'6750'});f.game.stop();
   });
   it('autosave/export retain exact Heat progress; immediate reload and Strict Mode do not double-cool', () => {
     const f=rebirthRuntime(initial(70,45000));f.at(1000);f.wall(2000);f.tick();
@@ -59,7 +61,7 @@ describe('shared Heat runtime and durable boundaries', () => {
     f.at(5000);f.wall(6000);f.autosave();const saved=f.game.getSnapshot().result.state;
     expect(saved.city).toMatchObject({heat:70,heatDecayElapsedMs:50000});
     const code=f.game.exportCode();if(!code.ok)throw Error('fixture');
-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 26,savedAt:6000,state:saved}});
+    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 27,savedAt:6000,state:saved}});
     f.game.stop();f.game.start();f.game.start();expect(f.timers()).toBe(2);expect(f.game.getSnapshot().result.state).toEqual(saved);f.game.stop();
     const reload=f.make();reload.start();expect(reload.getSnapshot().result.state).toEqual(saved);reload.stop();
   });

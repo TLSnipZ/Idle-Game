@@ -21,6 +21,7 @@ import { VEHICLE_CATALOG } from '../features/vehicles';
 import { SKILL_CATALOG } from '../features/skills';
 import { rebirthState } from './test-fixtures/rebirth-state';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { purchaseAutomation } from './purchase-automation';
 import { acquireTerritory } from './acquire-territory';
@@ -83,11 +84,11 @@ describe('Phase 9C deterministic progression routes', () => {
 
   it('opens passive production after six deliveries and reaches Level 2 after ten', () => {
     let s = createInitialGameState();
-    for (let i = 0; i < 6; i++) s = successful(performStarterJob(s));
+    for (let i = 0; i < 6; i++) s = performReadyStarterJobFixture(s);
     expect(s.economy.cash).toBe(B.purchaseCost);
     s = successful(purchaseBusiness(s, B.id));
     expect(s.economy.cash).toBe('0');
-    for (let i = 0; i < 4; i++) s = successful(performStarterJob(s));
+    for (let i = 0; i < 4; i++) s = performReadyStarterJobFixture(s);
     expect(s.progression.xp).toBe(getXpThresholdForLevel(2));
     expect(successful(simulateGameElapsed(s, 1000)).economy.cash).toBe('10075');
   });
@@ -147,10 +148,10 @@ describe('Phase 9C deterministic progression routes', () => {
         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
     const savedAt = 1700000000000, before = structuredClone(rich);
-    expect(CURRENT_SAVE_VERSION).toBe(26);
+    expect(CURRENT_SAVE_VERSION).toBe(27);
     const serialized = serializeSave(rich, savedAt);
     if (!serialized.ok) throw Error('serialization');
-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 26, savedAt, state: rich } });
+    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 27, savedAt, state: rich } });
     const exported = exportSaveCode(rich, savedAt);
     if (!exported.ok) throw Error('export');
     expect(exported.code.startsWith('CE1-')).toBe(true);

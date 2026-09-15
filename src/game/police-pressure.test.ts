@@ -8,6 +8,7 @@ import { selectDiscreetDelivery } from './discreet-delivery';
 import { evaluateJobReward, evaluateBusinessProduction } from './effective-stats';
 import { serializeSave, parseSave } from './save-schema';
 import { exportSaveCode, validateSaveCode } from './save-code';
+import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
 
 function heated(heat: number, remainder = 0): GameState {
   const s = createInitialGameState();
@@ -22,7 +23,8 @@ describe('Police Pressure derived rules', () => {
     const first = performRiskyDelivery(heated(39));
     expect(first).toMatchObject({ ok: true, moneyEarned: '3750' });
     expect(first.state.city.heat).toBe(44);
-    expect(performRiskyDelivery(first.state)).toMatchObject({ ok: true, moneyEarned: '3125' });
+    expect(performRiskyDelivery(first.state)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
+    expect(performRiskyDelivery(readyManualJobFixture(first.state))).toMatchObject({ ok: true, moneyEarned: '3125' });
   });
   it.each([-1, 101, NaN, 1.1])('rejects malformed pressure %s', heat => {
     expect(() => getPolicePressure(heat)).toThrow(RangeError);
@@ -55,7 +57,8 @@ describe('Discreet delivery counterplay', () => {
     expect(after.permanentProgression.statistics.peakHeat).toBe(90);
     expect(after.garage).toBe(state.garage); expect(after.automation).toBe(state.automation);
     expect(evaluateBusinessProduction(after, 'business:dockside-detail', 1)).toEqual(evaluateBusinessProduction(state, 'business:dockside-detail', 1));
-    expect(performRiskyDelivery(after).ok).toBe(true);
+    expect(performRiskyDelivery(after)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
+    expect(performRiskyDelivery(readyManualJobFixture(after)).ok).toBe(true);
     expect(evaluateJobReward(after, 'dispatcher')).toMatchObject({ ok: true, reward: '2500' });
   });
   it('retains exact manual Senda and upgrade effects with one floor at payout', () => {
