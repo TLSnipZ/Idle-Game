@@ -1,6 +1,6 @@
 # Operations Balance II — portfolio rewards and shared cadence
 
-Status: **implemented on PR #52; not merged or deployed**. This document is the authoritative implementation handoff for the second Operations balance pass.
+Status: **merged via PR #52 and deployed to GitHub Pages**. Final feature head: `da976b6ee450573af8db652c385adb8741cc4d4b`; merge commit: `1a7067e3c4b77b4dae286de86496c8a30e4bb61d`. Verify Solara City #146 passed on the exact PR head, evidence artifact `10394829835`; Pages deploy #98 succeeded from the merge commit. This document is the authoritative implementation handoff for the second Operations balance pass.
 
 ## Reward contract
 
@@ -52,14 +52,14 @@ This keeps the opening actionable immediately while removing one-click spam. Doc
 
 ## Verification contract
 
-The final PR head must pass all of the following before the PR is marked ready:
+The final PR head passed all of the following before merge:
 
 - TypeScript typecheck and production Vite build.
-- Complete Vitest suite (**2,650 tests** at implementation time).
+- Complete Vitest suite (**2,650 / 2,650 passed, 0 failed, 0 skipped**).
 - Existing full Chromium regression matrix.
 - Dedicated Operations Balance II browser verifier across **EN / DE / Villager × 390 / 1440 px**, including fresh Ready state, shared consumption, restored readiness, discreet action, screenshots and no horizontal overflow.
 - `git diff --check`.
 
-Verification evidence must correspond to the **exact final PR head**; an earlier green run is not sufficient after code or documentation changes.
+Verification evidence corresponds to exact feature head `da976b6ee450573af8db652c385adb8741cc4d4b`: Verify Solara City #146, artifact `10394829835`. Merge commit `1a7067e3c4b77b4dae286de86496c8a30e4bb61d` deployed successfully through GitHub Pages run #98.
 
-No vehicle/content/artwork expansion, price changes outside the approved reward formula, layout overhaul or deployment is part of this phase. Final run/artifact evidence belongs in PR #52.
+No vehicle/content/artwork expansion, price changes outside the approved reward formula or unrelated layout overhaul was part of this phase.
