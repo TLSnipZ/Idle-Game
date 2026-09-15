@@ -9,7 +9,6 @@ import { getPlayerLevel, getXpThresholdForLevel } from '../features/progression'
 import { STARTER_BUSINESS as B } from '../features/businesses';
 import { STARTER_VEHICLE as V } from '../features/vehicles';
 import { STREET_CONNECTIONS as S, EXPRESS_TIPS as E, DETAILING_LINE as L, FLEET_LOGISTICS as F } from '../features/upgrades';
-import { performStarterJob } from './perform-starter-job';
 import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { selectUpgrade } from './selectors';
