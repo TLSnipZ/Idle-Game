@@ -11,6 +11,7 @@ import { selectCity, selectTerritory } from './territory-selectors';
 import { evaluateRequirements, newlyEligibleContent } from './requirements';
 import { evaluateBusinessProduction, evaluateJobReward } from './effective-stats';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { simulateGameElapsed } from './simulate-game-elapsed';
 import { simulateAutomation } from './simulate-automation';
@@ -103,10 +104,10 @@ describe('Solara City catalog and acquisition', () => {
   });
   it('fresh players work, buy Dockside and reach level 2 without acquiring territory', () => {
     let state = createInitialGameState();
-    for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
+    for (let i = 0; i < 6; i++) state = performReadyStarterJobFixture(state);
     expect(state.economy.cash).toBe('15000'); expect(state.progression.xp).toBe(60);
     const purchase = purchaseBusiness(state, B.id); expect(purchase.ok).toBe(true); state = purchase.state;
-    for (let i = 0; i < 4; i++) state = performStarterJob(state).state;
+    for (let i = 0; i < 4; i++) state = performReadyStarterJobFixture(state);
     expect(getPlayerLevel(state.progression.xp)).toBe(2); expect(state.city.ownedTerritoryIds).toEqual([W.id]);
   });
 });
@@ -114,23 +115,23 @@ describe('Solara City catalog and acquisition', () => {
 describe('territory modifiers and temporary Rebirth policy', () => {
   it('adds exactly one job source, leaving business production and XP unaffected', () => {
     const old = territoryState(), state = territoryState(true);
-    expect(evaluateJobReward(old)).toMatchObject({ reward: '2500', applied: [] });
-    expect(evaluateJobReward(state)).toMatchObject({ reward: '2750', applied: N.modifiers });
+    expect(evaluateJobReward(old)).toMatchObject({ reward: '9000', applied: [] });
+    expect(evaluateJobReward(state)).toMatchObject({ reward: '9900', applied: N.modifiers });
     expect(evaluateBusinessProduction(state, B.id, 15)).toEqual(evaluateBusinessProduction(old, B.id, 15));
     expect(performStarterJob(state).state.progression.xp - state.progression.xp).toBe(10);
-    expect(cashDelta(performStarterJob(state).state, state)).toEqual({ ok: true, value: '2750' });
+    expect(cashDelta(performStarterJob(state).state, state)).toEqual({ ok: true, value: '9900' });
     expect(collectTerritoryModifiers(state.city)).toEqual(N.modifiers);
   });
-  it('evaluates the complete flat/percentage stack at exactly $43.56 for manual and Dispatcher cash', () => {
+  it('evaluates separate portfolio-paced manual and Dispatcher cash through the same modifier stack', () => {
     const base = territoryState(true);
     const state: GameState = { ...base, upgrades: { purchasedIds: ['upgrade:express-tips', 'upgrade:street-connections'] },
       permanentProgression: { ...base.permanentProgression, skills: { [FAST]: 1, [LEARN]: 1 } } };
     const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
-    expect(reward.reward).toBe('4356');
+    expect(reward.reward).toBe('13794');
     expect(reward.applied.map(m => m.sourceId)).toEqual(['upgrade:express-tips', 'skill:fast-talker', 'upgrade:street-connections', N.id]);
     expect(evaluateJobReward({ ...state, upgrades: { purchasedIds: [...state.upgrades.purchasedIds].reverse() } })).toEqual(reward);
     const manual = performStarterJob(state);
-    expect(cashDelta(manual.state, state)).toEqual({ ok: true, value: '4356' });
+    expect(cashDelta(manual.state, state)).toEqual({ ok: true, value: '13794' });
     expect(manual.state.progression.xp - state.progression.xp).toBe(11);
     const batch = simulateAutomation(state, 30000); if (!batch.ok) throw Error('fixture');
     expect(batch.automation).toEqual({ completedJobs: 3, income: '13068', xpEarned: 16 });
@@ -175,7 +176,7 @@ describe('territory modifiers and temporary Rebirth policy', () => {
     const state = freeze({ ...base, city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] },
       permanentProgression: { statistics: createInitialStatistics(2), unlockedAchievementIds: [], empirePoints: 3, rebirthCount: 2, skills: { [ROOT]: 1, [FAST]: 1 } } });
     const result = performRebirth(state); if (!result.ok) throw Error('fixture');
-    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
+    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual([...new Set([...Object.keys(state), 'manualJobs'])].sort());
     expect(result.state.city).toEqual(createInitialGameState().city);
     expect(result.state.economy.cash).toBe('0'); expect(result.state.businesses.owned).toEqual({});
     expect(result.state.businesses.productionRemainderMilliCents).toBe(0);

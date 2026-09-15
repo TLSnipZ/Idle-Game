@@ -38,9 +38,10 @@ it('keeps each mounted runtime locale across command renders and separates insta
     game(1).setPresentationLocale('de'); game(2).setPresentationLocale('villager');
     for (let attempt = 0; attempt < 3; attempt++) {
       await act(() => game(1).runStarterJob());
-      expect(game(1).feedback.message).toContain('Lieferung erledigt.');
+      expect(game(1).feedback.message).toContain(attempt === 0 ? 'Lieferung erledigt.' : 'Die manuelle Crew sortiert sich noch.');
       await act(() => game(2).runStarterJob());
-      expect(game(2).feedback.message).toContain(villagerText('Delivery completed.'));
+      const english = attempt === 0 ? 'Delivery completed.' : 'Manual crew is resetting.';
+      expect(game(2).feedback.message).toContain(villagerText(english));
       expect(game(2).feedback.message).toBe(villagerText(game(2).feedback.message));
       expect(game(2).feedback.message).toMatch(/^[HhMmRr]+/);
     }

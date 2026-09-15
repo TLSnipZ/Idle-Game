@@ -85,10 +85,10 @@ it('explains named production bonuses and the exact combined effective value', (
   expect(html.replace(/<[^>]*>/g, '')).toContain('$7.73/sec'); // Exact production is unchanged; the player-facing rate rounds to cents.
 });
 
-it('explains effective $36 delivery reward with flat-before-percent named sources', () => {
+it('explains effective portfolio-paced delivery reward with flat-before-percent named sources', () => {
   const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
   const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
-  expect(formatCash(reward.reward)).toBe('$36.00');
+  expect(formatCash(reward.reward)).toBe('$42.00');
   const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
   expect(html).toContain('Express Tips: +$5.00'); expect(html).toContain('Street Connections: +20%');
   expect(html.indexOf('Express Tips')).toBeLessThan(html.indexOf('Street Connections'));

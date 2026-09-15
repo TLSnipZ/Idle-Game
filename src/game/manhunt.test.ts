@@ -76,7 +76,7 @@ describe('local MANHUNT rules', () => {
     const s = hunted(100, '0');
     expect(performStarterJob(s)).toMatchObject({ ok: true, moneyEarned: '2062' });
     let cooled = s;
-    for (let i = 0; i < 11; i++) cooled = performDiscreetDelivery(cooled).state;
+    for (let i = 0; i < 11; i++) cooled = performDiscreetDelivery(readyManualJobFixture(cooled)).state;
     expect(cooled.city.heat).toBe(78); expect(setActiveDistrict(cooled, N.id).ok).toBe(true);
     expect(layLow(hunted()).state.city.heat).toBe(70);
     expect(simulateGameElapsed(hunted(), 60000).state.city.heat).toBe(79);
@@ -90,7 +90,7 @@ describe('local MANHUNT rules', () => {
   });
   it('v20 and CE1 retain pursuit through existing district Heat without extra fields', () => {
     const s = hunted(100), saved = serializeSave(s, 1000), code = exportSaveCode(s, 1000);
-    expect(CURRENT_SAVE_VERSION).toBe(26);
+    expect(CURRENT_SAVE_VERSION).toBe(27);
     if (!saved.ok || !code.ok) throw Error('fixture');
     const loaded = parseSave(saved.serialized);
     expect(validateSaveCode(code.code)).toEqual(loaded);

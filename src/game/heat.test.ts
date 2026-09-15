@@ -6,6 +6,7 @@ import { territoryState } from './test-fixtures/territory-state';
 import { rebirthState } from './test-fixtures/rebirth-state';
 import { FAST, LEARN, NEVER } from './test-fixtures/skill-state';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { acquireTerritory } from './acquire-territory';
 import { layLow } from './lay-low';
 import { simulateAutomation } from './simulate-automation';
@@ -144,10 +145,10 @@ describe('atomic Heat sources and exact job penalties', () => {
     }
     const s = createInitialGameState(); expect(acquireTerritory(s,WATERFRONT.id).state).toBe(s);
   });
-  it.each([[0,4356n,1n,'4356'],[60,19602n,5n,'3920'],[80,3267n,1n,'3267']] as const)('full stack at Heat %i retains exact rational before final cents', (heat,n,d,payout) => {
-    const s = stack(heat), reward = evaluateJobReward(s); expect(reward).toMatchObject({ ok: true, effective: rational(n,d), reward: payout });
-    const job = performStarterJob(s); expect(job.ok && job.moneyEarned).toBe(payout); expect(job.ok && job.xpEarned).toBe(11);
-    const batch = simulateAutomation(s,30000); expect(batch.ok && batch.automation.income).toBe((BigInt(payout)*3n).toString());
+  it.each([[0,13794n,1n,'13794','4356'],[60,62073n,5n,'12414','3920'],[80,20691n,2n,'10345','3267']] as const)('full stack at Heat %i keeps exact manual portfolio pay and Dispatcher pay', (heat,n,d,manualPayout,dispatcherPayout) => {
+    const s = stack(heat), reward = evaluateJobReward(s); expect(reward).toMatchObject({ ok: true, effective: rational(n,d), reward: manualPayout });
+    const job = performStarterJob(s); expect(job.ok && job.moneyEarned).toBe(manualPayout); expect(job.ok && job.xpEarned).toBe(11);
+    const batch = simulateAutomation(s,30000); expect(batch.ok && batch.automation.income).toBe((BigInt(dispatcherPayout)*3n).toString());
     expect(batch.ok && batch.automation.xpEarned).toBe(16);
     if (!reward.ok) throw Error('fixture');
     expect(reward.applied.filter(m => m.id === HEAT_MODIFIER_ID)).toHaveLength(heat < 60 ? 0 : 1);
@@ -209,7 +210,7 @@ describe('offline and fresh/Rebirth contracts', () => {
   });
   it('fresh progression is playable and max Heat never blocks work or revokes territory', () => {
     let s = createInitialGameState(); expect(s.city.heat).toBe(0); expect(layLow(s).ok).toBe(false);
-    for (let i=0;i<6;i++) s=performStarterJob(s).state;
+    for (let i=0;i<6;i++) s=performReadyStarterJobFixture(s);
     expect(s.economy.cash).toBe('15000'); expect(s.progression.xp).toBe(60);
     expect(purchaseBusiness(s,STARTER_BUSINESS.id).ok).toBe(true);
     const max = heated(100,0,territoryState(true)); expect(performStarterJob(max).ok).toBe(true);

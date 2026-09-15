@@ -75,7 +75,7 @@ describe('Solara City presentation and interaction', () => {
     const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
     const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
     expect(html).toContain('Neon Mile: +10%'); expect(html).toContain('Fast Talker: +10%');
-    expect(describeAction('delivery', performStarterJob(state))).toContain('+$30.25 · +10 XP');
+    expect(describeAction('delivery', performStarterJob(state))).toContain('+$108.90 · +10 XP');
   });
   it('Rebirth confirmation describes territory loss, cancellation preserves it, success restores only Waterfront', () => {
     const f = rebirthRuntime({ ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });

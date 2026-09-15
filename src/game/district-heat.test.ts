@@ -53,7 +53,8 @@ describe('District Heat ownership and travel', () => {
     const risky = performRiskyDelivery(s).state;
     expect(risky.city.heat).toBe(5);
     expect(getDistrictHeat(risky.city, W.id).heat).toBe(80);
-    const quiet = performDiscreetDelivery(risky).state;
+    expect(performDiscreetDelivery(risky)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
+    const quiet = performDiscreetDelivery(readyManualJobFixture(risky)).state;
     expect(quiet.city.heat).toBe(3);
     const low = layLow(quiet).state;
     expect(low.city.heat).toBe(0); expect(getDistrictHeat(low.city, W.id).heat).toBe(80);
