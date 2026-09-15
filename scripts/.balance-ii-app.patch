@@ -1,0 +1,99 @@
+diff -ruN solara-pr52-original/src/app/locale-runtime.test.tsx solara-pr52/src/app/locale-runtime.test.tsx
+--- solara-pr52-original/src/app/locale-runtime.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/locale-runtime.test.tsx	2026-09-15 08:46:51.492453073 +0000
+@@ -38,9 +38,10 @@
+     game(1).setPresentationLocale('de'); game(2).setPresentationLocale('villager');
+     for (let attempt = 0; attempt < 3; attempt++) {
+       await act(() => game(1).runStarterJob());
+-      expect(game(1).feedback.message).toContain('Lieferung erledigt.');
++      expect(game(1).feedback.message).toContain(attempt === 0 ? 'Lieferung erledigt.' : 'Die manuelle Crew sortiert sich noch.');
+       await act(() => game(2).runStarterJob());
+-      expect(game(2).feedback.message).toContain(villagerText('Delivery completed.'));
++      const english = attempt === 0 ? 'Delivery completed.' : 'Manual crew is resetting.';
++      expect(game(2).feedback.message).toContain(villagerText(english));
+       expect(game(2).feedback.message).toBe(villagerText(game(2).feedback.message));
+       expect(game(2).feedback.message).toMatch(/^[HhMmRr]+/);
+     }
+diff -ruN solara-pr52-original/src/app/navigation-interaction.test.tsx solara-pr52/src/app/navigation-interaction.test.tsx
+--- solara-pr52-original/src/app/navigation-interaction.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/navigation-interaction.test.tsx	2026-09-15 08:46:51.492678745 +0000
+@@ -210,7 +210,7 @@
+     expect(f.game().getSnapshot().result.state).toEqual(incoming);
+     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
+     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
+-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 26,state:incoming}});
++    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 27,state:incoming}});
+   });
+   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
+     const f = await mount(autoUpgraderState(),90000);
+@@ -349,7 +349,7 @@
+     expect(container.querySelector('.vehicle-artwork')).toBe(image); expect(content()).toContain('OWNED');
+     expect(buy.isConnected).toBe(false); expect(window.scrollTo).not.toHaveBeenCalled();
+   });
+-  it('global XP survives all sections and resets its range on a Job level-up without focus movement', async () => {
++  it('global XP survives all sections and resets its range on a Job level-up with a usable local focus fallback', async () => {
+     const state = createInitialGameState(); const f = await mount({ ...state, progression: { xp: getXpThresholdForLevel(2) - 10 } });
+     const progress = container.querySelector<HTMLProgressElement>('.hud-xp-progress');
+     for (const section of PRIMARY_SECTIONS) {
+@@ -360,7 +360,7 @@
+     vi.mocked(window.scrollTo).mockClear(); await act(() => delivery?.click());
+     const authority = getLevelProgress(f.game().getSnapshot().result.state.progression.xp);
+     expect(authority.currentLevel).toBe(2); expect(progress?.value).toBe(authority.xpIntoLevel); expect(progress?.max).toBe(authority.xpNeededForLevel);
+-    expect(document.activeElement).toBe(delivery); expect(window.scrollTo).not.toHaveBeenCalled();
++    expect(document.activeElement).toBe(container.querySelector('#starter-heading')); expect(window.scrollTo).not.toHaveBeenCalled();
+     expect(progress?.closest('[role="status"], [aria-live]')).toBeNull();
+   });
+   it('passive Rebirth eligibility coexists with feedback and preserves Operations focus', async () => {
+diff -ruN solara-pr52-original/src/app/navigation.test.tsx solara-pr52/src/app/navigation.test.tsx
+--- solara-pr52-original/src/app/navigation.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/navigation.test.tsx	2026-09-15 08:36:49.295871497 +0000
+@@ -260,8 +260,8 @@
+   it('v17 and CE1 contain only the original authoritative state, never section/confirmation state', () => {
+     const state = autoUpgraderState(), h = harness(view(state)); h.select(SECTION.empire.id); h.rebirthControls.request();
+     const saved = serializeSave(state,1234), code = exportSaveCode(state,1234); if (!saved.ok || !code.ok) throw Error('fixture');
+-    expect(CURRENT_SAVE_VERSION).toBe(26); expect(code.code.startsWith('CE1-')).toBe(true);
+-    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 26,state}});
++    expect(CURRENT_SAVE_VERSION).toBe(27); expect(code.code.startsWith('CE1-')).toBe(true);
++    expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{version: 27,state}});
+     expect(saved.serialized).not.toMatch(/activeSection|navigation|confirming|overview|sectionId/);
+   });
+ });
+diff -ruN solara-pr52-original/src/app/reset-progress.test.tsx solara-pr52/src/app/reset-progress.test.tsx
+--- solara-pr52-original/src/app/reset-progress.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/reset-progress.test.tsx	2026-09-15 08:36:49.295548522 +0000
+@@ -173,6 +173,6 @@
+     expect(f.game().getSnapshot().result.state.progression.xp).toBe(10);
+     expect(f.game().getSnapshot().result.state.economy.cash).toBe('2500');
+     expect(f.game().getSnapshot().result.state.permanentProgression.statistics.manualJobsCompleted).toBe(1);
+-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 26 } });
++    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 27 } });
+   });
+ });
+diff -ruN solara-pr52-original/src/app/territories.test.tsx solara-pr52/src/app/territories.test.tsx
+--- solara-pr52-original/src/app/territories.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/territories.test.tsx	2026-09-15 08:46:38.491826282 +0000
+@@ -75,7 +75,7 @@
+     const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
+     const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
+     expect(html).toContain('Neon Mile: +10%'); expect(html).toContain('Fast Talker: +10%');
+-    expect(describeAction('delivery', performStarterJob(state))).toContain('+$30.25 · +10 XP');
++    expect(describeAction('delivery', performStarterJob(state))).toContain('+$108.90 · +10 XP');
+   });
+   it('Rebirth confirmation describes territory loss, cancellation preserves it, success restores only Waterfront', () => {
+     const f = rebirthRuntime({ ...rebirthState(), city: { heat: 0, heatDecayElapsedMs: 0, ownedTerritoryIds: [W.id, N.id] } });
+diff -ruN solara-pr52-original/src/app/upgrade-presentation.test.tsx solara-pr52/src/app/upgrade-presentation.test.tsx
+--- solara-pr52-original/src/app/upgrade-presentation.test.tsx	2026-09-15 07:56:34.000000000 +0000
++++ solara-pr52/src/app/upgrade-presentation.test.tsx	2026-09-15 08:46:38.491878288 +0000
+@@ -85,10 +85,10 @@
+   expect(html.replace(/<[^>]*>/g, '')).toContain('$7.73/sec'); // Exact production is unchanged; the player-facing rate rounds to cents.
+ });
+ 
+-it('explains effective $36 delivery reward with flat-before-percent named sources', () => {
++it('explains effective portfolio-paced delivery reward with flat-before-percent named sources', () => {
+   const state = { ...owned(), upgrades: { purchasedIds: UPGRADE_CATALOG.map(u => u.id) } };
+   const reward = evaluateJobReward(state); if (!reward.ok) throw Error('fixture');
+-  expect(formatCash(reward.reward)).toBe('$36.00');
++  expect(formatCash(reward.reward)).toBe('$42.00');
+   const html = renderToStaticMarkup(<ModifierBreakdown modifiers={reward.applied} />);
+   expect(html).toContain('Express Tips: +$5.00'); expect(html).toContain('Street Connections: +20%');
+   expect(html.indexOf('Express Tips')).toBeLessThan(html.indexOf('Street Connections'));
