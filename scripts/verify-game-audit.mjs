@@ -17,6 +17,20 @@ async function settings(page, locale) {
   await page.keyboard.press('Escape');
 }
 
+// Test-only browser setup helper. The real 10-second cadence is verified by
+// verify-operations-balance-ii.mjs; legacy feature audits need an independent
+// ready action so they can exercise their own contracts without wall-clock waits.
+async function restoreManualReadiness(page) {
+  await page.evaluate(() => {
+    const envelope = JSON.parse(localStorage.getItem('crime-empire:save'));
+    delete envelope.state.manualJobs;
+    envelope.savedAt = Date.now();
+    localStorage.setItem('crime-empire:save', JSON.stringify(envelope));
+  });
+  await page.reload();
+  await navigation(page).nth(1).click();
+}
+
 // Check rendered copy, collapsed details, option labels and accessible descriptions.
 // Editable backup/input data and the separately displayed RESET token are not prose.
 async function assertVillagerOnly(page) {
@@ -157,6 +171,7 @@ try {
   await storagePage.goto('http://127.0.0.1:4174');
   await navigation(storagePage).nth(1).click();
   await storagePage.locator('.operations-primary-action').click();
+  await restoreManualReadiness(storagePage);
   const storedBeforeFailure = await saved(storagePage);
   const cashBeforeFailure = await storagePage.locator('.hud-cash dd').textContent();
   await storagePage.evaluate(() => {
@@ -178,6 +193,7 @@ try {
     const box = el.getBoundingClientRect(); return box.left >= 0 && box.right <= innerWidth;
   }), 'Save explanation fits mobile width');
   await storagePage.evaluate(() => { document.documentElement.dataset.failSave = 'false'; });
+  await storagePage.waitForFunction(() => !document.querySelector('.operations-primary-action')?.disabled);
   await storagePage.locator('.operations-primary-action').click();
   assert.equal(await storagePage.locator('.save-status-warning').count(), 0);
   assert.equal(await storagePage.locator('.save-status').getAttribute('open'), '', 'Recovery preserves disclosure state');
@@ -200,6 +216,7 @@ try {
       else assert.doesNotMatch(feedback, /[a-gi-ln-qs-z]/i);
       if (locale === 'villager') assert.match(feedback, /^[HhMmRr]+/);
       await page.waitForTimeout(300);
+      await restoreManualReadiness(page);
     }
   }
   await navigation(page).nth(4).click();
@@ -377,16 +394,24 @@ try {
     assert.equal(current.city.heat, 38); assert.equal(current.economy.cash, '101250');
     assert.equal(current.progression.xp, 0);
     assert.ok((await page.locator('.risky-delivery:not(.discreet-delivery)').textContent()).includes('+50%'));
+    await restoreManualReadiness(page);
     await risk.click(); current = (await saved(page)).state;
     assert.equal(current.city.heat, 43); assert.equal(current.economy.cash, '105000');
-    for (let i = 0; i < 4; i++) await risk.click();
+    for (let i = 0; i < 4; i++) {
+      await restoreManualReadiness(page);
+      await risk.click();
+    }
     current = (await saved(page)).state;
     assert.equal(current.city.heat, 63); assert.equal(current.economy.cash, '117500');
     assert.equal(await risk.isDisabled(), true);
-    await discreet.click(); await discreet.click();
+    await restoreManualReadiness(page);
+    await discreet.click();
+    await restoreManualReadiness(page);
+    await discreet.click();
     current = (await saved(page)).state;
     assert.equal(current.city.heat, 59); assert.equal(current.economy.cash, '119750');
     assert.equal(current.progression.xp, 50);
+    await restoreManualReadiness(page);
     assert.equal(await risk.isDisabled(), false);
     if (locale === 'villager') await assertVillagerOnly(page);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
@@ -429,12 +454,14 @@ try {
     current = (await saved(page)).state;
     assert.equal(current.city.heat, 5);
     assert.equal(current.economy.cash, '104125');
+    await restoreManualReadiness(page);
     await page.locator('.discreet-delivery-button').click();
     current = (await saved(page)).state;
     assert.equal(current.city.heat, 3);
     assert.equal(current.city.districts.parked.heat, 79);
     assert.equal(current.economy.cash, '105500');
     assert.equal(current.progression.xp, 10);
+    await restoreManualReadiness(page);
     await district.selectOption('territory:waterfront');
     await page.locator('.operations-primary-action').click();
     current = (await saved(page)).state;
@@ -450,6 +477,7 @@ try {
     assert.equal(current.city.heat, 80); assert.equal(current.city.districts.parked.heat, 3);
     assert.equal(await page.locator('#active-district').isDisabled(), true);
     await navigation(page).nth(1).click();
+    await restoreManualReadiness(page);
     await page.locator('.discreet-delivery-button').click();
     assert.equal(await page.locator('#active-district').isDisabled(), false);
     await page.locator('#active-district').selectOption('territory:neon-mile');
