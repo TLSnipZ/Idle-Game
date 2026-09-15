@@ -14,6 +14,7 @@ import { serializeSave, parseSave, CURRENT_SAVE_VERSION } from './save-schema';
 import { exportSaveCode, validateSaveCode } from './save-code';
 import { performRebirth } from './rebirth';
 import { rebirthState } from './test-fixtures/rebirth-state';
+import { readyManualJobFixture } from './test-fixtures/manual-job';
 
 function hunted(heat = 80, cash = '125000'): GameState {
   const s = createInitialGameState();
