@@ -15,21 +15,7 @@ jobs:
         with:
           ref: tmp-balance-ii-staging-2
           fetch-depth: 0
-      - name: Verify staged chunks
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > /tmp/checksums <<'EOF'
-          45e674c031cffe30d246d4336b7ab60d67a3285b4be2ada8c0f1db08d7c6a9a4  scripts/.balance-ii-app.patch.gz.b64
-          f7878ebd25548e00760c68f7f0f5efd4ece71ade256184047f581ee10dda2092  scripts/.balance-ii-game.patch.gz.b64.part1
-          3cdaee538eac236b932c16f8d04f601f17e5e5511962a196f0fbd7c1a591b911  scripts/.balance-ii-game.patch.gz.b64.part2
-          46901f2fd54c2a0e87a53a179766a529362f6a739a2c9ea4092cae6b4a5167af  scripts/.balance-ii-game.patch.gz.b64.part3
-          f36f3c069b9530ec65958e92267eab89da8b870c5cc127fe2ee390fdf1be283c  scripts/.balance-ii-game.patch.gz.b64.part4
-          3f94047d34f7d908972737027faba1adbfc3435a708a8c1473e54eb4bcdf4f60  scripts/.balance-ii-platform.patch.gz.b64.part1
-          66e043519e150692f266488a0470d9892778a0a7162736a36c9a927daa7db376  scripts/.balance-ii-platform.patch.gz.b64.part2
-          EOF
-          sha256sum -c /tmp/checksums
-      - name: Reconstruct and apply regression patches
+      - name: Reconstruct and verify regression patches
         shell: bash
         run: |
           set -euo pipefail
@@ -42,6 +28,16 @@ jobs:
           cat scripts/.balance-ii-platform.patch.gz.b64.part1 \
               scripts/.balance-ii-platform.patch.gz.b64.part2 \
             | base64 -d | gzip -dc > /tmp/balance-platform.patch
+          printf '%s  %s\n' \
+            dd41421716447297e6ec127fbce6a45b2b8c84bc053fda20bcf929d1cc5c74fa /tmp/balance-app.patch \
+            f7630338ced8be135166478f03abf8178a5e3b5a637d83422cb8a6621801a444 /tmp/balance-game.patch \
+            f81d98a9754769779a35069b91fd2089e19f3fb68d5d8bb27ca6ebcc36cd1733 /tmp/balance-platform.patch \
+            > /tmp/patch-checksums
+          sha256sum -c /tmp/patch-checksums
+      - name: Apply regression patches
+        shell: bash
+        run: |
+          set -euo pipefail
           patch -p1 --forward < /tmp/balance-app.patch
           patch -p1 --forward < /tmp/balance-game.patch
           patch -p1 --forward < /tmp/balance-platform.patch
