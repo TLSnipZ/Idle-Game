@@ -1,0 +1,156 @@
+--- /mnt/data/solara-pr52-original/src/game/tier-one-vehicles.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/tier-one-vehicles.test.ts	2026-09-15 08:36:49.293843396 +0000
+@@ -118,7 +118,7 @@
+     const state = owner ? rebirthState() : createInitialGameState();
+     const input = { format: 'crime-empire-save', version: 18, savedAt: 123, state }, before = structuredClone(input);
+     const result = migrateToCurrentSave(input);
+-    expect(result).toEqual({ ok: true, envelope: { ...input, version: 26 } });
++    expect(result).toEqual({ ok: true, envelope: { ...input, version: 27 } });
+     expect(input).toEqual(before);
+     expect(validateSaveCode(encodeSaveText(JSON.stringify(input)))).toEqual(result);
+   });
+@@ -135,7 +135,7 @@
+   it.each(VEHICLE_CATALOG.map(v => v.id))('current selection %s round-trips in local save and CE1', id => {
+     const state = owned(id), encoded = serializeSave(state, 123);
+     if (!encoded.ok) throw Error(encoded.error);
+-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 123, state } });
++    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 123, state } });
+     expect(validateSaveCode(encodeSaveText(encoded.serialized))).toEqual(parseSave(encoded.serialized));
+   });
+ });
+--- /mnt/data/solara-pr52-original/src/game/vehicle-tuning.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/vehicle-tuning.test.ts	2026-09-15 08:36:49.293960658 +0000
+@@ -70,9 +70,9 @@
+   it('migrates v20 stock unchanged and round-trips tuned saves through CE1', () => {
+     const s = state();
+     const old = migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: s });
+-    expect(old).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 1234, state: s } });
++    expect(old).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 1234, state: s } });
+     const tuned = buy(s), encoded = serializeSave(tuned, 1234); if (!encoded.ok) throw Error('fixture');
+-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 26, state: tuned } });
++    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 27, state: tuned } });
+     const code = exportSaveCode(tuned, 1234); if (!code.ok) throw Error('fixture');
+     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: tuned } });
+     expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 20, savedAt: 1234, state: tuned }).ok).toBe(false);
+--- /mnt/data/solara-pr52-original/src/game/serein.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/serein.test.ts	2026-09-15 08:46:38.491715439 +0000
+@@ -35,14 +35,14 @@
+     appearances:{[K.id]:'appearance:kxr-coastal' as const}}};
+   const bought=purchaseVehicle(state,N.id);expect(bought.ok).toBe(true);
+   expect(bought.state.garage).toEqual({...state.garage,ownedVehicleIds:[K.id,N.id]});
+-  expect(evaluateJobReward(bought.state)).toMatchObject({reward:'2700'});
++  expect(evaluateJobReward(bought.state)).toMatchObject({reward:'12960'});
+   const selected=setActiveVehicle(bought.state,N.id);
+   expect(selected.ok).toBe(true);
+-  expect(evaluateJobReward(selected.state)).toMatchObject({reward:'3150'});
++  expect(evaluateJobReward(selected.state)).toMatchObject({reward:'15120'});
+   expect(evaluateJobReward(selected.state,'dispatcher')).toMatchObject({reward:'2500'});
+-  expect(evaluateRiskyJobReward(selected.state)).toMatchObject({reward:'4725'});
+-  expect(evaluateDiscreetJobReward(selected.state)).toMatchObject({reward:'1575'});
+-  expect(performStarterJob(selected.state)).toMatchObject({moneyEarned:'3150'});
++  expect(evaluateRiskyJobReward(selected.state)).toMatchObject({reward:'22680'});
++  expect(evaluateDiscreetJobReward(selected.state)).toMatchObject({reward:'7560'});
++  expect(performStarterJob(selected.state)).toMatchObject({moneyEarned:'15120'});
+ });
+ it('uses unchanged Dispatcher earnings with saved Serein active',()=>{
+   const s=createInitialGameState();
+@@ -61,10 +61,10 @@
+     builds:{[K.id]:{purchasedIds:['tuning:kxr-courier-ecu' as const],selectedId:'tuning:kxr-courier-ecu' as const}},
+     appearances:{[K.id]:'appearance:kxr-coastal' as const}}};
+   expect(migrateToCurrentSave({format:SAVE_FORMAT,version:23,savedAt:1234,state:old}))
+-    .toEqual({ok:true,envelope:{format:SAVE_FORMAT,version: 26,savedAt:1234,state:old}});
++    .toEqual({ok:true,envelope:{format:SAVE_FORMAT,version: 27,savedAt:1234,state:old}});
+   const bought=purchaseVehicle(old,N.id).state;
+   const saved=serializeSave(bought,5678);if(!saved.ok)throw Error(saved.error);
+-  expect(parseSave(saved.serialized)).toMatchObject({ok:true,envelope:{version: 26,state:bought,savedAt:5678}});
++  expect(parseSave(saved.serialized)).toMatchObject({ok:true,envelope:{version: 27,state:bought,savedAt:5678}});
+   const code=exportSaveCode(bought,5678);if(!code.ok)throw Error(code.error);
+   expect(validateSaveCode(code.code)).toMatchObject({ok:true,envelope:{state:bought}});
+ });
+@@ -73,6 +73,6 @@
+   expect(selectVehicleAppearance(state,N.id,'appearance:kxr-coastal').ok).toBe(false);
+   expect(purchaseTuning(state,'tuning:kxr-courier-ecu').ok).toBe(false);
+   expect(setActiveVehicle(createInitialGameState(),N.id)).toMatchObject({ok:false,error:'vehicle-not-owned'});
+-  expect(migrateToCurrentSave({format:SAVE_FORMAT,version: 26,savedAt:0,state:{
++  expect(migrateToCurrentSave({format:SAVE_FORMAT,version: 27,savedAt:0,state:{
+     ...state,garage:{...state.garage,appearances:{[N.id]:'appearance:kxr-coastal'}}}}).ok).toBe(false);
+ });
+--- /mnt/data/solara-pr52-original/src/game/balance-audit.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/balance-audit.test.ts	2026-09-15 08:37:52.275680063 +0000
+@@ -21,6 +21,7 @@
+ import { SKILL_CATALOG } from '../features/skills';
+ import { rebirthState } from './test-fixtures/rebirth-state';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { purchaseBusiness } from './purchase-business';
+ import { purchaseAutomation } from './purchase-automation';
+ import { acquireTerritory } from './acquire-territory';
+@@ -83,11 +84,11 @@
+ 
+   it('opens passive production after six deliveries and reaches Level 2 after ten', () => {
+     let s = createInitialGameState();
+-    for (let i = 0; i < 6; i++) s = successful(performStarterJob(s));
++    for (let i = 0; i < 6; i++) s = performReadyStarterJobFixture(s);
+     expect(s.economy.cash).toBe(B.purchaseCost);
+     s = successful(purchaseBusiness(s, B.id));
+     expect(s.economy.cash).toBe('0');
+-    for (let i = 0; i < 4; i++) s = successful(performStarterJob(s));
++    for (let i = 0; i < 4; i++) s = performReadyStarterJobFixture(s);
+     expect(s.progression.xp).toBe(getXpThresholdForLevel(2));
+     expect(successful(simulateGameElapsed(s, 1000)).economy.cash).toBe('10075');
+   });
+@@ -147,10 +148,10 @@
+         unlockedAchievementIds: ACHIEVEMENT_CATALOG.map(a => a.id), statistics: { manualJobsCompleted: 200, automatedJobsCompleted: 500,
+           businessLevelsPurchased: 47, territoriesAcquired: 3, crewMembersRecruited: 9, eventsResolved: 12, rebirthsCompleted: 2, peakHeat: 99 } } };
+     const savedAt = 1700000000000, before = structuredClone(rich);
+-    expect(CURRENT_SAVE_VERSION).toBe(26);
++    expect(CURRENT_SAVE_VERSION).toBe(27);
+     const serialized = serializeSave(rich, savedAt);
+     if (!serialized.ok) throw Error('serialization');
+-    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 26, savedAt, state: rich } });
++    expect(parseSave(serialized.serialized)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 27, savedAt, state: rich } });
+     const exported = exportSaveCode(rich, savedAt);
+     if (!exported.ok) throw Error('export');
+     expect(exported.code.startsWith('CE1-')).toBe(true);
+--- /mnt/data/solara-pr52-original/src/game/tier-two-customization.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/tier-two-customization.test.ts	2026-09-15 08:36:49.294294449 +0000
+@@ -68,7 +68,7 @@
+   it('migrates v25 without grants or changes to any progress and independently copies builds', () => {
+     const before = state();
+     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 25, savedAt: 987654, state: before });
+-    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 987654, state: before } });
++    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 27, savedAt: 987654, state: before } });
+     if (!r.ok) throw Error(r.error);
+     expect(r.envelope.state.garage.builds).not.toBe(before.garage.builds);
+     for (const car of cars) expect(r.envelope.state.garage.builds?.[car]).toBeUndefined();
+@@ -86,7 +86,7 @@
+     const painted = looks.reduce((s, look) => paint(s, look.vehicleId, look.id), built);
+     const code = exportSaveCode(painted, 1234); if (!code.ok) throw Error(code.error);
+     expect(code.code).toMatch(/^CE1-/);
+-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 1234, state: painted } });
++    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 1234, state: painted } });
+     const rebirth = performRebirth({ ...rebirthState(), garage: painted.garage });
+     if (!rebirth.ok) throw Error(rebirth.error);
+     expect(rebirth.state.garage).toEqual(painted.garage);
+--- /mnt/data/solara-pr52-original/src/game/game-state.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/game-state.test.ts	2026-09-15 08:43:01.584830606 +0000
+@@ -2,6 +2,7 @@
+ import { describe, expect, it } from 'vitest';
+ import { createInitialGameState } from './game-state';
+ import { performStarterJob } from './perform-starter-job';
++import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
+ import { selectCash } from './selectors';
+ import { STARTER_JOB, MAX_MONEY_DIGITS, moneyFromMinorUnits } from '../features/economy';
+ 
+@@ -24,7 +25,10 @@
+     expect(selectCash(state)).toBe('0');
+     expect(result.state).not.toBe(state);
+     expect(result.state.economy).not.toBe(state.economy);
+-    const next = performStarterJob(result.state);
++    const blocked = performStarterJob(result.state);
++    expect(blocked).toMatchObject({ ok: false, error: 'manual-job-not-ready', remainingMs: 10000 });
++    expect(blocked.state).toBe(result.state);
++    const next = performStarterJob(readyManualJobFixture(result.state));
+     expect(next.ok).toBe(true);
+     expect(selectCash(next.state)).toBe('5000');
+   });
