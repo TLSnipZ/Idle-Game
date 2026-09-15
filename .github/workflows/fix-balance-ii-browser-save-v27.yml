@@ -1,0 +1,65 @@
+name: Fix Balance II browser save assertions
+on:
+  push:
+    branches: [feat/operations-balance-ii]
+    paths: [.github/workflows/fix-balance-ii-browser-save-v27.yml]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/operations-balance-ii
+          fetch-depth: 0
+      - name: Update post-migration browser assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          replacements = {
+              'scripts/verify-garage-browser.mjs': [
+                  ('assert.equal(saved.version, 26)', 'assert.equal(saved.version, 27)'),
+              ],
+              'scripts/verify-serein.mjs': [
+                  ('assert.equal(saved.version,26)', 'assert.equal(saved.version,27)'),
+              ],
+              'scripts/verify-model-tuning.mjs': [
+                  ('assert.equal(current.version, 26)', 'assert.equal(current.version, 27)'),
+              ],
+              'scripts/verify-rendan-canto.mjs': [
+                  ('assert.equal(snapshot.version, 26)', 'assert.equal(snapshot.version, 27)'),
+              ],
+              'scripts/verify-vehicle-appearance.mjs': [
+                  ('assert.equal((await saved(page)).version, 26)', 'assert.equal((await saved(page)).version, 27)'),
+              ],
+              'scripts/verify-tier-two-customization.mjs': [
+                  ('assert.equal((await saved(page)).version, 26)', 'assert.equal((await saved(page)).version, 27)'),
+              ],
+              'scripts/verify-game-audit.mjs': [
+                  ('assert.equal((await saved(page)).version, 26)', 'assert.equal((await saved(page)).version, 27)'),
+              ],
+          }
+          for filename, pairs in replacements.items():
+              path = Path(filename)
+              text = path.read_text()
+              for old, new in pairs:
+                  count = text.count(old)
+                  if count == 0:
+                      raise SystemExit(f'missing expected current-version assertion: {filename}: {old}')
+                  text = text.replace(old, new)
+              path.write_text(text)
+          PY
+          git diff --check
+      - name: Commit browser verifier migration expectations
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/fix-balance-ii-browser-save-v27.yml
+          git add scripts/verify-garage-browser.mjs scripts/verify-serein.mjs scripts/verify-model-tuning.mjs scripts/verify-rendan-canto.mjs scripts/verify-vehicle-appearance.mjs scripts/verify-tier-two-customization.mjs scripts/verify-game-audit.mjs
+          git commit -m 'test: migrate browser verifier expectations to save v27'
+          git push origin HEAD:feat/operations-balance-ii
