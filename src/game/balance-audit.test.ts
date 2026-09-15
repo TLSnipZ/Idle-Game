@@ -20,7 +20,6 @@ import { createInitialStatistics } from '../features/statistics';
 import { VEHICLE_CATALOG } from '../features/vehicles';
 import { SKILL_CATALOG } from '../features/skills';
 import { rebirthState } from './test-fixtures/rebirth-state';
-import { performStarterJob } from './perform-starter-job';
 import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { purchaseAutomation } from './purchase-automation';

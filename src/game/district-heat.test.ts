@@ -13,6 +13,7 @@ import { DELIVERY_DISPATCHER } from '../features/automation';
 import { resolveEventChoice } from './resolve-event-choice';
 import { performRebirth } from './rebirth';
 import { rebirthState } from './test-fixtures/rebirth-state';
+import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
 import { autoUpgraderState } from './test-fixtures/auto-upgrader-state';
 
 function owned(heat = 80, remainder = 0): GameState {

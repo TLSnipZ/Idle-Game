@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialGameState } from './game-state';
-import { performStarterJob } from './perform-starter-job';
 import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { purchaseBusiness } from './purchase-business';
 import { purchaseSkillRank } from './purchase-skill-rank';

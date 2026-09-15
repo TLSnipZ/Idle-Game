@@ -11,7 +11,6 @@ import { purchaseUpgrade } from './purchase-upgrade';
 import { purchaseAutomation } from './purchase-automation';
 import { purchaseBusiness } from './purchase-business';
 import { upgradeBusiness } from './upgrade-business';
-import { performStarterJob } from './perform-starter-job';
 import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { selectUpgrade, selectCanPurchaseBusiness } from './selectors';
 import { selectDispatcher } from './automation-selectors';
