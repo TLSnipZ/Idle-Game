@@ -46,8 +46,9 @@ With no Business owned, the $25 floor applies. The first action is immediate, so
 
 - **30 seconds:** 4 successful standard jobs = **$100** and **40 XP**.
 - **50 seconds:** 6 successful standard jobs = **$150** and **60 XP**, exactly enough to buy Dockside Detail.
+- **90 seconds:** 10 uninterrupted standard floor jobs = **$250** and **100 XP**, the earliest Player Level 2 threshold.
 
-This keeps the opening actionable immediately while removing one-click spam. Dockside arrives at a clear ~50-second milestone; Player Level 2 is not handed out before the first Business purchase, so early XP gates still have room to matter.
+This keeps the opening actionable immediately while removing one-click spam. Dockside arrives at a clear ~50-second milestone; Player Level 2 follows around 90 seconds on the uninterrupted manual route, leaving early acquisition and XP gates distinct without making either a long wait.
 
 ## Verification contract
 
