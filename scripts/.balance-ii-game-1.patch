@@ -1,0 +1,190 @@
+--- /mnt/data/solara-pr52-original/src/game/requirements.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/requirements.test.ts	2026-09-15 08:37:51.701145467 +0000
+@@ -12,6 +12,7 @@
+ import { purchaseBusiness } from './purchase-business';
+ import { upgradeBusiness } from './upgrade-business';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { selectUpgrade, selectCanPurchaseBusiness } from './selectors';
+ import { selectDispatcher } from './automation-selectors';
+ 
+@@ -108,11 +109,11 @@
+   });
+   it('has no fresh-save deadlock and does not gate the first business', () => {
+     let state = createInitialGameState();
+-    for (let i=0;i<6;i++) { const job = performStarterJob(state); expect(job.ok).toBe(true); state=job.state; }
++    for (let i=0;i<6;i++) state=performReadyStarterJobFixture(state);
+     expect(state.progression.xp).toBe(60);
+     expect(selectCanPurchaseBusiness(state,B.id)).toBe(true);
+     const bought=purchaseBusiness(state,B.id); expect(bought.ok).toBe(true); state=bought.state;
+-    for (let i=0;i<4;i++) state=performStarterJob(state).state;
++    for (let i=0;i<4;i++) state=performReadyStarterJobFixture(state);
+     expect(state.progression.xp).toBe(100);
+     expect(selectUpgrade(state,S.id)?.eligible).toBe(true);
+   });
+--- /mnt/data/solara-pr52-original/src/game/purchase-business.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/purchase-business.test.ts	2026-09-15 08:43:01.585136055 +0000
+@@ -6,6 +6,7 @@
+ import { purchaseBusiness } from './purchase-business';
+ import { performStarterJob } from './perform-starter-job';
+ import { selectCash, selectCanPurchaseBusiness, selectOwnsBusiness } from './selectors';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ 
+ const id = STARTER_BUSINESS.id;
+ 
+@@ -94,9 +95,7 @@
+     let state = createInitialGameState();
+     for (let delivery = 0; delivery < 6; delivery++) {
+       expect(selectCanPurchaseBusiness(state, id)).toBe(false);
+-      const earned = performStarterJob(state);
+-      expect(earned.ok).toBe(true);
+-      state = earned.state;
++      state = performReadyStarterJobFixture(state);
+     }
+     const result = purchaseBusiness(state, id);
+     expect(result.ok).toBe(true);
+--- /mnt/data/solara-pr52-original/src/game/heat.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/heat.test.ts	2026-09-15 08:46:38.491514474 +0000
+@@ -6,6 +6,7 @@
+ import { rebirthState } from './test-fixtures/rebirth-state';
+ import { FAST, LEARN, NEVER } from './test-fixtures/skill-state';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { acquireTerritory } from './acquire-territory';
+ import { layLow } from './lay-low';
+ import { simulateAutomation } from './simulate-automation';
+@@ -144,10 +145,10 @@
+     }
+     const s = createInitialGameState(); expect(acquireTerritory(s,WATERFRONT.id).state).toBe(s);
+   });
+-  it.each([[0,4356n,1n,'4356'],[60,19602n,5n,'3920'],[80,3267n,1n,'3267']] as const)('full stack at Heat %i retains exact rational before final cents', (heat,n,d,payout) => {
+-    const s = stack(heat), reward = evaluateJobReward(s); expect(reward).toMatchObject({ ok: true, effective: rational(n,d), reward: payout });
+-    const job = performStarterJob(s); expect(job.ok && job.moneyEarned).toBe(payout); expect(job.ok && job.xpEarned).toBe(11);
+-    const batch = simulateAutomation(s,30000); expect(batch.ok && batch.automation.income).toBe((BigInt(payout)*3n).toString());
++  it.each([[0,13794n,1n,'13794','4356'],[60,62073n,5n,'12414','3920'],[80,20691n,2n,'10345','3267']] as const)('full stack at Heat %i keeps exact manual portfolio pay and Dispatcher pay', (heat,n,d,manualPayout,dispatcherPayout) => {
++    const s = stack(heat), reward = evaluateJobReward(s); expect(reward).toMatchObject({ ok: true, effective: rational(n,d), reward: manualPayout });
++    const job = performStarterJob(s); expect(job.ok && job.moneyEarned).toBe(manualPayout); expect(job.ok && job.xpEarned).toBe(11);
++    const batch = simulateAutomation(s,30000); expect(batch.ok && batch.automation.income).toBe((BigInt(dispatcherPayout)*3n).toString());
+     expect(batch.ok && batch.automation.xpEarned).toBe(16);
+     if (!reward.ok) throw Error('fixture');
+     expect(reward.applied.filter(m => m.id === HEAT_MODIFIER_ID)).toHaveLength(heat < 60 ? 0 : 1);
+@@ -209,7 +210,7 @@
+   });
+   it('fresh progression is playable and max Heat never blocks work or revokes territory', () => {
+     let s = createInitialGameState(); expect(s.city.heat).toBe(0); expect(layLow(s).ok).toBe(false);
+-    for (let i=0;i<6;i++) s=performStarterJob(s).state;
++    for (let i=0;i<6;i++) s=performReadyStarterJobFixture(s);
+     expect(s.economy.cash).toBe('15000'); expect(s.progression.xp).toBe(60);
+     expect(purchaseBusiness(s,STARTER_BUSINESS.id).ok).toBe(true);
+     const max = heated(100,0,territoryState(true)); expect(performStarterJob(max).ok).toBe(true);
+--- /mnt/data/solara-pr52-original/src/game/guidance.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/guidance.test.ts	2026-09-15 08:43:27.904261979 +0000
+@@ -218,7 +218,7 @@
+     } finally { clock.mockRestore(); random.mockRestore(); }
+     if (!save.ok || !code.ok) throw Error('fixture');
+     const parsed = parseSave(save.serialized), restored = validateSaveCode(code.code);
+-    expect(parsed.ok && parsed.envelope.version).toBe(26);
++    expect(parsed.ok && parsed.envelope.version).toBe(27);
+     expect(restored.ok && selectGuidance(restored.envelope.state)).toEqual(selectGuidance(state));
+   });
+   it('does not change catalogs or insert guidance into GameState', () => {
+--- /mnt/data/solara-pr52-original/src/game/crew.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/crew.test.ts	2026-09-15 08:46:38.491362430 +0000
+@@ -16,6 +16,7 @@
+ import { selectHeat } from './heat-selectors';
+ import { selectCrew, selectCrewMember } from './crew-selectors';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { simulateAutomation } from './simulate-automation';
+ import { simulateGameElapsed } from './simulate-game-elapsed';
+ import { simulateElapsed } from './simulate-elapsed';
+@@ -147,13 +148,13 @@
+     expect(evaluateBusinessProduction(bench,B.id,1)).toEqual(evaluateBusinessProduction(s,B.id,1));
+     expect(getOfflineCapMs(bench)).toBe(getOfflineCapMs(s));expect(selectRebirth(bench)).toEqual(selectRebirth(s));
+   });
+-  it.each([[0,rational(23958n,5n),'4791'],[60,rational(107811n,25n),'4312']] as const)('Rico full stack at Heat %i stays rational before existing per-job floor', (h,exact,payout) => {
++  it.each([[0,rational(75867n,5n),'15173','4791'],[60,rational(682803n,50n),'13656','4312']] as const)('Rico full stack at Heat %i keeps manual portfolio pay separate from Dispatcher pay', (h,exact,manualPayout,dispatcherPayout) => {
+     const s=jobStack(h), evaluated=evaluateJobReward(s);
+-    expect(evaluated).toMatchObject({ok:true,effective:exact,reward:payout});
++    expect(evaluated).toMatchObject({ok:true,effective:exact,reward:manualPayout});
+     if(!evaluated.ok)throw Error('fixture');expect(evaluated.applied.some(m=>m.sourceId===R.id)).toBe(true);
+     expect(evaluated.applied.filter(m=>m.operation==='multiply-basis-points').map(m=>m.id)).toEqual(evaluated.applied.filter(m=>m.operation==='multiply-basis-points').map(m=>m.id).sort());
+-    const manual=performStarterJob(s);expect(manual).toMatchObject({ok:true,moneyEarned:payout,xpEarned:11});expect(manual.state.city.heat).toBe(h+1);
+-    const batch=simulateAutomation(s,30000);expect(batch).toMatchObject({ok:true,automation:{completedJobs:3,income:(BigInt(payout)*3n).toString(),xpEarned:16}});
++    const manual=performStarterJob(s);expect(manual).toMatchObject({ok:true,moneyEarned:manualPayout,xpEarned:11});expect(manual.state.city.heat).toBe(h+1);
++    const batch=simulateAutomation(s,30000);expect(batch).toMatchObject({ok:true,automation:{completedJobs:3,income:(BigInt(dispatcherPayout)*3n).toString(),xpEarned:16}});
+   });
+   it('Rico alone adds 10% Money, disappears on unassignment, and changes neither XP nor Heat or production', () => {
+     const base={...createInitialGameState(),crew:crewState().crew};const s=assignCrewMember(base,'operations',R.id).state;
+@@ -237,7 +238,7 @@
+     const second=performRebirth({...s,permanentProgression:r.state.permanentProgression});expect(second.state.permanentProgression.empirePoints).toBe(11);expect(second.state.crew).toEqual(fresh.crew);
+   });
+   it('fresh progression and max Heat work without optional Crew', () => {
+-    let s=createInitialGameState();for(let i=0;i<6;i++)s=performStarterJob(s).state;
++    let s=createInitialGameState();for(let i=0;i<6;i++)s=performReadyStarterJobFixture(s);
+     expect(s.progression.xp).toBe(60);expect(purchaseBusiness(s,B.id).ok).toBe(true);expect(s.crew).toEqual(createInitialCrewState());
+     expect(performStarterJob(heat(s,100))).toMatchObject({ok:true,moneyEarned:'1875'});
+     const d=heat({...crewState(),crew:createInitialCrewState()},100);expect(simulateGameElapsed(d,10000).ok).toBe(true);
+--- /mnt/data/solara-pr52-original/src/game/release-flow.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/release-flow.test.ts	2026-09-15 08:47:40.289418568 +0000
+@@ -1,6 +1,7 @@
+ import { describe, expect, it } from 'vitest';
+ import { createInitialGameState } from './game-state';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { purchaseBusiness } from './purchase-business';
+ import { purchaseSkillRank } from './purchase-skill-rank';
+ import { performRebirth, selectRebirth } from './rebirth';
+@@ -31,14 +32,14 @@
+     expect(validateSaveState(state)).toEqual(state);
+     const code = exportSaveCode(state, 123);
+     if (!code.ok) throw Error(code.error);
+-    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 26, savedAt: 123, state } });
++    expect(validateSaveCode(code.code)).toEqual({ ok: true, envelope: { format: 'crime-empire-save', version: 27, savedAt: 123, state } });
+   });
+ 
+   it('legal earnings and acquisitions reach all milestones, then reset and rebuild with permanent benefits', () => {
+     // No gifted cash, XP, ownership or completed milestones. Sixty legal jobs
+     // also exercise Running Hot before the existing deterministic idle route.
+     let state = createInitialGameState();
+-    for (let job = 0; job < 60; job++) state = successful(performStarterJob(state));
++    for (let job = 0; job < 60; job++) state = performReadyStarterJobFixture(state);
+     const route = runBalanceModel('idle-leaning', state);
+     for (const name of ['Player 2', 'Dockside 1', 'Dockside 5', 'Dockside 10', 'Delivery Dispatcher',
+       'Kairo KX-R', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Business Auto-Upgrader', 'Rebirth eligible'])
+@@ -68,7 +69,7 @@
+     expect(reset.permanentProgression.unlockedAchievementIds).toEqual(ACHIEVEMENT_CATALOG.map(a => a.id));
+     expect(validateSaveState(reset)).toEqual(reset);
+     reset = successful(purchaseSkillRank(reset, 'skill:streetwise-investment'));
+-    for (let job = 0; job < 6; job++) reset = successful(performStarterJob(reset));
++    for (let job = 0; job < 6; job++) reset = performReadyStarterJobFixture(reset);
+     reset = successful(purchaseBusiness(reset, B.id));
+     expect(productionDollars(reset)).toBeCloseTo(0.86625, 8);
+     expect(reset.permanentProgression.statistics.manualJobsCompleted).toBe(state.permanentProgression.statistics.manualJobsCompleted + 6);
+--- /mnt/data/solara-pr52-original/src/game/rendan-canto.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/rendan-canto.test.ts	2026-09-15 08:36:49.292608410 +0000
+@@ -65,13 +65,13 @@
+     const selected = setActiveVehicle(bought.state, car.id).state;
+     expect(collectModifiers(selected).filter(m => m.sourceId.startsWith('vehicle:') || m.sourceId.startsWith('tuning:'))).toEqual(car.modifiers);
+     const saved = serializeSave(selected, 4567); if (!saved.ok) throw Error(saved.error);
+-    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 4567, state: selected } });
++    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 4567, state: selected } });
+     const code = exportSaveCode(selected, 4567); if (!code.ok) throw Error(code.error);
+     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: selected } });
+     expect(selectVehicleAppearance(selected, car.id, 'appearance:kxr-coastal').ok).toBe(false);
+     for (const extra of [{ activeVehicleId: 'vehicle:unknown' }, { appearances: { [car.id]: 'appearance:kxr-coastal' } },
+       { builds: { [car.id]: garage.builds[K.id] } }]) {
+-      expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 26, savedAt: 0, state: { ...selected, garage: { ...selected.garage, ...extra } } }).ok).toBe(false);
++      expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 27, savedAt: 0, state: { ...selected, garage: { ...selected.garage, ...extra } } }).ok).toBe(false);
+     }
+   });
+   it.each([19, 20, 21, 22, 23, 24])(`${car.name}: rejects future-car injection into v%i`, version => {
+@@ -86,7 +86,7 @@
+     appearances: { [K.id]: 'appearance:kxr-coastal' as const } },
+     businesses: { ...s.businesses, productionRemainderMilliCents: 987, productionRemainderSubMilliCents: { numerator: '1', denominator: '3' } } };
+   expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 24, savedAt: 9876, state }))
+-    .toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 9876, state } });
++    .toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 27, savedAt: 9876, state } });
+ });
+ it('plural effect comparison detects second-effect changes but ignores source identity/order', () => {
+   const previous = { ...createInitialGameState(), garage: { ownedVehicleIds: [R.id, C.id], activeVehicleId: R.id } };
