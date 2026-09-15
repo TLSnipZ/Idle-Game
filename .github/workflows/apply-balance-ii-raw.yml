@@ -1,0 +1,41 @@
+name: Apply Balance II raw staging patch
+on:
+  push:
+    branches: [tmp-balance-ii-apply2]
+    paths:
+      - 'scripts/.balance-ii-*.patch'
+      - '.github/workflows/apply-balance-ii-raw.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: tmp-balance-ii-apply2
+          fetch-depth: 0
+      - name: Validate and apply regression patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch --dry-run -p1 < scripts/.balance-ii-app.patch
+          for p in scripts/.balance-ii-game-*.patch scripts/.balance-ii-platform-*.patch; do
+            patch --dry-run -p4 < "$p"
+          done
+          patch -p1 < scripts/.balance-ii-app.patch
+          for p in scripts/.balance-ii-game-*.patch scripts/.balance-ii-platform-*.patch; do
+            patch -p4 < "$p"
+          done
+          rm -f scripts/.balance-ii-*.patch
+          rm -f .github/workflows/apply-balance-ii-raw.yml
+          git diff --check
+      - name: Commit staged source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'TLSnipZ'
+          git config user.email '104726894+TLSnipZ@users.noreply.github.com'
+          git add -A
+          git commit -m 'test: align regressions with Operations Balance II'
+          git push origin HEAD:tmp-balance-ii-apply2
