@@ -11,6 +11,7 @@ import { validateSaveState } from './save-schema';
 import { exportSaveCode, validateSaveCode } from './save-code';
 import { runBalanceModel, successful, productionDollars } from './test-fixtures/balance-model';
 import { rebirthState } from './test-fixtures/rebirth-state';
+import { unlockEligibleAchievements } from './achievements';
 import { STARTER_BUSINESS as B } from '../features/businesses';
 import { BUSINESS_AUTO_UPGRADER as A, DELIVERY_DISPATCHER as D } from '../features/automation';
 import { STARTER_VEHICLE as V } from '../features/vehicles';
@@ -39,6 +40,9 @@ describe('Phase 9E Base Game release flow', () => {
     // also exercise Running Hot before the existing deterministic idle route.
     let state = createInitialGameState();
     for (let job = 0; job < 60; job++) state = performReadyStarterJobFixture(state);
+    // The fixture bypasses the platform command wrapper, so mirror the runtime's
+    // immediate post-command achievement observation before the long offline route cools Heat.
+    state = unlockEligibleAchievements(state).state;
     const route = runBalanceModel('idle-leaning', state);
     for (const name of ['Player 2', 'Dockside 1', 'Dockside 5', 'Dockside 10', 'Delivery Dispatcher',
       'Kairo KX-R', 'Neon Mile', 'Rico Vale', 'Mara Knox', 'Jax Mercer', 'Business Auto-Upgrader', 'Rebirth eligible'])
