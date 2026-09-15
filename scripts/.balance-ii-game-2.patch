@@ -1,0 +1,185 @@
+--- /mnt/data/solara-pr52-original/src/game/heat-support.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/heat-support.test.ts	2026-09-15 08:43:27.904083026 +0000
+@@ -82,7 +82,7 @@
+     const loaded = parseSave(save.serialized);
+     expect(validateSaveCode(code.code)).toEqual(loaded);
+     if (!loaded.ok) throw Error('fixture');
+-    expect(loaded.envelope.version).toBe(26);
++    expect(loaded.envelope.version).toBe(27);
+     expect(evaluateDecoyCost(loaded.envelope.state)).toEqual(evaluateDecoyCost(s));
+     expect(save.serialized).not.toMatch(/support|discount|baseCost|decoy/i);
+   });
+--- /mnt/data/solara-pr52-original/src/game/police-pressure.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/police-pressure.test.ts	2026-09-15 08:43:01.585077970 +0000
+@@ -8,6 +8,7 @@
+ import { evaluateJobReward, evaluateBusinessProduction } from './effective-stats';
+ import { serializeSave, parseSave } from './save-schema';
+ import { exportSaveCode, validateSaveCode } from './save-code';
++import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
+ 
+ function heated(heat: number, remainder = 0): GameState {
+   const s = createInitialGameState();
+@@ -22,7 +23,8 @@
+     const first = performRiskyDelivery(heated(39));
+     expect(first).toMatchObject({ ok: true, moneyEarned: '3750' });
+     expect(first.state.city.heat).toBe(44);
+-    expect(performRiskyDelivery(first.state)).toMatchObject({ ok: true, moneyEarned: '3125' });
++    expect(performRiskyDelivery(first.state)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
++    expect(performRiskyDelivery(readyManualJobFixture(first.state))).toMatchObject({ ok: true, moneyEarned: '3125' });
+   });
+   it.each([-1, 101, NaN, 1.1])('rejects malformed pressure %s', heat => {
+     expect(() => getPolicePressure(heat)).toThrow(RangeError);
+@@ -55,7 +57,8 @@
+     expect(after.permanentProgression.statistics.peakHeat).toBe(90);
+     expect(after.garage).toBe(state.garage); expect(after.automation).toBe(state.automation);
+     expect(evaluateBusinessProduction(after, 'business:dockside-detail', 1)).toEqual(evaluateBusinessProduction(state, 'business:dockside-detail', 1));
+-    expect(performRiskyDelivery(after).ok).toBe(true);
++    expect(performRiskyDelivery(after)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
++    expect(performRiskyDelivery(readyManualJobFixture(after)).ok).toBe(true);
+     expect(evaluateJobReward(after, 'dispatcher')).toMatchObject({ ok: true, reward: '2500' });
+   });
+   it('retains exact manual Senda and upgrade effects with one floor at payout', () => {
+--- /mnt/data/solara-pr52-original/src/game/district-heat.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/district-heat.test.ts	2026-09-15 08:45:00.715046538 +0000
+@@ -53,7 +53,8 @@
+     const risky = performRiskyDelivery(s).state;
+     expect(risky.city.heat).toBe(5);
+     expect(getDistrictHeat(risky.city, W.id).heat).toBe(80);
+-    const quiet = performDiscreetDelivery(risky).state;
++    expect(performDiscreetDelivery(risky)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
++    const quiet = performDiscreetDelivery(readyManualJobFixture(risky)).state;
+     expect(quiet.city.heat).toBe(3);
+     const low = layLow(quiet).state;
+     expect(low.city.heat).toBe(0); expect(getDistrictHeat(low.city, W.id).heat).toBe(80);
+--- /mnt/data/solara-pr52-original/src/game/statistics.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/statistics.test.ts	2026-09-15 08:43:01.585203374 +0000
+@@ -23,6 +23,7 @@
+ import { moneyFromMinorUnits } from '../features/economy';
+ import { ACHIEVEMENT_CATALOG } from '../features/achievements';
+ import { unlockEligibleAchievements } from './achievements';
++import { performReadyStarterJobFixture, readyManualJobFixture } from './test-fixtures/manual-job-ready';
+ const fresh = createInitialGameState;
+ function stats(state: GameState) { return state.permanentProgression.statistics; }
+ function history(state: GameState, changes: Partial<StatisticsState>): GameState {
+@@ -55,7 +56,7 @@
+     const s = Object.freeze(createInitialStatistics()); expect(() => incrementStatistic(s, 'manualJobsCompleted', amount)).toThrow(RangeError);
+   });
+   it('manual actions count independently and retain exact existing Money/XP/Heat', () => {
+-    let s = fresh(); for (let i = 0; i < 10; i++) s = success(performStarterJob(s));
++    let s = fresh(); for (let i = 0; i < 10; i++) s = performReadyStarterJobFixture(s);
+     expect(stats(s)).toEqual({ ...createInitialStatistics(), manualJobsCompleted: 10, peakHeat: 10 });
+     expect(s.economy.cash).toBe('25000'); expect(s.progression.xp).toBe(100); expect(s.city.heat).toBe(10);
+     const failed = performStarterJob({ ...s, progression: { xp: Number.MAX_SAFE_INTEGER } });
+@@ -130,7 +131,7 @@
+     const first = success(performStarterJob(fresh())); expect(stats(first).peakHeat).toBe(1);
+     const cold = success(simulateGameElapsed(first, 60000)); expect(cold.city.heat).toBe(0); expect(stats(cold).peakHeat).toBe(1);
+     const hot = success(performStarterJob(heat(cold, 59))); expect(stats(hot).peakHeat).toBe(60);
+-    const max = success(performStarterJob(heat(hot, 99))); expect(stats(max).peakHeat).toBe(100);
++    const max = success(performStarterJob(readyManualJobFixture(heat(hot, 99)))); expect(stats(max).peakHeat).toBe(100);
+     const lower = success(layLow({ ...max, economy: rebirthState().economy })); expect(stats(lower).peakHeat).toBe(100);
+     const reset = success(performRebirth({ ...rebirthState(), permanentProgression: lower.permanentProgression }));
+     expect(reset.city.heat).toBe(0); expect(stats(reset).peakHeat).toBe(100);
+--- /mnt/data/solara-pr52-original/src/game/manhunt.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/manhunt.test.ts	2026-09-15 08:45:00.715197670 +0000
+@@ -76,7 +76,7 @@
+     const s = hunted(100, '0');
+     expect(performStarterJob(s)).toMatchObject({ ok: true, moneyEarned: '2062' });
+     let cooled = s;
+-    for (let i = 0; i < 11; i++) cooled = performDiscreetDelivery(cooled).state;
++    for (let i = 0; i < 11; i++) cooled = performDiscreetDelivery(readyManualJobFixture(cooled)).state;
+     expect(cooled.city.heat).toBe(78); expect(setActiveDistrict(cooled, N.id).ok).toBe(true);
+     expect(layLow(hunted()).state.city.heat).toBe(70);
+     expect(simulateGameElapsed(hunted(), 60000).state.city.heat).toBe(79);
+@@ -90,7 +90,7 @@
+   });
+   it('v20 and CE1 retain pursuit through existing district Heat without extra fields', () => {
+     const s = hunted(100), saved = serializeSave(s, 1000), code = exportSaveCode(s, 1000);
+-    expect(CURRENT_SAVE_VERSION).toBe(26);
++    expect(CURRENT_SAVE_VERSION).toBe(27);
+     if (!saved.ok || !code.ok) throw Error('fixture');
+     const loaded = parseSave(saved.serialized);
+     expect(validateSaveCode(code.code)).toEqual(loaded);
+--- /mnt/data/solara-pr52-original/src/game/vehicle-appearance.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/vehicle-appearance.test.ts	2026-09-15 08:36:49.293308750 +0000
+@@ -55,7 +55,7 @@
+   it('migrates v22 with all model builds, exact cash and timestamp, without selecting cosmetics', () => {
+     const bought = purchaseTuning(state(), 'tuning:lilt-quiet-running'); if (!bought.ok) throw Error(bought.error);
+     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 22, savedAt: 4321, state: bought.state });
+-    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 4321, state: bought.state } });
++    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 27, savedAt: 4321, state: bought.state } });
+     if (!r.ok) throw Error(r.error);
+     expect(r.envelope.state.garage).not.toBe(bought.state.garage);
+     expect(r.envelope.state.garage.appearances).toBeUndefined();
+@@ -65,7 +65,7 @@
+   it('round-trips every saved finish in v23 and CE1 and retains them through Rebirth', () => {
+     const s = paint(paint(paint(state(), K.id, 'appearance:kxr-coastal'), S.id, 'appearance:senda-amethyst'), L.id, 'appearance:lilt-lagoon');
+     const saved = serializeSave(s, 1234); if (!saved.ok) throw Error(saved.error);
+-    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 26, state: s } });
++    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 27, state: s } });
+     const code = exportSaveCode(s, 1234); if (!code.ok) throw Error(code.error);
+     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: s } });
+     const r = performRebirth(s); if (!r.ok) throw Error(r.error);
+--- /mnt/data/solara-pr52-original/src/game/business-gates.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/business-gates.test.ts	2026-09-15 08:36:49.293386354 +0000
+@@ -19,11 +19,11 @@
+       businesses: { ...fresh.businesses, owned: { [id]: { level: 3 } } } };
+     const definition = BUSINESS_CATALOG.find(b => b.id === id)!;
+     expect(evaluateRequirements(state, definition.requirements).met).toBe(false);
+-    expect(CURRENT_SAVE_VERSION).toBe(26);
++    expect(CURRENT_SAVE_VERSION).toBe(27);
+     expect(validateSaveState(state)).toEqual(state);
+     const code = exportSaveCode(state, 123); if (!code.ok) throw Error(code.error);
+     expect(code.code.startsWith('CE1-')).toBe(true);
+-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 26, state } });
++    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 27, state } });
+     expect(purchaseBusiness(state, id)).toMatchObject({ ok: false, error: 'already-owned', state });
+     const produced = simulateElapsed(state, 1000); expect(produced.ok).toBe(true);
+     expect(produced.state.economy.cash).toBe(String(BigInt(state.economy.cash) + BigInt(definition.baseProductionCentsPerSecond) * 3n));
+--- /mnt/data/solara-pr52-original/src/game/model-tuning.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/model-tuning.test.ts	2026-09-15 08:36:49.293470127 +0000
+@@ -95,7 +95,7 @@
+   it('migrates v21 KX-R builds without grants and keeps the timestamp', () => {
+     const s = buy(base(), 'tuning:kxr-courier-ecu');
+     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 21, savedAt: 1234, state: s });
+-    expect(r).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 1234, state: s } });
++    expect(r).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 1234, state: s } });
+     if (!r.ok) throw Error('fixture');
+     expect(r.envelope.state.garage.builds?.[K.id]?.purchasedIds).not.toBe(s.garage.builds?.[K.id]?.purchasedIds);
+     expect(r.envelope.state.garage.builds?.[S.id]).toBeUndefined();
+@@ -104,7 +104,7 @@
+   it('round-trips every new build through v22 and CE1 and rejects incompatible saved parts', () => {
+     const s = [E, F, Q, D].reduce(buy, base()), encoded = serializeSave(s, 1234);
+     if (!encoded.ok) throw Error('fixture');
+-    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 26, state: s } });
++    expect(parseSave(encoded.serialized)).toMatchObject({ ok: true, envelope: { version: 27, state: s } });
+     const code = exportSaveCode(s, 1234); if (!code.ok) throw Error('fixture');
+     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: s } });
+     expect(validateSaveState({ ...s, garage: { ...s.garage, builds: { [S.id]: { purchasedIds: [Q], selectedId: Q } } } })).toBeNull();
+--- /mnt/data/solara-pr52-original/src/game/rebirth.test.ts	2026-09-15 07:56:34.000000000 +0000
++++ /mnt/data/solara-pr52/src/game/rebirth.test.ts	2026-09-15 08:45:00.715270737 +0000
+@@ -10,6 +10,7 @@
+ import { STARTER_VEHICLE as V } from '../features/vehicles';
+ import { STREET_CONNECTIONS as S, EXPRESS_TIPS as E, DETAILING_LINE as L, FLEET_LOGISTICS as F } from '../features/upgrades';
+ import { performStarterJob } from './perform-starter-job';
++import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
+ import { purchaseBusiness } from './purchase-business';
+ import { selectUpgrade } from './selectors';
+ import { selectDispatcher } from './automation-selectors';
+@@ -65,7 +66,7 @@
+     expect(after.permanentProgression).toEqual({ statistics: createInitialStatistics(4), unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4});
+     expect(after).toEqual({...createInitialGameState(),garage:state.garage,permanentProgression:{ statistics: createInitialStatistics(4), unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'],skills: {}, empirePoints:16,rebirthCount:4}});
+     expect(JSON.stringify(state)).toBe(before);expect(result).toEqual(performRebirth(state));
+-    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual(Object.keys(state).sort());
++    expect(Object.keys(REBIRTH_POLICY).sort()).toEqual([...new Set([...Object.keys(state), 'manualJobs'])].sort());
+   });
+   it('supports repeat Rebirths: 4 then 7 EP, count 2, same collection', () => {
+     const first=performRebirth(rebirthState()).state;
+@@ -97,7 +98,7 @@
+     for(const upgrade of [S,L,F]) expect(selectUpgrade(state,upgrade.id)?.eligible).toBe(false);
+     expect(selectDispatcher(state).eligible).toBe(false);
+     expect(simulateGameElapsed(state,10000).state).toEqual(state);
+-    for(let i=0;i<6;i++)state=performStarterJob(state).state;
++    for(let i=0;i<6;i++)state=performReadyStarterJobFixture(state);
+     state=purchaseBusiness(state,B.id).state;
+     expect(state.upgrades.purchasedIds).toEqual([]);expect(state.garage.ownedVehicleIds).toEqual([V.id]);
+     const production=evaluateBusinessProduction(state,B.id,1);
