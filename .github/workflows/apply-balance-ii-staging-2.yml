@@ -1,12 +1,14 @@
 name: Apply Balance II staging patch 2
 on:
   push:
-    branches: [tmp-balance-ii-staging-2]
+    branches:
+      - tmp-balance-ii-staging-2
+    paths:
+      - .github/workflows/apply-balance-ii-staging-2.yml
 permissions:
   contents: write
 jobs:
   apply:
-    if: ${{ github.event.head_commit.message == 'chore: add verified Balance II staging applier' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
