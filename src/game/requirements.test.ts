@@ -12,6 +12,7 @@ import { purchaseAutomation } from './purchase-automation';
 import { purchaseBusiness } from './purchase-business';
 import { upgradeBusiness } from './upgrade-business';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { selectUpgrade, selectCanPurchaseBusiness } from './selectors';
 import { selectDispatcher } from './automation-selectors';
 
@@ -108,11 +109,11 @@ describe('canonical content gates', () => {
   });
   it('has no fresh-save deadlock and does not gate the first business', () => {
     let state = createInitialGameState();
-    for (let i=0;i<6;i++) { const job = performStarterJob(state); expect(job.ok).toBe(true); state=job.state; }
+    for (let i=0;i<6;i++) state=performReadyStarterJobFixture(state);
     expect(state.progression.xp).toBe(60);
     expect(selectCanPurchaseBusiness(state,B.id)).toBe(true);
     const bought=purchaseBusiness(state,B.id); expect(bought.ok).toBe(true); state=bought.state;
-    for (let i=0;i<4;i++) state=performStarterJob(state).state;
+    for (let i=0;i<4;i++) state=performReadyStarterJobFixture(state);
     expect(state.progression.xp).toBe(100);
     expect(selectUpgrade(state,S.id)?.eligible).toBe(true);
   });

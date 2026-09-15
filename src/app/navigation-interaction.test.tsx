@@ -210,7 +210,7 @@ describe('mounted navigation and one live runtime', () => {
     expect(f.game().getSnapshot().result.state).toEqual(incoming);
     expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('EMPIRE');
     expect(content()).toContain('Save imported'); expect(createPersistentGame).toHaveBeenCalledTimes(1);
-    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 26,state:incoming}});
+    expect(parseSave(f.raw())).toMatchObject({ok:true,envelope:{version: 27,state:incoming}});
   });
   it('offline spending summary and achievement announcements are visible on initial Overview', async () => {
     const f = await mount(autoUpgraderState(),90000);
@@ -349,7 +349,7 @@ describe('POST 2D local interaction and progression', () => {
     expect(container.querySelector('.vehicle-artwork')).toBe(image); expect(content()).toContain('OWNED');
     expect(buy.isConnected).toBe(false); expect(window.scrollTo).not.toHaveBeenCalled();
   });
-  it('global XP survives all sections and resets its range on a Job level-up without focus movement', async () => {
+  it('global XP survives all sections and resets its range on a Job level-up with a usable local focus fallback', async () => {
     const state = createInitialGameState(); const f = await mount({ ...state, progression: { xp: getXpThresholdForLevel(2) - 10 } });
     const progress = container.querySelector<HTMLProgressElement>('.hud-xp-progress');
     for (const section of PRIMARY_SECTIONS) {
@@ -360,7 +360,7 @@ describe('POST 2D local interaction and progression', () => {
     vi.mocked(window.scrollTo).mockClear(); await act(() => delivery?.click());
     const authority = getLevelProgress(f.game().getSnapshot().result.state.progression.xp);
     expect(authority.currentLevel).toBe(2); expect(progress?.value).toBe(authority.xpIntoLevel); expect(progress?.max).toBe(authority.xpNeededForLevel);
-    expect(document.activeElement).toBe(delivery); expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(container.querySelector('#starter-heading')); expect(window.scrollTo).not.toHaveBeenCalled();
     expect(progress?.closest('[role="status"], [aria-live]')).toBeNull();
   });
   it('passive Rebirth eligibility coexists with feedback and preserves Operations focus', async () => {

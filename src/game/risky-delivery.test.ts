@@ -8,6 +8,7 @@ import { moneyFromMinorUnits, MAX_MONEY_DIGITS } from '../features/economy';
 import { parseSave, serializeSave } from './save-schema';
 import { exportSaveCode, validateSaveCode } from './save-code';
 import { FAST, ROOT } from './test-fixtures/skill-state';
+import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
 
 function heated(heat: number, remainder = 0): GameState {
   const s = createInitialGameState();
@@ -37,7 +38,8 @@ describe('Heat I: optional risk and reward', () => {
     const first = performRiskyDelivery(heated(59));
     expect(first.state.city.heat).toBe(64);
     expect(performRiskyDelivery(first.state).state).toBe(first.state);
-    expect(performStarterJob(first.state)).toMatchObject({ ok: true, moneyEarned: '2250' });
+    expect(performStarterJob(first.state)).toMatchObject({ ok: false, error: 'manual-job-not-ready' });
+    expect(performStarterJob(readyManualJobFixture(first.state))).toMatchObject({ ok: true, moneyEarned: '2250' });
   });
   it('applies all manual modifiers before a single final cent floor', () => {
     const s = heated(20);

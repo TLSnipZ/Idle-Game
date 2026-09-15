@@ -68,7 +68,7 @@ describe('Tier-2 customization and its historical boundary', () => {
   it('migrates v25 without grants or changes to any progress and independently copies builds', () => {
     const before = state();
     const r = migrateToCurrentSave({ format: SAVE_FORMAT, version: 25, savedAt: 987654, state: before });
-    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 987654, state: before } });
+    expect(r).toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 27, savedAt: 987654, state: before } });
     if (!r.ok) throw Error(r.error);
     expect(r.envelope.state.garage.builds).not.toBe(before.garage.builds);
     for (const car of cars) expect(r.envelope.state.garage.builds?.[car]).toBeUndefined();
@@ -86,7 +86,7 @@ describe('Tier-2 customization and its historical boundary', () => {
     const painted = looks.reduce((s, look) => paint(s, look.vehicleId, look.id), built);
     const code = exportSaveCode(painted, 1234); if (!code.ok) throw Error(code.error);
     expect(code.code).toMatch(/^CE1-/);
-    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 1234, state: painted } });
+    expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 1234, state: painted } });
     const rebirth = performRebirth({ ...rebirthState(), garage: painted.garage });
     if (!rebirth.ok) throw Error(rebirth.error);
     expect(rebirth.state.garage).toEqual(painted.garage);

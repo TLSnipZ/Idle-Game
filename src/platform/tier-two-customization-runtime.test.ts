@@ -45,7 +45,7 @@ describe('Tier-2 durable customization', () => {
     f.game.configureAppearance(C, 'appearance:canto-slate');
     f.game.configureAppearance(R, 'appearance:rendan-ice');
     const before = f.game.getSnapshot().result.state;
-    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 26, state: before } });
+    expect(parseSave(f.raw())).toMatchObject({ ok: true, envelope: { version: 27, state: before } });
     f.game.stop(); f.wall(11000);
     const reload = f.make(); reload.start();
     const expected = simulateGameElapsed(before, 10000); if (!expected.ok) throw Error(expected.error);

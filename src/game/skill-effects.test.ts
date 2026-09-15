@@ -4,6 +4,7 @@ import { skillState, ROOT, FAST, LEARN, SILENT, NEVER } from './test-fixtures/sk
 import { evaluateBusinessProduction, evaluateJobReward } from './effective-stats';
 import { evaluateXpReward } from './xp-reward';
 import { performStarterJob } from './perform-starter-job';
+import { performReadyStarterJobFixture } from './test-fixtures/manual-job-ready';
 import { upgradeBusiness } from './upgrade-business';
 import { simulateAutomation } from './simulate-automation';
 import { simulateGameElapsed } from './simulate-game-elapsed';
@@ -117,7 +118,7 @@ describe('permanent offline and Rebirth effects', () => {
     expect(reset.permanentProgression).toEqual({ ...before.permanentProgression, statistics:{...before.permanentProgression.statistics,rebirthsCompleted:2}, empirePoints: 7, rebirthCount: 2, unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:first-rebirth'] });
     expect(getOfflineCapMs(reset)).toBe(12 * 3600000);
     const job = performStarterJob(reset); expect(job.state.economy.cash).toBe('2750'); expect(job.state.progression.xp).toBe(11);
-    let state = reset; for (let i = 0; i < 6; i++) state = performStarterJob(state).state;
+    let state = reset; for (let i = 0; i < 6; i++) state = performReadyStarterJobFixture(state);
     state = purchaseBusiness(state, B.id).state; expect(state.upgrades.purchasedIds).toEqual([]);
     expect(evaluateBusinessProduction(state, B.id, 1)).toMatchObject({ ok: true, effective: rational(3993n, 40n) });
     const online = simulateGameElapsed(state, 80000).state;

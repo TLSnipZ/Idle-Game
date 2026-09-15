@@ -65,13 +65,13 @@ for (const sample of cases) {
     const selected = setActiveVehicle(bought.state, car.id).state;
     expect(collectModifiers(selected).filter(m => m.sourceId.startsWith('vehicle:') || m.sourceId.startsWith('tuning:'))).toEqual(car.modifiers);
     const saved = serializeSave(selected, 4567); if (!saved.ok) throw Error(saved.error);
-    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 4567, state: selected } });
+    expect(parseSave(saved.serialized)).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 4567, state: selected } });
     const code = exportSaveCode(selected, 4567); if (!code.ok) throw Error(code.error);
     expect(validateSaveCode(code.code)).toMatchObject({ ok: true, envelope: { state: selected } });
     expect(selectVehicleAppearance(selected, car.id, 'appearance:kxr-coastal').ok).toBe(false);
     for (const extra of [{ activeVehicleId: 'vehicle:unknown' }, { appearances: { [car.id]: 'appearance:kxr-coastal' } },
       { builds: { [car.id]: garage.builds[K.id] } }]) {
-      expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 26, savedAt: 0, state: { ...selected, garage: { ...selected.garage, ...extra } } }).ok).toBe(false);
+      expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 27, savedAt: 0, state: { ...selected, garage: { ...selected.garage, ...extra } } }).ok).toBe(false);
     }
   });
   it.each([19, 20, 21, 22, 23, 24])(`${car.name}: rejects future-car injection into v%i`, version => {
@@ -86,7 +86,7 @@ it('v24 migration retains Serein, all existing builds/finishes and fractions wit
     appearances: { [K.id]: 'appearance:kxr-coastal' as const } },
     businesses: { ...s.businesses, productionRemainderMilliCents: 987, productionRemainderSubMilliCents: { numerator: '1', denominator: '3' } } };
   expect(migrateToCurrentSave({ format: SAVE_FORMAT, version: 24, savedAt: 9876, state }))
-    .toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 26, savedAt: 9876, state } });
+    .toEqual({ ok: true, envelope: { format: SAVE_FORMAT, version: 27, savedAt: 9876, state } });
 });
 it('plural effect comparison detects second-effect changes but ignores source identity/order', () => {
   const previous = { ...createInitialGameState(), garage: { ownedVehicleIds: [R.id, C.id], activeVehicleId: R.id } };

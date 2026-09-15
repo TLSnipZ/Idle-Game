@@ -2,6 +2,7 @@ import { createInitialStatistics } from '../features/statistics';
 import { describe, expect, it } from 'vitest';
 import { createInitialGameState } from './game-state';
 import { performStarterJob } from './perform-starter-job';
+import { readyManualJobFixture } from './test-fixtures/manual-job-ready';
 import { selectCash } from './selectors';
 import { STARTER_JOB, MAX_MONEY_DIGITS, moneyFromMinorUnits } from '../features/economy';
 
@@ -24,7 +25,10 @@ describe('game state and starter delivery', () => {
     expect(selectCash(state)).toBe('0');
     expect(result.state).not.toBe(state);
     expect(result.state.economy).not.toBe(state.economy);
-    const next = performStarterJob(result.state);
+    const blocked = performStarterJob(result.state);
+    expect(blocked).toMatchObject({ ok: false, error: 'manual-job-not-ready', remainingMs: 10000 });
+    expect(blocked.state).toBe(result.state);
+    const next = performStarterJob(readyManualJobFixture(result.state));
     expect(next.ok).toBe(true);
     expect(selectCash(next.state)).toBe('5000');
   });

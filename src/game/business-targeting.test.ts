@@ -31,7 +31,7 @@ function historical(s: GameState) { const { businessAutoUpgradeTargetId: _target
 afterEach(() => vi.restoreAllMocks());
 describe('v17 target compatibility', () => {
   it('adds only the stable target to fresh automation; new Businesses remain absent', () => {
-    const s = createInitialGameState(); expect(CURRENT_SAVE_VERSION).toBe(26);
+    const s = createInitialGameState(); expect(CURRENT_SAVE_VERSION).toBe(27);
     expect(s.businesses.owned).toEqual({});
     expect(s.automation).toEqual({ unlockedIds: [], enabledIds: [], starterJobElapsedMs: 0, businessAutoUpgradeElapsedMs: 0, businessAutoUpgradeTargetId: D.id });
   });

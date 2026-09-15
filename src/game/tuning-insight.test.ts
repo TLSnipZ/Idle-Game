@@ -48,8 +48,8 @@ describe('Workshop purchase insight', () => {
   it('shows production lost when replacing gearing with a manual ECU, including fractional production', () => {
     const state = buy(fixture(), 'tuning:serein-workshop-gearing');
     const insight = selectTuningInsight(state, 'tuning:serein-nightshift-ecu')!;
-    expect(insight.before).toMatchObject({ production: { numerator: '1575', denominator: '2' }, manual: '3150' });
-    expect(insight.after).toMatchObject({ production: { numerator: '750', denominator: '1' }, manual: '3402' });
+    expect(insight.before).toMatchObject({ production: { numerator: '1575', denominator: '2' }, manual: '7560' });
+    expect(insight.after).toMatchObject({ production: { numerator: '750', denominator: '1' }, manual: '8164' });
   });
   it('includes local Business support and assigned Crew when trading cooling for cheaper decoys', () => {
     const state = buy({ ...fixture(), crew: { recruitedIds: ['crew:mara-knox'], assignments: { operations: 'crew:mara-knox', logistics: null } } }, 'tuning:lilt-quiet-running');
@@ -61,7 +61,7 @@ describe('Workshop purchase insight', () => {
     const state = fixture();
     const city = switchCityDistrict({ ...state.city, ownedTerritoryIds: [WATERFRONT.id, NEON_MILE.id] }, NEON_MILE.id);
     const insight = selectTuningInsight({ ...state, city: { ...city, heat: 70 } }, 'tuning:rendan-dispatch-gearing')!;
-    expect(BigInt(insight.after.manual)).toBeLessThan(2950n);
+    expect(insight.after.manual).toBe('7009');
     expect(insight.after.dispatcher).toBe('3634'); // Cold Waterfront plus owned Neon's +10% Cash.
   });
   it('works with zero Cash and no Businesses, distinguishes unowned Dispatcher, and does not activate anything', () => {

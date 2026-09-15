@@ -62,25 +62,25 @@ describe('durable full New Game reset', () => {
     expect(f.game.getSnapshot()).toMatchObject({ offline: null, runtimeError: null, persistence: { kind: 'saved' } });
     for (const field of ['achievementEvent', 'levelEvent', 'cityEvent', 'automationEvent'])
       expect(Object.hasOwn(f.game.getSnapshot(), field)).toBe(false);
-    expect(parseSave(f.raw() ?? '')).toMatchObject({ ok: true, envelope: { version: 26, savedAt: 601000 } });
+    expect(parseSave(f.raw() ?? '')).toMatchObject({ ok: true, envelope: { version: 27, savedAt: 601000 } });
     f.game.stop();
   });
   it('preserves current v17 and CE1 after the reset', () => {
     const f = fixture(); f.game.resetProgress('RESET');
-    expect(CURRENT_SAVE_VERSION).toBe(26);
+    expect(CURRENT_SAVE_VERSION).toBe(27);
     const result = f.game.exportCode(); if (!result.ok) throw Error('Export failed');
     expect(result.code.startsWith('CE1-')).toBe(true);
     expect(validateSaveCode(result.code)).toMatchObject({ ok: true,
-      envelope: { version: 26, state: createInitialGameState() } }); f.game.stop();
+      envelope: { version: 27, state: createInitialGameState() } }); f.game.stop();
   });
   it('starts new clocks and exact fractions without carrying old production or automation forward', () => {
     const f = fixture(); f.at(10000.75); f.wall(11000); f.game.resetProgress('RESET');
-    f.at(10001); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(createInitialGameState());
-    for (let i = 0; i < 6; i++) f.game.execute(performStarterJob);
+    let now = 10001; f.at(now); f.tick(); expect(f.game.getSnapshot().result.state).toEqual(createInitialGameState());
+    for (let i = 0; i < 6; i++) { f.game.execute(performStarterJob); if (i < 5) { now += 10000; f.at(now); f.tick(); } }
     f.game.execute(state => purchaseBusiness(state, STARTER_BUSINESS.id));
     const rebuilt = f.game.getSnapshot().result.state;
     expect(rebuilt.businesses.owned[STARTER_BUSINESS.id]?.level).toBe(1);
-    f.at(11001); f.tick();
+    f.at(now + 1000); f.tick();
     expect(f.game.getSnapshot().result.state).toEqual(simulateOnlineElapsed(rebuilt, 1000, { next: () => 0.99 }).state);
     expect(f.game.getSnapshot().result.state.automation.unlockedIds).toEqual([]); f.game.stop();
   });
