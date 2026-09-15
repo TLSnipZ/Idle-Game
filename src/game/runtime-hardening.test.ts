@@ -9,6 +9,7 @@ import { simulateOnlineElapsed } from './simulate-online-elapsed';
 import { MAX_AUTO_UPGRADE_SEGMENTS } from './simulate-auto-upgrader';
 import * as production from './simulate-elapsed';
 import * as dispatch from './simulate-automation';
+import { evaluateJobReward } from './effective-stats';
 import { moneyFromMinorUnits } from '../features/economy';
 import { decayHeat } from '../features/heat';
 import { BUSINESS_AUTO_UPGRADER as A } from '../features/automation';
@@ -52,30 +53,35 @@ describe('Phase 9D bounded runtime and frozen pre-9D outputs', () => {
     expect(result).toEqual(simulate(normal, ms));
   });
   it.each([
-    { start: 25, cash: '0', level: 46, finalCash: '6792454', xp: 60427, levels: 21,
+    { start: 25, cash: '0', level: 46, xp: 60427, levels: 21,
       income: '387283054', spent: '397425000', milli: 997, numerator: '5', denominator: '24' },
-    { start: 95, cash: '1000000000', level: 100, finalCash: '1380373120', xp: 59995, levels: 5,
+    { start: 95, cash: '1000000000', level: 100, xp: 59995, levels: 5,
       income: '1069263720', spent: '705825000', milli: 43, numerator: '133', denominator: '192' },
-  ])('12h exact pre-9D baseline from Dockside $start, including funding/max collapse', expected => {
-    // Recorded from f3a8631. Keep its historical +15% vehicle solely for this oracle;
-    // current KX-R +10% and chronology are covered by current production tests.
+  ])('12h exact production/upgrader baseline from Dockside $start with current Dispatcher pricing', expected => {
+    // Recorded from f3a8631. Keep its historical +15% vehicle solely for the
+    // production/Auto-Upgrader oracle; Operations Balance II intentionally reprices
+    // Dispatcher Cash from the outer batch-start portfolio instead of a frozen $25 base.
     const vehicle = vehicles.STARTER_VEHICLE;
     const base = vehicle.modifiers[0];
     if (base?.operation !== 'multiply-basis-points') throw Error('fixture');
     vi.spyOn(vehicles, 'findVehicle').mockImplementation(id => id === vehicle.id
       ? { ...vehicle, modifiers: [{ ...base, operation: 'multiply-basis-points', bonusBasisPoints: 1500 }] } : undefined);
     const state = runtimeLoad(expected.start, expected.cash); freeze(state);
+    const dispatcherReward = evaluateJobReward(state, 'dispatcher');
+    if (!dispatcherReward.ok) throw Error('fixture');
+    const dispatcherIncome = (BigInt(dispatcherReward.reward) * 4320n).toString();
+    const finalCash = (BigInt(expected.cash) + BigInt(expected.income) + BigInt(dispatcherIncome) - BigInt(expected.spent)).toString();
     const calls = vi.spyOn(production, 'simulateElapsed');
     const result = simulate(state, 43200000);
     expect(result).toEqual({ ok: true,
-      state: { ...state, economy: { cash: expected.finalCash }, progression: { xp: expected.xp },
+      state: { ...state, economy: { cash: finalCash }, progression: { xp: expected.xp },
         city: { ...state.city, heat: 0, heatDecayElapsedMs: 0 },
         businesses: { owned: { [B.id]: { level: expected.level } }, productionRemainderMilliCents: expected.milli,
           productionRemainderSubMilliCents: { numerator: expected.numerator, denominator: expected.denominator } },
         permanentProgression: { ...state.permanentProgression,
           statistics: { ...state.permanentProgression.statistics, automatedJobsCompleted: 4320, businessLevelsPurchased: expected.levels },
           unlockedAchievementIds: ['achievement:first-steps', 'achievement:dockside-operator', 'achievement:neon-takeover', 'achievement:crew-chief'] } },
-      automation: { completedJobs: 4320, income: '16934400', xpEarned: 23760 }, businessIncome: expected.income,
+      automation: { completedJobs: 4320, income: dispatcherIncome, xpEarned: 23760 }, businessIncome: expected.income,
       autoUpgrader: { targetId: 'business:dockside-detail', levelsPurchased: expected.levels, spent: expected.spent } });
     expect(calls.mock.calls.length).toBeLessThanOrEqual(1441);
     expect(reconcileOffline(state, 1000, 43201000).state).toEqual(result.state);
