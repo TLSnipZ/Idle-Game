@@ -59,4 +59,6 @@ The final PR head must pass all of the following before the PR is marked ready:
 - Dedicated Operations Balance II browser verifier across **EN / DE / Villager × 390 / 1440 px**, including fresh Ready state, shared consumption, restored readiness, discreet action, screenshots and no horizontal overflow.
 - `git diff --check`.
 
+Verification evidence must correspond to the **exact final PR head**; an earlier green run is not sufficient after code or documentation changes.
+
 No vehicle/content/artwork expansion, price changes outside the approved reward formula, layout overhaul or deployment is part of this phase. Final run/artifact evidence belongs in PR #52.
