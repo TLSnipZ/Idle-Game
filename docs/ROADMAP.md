@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current phase — Operations Balance II
+
+Implemented on PR #52: portfolio-paced Operations rewards and one shared 10-second manual readiness slot. Manual base Cash is `max($25, P × 8s)` and Dispatcher base Cash is `max($25, P × 1s)`, where `P` is owned unmodified Business production at current levels; existing scoped modifiers apply afterward. Save v27 / CE1 persists pending readiness, migrates v26 ready without grants, and retains a pending delay through Rebirth/import without historic manual payout. Dedicated EN/DE/Villager browser verification is part of the acceptance gate. See [Operations Balance II](OPERATIONS_BALANCE_II.md). PR #52 remains unmerged/unpublished until explicitly approved.
+
+
 ## Current phase — Workshop purchase insight
 
 Implements the first bounded Purchase Intelligence slice: optional before/after

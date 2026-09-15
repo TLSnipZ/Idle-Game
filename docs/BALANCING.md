@@ -1,5 +1,10 @@
 # Base Game balance
 
+## Current phase — Operations Balance II
+
+Let `P` be the sum of unmodified base production/sec of all currently owned Businesses at their current levels. Standard, risky and discreet manual delivery base Cash is `max($25, P × 8s)`; Dispatcher base Cash per completed job is `max($25, P × 1s)`. Existing scoped flat and percentage modifiers apply after base selection, so production modifiers never double-dip into Operations Cash. Manual variants share one 10-second readiness slot: fresh/fully recovered is ready immediately, only success consumes it, and elapsed time restores at most one action with no offline backlog. Dispatcher remains on its existing 10-second cadence and evaluates reward once from the outer batch-start state even when Auto-Upgrader purchases occur inside the elapsed window. Save v27 / CE1 persists only pending readiness. See [Operations Balance II](OPERATIONS_BALANCE_II.md).
+
+
 ## KX-R tuning pilot
 
 Fleet gearing: $15,000 for +5% Business Production. Courier ECU: $10,000 for +8% manual Job Cash. One fitted setup, active-car only, permanent through Rebirth. Base vehicle effects remain. Exact assumptions and marginal payback: [GARAGE_TUNING.md](GARAGE_TUNING.md).
@@ -102,9 +107,13 @@ remain unowned. Fresh state and Rebirth reset target to Dockside; v17 import ret
 
 ## Opening and business progression
 
-Fresh cash: **$0**. The manual waterfront delivery pays **$25**, **10 base XP** and
-**+1 Heat after payout**. There is no cooldown. Six base deliveries fund Dockside;
-ten reach Player Level 2. Heat cash penalties do not apply during those ten jobs.
+Fresh cash: **$0**. Before any Business is owned, the manual waterfront delivery
+uses the **$25 floor**, pays **10 base XP** and adds **+1 Heat after payout**. Standard,
+risky and discreet manual actions share one **10-second** readiness slot. The first
+action is ready immediately and only a successful action consumes the slot. Six floor
+jobs at 0/10/20/30/40/50 seconds fund Dockside; ten uninterrupted floor jobs reach
+100 XP / Player Level 2 at the earliest around 90 seconds. Heat cash penalties do not
+apply during those first ten standard jobs.
 
 **Dockside Detail** (`business:dockside-detail`):
 
@@ -175,10 +184,13 @@ $0.9375/sec, repaying its price in about 44 minutes 27 seconds.
 
 **Delivery Dispatcher** (`automation:delivery-dispatcher`): **$5,000**, requires
 **Dockside owned and Player Level 3**. Ownership always activates one delivery per
-**10,000ms**. It uses current central job cash, 5 base XP per cycle, and the Heat
-batch rule below. Manual jobs remain available. Completed cycles are computed
-mathematically with exact partial progress; no per-cycle simulation loop exists.
-At COLD, no job upgrades / either / both pay **$25 / $30 / $36** per cycle.
+**10,000ms**. Its base Cash per cycle is `max($25, P × 1s)` from the owned unmodified
+Business portfolio at the outer batch-start state; existing Dispatcher-scoped reward
+modifiers apply afterward. It awards 5 base XP per cycle and keeps the Heat batch rule
+below. Manual jobs remain independently available through their shared readiness slot.
+Completed cycles are computed mathematically with exact partial progress; no per-cycle
+simulation loop exists. While the Dispatcher base remains on the $25 floor, no job
+upgrades / either / both still pay **$25 / $30 / $36** per cycle at COLD.
 
 **Business Auto-Upgrader** (`automation:business-auto-upgrader`):
 
@@ -253,7 +265,8 @@ Only assigned Crew act. Rico and Mara compete for Operations; Jax occupies Logis
 Recruitment gives no XP/Heat. Assignment/replacement/unassignment are free, with no
 immediate decay, and all Crew reset on Rebirth. No bench bonuses or upkeep.
 
-Full job example with both normal upgrades, Fast Talker rank 1, Neon and Rico:
+Manual-floor example with both normal upgrades, Fast Talker rank 1, Neon and Rico
+(while the portfolio-derived manual base is still $25):
 **($25 + $5) × 1.20 × 1.10 × 1.10 × 1.10 = $47.916** before final cent flooring.
 COLD pays **$47.91**, HOT **$43.12**, MANHUNT **$35.93**.
 
