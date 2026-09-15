@@ -11,7 +11,6 @@ import { formatReward } from './number-format';
 import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { evaluateXpReward } from '../game/xp-reward';
-import { isManualJobReady, manualJobRemainingMs } from '../game/manual-job-readiness';
 import { MANUAL_JOB_HEAT } from '../features/heat';
 import { formatXp } from './progression-presentation';
 import { ModifierBreakdown } from './ModifierBreakdown';
@@ -51,8 +50,6 @@ export function OperationsSection({ game, destination }: { readonly game: Return
   const waterfront = getActiveDistrictId(snapshot.state.city) === WATERFRONT.id;
   const reward = evaluateJobReward(snapshot.state);
   const xp = evaluateXpReward(snapshot.state, 'manualJob');
-  const ready = isManualJobReady(snapshot.state.manualJobs);
-  const remainingSeconds = Math.ceil(manualJobRemainingMs(snapshot.state.manualJobs) / 1000);
   const unavailable = text('Unavailable', 'Nicht verfügbar');
   const totalProduction = dashboardPresentation(snapshot.state).production;
 
@@ -77,11 +74,9 @@ export function OperationsSection({ game, destination }: { readonly game: Return
         <div><dt>{text('XP')}</dt><dd>+{xp.ok ? formatXp(xp.reward) : unavailable}</dd></div>
         <div><dt>{text('Heat')}</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
       </dl>
-      <p className={`manual-readiness ${ready ? 'is-ready' : ''}`} aria-live="polite">{ready
-        ? text('DELIVERY READY · One manual job can leave now.', 'LIEFERUNG BEREIT · Ein manueller Job kann jetzt raus.')
-        : text(`CREW RESET · ${remainingSeconds}s · Normal, risky and discreet deliveries share this slot.`, `CREW RESET · ${remainingSeconds}s · Normal, riskant und diskret teilen sich diesen Slot.`)}</p>
-      <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused || !ready}>
-        <span>{paused ? text('Session paused', 'Session pausiert') : !ready ? text(`Crew resetting · ${remainingSeconds}s`, `Crew sortiert sich · ${remainingSeconds}s`) : waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
+      <p className="manual-readiness is-ready">{text('NO COOLDOWN · Standard deliveries are always ready. Click responsibly. Or don’t.', 'KEIN COOLDOWN · Normale Lieferungen sind immer bereit. Klick verantwortungsvoll. Oder auch nicht.')}</p>
+      <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused}>
+        <span>{paused ? text('Session paused', 'Session pausiert') : waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
         <span className="reward">+{reward.ok ? formatReward(reward.reward) : unavailable} <span aria-hidden="true">↗</span></span>
       </button>
       {reward.ok && reward.applied.length > 0 && <details className="operations-disclosure">
@@ -92,32 +87,22 @@ export function OperationsSection({ game, destination }: { readonly game: Return
       <RiskyDelivery state={snapshot.state} paused={paused} onRun={game.runRiskyDelivery} />
       <DiscreetDelivery state={snapshot.state} paused={paused} onRun={game.runDiscreetDelivery} />
     </section>
-
     <DistrictHeat state={snapshot.state} paused={paused || game.persistence.kind === 'blocked'} onChoose={game.chooseDistrict} onDecoy={game.runManhuntDecoy} />
-
     </div>
     <section hidden={view !== 'businesses-heading'} className="operations-block businesses-block" aria-labelledby="businesses-heading">
-      <div className="operations-section-heading business-heading-row">
-        <div><span className="eyebrow">{text('YOUR EMPIRE', 'DEIN IMPERIUM')}</span><h2 id="businesses-heading" className="operations-target" tabIndex={-1}>{text('Businesses', 'Businesses')}</h2></div>
-        <div className="business-total-compact"><span>{text('Total production', 'Gesamtproduktion')}</span><strong><RateValue text={totalProduction} /></strong></div>
-      </div>
+      <div className="operations-section-heading business-heading-row"><div><span className="eyebrow">{text('YOUR EMPIRE', 'DEIN IMPERIUM')}</span><h2 id="businesses-heading" className="operations-target" tabIndex={-1}>{text('Businesses', 'Businesses')}</h2></div><div className="business-total-compact"><span>{text('Total production', 'Gesamtproduktion')}</span><strong><RateValue text={totalProduction} /></strong></div></div>
       <p className="operations-lead">{text('Own the block, upgrade the paperwork, and pretend recurring revenue is a personality.', 'Übernimm den Block, upgrade den Papierkram und tu so, als wäre passives Einkommen eine Persönlichkeit.')}</p>
       <BusinessPortfolio game={game} destination={destination ?? null} />
     </section>
-
     <section hidden={view !== 'upgrades-heading'} className="operations-block upgrades-block" aria-labelledby="upgrades-heading">
       <div className="operations-section-heading"><div><span className="eyebrow">{text('EQUIPMENT', 'EQUIPMENT')}</span><h2 id="upgrades-heading" tabIndex={-1}>{text('Business Upgrades', 'Business-Upgrades')}</h2></div></div>
       <p className="operations-lead">{text('Spend money to make money. Economists hate this one extremely obvious trick.', 'Gib Geld aus, um mehr Geld zu machen. Volkswirte hassen diesen erstaunlich offensichtlichen Trick.')}</p>
       <div className="upgrade-catalog">{UPGRADE_CATALOG.map(upgrade => <UpgradeCard key={upgrade.id} view={selectUpgrade(snapshot.state, upgrade.id)} paused={paused} onPurchase={() => buyUpgrade(upgrade.id)} />)}</div>
     </section>
-
     <section hidden={view !== 'automation-heading'} className="operations-block automation-block" aria-labelledby="automation-heading">
       <div className="operations-section-heading"><div><span className="eyebrow">{text('DELEGATE THE BORING PART', 'DELEGIER DEN LANGWEILIGEN TEIL')}</span><h2 id="automation-heading" className="operations-target" tabIndex={-1}>{text('Automation', 'Automatisierung')}</h2></div></div>
       <p className="operations-lead">{text('Let the machinery earn money while you focus on making increasingly expensive decisions.', 'Lass die Maschinen Geld verdienen, während du dich auf zunehmend teure Fehlentscheidungen konzentrierst.')}</p>
-      <div className="automation-grid">
-        <AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} />
-        <AutoUpgraderCard view={selectAutoUpgrader(snapshot.state)} paused={paused} onPurchase={() => buyAutomation(BUSINESS_AUTO_UPGRADER.id)} onTargetChange={changeAutoUpgraderTarget} onToggle={enabled => toggleAutomation(BUSINESS_AUTO_UPGRADER.id, enabled)} />
-      </div>
+      <div className="automation-grid"><AutomationCard view={selectDispatcher(snapshot.state)} paused={paused} event={automationEvent} onPurchase={() => buyAutomation(DELIVERY_DISPATCHER.id)} /><AutoUpgraderCard view={selectAutoUpgrader(snapshot.state)} paused={paused} onPurchase={() => buyAutomation(BUSINESS_AUTO_UPGRADER.id)} onTargetChange={changeAutoUpgraderTarget} onToggle={enabled => toggleAutomation(BUSINESS_AUTO_UPGRADER.id, enabled)} /></div>
     </section>
   </div>;
 }
