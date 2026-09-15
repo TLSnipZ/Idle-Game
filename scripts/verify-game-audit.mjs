@@ -328,7 +328,7 @@ try {
     assert.equal(BigInt(after.economy.cash) - BigInt(before.economy.cash), 3125n);
     assert.equal(after.permanentProgression.statistics.manualJobsCompleted, before.permanentProgression.statistics.manualJobsCompleted + 1);
     assert.equal(await button.isDisabled(), true);
-    assert.equal(await page.locator('.operations-primary-action').isDisabled(), false);
+    assert.equal(await page.locator('.operations-primary-action').isDisabled(), true, 'Risky success consumes shared manual readiness');
     if (locale === 'villager') await assertVillagerOnly(page);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await page.screenshot({ path: 'browser-evidence/risk-' + locale + '-' + width + '.png', fullPage: true });
@@ -339,6 +339,16 @@ try {
     await page.locator('.heat-action button').click();
     assert.equal((await saved(page)).state.city.heat, 54);
     await navigation(page).nth(1).click();
+    assert.equal(await button.isDisabled(), true, 'Lay Low does not clear shared manual readiness');
+    await page.evaluate(() => {
+      const envelope = JSON.parse(localStorage.getItem('crime-empire:save'));
+      envelope.state.manualJobs = { elapsedMs: 9999 };
+      envelope.savedAt = Date.now();
+      localStorage.setItem('crime-empire:save', JSON.stringify(envelope));
+    });
+    await page.reload();
+    await navigation(page).nth(1).click();
+    await page.waitForFunction(() => !document.querySelector('.risky-delivery-button')?.disabled);
     assert.equal(await button.isDisabled(), false);
     assert.deepEqual(errors, []);
     await context.close();
