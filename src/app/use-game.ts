@@ -50,7 +50,7 @@ export function useGame() {
     'Die Aktion konnte nicht gespeichert werden. Kein Kauf und keine Änderung durchgeführt. Dein Cash darf heute ausnahmsweise bleiben.');
 
   function runStarterJob() {
-    runtime.execute(state => {
+    return runtime.execute(state => {
       const result = performStarterJob(state);
       setFeedback(previous => ({ sequence: previous.sequence + 1, tone: result.ok ? 'success' : 'warning', message: describeAction('delivery', result, undefined, localeRef.current) }));
       return result;
