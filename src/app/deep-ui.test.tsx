@@ -115,12 +115,13 @@ describe('POST 1B system compositions', () => {
     if (!vehicle) throw Error('catalog fixture');
     const state = owned ? { ...s, garage: { ownedVehicleIds: [vehicle.id], activeVehicleId: vehicle.id } } : s;
     const panel = dom(<Garage state={state} paused={false} onPurchase={noop} onSelect={noop} />);
-    expect(panel.querySelectorAll('article')).toHaveLength(6);
+    expect(panel.querySelectorAll('article')).toHaveLength(7);
     expect(panel.querySelectorAll('.garage-catalog img')).toHaveLength(6);
     expect(panel.textContent).toContain('Kairo KX-R');
+    expect(panel.textContent).toContain('Toseki Raizan');
     expect(panel.textContent).toContain('PERMANENT VEHICLE');
     expect(panel.textContent).toContain('+10% Business Production');
-    expect(panel.querySelectorAll('.vehicle-specification button')).toHaveLength(owned ? 5 : 6);
+    expect(panel.querySelectorAll('.vehicle-specification button')).toHaveLength(owned ? 6 : 7);
     expect(panel.querySelector('article')?.textContent?.includes('Price:')).toBe(!owned);
   });
 });
@@ -141,7 +142,7 @@ it.each(['locked', 'unaffordable', 'ready', 'owned'] as const)('KX-R %s uses acc
   expect(image?.getAttribute('loading')).toBe('lazy'); expect(image?.getAttribute('decoding')).toBe('async');
   expect(image?.getAttribute('width')).toBe('1672'); expect(image?.getAttribute('height')).toBe('941');
   expect(image?.hasAttribute('tabindex')).toBe(false); expect(image?.closest('a,button,[role="button"]')).toBeNull();
-  image?.remove(); // Information/action stay usable even when the image is unavailable.
+  image?.remove();
   expect(panel.textContent).toContain('Kairo KX-R'); expect(panel.textContent).toContain('+10% Business Production');
   expect(panel.textContent).not.toMatch(/Vortex|SET ACTIVE|TUNE|CUSTOMIZE|EK9|Honda/);
   if (mode === 'owned') {
