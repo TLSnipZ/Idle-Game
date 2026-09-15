@@ -12,6 +12,7 @@ import { selectUpgrade } from '../game/selectors';
 import { evaluateJobReward } from '../game/effective-stats';
 import { evaluateXpReward } from '../game/xp-reward';
 import { MANUAL_JOB_HEAT } from '../features/heat';
+import { getLevelProgress } from '../features/progression';
 import { formatXp } from './progression-presentation';
 import { ModifierBreakdown } from './ModifierBreakdown';
 import { UpgradeCard } from './UpgradeCard';
@@ -52,6 +53,15 @@ export function OperationsSection({ game, destination }: { readonly game: Return
   const xp = evaluateXpReward(snapshot.state, 'manualJob');
   const unavailable = text('Unavailable', 'Nicht verfügbar');
   const totalProduction = dashboardPresentation(snapshot.state).production;
+  function runStandardDelivery() {
+    const beforeLevel = getLevelProgress(snapshot.state.progression.xp).currentLevel;
+    const result = runStarterJob();
+    if (!result?.ok) return;
+    const afterLevel = getLevelProgress(result.state.progression.xp).currentLevel;
+    if (afterLevel <= beforeLevel) return;
+    const target = document.getElementById('starter-heading');
+    if (target && workspace.current?.contains(target)) { target.tabIndex = -1; target.focus({ preventScroll: true }); }
+  }
 
   return <div className="operations-page operations-workspace" ref={workspace}>
     <nav className="operations-tabs section-index" aria-label={text('Operations sections', 'Bereiche der Operationen')}>
@@ -75,7 +85,7 @@ export function OperationsSection({ game, destination }: { readonly game: Return
         <div><dt>{text('Heat')}</dt><dd>+{MANUAL_JOB_HEAT}</dd></div>
       </dl>
       <p className="manual-readiness is-ready">{text('NO COOLDOWN · Standard deliveries are always ready. Click responsibly. Or don’t.', 'KEIN COOLDOWN · Normale Lieferungen sind immer bereit. Klick verantwortungsvoll. Oder auch nicht.')}</p>
-      <button className="action-button delivery-button operations-primary-action" onClick={runStarterJob} disabled={paused}>
+      <button className="action-button delivery-button operations-primary-action" onClick={runStandardDelivery} disabled={paused}>
         <span>{paused ? text('Session paused', 'Session pausiert') : waterfront ? text('Run waterfront delivery', 'Waterfront-Lieferung fahren') : text('Run district delivery', 'Bezirkslieferung fahren')}</span>
         <span className="reward">+{reward.ok ? formatReward(reward.reward) : unavailable} <span aria-hidden="true">↗</span></span>
       </button>
