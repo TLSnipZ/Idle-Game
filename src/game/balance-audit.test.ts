@@ -134,7 +134,7 @@ describe('Phase 9C deterministic progression routes', () => {
   it('retains current catalogs and unchanged observational fields', () => {
     expect([TERRITORY_CATALOG.length, CREW_CATALOG.length, EVENT_CATALOG.length, ACHIEVEMENT_CATALOG.length,
       Object.keys(createInitialStatistics()).length, VEHICLE_CATALOG.length, UPGRADE_CATALOG.length, SKILL_CATALOG.length])
-      .toEqual([2,3,3,6,8,6,5,5]);
+      .toEqual([2,3,3,6,8,7,5,5]);
     expect(AUTOMATIONS.map(a => a.id)).toEqual([D.id, A.id]);
   });
   it('roundtrips a rich current v17 save and CE1 code without balance compensation or field changes', () => {
