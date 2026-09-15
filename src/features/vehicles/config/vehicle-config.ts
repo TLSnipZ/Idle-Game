@@ -104,8 +104,19 @@ export const SEVRIN_CANTO_CLUB: VehicleDefinition = Object.freeze({
     }),
   ]),
 });
+export const TOSEKI_RAIZAN: VehicleDefinition = Object.freeze({
+  id: 'vehicle:toseki-raizan', name: 'Toseki Raizan', manufacturer: 'Toseki', model: 'Raizan', category: 'Heat-response specialist',
+  description: 'A rally-bred four-door for people whose route planner includes an exit strategy. The paperwork cools down faster than the brakes.',
+  purchaseCost: moneyFromMinorUnits('22000000'),
+  requirements: Object.freeze<Requirement[]>([
+    { type: 'player-level', minimumLevel: 16 },
+    { type: 'business-owned', businessId: 'business:afterdark-customs' },
+    { type: 'business-level', businessId: 'business:afterdark-customs', minimumLevel: 7 },
+  ]),
+  modifiers: Object.freeze<Modifier[]>([]),
+});
 /** Explicit presentation order, independent of modifier evaluation order. */
-export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, NAMERA_SEREIN, TOSEKI_RENDAN, SEVRIN_CANTO_CLUB]);
+export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, NAMERA_SEREIN, TOSEKI_RENDAN, SEVRIN_CANTO_CLUB, TOSEKI_RAIZAN]);
 export function findVehicle(id: unknown): VehicleDefinition | undefined {
   return VEHICLE_CATALOG.find(vehicle => vehicle.id === id);
 }
