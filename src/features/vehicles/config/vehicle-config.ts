@@ -52,9 +52,10 @@ export const TOSEKI_RAIZAN: VehicleDefinition = Object.freeze({
     { type: 'business-owned', businessId: 'business:solara-nights' },
     { type: 'business-level', businessId: 'business:solara-nights', minimumLevel: 2 },
   ]),
-  modifiers: Object.freeze<Modifier[]>([Object.freeze({
-    id: 'modifier:toseki-raizan-delivery-cash', sourceId: 'vehicle:toseki-raizan', target: Object.freeze({ stat: 'job-reward' }), operation: 'multiply-basis-points', bonusBasisPoints: 2400,
-  })]),
+  modifiers: Object.freeze<Modifier[]>([
+    Object.freeze({ id: 'modifier:toseki-raizan-delivery-cash', sourceId: 'vehicle:toseki-raizan', target: Object.freeze({ stat: 'job-reward' }), operation: 'multiply-basis-points', bonusBasisPoints: 2400 }),
+    Object.freeze({ id: 'modifier:toseki-raizan-heat-response-cost', sourceId: 'vehicle:toseki-raizan', target: Object.freeze({ stat: 'heat-response-cost' }), operation: 'multiply-basis-points', bonusBasisPoints: -1500 }),
+  ]),
 });
 /** Explicit presentation order, independent of modifier evaluation order. */
 export const VEHICLE_CATALOG: readonly VehicleDefinition[] = Object.freeze([STARTER_VEHICLE, KAIRO_SENDA, NAMERA_LILT, NAMERA_SEREIN, TOSEKI_RENDAN, SEVRIN_CANTO_CLUB, TOSEKI_RAIZAN]);
