@@ -43,7 +43,7 @@ try {
       sessionStorage.setItem('ivd-seeded','1');
     }, { f, locale });
     await page.goto(baseUrl); await page.locator('.primary-navigation button').nth(3).click();
-    assert.equal((await saved(page)).version, 26);
+    assert.equal((await saved(page)).version, 27);
     await openCollectionView(page, 'tuning'); await page.locator('#tuning-vehicle').selectOption(model.id);
     const part0 = page.locator(`[data-tuning-id="tuning:${model.parts[0]}"] button`);
     // A quota failure must retain the player's Cash and old build, then allow retry.
