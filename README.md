@@ -29,7 +29,13 @@ A coastal crime-empire idle / tycoon game about street hustles, neon nights and 
 
 
 
-## Current phase — Workshop purchase insight
+## Current phase — Operations Balance II
+
+Operations rewards now scale with the owned Business portfolio without using production modifiers twice: manual delivery base Cash is `max($25, P × 8s)` and Dispatcher base Cash is `max($25, P × 1s)`, where `P` is the sum of unmodified production from currently owned Businesses at their current levels. Existing scoped flat and percentage modifiers apply after that base. Normal, risky and discreet manual deliveries share one 10-second readiness slot; the first action is ready immediately, successful actions consume it, failed actions do not, and elapsed time can restore only one ready action with no offline backlog.
+
+Save **v27 / CE1** persists only a pending manual delay; the canonical ready state stores no `manualJobs` field. v26 migration starts ready without grants, Rebirth retains a pending delay, and imports retain the validated remaining delay while establishing a new local runtime clock. Dispatcher cadence, ownership, Heat and XP batching remain unchanged, including Auto-Upgrader outer-batch pricing semantics. EN/DE/Villager Operations UI shows ready/countdown feedback. See [Operations Balance II](docs/OPERATIONS_BALANCE_II.md). PR #52 owns final CI evidence and remains unmerged/unpublished until explicitly approved.
+
+## Previous phase — Workshop purchase insight
 
 Implements the first bounded Purchase Intelligence slice: optional before/after
 comparisons for all twelve Workshop setups. Both columns assume the selected car
