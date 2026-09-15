@@ -105,7 +105,7 @@ describe('mounted game runtime', () => {
     const f = fixture(); f.runtime.start(); f.at(0.75);
     f.runtime.execute(performStarterJob);
     f.at(1); f.tick();
-    expect(f.state()).toEqual(performStarterJob(onlineElapsed(owned(), 1).state).state);
+    expect(f.state()).toEqual(onlineElapsed(performStarterJob(owned()).state, 1).state);
   });
   it('commands see pre-command production and preserve it through a job', () => {
     const f = fixture(); f.runtime.start(); f.at(1000);
