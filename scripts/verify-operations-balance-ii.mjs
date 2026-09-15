@@ -55,7 +55,7 @@ try {
     assert.equal(await discreet.isDisabled(), true);
     assert.equal(await page.locator('.manual-readiness.is-ready').count(), 3);
     const before = await saved(page);
-    assert.ok(!Object.hasOwn(before.manualJobs, 'elapsedMs'));
+    assert.equal(before.manualJobs, undefined);
 
     await standard.click();
     const pending = await saved(page);
@@ -77,7 +77,7 @@ try {
       await page.waitForTimeout(10_300);
       await page.waitForFunction(() => !document.querySelector('.operations-primary-action')?.disabled);
       const ready = await saved(page);
-      assert.ok(!Object.hasOwn(ready.manualJobs, 'elapsedMs'));
+      assert.equal(ready.manualJobs, undefined);
       assert.equal(await standard.isEnabled(), true);
       assert.equal(await risky.isEnabled(), true);
       assert.equal(await discreet.isEnabled(), true);
