@@ -117,7 +117,6 @@ Release status and CI/deployment evidence are tracked in PR #43.
 Next separate scope: IV-C Rendan/Canto; no additional cars or customization ship here.
 
 ## Current phase — Garage IV-A: Tier-2 catalog/progression analysis
-
 Completed the isolated comparison of proposed Tier-2 cars against today's stock
 and tuned Tier-1 choices. Serein, Rendan and Canto Club now have revised proposed
 roles and Afterdark-based gates; see [Tier-2 decision](docs/TIER_TWO_GARAGE.md) for numbers,
@@ -219,7 +218,7 @@ The Garage has **six purchasable vehicles**. Senda costs $40,000 at Player 6 / D
 
 **Playable development build — still growing, not a finished release.**
 
-This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v26**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
+This build includes the Base Game foundation and **POST 3D: Business Progression Gates & Shared Requirement Polish**, followed by a **safe New Game / Reset Progress** flow and **Next Objective / Guidance**. This build includes **Tier-1 Garage**; [PR #27](https://github.com/TLSnipZ/Idle-Game/pull/27) records verification and release evidence. Current saves use **schema v27**; portable backups retain the **CE1** format. Supported older saves migrate through the existing sequential migration chain.
 
 The [Base Game roadmap](docs/ROADMAP.md) records the original development phases. [Post-roadmap priorities](docs/POST_ROADMAP.md) track subsequent expansions and the next planned work. Implementation status and browser/live acceptance are recorded separately; a completed code milestone is not a claim that every device has been visually tested.
 
